@@ -27,9 +27,9 @@ export const DIFFICULTIES = Object.freeze({
 });
 
 export const BOARD_BACKGROUNDS = Object.freeze({
-    easy: "hsl(90 100% 10%)",
-    medium: "hsl(50 100% 10%)",
-    hard: "hsl(0 100% 10%)",
+    easy: "hsl(90 100% 5%)",
+    medium: "hsl(50 100% 5%)",
+    hard: "hsl(0 100% 5%)",
 });
 
 export const DEFAULT_DIFFICULTY = "easy";
