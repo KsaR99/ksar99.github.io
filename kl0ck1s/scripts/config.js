@@ -50,7 +50,7 @@ export const NEXT_PREVIEW_CELL_SIZE = 22;
 
 export const SOUND_FILES = Object.freeze({
     lineClear: "sounds/line-clear.ogg",
-    drop: "sounds/drop.ogg",
+    drop: "sounds/drop.mp3",
     gameOver: "sounds/game-over.ogg",
     levelUp: "sounds/level-up.ogg",
 });
