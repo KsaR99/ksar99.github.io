@@ -32,11 +32,19 @@ const nextCanvas = document.getElementById("next-piece-canvas");
 const nextCtx = nextCanvas.getContext("2d");
 nextCtx.imageSmoothingEnabled = false;
 
+function getVerticalChrome() {
+    const board = document.querySelector(".board");
+    const bodyStyle = getComputedStyle(document.body);
+    const boardStyle = getComputedStyle(board);
+
+    const bodyPadding = parseFloat(bodyStyle.paddingTop) + parseFloat(bodyStyle.paddingBottom);
+    const boardBorder = parseFloat(boardStyle.borderTopWidth) + parseFloat(boardStyle.borderBottomWidth);
+
+    return bodyPadding + boardBorder;
+}
+
 function resizeBoardCanvas() {
-    const wrapPadding = 24;
-    const wrapBorder = 2;
-    const bodyPadding = 32;
-    const availableHeight = window.innerHeight - wrapPadding - wrapBorder - bodyPadding;
+    const availableHeight = window.innerHeight - getVerticalChrome();
 
     BOARD_CONFIG.CELL_SIZE = calculateCellSize({
         availableHeight,
@@ -101,3 +109,10 @@ window.addEventListener("resize", () => {
     resizeBoardCanvas();
     game.render();
 });
+
+if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", () => {
+        resizeBoardCanvas();
+        game.render();
+    });
+}
