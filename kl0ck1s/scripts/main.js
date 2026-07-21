@@ -44,7 +44,8 @@ function getVerticalChrome() {
 }
 
 function resizeBoardCanvas() {
-    const availableHeight = window.innerHeight - getVerticalChrome();
+    const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+    const availableHeight = viewportHeight - getVerticalChrome();
 
     BOARD_CONFIG.CELL_SIZE = calculateCellSize({
         availableHeight,
@@ -105,14 +106,10 @@ const game = new Game({
 
 game.init();
 
-window.addEventListener("resize", () => {
+function handleViewportResize() {
     resizeBoardCanvas();
     game.render();
-});
-
-if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", () => {
-        resizeBoardCanvas();
-        game.render();
-    });
 }
+
+window.addEventListener("resize", handleViewportResize);
+window.visualViewport?.addEventListener("resize", handleViewportResize);
