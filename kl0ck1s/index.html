@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kl0ck1's</title>
+    <link href="styles/main.css" rel="stylesheet">
+</head>
+<body>
+<div class="app">
+    <div class="app__board board">
+        <canvas id="klockis-board" class="board__canvas"></canvas>
+        <div class="board__overlay" id="overlay"></div>
+    </div>
+    <div class="app__sidebar sidebar">
+        <div class="card">
+            <p class="brand__title">Kl0ck1's</p>
+            <p class="brand__subtitle">Ułóż linie, zdobywaj punkty.</p>
+        </div>
+        <div class="card" data-role="next-piece-card">
+            <h3 class="card__title">Następny klocek</h3>
+            <canvas id="next-piece-canvas" class="next-piece__canvas" width="96" height="96"></canvas>
+        </div>
+        <div class="card stats" data-role="stats-card">
+            <p class="stats__status" data-role="stats-status">Ostatnia gra</p>
+            <div>
+                <h3 class="card__title">Wynik</h3>
+                <div class="stats__value" id="score-value">0</div>
+            </div>
+            <div>
+                <h3 class="card__title">Poziom</h3>
+                <div class="stats__value" id="level-value">1</div>
+            </div>
+            <div>
+                <h3 class="card__title">Linie</h3>
+                <div class="stats__value" id="lines-value">0</div>
+            </div>
+            <div>
+                <h3 class="card__title">Rekord</h3>
+                <div class="stats__value" id="best-value">0</div>
+            </div>
+        </div>
+        <div class="card">
+            <h3 class="card__title controls__toggle" data-role="controls-toggle">
+                Sterowanie <kbd class="kbd kbd--hint">H</kbd>
+            </h3>
+            <ul class="controls__list controls__list--collapsed" data-role="controls-list">
+                <li class="controls__item"><span>Ruch lewo / prawo</span> <kbd class="kbd">&larr; &rarr;</kbd></li>
+                <li class="controls__item"><span>Szybszy spadek</span> <kbd class="kbd">&darr;</kbd></li>
+                <li class="controls__item"><span>Obrót</span> <kbd class="kbd">&uarr;</kbd></li>
+                <li class="controls__item"><span>Natychmiastowy spadek</span> <kbd class="kbd">Spacja</kbd></li>
+                <li class="controls__item"><span>Pauza / menu opcji</span> <kbd class="kbd">P</kbd></li>
+                <li class="controls__item"><span>Start / nowa gra</span> <kbd class="kbd">Enter</kbd></li>
+                <li class="controls__item"><span>Wycisz dźwięk</span> <kbd class="kbd">M</kbd></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<template id="tpl-screen-loading">
+    <div class="screen">
+        <h2 class="screen__title" data-field="title"></h2>
+        <p class="screen__hint" data-field="hint"></p>
+    </div>
+</template>
+
+<template id="tpl-screen-idle">
+    <div class="screen">
+        <h2 class="screen__title">Kl0ck1's</h2>
+        <p class="screen__hint">Wybierz poziom trudności</p>
+        <div class="difficulty" data-role="difficulty-select" data-field="difficulty"></div>
+        <p class="screen__hint screen__hint--tiny">Przełącz strzałkami <kbd class="kbd">&lt;</kbd> <kbd class="kbd">&gt;</kbd></p>
+        <p class="screen__hint">Naciśnij <kbd class="kbd">Enter</kbd>, aby rozpocząć</p>
+        <div class="leaderboard">
+            <h3 class="leaderboard__title">Tabela wyników</h3>
+            <div data-field="leaderboard"></div>
+        </div>
+    </div>
+</template>
+
+<template id="tpl-screen-paused">
+    <div class="screen">
+        <h2 class="screen__title">PAUZA</h2>
+        <p class="screen__hint">Naciśnij <kbd class="kbd">P</kbd>, aby wznowić</p>
+
+        <div class="options">
+            <h3 class="options__title">Opcje</h3>
+            <label class="options__row">
+                <span>Wycisz</span>
+                <input type="checkbox" class="options__input options__input--checkbox" data-role="mute-checkbox">
+            </label>
+            <label class="options__row">
+                <span>Głośność</span>
+                <input type="range" class="options__input options__input--range"
+                       data-role="volume-slider" min="0" max="100">
+            </label>
+        </div>
+
+        <button type="button" class="options__resume button button--accent" data-role="resume-button">Wznów</button>
+    </div>
+</template>
+
+<template id="tpl-screen-gameover-entry">
+    <div class="screen">
+        <h2 class="screen__title">KONIEC GRY</h2>
+        <p class="screen__hint">
+            Wynik: <strong class="screen__hint-highlight" data-field="score"></strong>
+            &middot; poziom <span data-field="level"></span> &middot; <span data-field="lines"></span> linii
+        </p>
+        <form data-role="score-form" class="score-form" autocomplete="off">
+            <input data-role="name-input" class="score-form__input" type="text" maxlength="16" placeholder="Twój nick">
+            <button type="submit" class="score-form__button button button--primary">Kontynuuj</button>
+        </form>
+        <div class="leaderboard">
+            <h3 class="leaderboard__title">Tabela wyników</h3>
+            <div data-field="leaderboard"></div>
+        </div>
+    </div>
+</template>
+
+<template id="tpl-screen-gameover-saved">
+    <div class="screen">
+        <h2 class="screen__title">WYNIK ZAPISANY</h2>
+        <p class="screen__hint">Wybierz poziom trudności</p>
+        <div class="difficulty" data-role="difficulty-select" data-field="difficulty"></div>
+        <p class="screen__hint screen__hint--tiny">Przełącz strzałkami <kbd class="kbd">&lt;</kbd> <kbd class="kbd">&gt;</kbd></p>
+        <p class="screen__hint">Naciśnij <kbd class="kbd">Enter</kbd>, aby zagrać ponownie</p>
+        <div class="leaderboard">
+            <h3 class="leaderboard__title">Tabela wyników</h3>
+            <div data-field="leaderboard"></div>
+        </div>
+    </div>
+</template>
+
+<template id="tpl-difficulty-button">
+    <button type="button" class="difficulty__button" data-role="difficulty-button">
+        <span data-field="label"></span>
+        <span class="difficulty__level" data-field="level"></span>
+    </button>
+</template>
+
+<template id="tpl-leaderboard-empty">
+    <p class="leaderboard__empty">Brak wyników - zagraj pierwszy!</p>
+</template>
+
+<template id="tpl-leaderboard-table">
+    <table class="leaderboard__table">
+        <thead>
+        <tr class="leaderboard__row">
+            <th class="leaderboard__heading">#</th>
+            <th class="leaderboard__heading">Nick</th>
+            <th class="leaderboard__heading">Wynik</th>
+            <th class="leaderboard__heading">Poz.</th>
+            <th class="leaderboard__heading">Linie</th>
+            <th class="leaderboard__heading leaderboard__heading--date">Data</th>
+        </tr>
+        </thead>
+        <tbody data-field="rows"></tbody>
+    </table>
+</template>
+
+<template id="tpl-leaderboard-row">
+    <tr class="leaderboard__row">
+        <td class="leaderboard__cell" data-field="rank"></td>
+        <td class="leaderboard__cell" data-field="name"></td>
+        <td class="leaderboard__cell" data-field="score"></td>
+        <td class="leaderboard__cell" data-field="level"></td>
+        <td class="leaderboard__cell" data-field="lines"></td>
+        <td class="leaderboard__cell leaderboard__cell--date" data-field="date"></td>
+    </tr>
+</template>
+
+<script type="module" src="scripts/main.js"></script>
+</body>
+</html>
