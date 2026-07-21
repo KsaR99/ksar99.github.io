@@ -345,7 +345,6 @@ export class Game {
         if (this.state !== "running") return;
         if (!this.board.collides(this.current, dir, 0)) {
             this.current.x += dir;
-            this.lockDelayTimer = 0;
         }
     }
 
@@ -364,7 +363,6 @@ export class Game {
         this.current.y += 1;
         this.addScore(pointsForSoftDrop(this.scoring));
         this.dropCounter = 0;
-        this.lockDelayTimer = 0;
     }
 
     hardDrop() {
@@ -391,7 +389,6 @@ export class Game {
             if (!this.board.collides(this.current, kick, 0, rotatedShape)) {
                 this.current.shape = rotatedShape;
                 this.current.x += kick;
-                this.lockDelayTimer = 0;
                 return;
             }
         }
