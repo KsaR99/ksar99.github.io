@@ -418,15 +418,25 @@ export class Game {
         ]);
 
         const REPEATABLE_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowDown"]);
+        const REPEAT_INITIAL_DELAY_MS = 100;
         const REPEAT_INTERVAL_MS = 50;
-        const heldIntervals = new Map();
+        const heldTimers = new Map();
 
         const stopRepeat = (code) => {
-            const intervalId = heldIntervals.get(code);
-            if (intervalId !== undefined) {
-                clearInterval(intervalId);
-                heldIntervals.delete(code);
-            }
+            const timers = heldTimers.get(code);
+            if (!timers) return;
+            if (timers.timeoutId !== undefined) clearTimeout(timers.timeoutId);
+            if (timers.intervalId !== undefined) clearInterval(timers.intervalId);
+            heldTimers.delete(code);
+        };
+
+        const startRepeat = (code, action) => {
+            stopRepeat(code);
+            const timeoutId = setTimeout(() => {
+                const intervalId = setInterval(action, REPEAT_INTERVAL_MS);
+                heldTimers.set(code, {intervalId});
+            }, REPEAT_INITIAL_DELAY_MS);
+            heldTimers.set(code, {timeoutId});
         };
 
         const isTypingInField = (event) => {
@@ -445,8 +455,7 @@ export class Game {
             if (REPEATABLE_KEYS.has(event.code)) {
                 if (event.repeat) return;
                 action();
-                stopRepeat(event.code);
-                heldIntervals.set(event.code, setInterval(action, REPEAT_INTERVAL_MS));
+                startRepeat(event.code, action);
                 return;
             }
 
@@ -458,8 +467,11 @@ export class Game {
 
         if (typeof window !== "undefined") {
             window.addEventListener("blur", () => {
-                heldIntervals.forEach((intervalId) => clearInterval(intervalId));
-                heldIntervals.clear();
+                heldTimers.forEach((timers) => {
+                    if (timers.timeoutId !== undefined) clearTimeout(timers.timeoutId);
+                    if (timers.intervalId !== undefined) clearInterval(timers.intervalId);
+                });
+                heldTimers.clear();
             });
         }
     }
