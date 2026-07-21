@@ -492,7 +492,7 @@ export class Game {
 
         if (resting) {
             this.lockDelayTimer += delta;
-            if (this.lockDelayTimer >= this.dropInterval) {
+            if (this.lockDelayTimer >= this.dropInterval * 5) {
                 this.lockCurrentPiece();
             }
             return;
