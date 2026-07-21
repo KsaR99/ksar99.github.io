@@ -70,6 +70,7 @@ export class Game {
         this.level = startLevel;
         this.dropInterval = dropIntervalForLevel(startLevel, this.scoring);
         this.dropCounter = 0;
+        this.lockDelayTimer = 0;
         this.lastTime = 0;
         this.hardDropUsed = false;
         this.clearingLines = [];
@@ -147,6 +148,7 @@ export class Game {
         this.current = new Piece(this.next, {cols: this.board.cols});
         this.next = this.bag.next();
         this.hardDropUsed = false;
+        this.lockDelayTimer = 0;
         this.renderer.drawNext(this.next);
 
         if (this.board.collides(this.current, 0, 0)) {
@@ -343,6 +345,7 @@ export class Game {
         if (this.state !== "running") return;
         if (!this.board.collides(this.current, dir, 0)) {
             this.current.x += dir;
+            this.lockDelayTimer = 0;
         }
     }
 
@@ -356,13 +359,12 @@ export class Game {
 
     softDrop() {
         if (this.state !== "running") return;
-        if (!this.board.collides(this.current, 0, 1)) {
-            this.current.y += 1;
-            this.addScore(pointsForSoftDrop(this.scoring));
-        } else {
-            this.lockCurrentPiece();
-        }
+        if (this.board.collides(this.current, 0, 1)) return;
+
+        this.current.y += 1;
+        this.addScore(pointsForSoftDrop(this.scoring));
         this.dropCounter = 0;
+        this.lockDelayTimer = 0;
     }
 
     hardDrop() {
@@ -389,6 +391,7 @@ export class Game {
             if (!this.board.collides(this.current, kick, 0, rotatedShape)) {
                 this.current.shape = rotatedShape;
                 this.current.x += kick;
+                this.lockDelayTimer = 0;
                 return;
             }
         }
@@ -414,6 +417,18 @@ export class Game {
             "ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Space",
         ]);
 
+        const REPEATABLE_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowDown"]);
+        const REPEAT_INTERVAL_MS = 50;
+        const heldIntervals = new Map();
+
+        const stopRepeat = (code) => {
+            const intervalId = heldIntervals.get(code);
+            if (intervalId !== undefined) {
+                clearInterval(intervalId);
+                heldIntervals.delete(code);
+            }
+        };
+
         const isTypingInField = (event) => {
             const tag = event.target.tagName;
             return tag === "INPUT" || tag === "TEXTAREA";
@@ -423,11 +438,30 @@ export class Game {
             if (isTypingInField(event)) return;
 
             if (PREVENT_DEFAULT_KEYS.has(event.code)) event.preventDefault();
-            if (event.code === "Space" && event.repeat) return;
 
             const action = KEY_ACTIONS[event.code];
-            if (action) action();
+            if (!action) return;
+
+            if (REPEATABLE_KEYS.has(event.code)) {
+                if (event.repeat) return;
+                action();
+                stopRepeat(event.code);
+                heldIntervals.set(event.code, setInterval(action, REPEAT_INTERVAL_MS));
+                return;
+            }
+
+            if (event.code === "Space" && event.repeat) return;
+            action();
         });
+
+        this.dom.addEventListener("keyup", (event) => stopRepeat(event.code));
+
+        if (typeof window !== "undefined") {
+            window.addEventListener("blur", () => {
+                heldIntervals.forEach((intervalId) => clearInterval(intervalId));
+                heldIntervals.clear();
+            });
+        }
     }
 
     update(delta) {
@@ -445,9 +479,21 @@ export class Game {
 
         if (this.state !== "running") return;
 
+        const resting = this.board.collides(this.current, 0, 1);
+
+        if (resting) {
+            this.lockDelayTimer += delta;
+            if (this.lockDelayTimer >= this.dropInterval) {
+                this.lockCurrentPiece();
+            }
+            return;
+        }
+
+        this.lockDelayTimer = 0;
         this.dropCounter += delta;
         if (this.dropCounter > this.dropInterval) {
-            this.softDrop();
+            this.current.y += 1;
+            this.dropCounter = 0;
         }
     }
 
