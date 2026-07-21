@@ -49,7 +49,7 @@ export const KLOCKOMINO_TYPES = Object.keys(KLOCKOMINOS);
 export const NEXT_PREVIEW_CELL_SIZE = 22;
 
 export const SOUND_FILES = Object.freeze({
-    lineClear: "sounds/line-clear.ogg",
+    lineClear: "sounds/line-clear.mp3",
     drop: "sounds/drop.mp3",
     gameOver: "sounds/game-over.ogg",
     levelUp: "sounds/level-up.ogg",
