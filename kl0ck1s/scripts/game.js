@@ -2,7 +2,7 @@
 
 import {Piece} from "./piece.js";
 import {dropIntervalForLevel} from "./utils.js";
-import {pointsForLineClear, pointsForSoftDrop, pointsForHardDrop, pointsForSpin, levelForLines} from "./scoring.js";
+import {levelForLines, pointsForHardDrop, pointsForLineClear, pointsForSoftDrop, pointsForSpin} from "./scoring.js";
 
 export class Game {
     static T_FRONT_CORNERS = [

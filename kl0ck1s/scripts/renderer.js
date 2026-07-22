@@ -1,6 +1,6 @@
 "use strict";
 
-import {withAlpha, trimShape} from "./utils.js";
+import {trimShape, withAlpha} from "./utils.js";
 
 export class Renderer {
     /**

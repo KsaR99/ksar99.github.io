@@ -12,11 +12,6 @@ export function trimShape(shape) {
     return rows.map((r) => cols.map((c) => shape[r][c]));
 }
 
-export function escapeHtml(str) {
-    const map = {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"};
-    return String(str).replace(/[&<>"']/g, (ch) => map[ch]);
-}
-
 export function withAlpha(hslColor, alpha) {
     return hslColor.replace(/\)$/, ` / ${alpha})`);
 }
