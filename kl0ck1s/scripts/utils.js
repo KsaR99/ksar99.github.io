@@ -6,18 +6,10 @@ export function cloneShape(shape) {
     return shape.map((row) => row.slice());
 }
 
-export function rotateMatrixClockwise(matrix) {
-    const rows = matrix.length;
-    const cols = matrix[0].length;
-    const rotated = Array.from({length: cols}, () => Array(rows).fill(0));
-
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            rotated[c][rows - 1 - r] = matrix[r][c];
-        }
-    }
-
-    return rotated;
+export function trimShape(shape) {
+    const rows = shape.map((row, r) => (row.some(Boolean) ? r : -1)).filter((r) => r !== -1);
+    const cols = shape[0].map((_, c) => (shape.some((row) => row[c]) ? c : -1)).filter((c) => c !== -1);
+    return rows.map((r) => cols.map((c) => shape[r][c]));
 }
 
 export function escapeHtml(str) {

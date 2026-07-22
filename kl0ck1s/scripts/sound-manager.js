@@ -26,7 +26,8 @@ export class SoundManager {
 
         const instance = base.cloneNode();
         instance.volume = this.volume;
-        instance.play().catch(() => {});
+        instance.play().catch(() => {
+        });
     }
 
     setMuted(muted) {

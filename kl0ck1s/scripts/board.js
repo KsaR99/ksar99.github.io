@@ -39,7 +39,28 @@ export class Board {
         return false;
     }
 
-   getDropOffset(piece) {
+    isCornerBlocked(x, y) {
+        if (!this.isInsideCols(x)) return true;
+        if (!this.isAboveFloor(y)) return true;
+        return !this.isCellFree(x, y);
+    }
+
+    getCornerFlags(piece) {
+        const width = piece.shape[0].length;
+        const height = piece.shape.length;
+        return {
+            topLeft: this.isCornerBlocked(piece.x - 1, piece.y - 1),
+            topRight: this.isCornerBlocked(piece.x + width, piece.y - 1),
+            bottomLeft: this.isCornerBlocked(piece.x - 1, piece.y + height),
+            bottomRight: this.isCornerBlocked(piece.x + width, piece.y + height),
+        };
+    }
+
+    countBlockedCorners(piece) {
+        return Object.values(this.getCornerFlags(piece)).filter(Boolean).length;
+    }
+
+    getDropOffset(piece) {
         let offset = 0;
         while (!this.collides(piece, 0, offset + 1)) {
             offset++;

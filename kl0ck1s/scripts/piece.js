@@ -1,7 +1,7 @@
 "use strict";
 
 import {BOARD_CONFIG, KLOCKOMINOS} from "./config.js";
-import {cloneShape, rotateMatrixClockwise} from "./utils.js";
+import {cloneShape} from "./utils.js";
 
 export class Piece {
     /**
@@ -15,12 +15,14 @@ export class Piece {
 
         this.type = type;
         this.color = def.color;
-        this.shape = cloneShape(def.shape);
+        this.rotationState = 0;
+        this.shape = cloneShape(def.states[this.rotationState]);
         this.x = Math.floor((cols - this.shape[0].length) / 2);
         this.y = 0;
     }
 
     rotated() {
-        return rotateMatrixClockwise(this.shape);
+        const states = KLOCKOMINOS[this.type].states;
+        return cloneShape(states[(this.rotationState + 1) % 4]);
     }
 }

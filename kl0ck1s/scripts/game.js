@@ -2,9 +2,43 @@
 
 import {Piece} from "./piece.js";
 import {dropIntervalForLevel} from "./utils.js";
-import {pointsForLineClear, pointsForSoftDrop, pointsForHardDrop, levelForLines} from "./scoring.js";
+import {pointsForLineClear, pointsForSoftDrop, pointsForHardDrop, pointsForSpin, levelForLines} from "./scoring.js";
 
 export class Game {
+    static T_FRONT_CORNERS = [
+        ["topLeft", "topRight"],
+        ["topRight", "bottomRight"],
+        ["bottomLeft", "bottomRight"],
+        ["topLeft", "bottomLeft"],
+    ];
+
+    static JLSTZ_KICKS = {
+        "0>1": [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]],
+        "1>2": [[0, 0], [1, 0], [1, 1], [0, -2], [1, -2]],
+        "2>3": [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]],
+        "3>0": [[0, 0], [-1, 0], [-1, 1], [0, -2], [-1, -2]],
+    };
+
+    static I_KICKS = {
+        "0>1": [[0, 0], [-2, 0], [1, 0], [-2, -1], [1, 2]],
+        "1>2": [[0, 0], [-1, 0], [2, 0], [-1, 2], [2, -1]],
+        "2>3": [[0, 0], [2, 0], [-1, 0], [2, 1], [-1, -2]],
+        "3>0": [[0, 0], [1, 0], [-2, 0], [1, -2], [-2, 1]],
+    };
+
+    static O_KICKS = {
+        "0>1": [[0, 0]],
+        "1>2": [[0, 0]],
+        "2>3": [[0, 0]],
+        "3>0": [[0, 0]],
+    };
+
+    static getKickTable(type) {
+        if (type === "I") return Game.I_KICKS;
+        if (type === "O") return Game.O_KICKS;
+        return Game.JLSTZ_KICKS;
+    }
+
     constructor({
                     board,
                     bag,
@@ -71,6 +105,10 @@ export class Game {
         this.dropInterval = dropIntervalForLevel(startLevel, this.scoring);
         this.dropCounter = 0;
         this.lockDelayTimer = 0;
+        this.lockDelayResets = 0;
+        this.groundedTime = 0;
+        this.lastAction = null;
+        this.pendingSpin = null;
         this.lastTime = 0;
         this.hardDropUsed = false;
         this.clearingLines = [];
@@ -149,6 +187,9 @@ export class Game {
         this.next = this.bag.next();
         this.hardDropUsed = false;
         this.lockDelayTimer = 0;
+        this.lockDelayResets = 0;
+        this.groundedTime = 0;
+        this.lastAction = null;
         this.renderer.drawNext(this.next);
 
         if (this.board.collides(this.current, 0, 0)) {
@@ -314,17 +355,40 @@ export class Game {
         this.hud.update(this.stats);
     }
 
+    detectSpin() {
+        if (this.lastAction !== "rotate") return null;
+        if (this.board.countBlockedCorners(this.current) < 3) return null;
+
+        if (this.current.type !== "T") {
+            return {type: this.current.type, mini: false};
+        }
+
+        const flags = this.board.getCornerFlags(this.current);
+        const frontKeys = Game.T_FRONT_CORNERS[this.current.rotationState % 4];
+        const frontBlocked = frontKeys.every((key) => flags[key]);
+
+        return {type: "T", mini: !frontBlocked};
+    }
+
+    registerSpin(spin, cleared) {
+        this.addScore(pointsForSpin(spin.type, cleared, this.level, spin.mini));
+    }
+
     lockCurrentPiece() {
+        const spin = this.detectSpin();
+
         this.soundManager.play("drop");
         this.board.lockPiece(this.current);
 
         const fullRows = this.board.getFullLineIndices();
 
         if (fullRows.length === 0) {
+            if (spin) this.registerSpin(spin, 0);
             this.spawnNext();
             return;
         }
 
+        this.pendingSpin = spin;
         this.soundManager.play("lineClear");
         this.state = "clearing";
         this.clearingLines = fullRows;
@@ -333,18 +397,28 @@ export class Game {
 
     finishLineClear() {
         const cleared = this.board.clearFullLines();
+        if (this.pendingSpin) this.registerSpin(this.pendingSpin, cleared);
         this.registerLineClears(cleared, false);
 
+        this.pendingSpin = null;
         this.clearingLines = [];
         this.dropCounter = 0;
         this.state = "running";
         this.spawnNext();
     }
 
+    resetLockDelay() {
+        if (this.lockDelayResets >= this.scoring.LOCK_DELAY_MAX_RESETS) return;
+        this.lockDelayTimer = 0;
+        this.lockDelayResets += 1;
+    }
+
     moveHorizontal(dir) {
         if (this.state !== "running") return;
         if (!this.board.collides(this.current, dir, 0)) {
             this.current.x += dir;
+            this.lastAction = "move";
+            if (this.board.collides(this.current, 0, 1)) this.resetLockDelay();
         }
     }
 
@@ -361,6 +435,7 @@ export class Game {
         if (this.board.collides(this.current, 0, 1)) return;
 
         this.current.y += 1;
+        this.lastAction = "move";
         this.addScore(pointsForSoftDrop(this.scoring));
         this.dropCounter = 0;
     }
@@ -383,12 +458,18 @@ export class Game {
         if (this.state !== "running") return;
 
         const rotatedShape = this.current.rotated();
-        const kicks = [0, -1, 1, -2, 2];
+        const fromState = this.current.rotationState;
+        const toState = (fromState + 1) % 4;
+        const kicks = Game.getKickTable(this.current.type)[`${fromState}>${toState}`];
 
-        for (const kick of kicks) {
-            if (!this.board.collides(this.current, kick, 0, rotatedShape)) {
+        for (const [dx, dy] of kicks) {
+            if (!this.board.collides(this.current, dx, dy, rotatedShape)) {
                 this.current.shape = rotatedShape;
-                this.current.x += kick;
+                this.current.x += dx;
+                this.current.y += dy;
+                this.current.rotationState = toState;
+                this.lastAction = "rotate";
+                if (this.board.collides(this.current, 0, 1)) this.resetLockDelay();
                 return;
             }
         }
@@ -492,13 +573,15 @@ export class Game {
 
         if (resting) {
             this.lockDelayTimer += delta;
-            if (this.lockDelayTimer >= this.dropInterval * 5) {
+            this.groundedTime += delta;
+            if (this.lockDelayTimer >= this.scoring.LOCK_DELAY || this.groundedTime >= this.scoring.MAX_GROUNDED_TIME) {
                 this.lockCurrentPiece();
             }
             return;
         }
 
         this.lockDelayTimer = 0;
+        this.groundedTime = 0;
         this.dropCounter += delta;
         if (this.dropCounter > this.dropInterval) {
             this.current.y += 1;

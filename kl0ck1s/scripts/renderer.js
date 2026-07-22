@@ -1,6 +1,6 @@
 "use strict";
 
-import {withAlpha} from "./utils.js";
+import {withAlpha, trimShape} from "./utils.js";
 
 export class Renderer {
     /**
@@ -172,7 +172,8 @@ export class Renderer {
         nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
         if (!type) return;
 
-        const {shape, color} = this.klockominos[type];
+        const {states, color} = this.klockominos[type];
+        const shape = trimShape(states[0]);
         const w = shape[0].length;
         const h = shape.length;
         const offsetX = (nextCanvas.width / nextPreviewCellSize - w) / 2;
