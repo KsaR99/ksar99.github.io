@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Kl0ck1's</title>
-    <link href="styles/main.css?v=6" rel="stylesheet">
+    <link href="styles/main.css?v=9" rel="stylesheet">
 </head>
 <body>
 <div class="app">
     <div class="app__board board">
         <canvas id="klockis-board" class="board__canvas"></canvas>
+        <div class="board__vhs" id="vhs-overlay">
+            <canvas class="board__vhs-noise" id="vhs-noise-canvas"></canvas>
+        </div>
         <div class="board__overlay" id="overlay"></div>
     </div>
     <div class="app__sidebar sidebar">
@@ -49,9 +52,10 @@
                 <li class="controls__item"><span>Ruch lewo / prawo</span> <kbd class="kbd">◀ ▶</kbd></li>
                 <li class="controls__item"><span>Szybszy spadek</span> <kbd class="kbd">▼</kbd></li>
                 <li class="controls__item"><span>Natychmiastowy spadek</span> <kbd class="kbd">Spacja</kbd></li>
-                <li class="controls__item"><span>Pauza / menu opcji</span> <kbd class="kbd">P</kbd></li>
+                <li class="controls__item"><span>Pauza</span> <kbd class="kbd">P</kbd></li>
                 <li class="controls__item"><span>Start / nowa gra</span> <kbd class="kbd">Enter</kbd></li>
                 <li class="controls__item"><span>Wycisz dźwięk</span> <kbd class="kbd">M</kbd></li>
+                <li class="controls__item"><span>Opcje</span> <kbd class="kbd">O</kbd></li>
             </ul>
         </div>
     </div>
@@ -83,9 +87,18 @@
     <div class="screen">
         <h2 class="screen__title">PAUZA</h2>
         <p class="screen__hint">Naciśnij <kbd class="kbd">P</kbd>, aby wznowić</p>
+        <p class="screen__hint">Naciśnij <kbd class="kbd">O</kbd>, aby otworzyć opcje</p>
+        <button type="button" class="options__resume button button--accent" data-role="resume-button">Wznów</button>
+    </div>
+</template>
+
+<template id="tpl-screen-options">
+    <div class="screen">
+        <h2 class="screen__title">OPCJE</h2>
+        <p class="screen__hint">Naciśnij <kbd class="kbd">O</kbd>, aby zamknąć</p>
 
         <div class="options">
-            <h3 class="options__title">Opcje</h3>
+            <h3 class="options__title">Dźwięk</h3>
             <label class="options__row">
                 <span>Wycisz</span>
                 <input type="checkbox" class="options__input options__input--checkbox" data-role="mute-checkbox">
@@ -97,7 +110,23 @@
             </label>
         </div>
 
-        <button type="button" class="options__resume button button--accent" data-role="resume-button">Wznów</button>
+        <div class="options">
+            <h3 class="options__title">Wydajność</h3>
+            <label class="options__row">
+                <span>Poświata (blur)</span>
+                <input type="checkbox" class="options__input options__input--checkbox" data-role="glow-checkbox">
+            </label>
+            <label class="options__row">
+                <span>Przezroczystość</span>
+                <input type="checkbox" class="options__input options__input--checkbox" data-role="transparency-checkbox">
+            </label>
+            <label class="options__row">
+                <span>Zakłócenia VHS (szum)</span>
+                <input type="checkbox" class="options__input options__input--checkbox" data-role="vhs-checkbox">
+            </label>
+        </div>
+
+        <button type="button" class="options__resume button button--accent" data-role="options-close-button">Zamknij</button>
     </div>
 </template>
 
@@ -172,6 +201,6 @@
     </tr>
 </template>
 
-<script type="module" src="scripts/main.js?v=5"></script>
+<script type="module" src="scripts/main.js?v=11"></script>
 </body>
 </html>

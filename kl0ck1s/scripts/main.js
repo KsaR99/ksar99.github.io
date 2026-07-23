@@ -23,6 +23,7 @@ import {SpriteCache} from "./sprite-cache.js";
 import {SoundManager} from "./sound-manager.js";
 import {Renderer} from "./renderer.js";
 import {HUD} from "./hud.js";
+import {VhsNoise} from "./vhs-noise.js?v=5";
 import {Game} from "./game.js";
 
 /** @type {HTMLCanvasElement} */
@@ -58,7 +59,10 @@ function resizeBoardCanvas() {
     boardCanvas.width = BOARD_CONFIG.CELL_SIZE * BOARD_CONFIG.COLS;
     boardCanvas.height = BOARD_CONFIG.CELL_SIZE * BOARD_CONFIG.ROWS;
     ctx.imageSmoothingEnabled = false;
+    vhsNoise.resize(boardCanvas.width, boardCanvas.height);
 }
+
+const vhsNoise = new VhsNoise(document.getElementById("vhs-noise-canvas"));
 
 resizeBoardCanvas();
 
@@ -86,7 +90,8 @@ const hud = new HUD({
 });
 
 const soundManager = new SoundManager(SOUND_FILES);
-const leaderboard = new Leaderboard(new PersistentStore());
+const store = new PersistentStore();
+const leaderboard = new Leaderboard(store);
 const board = new Board(BOARD_CONFIG.COLS, BOARD_CONFIG.ROWS);
 const bag = new PieceBag(KLOCKOMINO_TYPES);
 
@@ -104,6 +109,8 @@ const game = new Game({
     scoring: SCORING,
     levelUpBannerDuration: LEVEL_UP_BANNER_DURATION,
     lineClearAnimationDuration: LINE_CLEAR_ANIMATION_DURATION,
+    settingsStore: store,
+    vhsNoise,
 });
 
 game.init();

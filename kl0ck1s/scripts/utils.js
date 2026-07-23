@@ -16,6 +16,16 @@ export function withAlpha(color, alpha) {
     return color.replace(/\)$/, ` / ${alpha})`);
 }
 
+export function lightenOklch(color, amount = 0.16, maxLightness = 0.82) {
+    const match = color.match(/oklch\(([\d.]+)\s+([\d.]+)\s+([\d.]+)\)/);
+    if (!match) return color;
+
+    const [, l, c, h] = match;
+    const lightened = Math.min(maxLightness, parseFloat(l) + amount);
+    const fadedChroma = parseFloat(c) * 0.55;
+    return `oklch(${lightened} ${fadedChroma} ${h})`;
+}
+
 export function dropIntervalForLevel(level, scoring = SCORING) {
     return Math.max(
         scoring.MIN_DROP_INTERVAL,

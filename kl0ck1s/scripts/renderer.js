@@ -1,6 +1,6 @@
 "use strict";
 
-import {trimShape, withAlpha} from "./utils.js";
+import {lightenOklch, trimShape, withAlpha} from "./utils.js";
 
 export class Renderer {
     /**
@@ -23,6 +23,16 @@ export class Renderer {
         this.boardConfig = boardConfig;
         this.klockominos = klockominos;
         this.nextPreviewCellSize = nextPreviewCellSize;
+        this.glowEnabled = true;
+        this.transparencyEnabled = true;
+    }
+
+    setGlowEnabled(enabled) {
+        this.glowEnabled = enabled;
+    }
+
+    setTransparencyEnabled(enabled) {
+        this.transparencyEnabled = enabled;
     }
 
     setTheme(backgroundColor) {
@@ -32,6 +42,7 @@ export class Renderer {
 
     drawCell(context, x, y, color, size, glow = false) {
         const sprite = this.spriteCache.get(color, size);
+        glow = glow && this.glowEnabled;
 
         if (glow) {
             context.save();
@@ -106,19 +117,32 @@ export class Renderer {
         const {ctx} = this;
         const strokeColor = withAlpha(piece.color, 0.6);
 
-        ctx.save();
-        ctx.globalAlpha = 0.3;
+        if (this.transparencyEnabled) {
+            ctx.save();
+            ctx.globalAlpha = 0.3;
 
-        piece.shape.forEach((row, r) => {
-            row.forEach((cell, c) => {
-                if (!cell) return;
-                const y = piece.y + r + offset;
-                if (y < 0) return;
-                this.drawCell(ctx, piece.x + c, y, piece.color, size);
+            piece.shape.forEach((row, r) => {
+                row.forEach((cell, c) => {
+                    if (!cell) return;
+                    const y = piece.y + r + offset;
+                    if (y < 0) return;
+                    this.drawCell(ctx, piece.x + c, y, piece.color, size);
+                });
             });
-        });
 
-        ctx.restore();
+            ctx.restore();
+        } else {
+            const ghostColor = lightenOklch(piece.color);
+
+            piece.shape.forEach((row, r) => {
+                row.forEach((cell, c) => {
+                    if (!cell) return;
+                    const y = piece.y + r + offset;
+                    if (y < 0) return;
+                    this.drawCell(ctx, piece.x + c, y, ghostColor, size);
+                });
+            });
+        }
 
         ctx.strokeStyle = strokeColor;
         ctx.lineWidth = 1;
@@ -136,11 +160,14 @@ export class Renderer {
     drawClearingLines(lineIndices, progress) {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx} = this;
-        const alpha = 0.85 * (1 - progress);
+        const flashBoost = Math.sin(Math.min(1, progress) * Math.PI);
+        const alpha = Math.min(1, 0.8 + flashBoost * 0.2);
 
         ctx.save();
-        ctx.shadowColor = "oklch(1 0 0 / 90%)";
-        ctx.shadowBlur = size * 1.2;
+        if (this.glowEnabled) {
+            ctx.shadowColor = "oklch(1 0 0 / 95%)";
+            ctx.shadowBlur = size * (0.3 + flashBoost * 0.35);
+        }
         ctx.fillStyle = `oklch(1 0 0 / ${alpha})`;
 
         lineIndices.forEach((y) => {
@@ -155,15 +182,26 @@ export class Renderer {
         const centerX = boardCanvas.width / 2;
         const centerY = boardCanvas.height / 2;
         const fontSize = Math.max(18, Math.round(boardConfig.CELL_SIZE * 1.3));
+        const text = `POZIOM ${level}`;
 
         ctx.save();
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.font = `bold ${fontSize}px monospace, "Courier New"`;
-        ctx.shadowBlur = fontSize * 0.25;
-        ctx.shadowColor = "oklch(0.911 0.237 130 / 0.9)";
+
+        ctx.shadowColor = "oklch(0 0 0 / 90%)";
+        ctx.shadowBlur = fontSize * 0.3;
+        ctx.fillStyle = "oklch(0 0 0 / 90%)";
+        ctx.fillText(text, centerX, centerY);
+
+        if (this.glowEnabled) {
+            ctx.shadowBlur = fontSize * 0.2;
+            ctx.shadowColor = "oklch(0.911 0.237 130 / 0.95)";
+        } else {
+            ctx.shadowBlur = 0;
+        }
         ctx.fillStyle = "oklch(0.807 0.274 142.321)";
-        ctx.fillText(`POZIOM ${level}`, centerX, centerY);
+        ctx.fillText(text, centerX, centerY);
         ctx.restore();
     }
 

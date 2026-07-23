@@ -30,13 +30,20 @@ export const Screens = {
         return screen;
     },
 
-    paused({volumePercent, muted}, dom = document) {
-        const screen = clone(dom, "tpl-screen-paused");
+    paused(dom = document) {
+        return clone(dom, "tpl-screen-paused");
+    },
+
+    options(settings, dom = document) {
+        const screen = clone(dom, "tpl-screen-options");
         const muteCheckbox = screen.querySelector('[data-role="mute-checkbox"]');
         const volumeSlider = screen.querySelector('[data-role="volume-slider"]');
-        muteCheckbox.checked = muted;
-        volumeSlider.value = volumePercent;
-        volumeSlider.disabled = muted;
+        muteCheckbox.checked = settings.muted;
+        volumeSlider.value = Math.round(settings.volume * 100);
+        volumeSlider.disabled = settings.muted;
+        screen.querySelector('[data-role="glow-checkbox"]').checked = settings.glow;
+        screen.querySelector('[data-role="transparency-checkbox"]').checked = settings.transparency;
+        screen.querySelector('[data-role="vhs-checkbox"]').checked = settings.vhs;
         return screen;
     },
 

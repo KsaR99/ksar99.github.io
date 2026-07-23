@@ -33,6 +33,8 @@ export class Game {
         "3>0": [[0, 0]],
     };
 
+    static SETTINGS_KEY = "klockis-settings";
+
     static getKickTable(type) {
         if (type === "I") return Game.I_KICKS;
         if (type === "O") return Game.O_KICKS;
@@ -53,6 +55,8 @@ export class Game {
                     scoring,
                     levelUpBannerDuration,
                     lineClearAnimationDuration,
+                    settingsStore = null,
+                    vhsNoise = null,
                     dom = (typeof document !== "undefined" ? document : null),
                 }) {
         this.board = board;
@@ -68,11 +72,27 @@ export class Game {
         this.scoring = scoring;
         this.levelUpBannerDuration = levelUpBannerDuration;
         this.lineClearAnimationDuration = lineClearAnimationDuration;
+        this.settingsStore = settingsStore ?? leaderboard.store;
+        this.vhsNoise = vhsNoise;
         this.dom = dom;
+        this.settings = this.defaultSettings();
+        this.vhsEnabled = false;
+        this.previousStateBeforeOptions = null;
+    }
+
+    defaultSettings() {
+        return {volume: 1, muted: false, glow: true, transparency: true, vhs: true};
+    }
+
+    prefersReducedMotion() {
+        const view = this.dom?.defaultView ?? (typeof window !== "undefined" ? window : null);
+        if (!view?.matchMedia) return false;
+        return view.matchMedia("(prefers-reduced-motion: reduce)").matches;
     }
 
     init() {
         this.soundManager.init();
+        this.loadSettings();
         this.applyDifficultyTheme();
         this.prepareNewRound();
         this.showIdleScreen().then();
@@ -230,7 +250,8 @@ export class Game {
             event.preventDefault();
             if (button) button.disabled = true;
 
-            const name = input.value.trim().slice(0, 16) || "Gracz";
+            const typedName = input.value.trim().slice(0, 16);
+            const name = typedName || "Gracz";
             const entry = {
                 name,
                 score: this.score,
@@ -239,8 +260,10 @@ export class Game {
                 date: new Date().toISOString(),
             };
 
+            const nameSavePromise = typedName ? this.leaderboard.setLastName(typedName) : Promise.resolve();
+
             const [, list] = await Promise.all([
-                this.leaderboard.setLastName(name),
+                nameSavePromise,
                 this.leaderboard.add(entry),
             ]);
 
@@ -271,29 +294,13 @@ export class Game {
     }
 
     renderPauseMenu() {
-        const volumePercent = Math.round(this.soundManager.volume * 100);
-        this.hud.showScreen(this.screens.paused({volumePercent, muted: this.soundManager.muted}, this.dom));
+        this.hud.showScreen(this.screens.paused(this.dom));
         this.bindPauseMenu();
     }
 
     bindPauseMenu() {
         if (!this.dom) return;
-        const muteCheckbox = this.dom.querySelector('[data-role="mute-checkbox"]');
-        const volumeSlider = this.dom.querySelector('[data-role="volume-slider"]');
         const resumeButton = this.dom.querySelector('[data-role="resume-button"]');
-
-        if (muteCheckbox) {
-            muteCheckbox.addEventListener("change", () => {
-                this.soundManager.setMuted(muteCheckbox.checked);
-                if (volumeSlider) volumeSlider.disabled = muteCheckbox.checked;
-            });
-        }
-
-        if (volumeSlider) {
-            volumeSlider.addEventListener("input", () => {
-                this.soundManager.setVolume(volumeSlider.value / 100);
-            });
-        }
 
         if (resumeButton) {
             resumeButton.addEventListener("click", () => this.togglePause());
@@ -301,13 +308,157 @@ export class Game {
     }
 
     toggleSound() {
-        this.soundManager.setMuted(!this.soundManager.muted);
+        this.settings.muted = !this.settings.muted;
+        this.soundManager.setMuted(this.settings.muted);
+        this.saveSettings();
 
         if (!this.dom) return;
         const muteCheckbox = this.dom.querySelector('[data-role="mute-checkbox"]');
         const volumeSlider = this.dom.querySelector('[data-role="volume-slider"]');
-        if (muteCheckbox) muteCheckbox.checked = this.soundManager.muted;
-        if (volumeSlider) volumeSlider.disabled = this.soundManager.muted;
+        if (muteCheckbox) muteCheckbox.checked = this.settings.muted;
+        if (volumeSlider) volumeSlider.disabled = this.settings.muted;
+    }
+
+    async loadSettings() {
+        let settings = this.defaultSettings();
+        let hasStoredSettings = false;
+
+        try {
+            const raw = await this.settingsStore.get(Game.SETTINGS_KEY);
+            if (raw) {
+                settings = {...settings, ...JSON.parse(raw)};
+                hasStoredSettings = true;
+            }
+        } catch {
+            settings = this.defaultSettings();
+        }
+
+        if (!hasStoredSettings && this.prefersReducedMotion()) {
+            settings.vhs = false;
+        }
+
+        this.settings = settings;
+        this.soundManager.setVolume(settings.volume);
+        this.soundManager.setMuted(settings.muted);
+        this.applyPerformanceSettings();
+    }
+
+    saveSettings() {
+        return this.settingsStore.set(Game.SETTINGS_KEY, JSON.stringify(this.settings));
+    }
+
+    applyPerformanceSettings() {
+        const {glow, transparency, vhs} = this.settings;
+        this.renderer.setGlowEnabled(glow);
+        this.renderer.setTransparencyEnabled(transparency);
+
+        const body = this.dom?.body;
+        if (body) {
+            body.classList.toggle("perf-no-glow", !glow);
+            body.classList.toggle("perf-no-transparency", !transparency);
+        }
+
+        this.vhsEnabled = vhs;
+        this.updateVhsOverlay();
+    }
+
+    updateVhsOverlay() {
+        if (!this.dom) return;
+        const vhsEl = this.dom.getElementById("vhs-overlay");
+        const active = Boolean(this.vhsEnabled) && (this.state === "running" || this.state === "clearing");
+
+        if (vhsEl) vhsEl.classList.toggle("board__vhs--active", active);
+
+        if (this.vhsNoise) {
+            if (active) this.vhsNoise.start();
+            else this.vhsNoise.stop();
+        }
+    }
+
+    toggleOptions() {
+        if (this.state === "options") {
+            const previousState = this.previousStateBeforeOptions ?? "idle";
+            this.previousStateBeforeOptions = null;
+            this.state = previousState;
+
+            if (previousState === "running") {
+                this.hud.hideOverlay();
+            } else if (previousState === "paused") {
+                this.renderPauseMenu();
+            } else if (previousState === "idle") {
+                this.renderIdleScreen(this.currentIdleList ?? []);
+            } else if (previousState === "gameover-saved" && this.currentGameOverSaved) {
+                const {list, entry} = this.currentGameOverSaved;
+                this.renderGameOverSaved(list, entry);
+            }
+            return;
+        }
+
+        if (!["idle", "running", "paused", "gameover-saved"].includes(this.state)) return;
+
+        this.previousStateBeforeOptions = this.state;
+        this.state = "options";
+        this.renderOptionsMenu();
+    }
+
+    renderOptionsMenu() {
+        this.hud.showScreen(this.screens.options(this.settings, this.dom));
+        this.bindOptionsMenu();
+    }
+
+    bindOptionsMenu() {
+        if (!this.dom) return;
+        const muteCheckbox = this.dom.querySelector('[data-role="mute-checkbox"]');
+        const volumeSlider = this.dom.querySelector('[data-role="volume-slider"]');
+        const glowCheckbox = this.dom.querySelector('[data-role="glow-checkbox"]');
+        const transparencyCheckbox = this.dom.querySelector('[data-role="transparency-checkbox"]');
+        const vhsCheckbox = this.dom.querySelector('[data-role="vhs-checkbox"]');
+        const closeButton = this.dom.querySelector('[data-role="options-close-button"]');
+
+        if (muteCheckbox) {
+            muteCheckbox.addEventListener("change", () => {
+                this.settings.muted = muteCheckbox.checked;
+                this.soundManager.setMuted(this.settings.muted);
+                if (volumeSlider) volumeSlider.disabled = this.settings.muted;
+                this.saveSettings();
+            });
+        }
+
+        if (volumeSlider) {
+            volumeSlider.addEventListener("input", () => {
+                this.settings.volume = volumeSlider.value / 100;
+                this.soundManager.setVolume(this.settings.volume);
+                this.saveSettings();
+            });
+        }
+
+        if (glowCheckbox) {
+            glowCheckbox.addEventListener("change", () => {
+                this.settings.glow = glowCheckbox.checked;
+                this.applyPerformanceSettings();
+                this.saveSettings();
+            });
+        }
+
+        if (transparencyCheckbox) {
+            transparencyCheckbox.addEventListener("change", () => {
+                this.settings.transparency = transparencyCheckbox.checked;
+                this.applyPerformanceSettings();
+                this.saveSettings();
+            });
+        }
+
+        if (vhsCheckbox) {
+            vhsCheckbox.addEventListener("change", () => {
+                this.settings.vhs = vhsCheckbox.checked;
+                this.applyPerformanceSettings();
+                this.saveSettings();
+            });
+        }
+
+        if (closeButton) {
+            closeButton.addEventListener("click", () => this.toggleOptions());
+        }
     }
 
     toggleControlsList() {
@@ -487,6 +638,7 @@ export class Game {
             Enter: () => this.handleEnter(),
             KeyH: () => this.toggleControlsList(),
             KeyM: () => this.toggleSound(),
+            KeyO: () => this.toggleOptions(),
             KeyP: () => this.togglePause(),
             KeyZ: () => this.rotate(),
         };
@@ -590,9 +742,13 @@ export class Game {
     }
 
     render() {
+        this.updateVhsOverlay();
         this.renderer.drawBoard(this.board);
 
-        if (this.state === "running" || this.state === "paused") {
+        const showPieceBehindOptions = this.state === "options"
+            && ["running", "paused"].includes(this.previousStateBeforeOptions);
+
+        if (this.state === "running" || this.state === "paused" || showPieceBehindOptions) {
             if (this.state === "running") this.renderer.drawGhost(this.current, this.board);
             this.renderer.drawPiece(this.current);
         } else if (this.state === "clearing") {

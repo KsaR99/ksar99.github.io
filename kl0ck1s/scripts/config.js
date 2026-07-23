@@ -26,19 +26,23 @@ export const SPIN_POINTS = Object.freeze({
     OTHER: [100, 200, 400, 600],
 });
 
-export const LEVEL_UP_BANNER_DURATION = 800; // ms
-export const LINE_CLEAR_ANIMATION_DURATION = 280; // ms
+export const LEVEL_UP_BANNER_DURATION = 777; // ms
+export const LINE_CLEAR_ANIMATION_DURATION = 265; // ms
 
 export const DIFFICULTIES = Object.freeze({
     easy: {label: "Easy", startLevel: 1},
     medium: {label: "Medium", startLevel: 5},
     hard: {label: "Hard", startLevel: 10},
+    expert: {label: "Expert", startLevel: 20},
+    pro: {label: "PRO", startLevel: 30},
 });
 
 export const BOARD_BACKGROUNDS = Object.freeze({
-    easy: "oklch(0.1579 0 0)",
-    medium: "oklch(0.1960 0.02064 271.521)",
-    hard: "oklch(0.2353 0.02402 273.436)",
+    easy: "oklch(0.25 0 0)",
+    medium: "oklch(0.20 0 0)",
+    hard: "oklch(0.15 0 0)",
+    expert: "oklch(0.10 0 0)",
+    pro: "oklch(0 0 0)",
 });
 
 export const DEFAULT_DIFFICULTY = "medium";
