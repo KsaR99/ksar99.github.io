@@ -13,7 +13,7 @@ export function createBlockSprite(color, size, canvasFactory = () => document.cr
     sctx.fillStyle = color;
     sctx.fillRect(0, 0, size, size);
 
-    sctx.fillStyle = "hsl(0 0% 100% / 0.35)";
+    sctx.fillStyle = "oklch(1 0 0 / 35%)";
     sctx.beginPath();
     sctx.moveTo(0, 0);
     sctx.lineTo(size, 0);
@@ -24,7 +24,7 @@ export function createBlockSprite(color, size, canvasFactory = () => document.cr
     sctx.closePath();
     sctx.fill();
 
-    sctx.fillStyle = "hsl(0 0 0 / 0.35)";
+    sctx.fillStyle = "oklch(0 0 0 / 35%)";
     sctx.beginPath();
     sctx.moveTo(size, 0);
     sctx.lineTo(size, size);
@@ -35,7 +35,7 @@ export function createBlockSprite(color, size, canvasFactory = () => document.cr
     sctx.closePath();
     sctx.fill();
 
-    sctx.strokeStyle = "hsl(0 0 0 / 0.3)";
+    sctx.strokeStyle = "oklch(0 0 0 / 30%)";
     sctx.lineWidth = 1;
     sctx.strokeRect(0.5, 0.5, size - 1, size - 1);
 

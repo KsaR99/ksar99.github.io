@@ -54,7 +54,7 @@ export class Renderer {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx} = this;
 
-        ctx.strokeStyle = "hsl(0 0 100% / 0.25)";
+        ctx.strokeStyle = "oklch(1 0 0 / 25%)";
         ctx.lineWidth = 1;
 
         for (let x = 0; x <= board.cols; x++) {
@@ -139,9 +139,9 @@ export class Renderer {
         const alpha = 0.85 * (1 - progress);
 
         ctx.save();
-        ctx.shadowColor = "hsl(0 0 100% / 0.9)";
+        ctx.shadowColor = "oklch(1 0 0 / 90%)";
         ctx.shadowBlur = size * 1.2;
-        ctx.fillStyle = `hsl(0 0 100% / ${alpha})`;
+        ctx.fillStyle = `oklch(1 0 0 / ${alpha})`;
 
         lineIndices.forEach((y) => {
             ctx.fillRect(0, y * size, this.boardConfig.COLS * size, size);
@@ -160,9 +160,9 @@ export class Renderer {
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.font = `bold ${fontSize}px "Courier New", monospace`;
-        ctx.shadowColor = "hsl(189 100% 58% / 0.9)";
         ctx.shadowBlur = fontSize * 0.6;
-        ctx.fillStyle = "hsl(189 100% 58%)";
+        ctx.shadowColor = "oklch(0.8325 0.1401 213.7 / 90%)";
+        ctx.fillStyle = "oklch(0.8325 0.1401 213.7)";
         ctx.fillText(`POZIOM ${level}`, centerX, centerY);
         ctx.restore();
     }

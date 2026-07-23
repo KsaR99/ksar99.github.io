@@ -483,12 +483,12 @@ export class Game {
             ArrowRight: () => this.handleHorizontalArrow(1),
             ArrowDown: () => this.softDrop(),
             ArrowUp: () => this.rotate(),
-            KeyZ: () => this.rotate(),
             Space: () => this.hardDrop(),
-            KeyP: () => this.togglePause(),
             Enter: () => this.handleEnter(),
-            KeyM: () => this.toggleSound(),
             KeyH: () => this.toggleControlsList(),
+            KeyM: () => this.toggleSound(),
+            KeyP: () => this.togglePause(),
+            KeyZ: () => this.rotate(),
         };
 
         const PREVENT_DEFAULT_KEYS = new Set([

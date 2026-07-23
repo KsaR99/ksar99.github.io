@@ -36,16 +36,16 @@ export const DIFFICULTIES = Object.freeze({
 });
 
 export const BOARD_BACKGROUNDS = Object.freeze({
-    easy: "hsl(0 0 5%)",
-    medium: "hsl(0 0 10%)",
-    hard: "hsl(0 0 15%)",
+    easy: "oklch(0.1579 0 0)",
+    medium: "oklch(0.1960 0.02064 271.521)",
+    hard: "oklch(0.2353 0.02402 273.436)",
 });
 
 export const DEFAULT_DIFFICULTY = "easy";
 
 export const KLOCKOMINOS = Object.freeze({
     I: {
-        color: "hsl(180 100% 50%)",
+        color: "oklch(0.905399 0.15455 194.7689)",
         states: [
             [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
             [[0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0]],
@@ -54,7 +54,7 @@ export const KLOCKOMINOS = Object.freeze({
         ],
     },
     J: {
-        color: "hsl(216 100% 50%)",
+        color: "oklch(0.5635 0.2408 260.82)",
         states: [
             [[1, 0, 0], [1, 1, 1], [0, 0, 0]],
             [[0, 1, 1], [0, 1, 0], [0, 1, 0]],
@@ -63,7 +63,7 @@ export const KLOCKOMINOS = Object.freeze({
         ],
     },
     L: {
-        color: "hsl(36 100% 50%)",
+        color: "oklch(0.772 0.1738 64.55)",
         states: [
             [[0, 0, 1], [1, 1, 1], [0, 0, 0]],
             [[0, 1, 0], [0, 1, 0], [0, 1, 1]],
@@ -72,7 +72,7 @@ export const KLOCKOMINOS = Object.freeze({
         ],
     },
     O: {
-        color: "hsl(60 100% 50%)",
+        color: "oklch(0.968 0.211 109.77)",
         states: [
             [[1, 1], [1, 1]],
             [[1, 1], [1, 1]],
@@ -81,7 +81,7 @@ export const KLOCKOMINOS = Object.freeze({
         ],
     },
     S: {
-        color: "hsl(140 100% 40%)",
+        color: "oklch(0.73558 0.22389 146.1363)",
         states: [
             [[0, 1, 1], [1, 1, 0], [0, 0, 0]],
             [[0, 1, 0], [0, 1, 1], [0, 0, 1]],
@@ -90,7 +90,7 @@ export const KLOCKOMINOS = Object.freeze({
         ],
     },
     T: {
-        color: "hsl(280 100% 50%)",
+        color: "oklch(0.5812 0.2986 307.03)",
         states: [
             [[0, 1, 0], [1, 1, 1], [0, 0, 0]],
             [[0, 1, 0], [0, 1, 1], [0, 1, 0]],
@@ -99,7 +99,7 @@ export const KLOCKOMINOS = Object.freeze({
         ],
     },
     Z: {
-        color: "hsl(0 100% 60%)",
+        color: "oklch(0.6489 0.237 26.97)",
         states: [
             [[1, 1, 0], [0, 1, 1], [0, 0, 0]],
             [[0, 0, 1], [0, 1, 1], [0, 1, 0]],

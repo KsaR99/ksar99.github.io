@@ -12,8 +12,8 @@ export function trimShape(shape) {
     return rows.map((r) => cols.map((c) => shape[r][c]));
 }
 
-export function withAlpha(hslColor, alpha) {
-    return hslColor.replace(/\)$/, ` / ${alpha})`);
+export function withAlpha(color, alpha) {
+    return color.replace(/\)$/, ` / ${alpha})`);
 }
 
 export function dropIntervalForLevel(level, scoring = SCORING) {
