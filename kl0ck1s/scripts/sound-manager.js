@@ -2,6 +2,9 @@
 
 export class SoundManager {
     constructor(soundFiles, {AudioCtor = (typeof Audio !== "undefined" ? Audio : null), volume = 1.0} = {}) {
+        /**
+         * @type {Record<string, string>}
+         */
         this.soundFiles = soundFiles;
         this.AudioCtor = AudioCtor;
         this.muted = false;
@@ -11,6 +14,7 @@ export class SoundManager {
 
     init() {
         if (!this.AudioCtor) return;
+
         Object.entries(this.soundFiles).forEach(([key, src]) => {
             const audio = new this.AudioCtor(src);
             audio.preload = "auto";

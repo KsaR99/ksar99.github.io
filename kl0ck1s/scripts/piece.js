@@ -11,7 +11,7 @@ export class Piece {
      */
     constructor(type, {cols = BOARD_CONFIG.COLS} = {}) {
         const def = KLOCKOMINOS[type];
-        if (!def) throw new Error(`Nieznany typ klocka: ${type}`);
+        if (!def) throw new Error(`Unknown block type: ${type}`);
 
         this.type = type;
         this.color = def.color;

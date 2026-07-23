@@ -41,11 +41,11 @@ export const BOARD_BACKGROUNDS = Object.freeze({
     hard: "oklch(0.2353 0.02402 273.436)",
 });
 
-export const DEFAULT_DIFFICULTY = "easy";
+export const DEFAULT_DIFFICULTY = "medium";
 
 export const KLOCKOMINOS = Object.freeze({
     I: {
-        color: "oklch(0.905399 0.15455 194.7689)",
+        color: "oklch(0.905399 0.15455 194.76)",
         states: [
             [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
             [[0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0]],
@@ -81,7 +81,7 @@ export const KLOCKOMINOS = Object.freeze({
         ],
     },
     S: {
-        color: "oklch(0.73558 0.22389 146.1363)",
+        color: "oklch(0.73558 0.22389 146.13)",
         states: [
             [[0, 1, 1], [1, 1, 0], [0, 0, 0]],
             [[0, 1, 0], [0, 1, 1], [0, 0, 1]],

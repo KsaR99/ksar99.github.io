@@ -25,9 +25,11 @@ import {Renderer} from "./renderer.js";
 import {HUD} from "./hud.js";
 import {Game} from "./game.js";
 
+/** @type {HTMLCanvasElement} */
 const boardCanvas = document.getElementById("klockis-board");
 const ctx = boardCanvas.getContext("2d");
 
+/** @type {HTMLCanvasElement} */
 const nextCanvas = document.getElementById("next-piece-canvas");
 const nextCtx = nextCanvas.getContext("2d");
 nextCtx.imageSmoothingEnabled = false;
