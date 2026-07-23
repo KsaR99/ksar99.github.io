@@ -63,11 +63,12 @@ export class Leaderboard {
 
         const table = this.dom.getElementById("tpl-leaderboard-table").content.cloneNode(true);
         const tbody = table.querySelector('[data-field="rows"]');
+        const podiumBadges = ["🥇", "🥈", "🥉"];
 
         list.forEach((entry, i) => {
             const row = this.dom.getElementById("tpl-leaderboard-row").content.cloneNode(true);
             row.querySelector(".leaderboard__row").classList.toggle("leaderboard__row--new", entry === highlightEntry);
-            row.querySelector('[data-field="rank"]').textContent = i + 1;
+            row.querySelector('[data-field="rank"]').textContent = (i < 3 ? podiumBadges[i] : i + 1);
             row.querySelector('[data-field="name"]').textContent = entry.name;
             row.querySelector('[data-field="score"]').textContent = entry.score;
             row.querySelector('[data-field="level"]').textContent = entry.level;

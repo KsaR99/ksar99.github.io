@@ -159,10 +159,10 @@ export class Renderer {
         ctx.save();
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.font = `bold ${fontSize}px "Courier New", monospace`;
-        ctx.shadowBlur = fontSize * 0.6;
-        ctx.shadowColor = "oklch(0.8325 0.1401 213.7 / 90%)";
-        ctx.fillStyle = "oklch(0.8325 0.1401 213.7)";
+        ctx.font = `bold ${fontSize}px monospace, "Courier New"`;
+        ctx.shadowBlur = fontSize * 0.25;
+        ctx.shadowColor = "oklch(0.911 0.237 130 / 0.9)";
+        ctx.fillStyle = "oklch(0.807 0.274 142.321)";
         ctx.fillText(`POZIOM ${level}`, centerX, centerY);
         ctx.restore();
     }
