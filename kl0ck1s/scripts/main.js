@@ -7,12 +7,13 @@ import {
     DIFFICULTIES,
     KLOCKOMINO_TYPES,
     KLOCKOMINOS,
-    LEVEL_UP_BANNER_DURATION,
-    LINE_CLEAR_ANIMATION_DURATION,
+    LEVEL_UP_BANNER_DURATION_MS,
+    LINE_CLEAR_ANIMATION_DURATION_MS,
     NEXT_PREVIEW_CELL_SIZE,
     SCORING,
     SOUND_FILES,
 } from "./config.js";
+
 import {calculateCellSize} from "./board-sizing.js";
 import {Board} from "./board.js";
 import {PieceBag} from "./piece-bag.js";
@@ -23,7 +24,7 @@ import {SpriteCache} from "./sprite-cache.js";
 import {SoundManager} from "./sound-manager.js";
 import {Renderer} from "./renderer.js";
 import {HUD} from "./hud.js";
-import {VhsNoise} from "./vhs-noise.js?v=5";
+import {VhsNoise} from "./vhs-noise.js";
 import {Game} from "./game.js";
 
 /** @type {HTMLCanvasElement} */
@@ -107,8 +108,8 @@ const game = new Game({
     defaultDifficulty: DEFAULT_DIFFICULTY,
     boardBackgrounds: BOARD_BACKGROUNDS,
     scoring: SCORING,
-    levelUpBannerDuration: LEVEL_UP_BANNER_DURATION,
-    lineClearAnimationDuration: LINE_CLEAR_ANIMATION_DURATION,
+    levelUpBannerDuration: LEVEL_UP_BANNER_DURATION_MS,
+    lineClearAnimationDuration: LINE_CLEAR_ANIMATION_DURATION_MS,
     settingsStore: store,
     vhsNoise,
 });
@@ -120,5 +121,4 @@ function handleViewportResize() {
     game.render();
 }
 
-window.addEventListener("resize", handleViewportResize);
-window.visualViewport?.addEventListener("resize", handleViewportResize);
+(window?.visualViewport || window).addEventListener("resize", handleViewportResize);

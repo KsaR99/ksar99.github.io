@@ -2,14 +2,14 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
     <title>Kl0ck1's</title>
     <link href="styles/main.css?v=9" rel="stylesheet">
 </head>
 <body>
 <div class="app">
     <div class="app__board board">
-        <canvas id="klockis-board" class="board__canvas"></canvas>
+        <canvas class="board__canvas" id="klockis-board"></canvas>
         <div class="board__vhs" id="vhs-overlay">
             <canvas class="board__vhs-noise" id="vhs-noise-canvas"></canvas>
         </div>
@@ -22,7 +22,7 @@
         </div>
         <div class="card" data-role="next-piece-card">
             <h3 class="card__title">Następny klocek</h3>
-            <canvas id="next-piece-canvas" class="next-piece__canvas" width="96" height="96"></canvas>
+            <canvas class="next-piece__canvas" height="96" id="next-piece-canvas" width="96"></canvas>
         </div>
         <div class="card stats" data-role="stats-card">
             <p class="stats__status" data-role="stats-status">Ostatnia gra</p>
@@ -48,7 +48,8 @@
                 Sterowanie <kbd class="kbd kbd--hint">H</kbd>
             </h3>
             <ul class="controls__list controls__list--collapsed" data-role="controls-list">
-                <li class="controls__item"><span>Obrót</span> <kbd class="kbd">▲</kbd>&nbsp;<kbd class="kbd">Z</kbd></li>
+                <li class="controls__item"><span>Obrót</span> <kbd class="kbd">▲</kbd>&nbsp;<kbd class="kbd">Z</kbd>
+                </li>
                 <li class="controls__item"><span>Ruch lewo / prawo</span> <kbd class="kbd">◀ ▶</kbd></li>
                 <li class="controls__item"><span>Szybszy spadek</span> <kbd class="kbd">▼</kbd></li>
                 <li class="controls__item"><span>Natychmiastowy spadek</span> <kbd class="kbd">Spacja</kbd></li>
@@ -72,7 +73,7 @@
     <div class="screen">
         <h2 class="screen__title">Kl0ck1's</h2>
         <p class="screen__hint">Wybierz poziom trudności</p>
-        <div class="difficulty" data-role="difficulty-select" data-field="difficulty"></div>
+        <div class="difficulty" data-field="difficulty" data-role="difficulty-select"></div>
         <p class="screen__hint screen__hint--tiny">Przełącz strzałkami <kbd class="kbd">◀</kbd> <kbd
                 class="kbd">▶</kbd></p>
         <p class="screen__hint">Naciśnij <kbd class="kbd">Enter</kbd>, aby rozpocząć</p>
@@ -88,7 +89,7 @@
         <h2 class="screen__title">PAUZA</h2>
         <p class="screen__hint">Naciśnij <kbd class="kbd">P</kbd>, aby wznowić</p>
         <p class="screen__hint">Naciśnij <kbd class="kbd">O</kbd>, aby otworzyć opcje</p>
-        <button type="button" class="options__resume button button--accent" data-role="resume-button">Wznów</button>
+        <button class="options__resume button button--accent" data-role="resume-button" type="button">Wznów</button>
     </div>
 </template>
 
@@ -101,12 +102,12 @@
             <h3 class="options__title">Dźwięk</h3>
             <label class="options__row">
                 <span>Wycisz</span>
-                <input type="checkbox" class="options__input options__input--checkbox" data-role="mute-checkbox">
+                <input class="options__input options__input--checkbox" data-role="mute-checkbox" type="checkbox">
             </label>
             <label class="options__row">
                 <span>Głośność</span>
-                <input type="range" class="options__input options__input--range"
-                       data-role="volume-slider" min="0" max="100">
+                <input class="options__input options__input--range" data-role="volume-slider"
+                       max="100" min="0" type="range">
             </label>
         </div>
 
@@ -114,19 +115,21 @@
             <h3 class="options__title">Wydajność</h3>
             <label class="options__row">
                 <span>Poświata (blur)</span>
-                <input type="checkbox" class="options__input options__input--checkbox" data-role="glow-checkbox">
+                <input class="options__input options__input--checkbox" data-role="glow-checkbox" type="checkbox">
             </label>
             <label class="options__row">
                 <span>Przezroczystość</span>
-                <input type="checkbox" class="options__input options__input--checkbox" data-role="transparency-checkbox">
+                <input class="options__input options__input--checkbox" data-role="transparency-checkbox"
+                       type="checkbox">
             </label>
             <label class="options__row">
                 <span>Zakłócenia VHS (szum)</span>
-                <input type="checkbox" class="options__input options__input--checkbox" data-role="vhs-checkbox">
+                <input class="options__input options__input--checkbox" data-role="vhs-checkbox" type="checkbox">
             </label>
         </div>
 
-        <button type="button" class="options__resume button button--accent" data-role="options-close-button">Zamknij</button>
+        <button class="options__resume button button--accent" data-role="options-close-button" type="button">Zamknij
+        </button>
     </div>
 </template>
 
@@ -137,9 +140,9 @@
             Wynik: <strong class="screen__hint-highlight" data-field="score"></strong>
             &middot; poziom <span data-field="level"></span> &middot; <span data-field="lines"></span> linii
         </p>
-        <form data-role="score-form" class="score-form" autocomplete="on">
-            <input data-role="name-input" class="score-form__input" type="text" maxlength="16" placeholder="Twój nick">
-            <button type="submit" class="score-form__button button button--primary">Kontynuuj</button>
+        <form autocomplete="on" class="score-form" data-role="score-form">
+            <input class="score-form__input" data-role="name-input" maxlength="16" placeholder="Twój nick" type="text">
+            <button class="score-form__button button button--primary" type="submit">Kontynuuj</button>
         </form>
         <div class="leaderboard">
             <h3 class="leaderboard__title">Tabela wyników</h3>
@@ -152,7 +155,7 @@
     <div class="screen">
         <h2 class="screen__title">WYNIK ZAPISANY</h2>
         <p class="screen__hint">Wybierz poziom trudności</p>
-        <div class="difficulty" data-role="difficulty-select" data-field="difficulty"></div>
+        <div class="difficulty" data-field="difficulty" data-role="difficulty-select"></div>
         <p class="screen__hint screen__hint--tiny">Przełącz strzałkami <kbd class="kbd">&lt;</kbd> <kbd
                 class="kbd">&gt;</kbd></p>
         <p class="screen__hint">Naciśnij <kbd class="kbd">Enter</kbd>, aby zagrać ponownie</p>
@@ -164,7 +167,7 @@
 </template>
 
 <template id="tpl-difficulty-button">
-    <button type="button" class="difficulty__button" data-role="difficulty-button">
+    <button class="difficulty__button" data-role="difficulty-button" type="button">
         <span data-field="label"></span>
         <span class="difficulty__level" data-field="level"></span>
     </button>
@@ -178,7 +181,7 @@
     <table class="leaderboard__table">
         <thead>
         <tr class="leaderboard__row">
-            <th class="leaderboard__heading">#</th>
+            <th class="leaderboard__heading">&nbsp;#</th>
             <th class="leaderboard__heading">Nick</th>
             <th class="leaderboard__heading">Wynik</th>
             <th class="leaderboard__heading">Poz.</th>
@@ -201,6 +204,6 @@
     </tr>
 </template>
 
-<script type="module" src="scripts/main.js?v=11"></script>
+<script src="scripts/main.js?v=11" type="module"></script>
 </body>
 </html>

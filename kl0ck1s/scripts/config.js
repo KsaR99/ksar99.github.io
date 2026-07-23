@@ -26,8 +26,8 @@ export const SPIN_POINTS = Object.freeze({
     OTHER: [100, 200, 400, 600],
 });
 
-export const LEVEL_UP_BANNER_DURATION = 777; // ms
-export const LINE_CLEAR_ANIMATION_DURATION = 265; // ms
+export const LEVEL_UP_BANNER_DURATION_MS = 750;
+export const LINE_CLEAR_ANIMATION_DURATION_MS = 260;
 
 export const DIFFICULTIES = Object.freeze({
     easy: {label: "Easy", startLevel: 1},
@@ -45,7 +45,7 @@ export const BOARD_BACKGROUNDS = Object.freeze({
     pro: "oklch(0 0 0)",
 });
 
-export const DEFAULT_DIFFICULTY = "medium";
+export const DEFAULT_DIFFICULTY = "hard";
 
 export const KLOCKOMINOS = Object.freeze({
     I: {

@@ -35,12 +35,6 @@ export class Game {
 
     static SETTINGS_KEY = "klockis-settings";
 
-    static getKickTable(type) {
-        if (type === "I") return Game.I_KICKS;
-        if (type === "O") return Game.O_KICKS;
-        return Game.JLSTZ_KICKS;
-    }
-
     constructor({
                     board,
                     bag,
@@ -80,6 +74,21 @@ export class Game {
         this.previousStateBeforeOptions = null;
     }
 
+    get stats() {
+        return {
+            score: formatNumber(this.score),
+            level: this.level,
+            lines: this.lines,
+            best: formatNumber(this.leaderboard.bestScore()),
+        };
+    }
+
+    static getKickTable(type) {
+        if (type === "I") return Game.I_KICKS;
+        if (type === "O") return Game.O_KICKS;
+        return Game.JLSTZ_KICKS;
+    }
+
     defaultSettings() {
         return {volume: 1, muted: false, glow: true, transparency: true, vhs: true};
     }
@@ -99,15 +108,6 @@ export class Game {
         this.bindControls();
         this.bindControlsToggle();
         requestAnimationFrame(this.loop.bind(this));
-    }
-
-    get stats() {
-        return {
-            score: formatNumber(this.score),
-            level: this.level,
-            lines: this.lines,
-            best: formatNumber(this.leaderboard.bestScore()),
-        };
     }
 
     renderLeaderboard(list, highlightEntry = null) {
