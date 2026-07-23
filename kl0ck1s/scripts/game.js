@@ -1,7 +1,7 @@
 "use strict";
 
 import {Piece} from "./piece.js";
-import {dropIntervalForLevel} from "./utils.js";
+import {dropIntervalForLevel, formatNumber} from "./utils.js";
 import {levelForLines, pointsForHardDrop, pointsForLineClear, pointsForSoftDrop, pointsForSpin} from "./scoring.js";
 
 export class Game {
@@ -83,10 +83,10 @@ export class Game {
 
     get stats() {
         return {
-            score: this.score,
+            score: formatNumber(this.score),
             level: this.level,
             lines: this.lines,
-            best: this.leaderboard.bestScore(),
+            best: formatNumber(this.leaderboard.bestScore()),
         };
     }
 

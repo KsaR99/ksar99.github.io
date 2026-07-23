@@ -22,3 +22,22 @@ export function dropIntervalForLevel(level, scoring = SCORING) {
         scoring.BASE_DROP_INTERVAL - (level - 1) * scoring.DROP_INTERVAL_STEP
     );
 }
+
+export function formatNumber(number, decimals = 1) {
+    const units = [
+        ["b", 1e9],
+        ["m", 1e6],
+        ["k", 1e3],
+    ];
+
+    for (const [suffix, value] of units) {
+        if (number >= value) {
+            return (number / value)
+                    .toFixed(decimals)
+                    .replace(/\.0$/, "")
+                + suffix;
+        }
+    }
+
+    return String(number);
+}
