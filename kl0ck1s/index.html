@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1" name="viewport">
     <title>Kl0ck1's</title>
-    <link href="styles/main.css?v=10" rel="stylesheet">
+    <link href="styles/main.css?v=11" rel="stylesheet">
 </head>
 <body>
 <div class="app">
@@ -18,45 +18,53 @@
     <div class="app__sidebar sidebar">
         <div class="card">
             <p class="brand__title">Kl0ck1's</p>
-            <p class="brand__subtitle">Ułóż linie, zdobywaj punkty.</p>
+            <p class="brand__subtitle" data-i18n="app.subtitle">Arrange the lines, score points.</p>
         </div>
         <div class="card" data-role="next-piece-card">
-            <h3 class="card__title">Następny klocek</h3>
+            <h3 class="card__title" data-i18n="sidebar.nextPiece">Next piece</h3>
             <canvas class="next-piece__canvas" height="96" id="next-piece-canvas" width="96"></canvas>
         </div>
         <div class="card stats" data-role="stats-card">
-            <p class="stats__status" data-role="stats-status">Ostatnia gra</p>
+            <p class="stats__status" data-i18n="sidebar.statusLast" data-role="stats-status">Last game</p>
             <div>
-                <h3 class="card__title">Wynik</h3>
+                <h3 class="card__title" data-i18n="sidebar.score">Score</h3>
                 <div class="stats__value" id="score-value">0</div>
             </div>
             <div>
-                <h3 class="card__title">Poziom</h3>
+                <h3 class="card__title" data-i18n="sidebar.level">Level</h3>
                 <div class="stats__value" id="level-value">1</div>
             </div>
             <div>
-                <h3 class="card__title">Linie</h3>
+                <h3 class="card__title" data-i18n="sidebar.lines">Lines</h3>
                 <div class="stats__value" id="lines-value">0</div>
             </div>
             <div>
-                <h3 class="card__title">Rekord</h3>
+                <h3 class="card__title" data-i18n="sidebar.best">Best</h3>
                 <div class="stats__value" id="best-value">0</div>
             </div>
         </div>
         <div class="card">
             <h3 class="card__title controls__toggle" data-role="controls-toggle">
-                Sterowanie <kbd class="kbd kbd--hint">H</kbd>
+                <span data-i18n="controls.toggle">Controls</span> <kbd class="kbd kbd--hint">H</kbd>
             </h3>
             <ul class="controls__list controls__list--collapsed" data-role="controls-list">
-                <li class="controls__item"><span>Obrót</span> <kbd class="kbd">▲</kbd>&nbsp;<kbd class="kbd">Z</kbd>
+                <li class="controls__item"><span data-i18n="controls.rotate">Rotate</span> <kbd class="kbd">▲</kbd>&nbsp;<kbd
+                        class="kbd">Z</kbd>
                 </li>
-                <li class="controls__item"><span>Ruch lewo / prawo</span> <kbd class="kbd">◀ ▶</kbd></li>
-                <li class="controls__item"><span>Szybszy spadek</span> <kbd class="kbd">▼</kbd></li>
-                <li class="controls__item"><span>Natychmiastowy spadek</span> <kbd class="kbd">Spacja</kbd></li>
-                <li class="controls__item"><span>Pauza</span> <kbd class="kbd">P</kbd></li>
-                <li class="controls__item"><span>Start / nowa gra</span> <kbd class="kbd">Enter</kbd></li>
-                <li class="controls__item"><span>Wycisz dźwięk</span> <kbd class="kbd">M</kbd></li>
-                <li class="controls__item"><span>Opcje</span> <kbd class="kbd">O</kbd></li>
+                <li class="controls__item"><span data-i18n="controls.moveLeftRight">Move left / right</span> <kbd
+                        class="kbd">◀ ▶</kbd></li>
+                <li class="controls__item"><span data-i18n="controls.softDrop">Soft drop</span> <kbd class="kbd">▼</kbd>
+                </li>
+                <li class="controls__item"><span data-i18n="controls.hardDrop">Hard drop</span> <kbd class="kbd"
+                                                                                                     data-i18n="controls.spaceKey">Space</kbd>
+                </li>
+                <li class="controls__item"><span data-i18n="controls.pause">Pause</span> <kbd class="kbd">P</kbd></li>
+                <li class="controls__item"><span data-i18n="controls.start">Start / new game</span> <kbd class="kbd">Enter</kbd>
+                </li>
+                <li class="controls__item"><span data-i18n="controls.mute">Mute sound</span> <kbd class="kbd">M</kbd>
+                </li>
+                <li class="controls__item"><span data-i18n="controls.options">Options</span> <kbd class="kbd">O</kbd>
+                </li>
             </ul>
         </div>
     </div>
@@ -72,13 +80,18 @@
 <template id="tpl-screen-idle">
     <div class="screen">
         <h2 class="screen__title">Kl0ck1's</h2>
-        <p class="screen__hint">Wybierz poziom trudności</p>
+        <p class="screen__hint" data-i18n="screens.idle.hint">Choose difficulty</p>
         <div class="difficulty" data-field="difficulty" data-role="difficulty-select"></div>
-        <p class="screen__hint screen__hint--tiny">Przełącz strzałkami <kbd class="kbd">◀</kbd> <kbd
-                class="kbd">▶</kbd></p>
-        <p class="screen__hint">Naciśnij <kbd class="kbd">Enter</kbd>, aby rozpocząć</p>
+        <p class="screen__hint screen__hint--tiny">
+            <span data-i18n="screens.common.switchHint">Switch with arrows</span> <kbd class="kbd">◀</kbd> <kbd
+                class="kbd">▶</kbd>
+        </p>
+        <p class="screen__hint">
+            <span data-i18n="screens.idle.startHintBefore">Press</span> <kbd class="kbd">Enter</kbd> <span
+                data-i18n="screens.idle.startHintAfter">to start</span>
+        </p>
         <div class="leaderboard">
-            <h3 class="leaderboard__title">Tabela wyników</h3>
+            <h3 class="leaderboard__title" data-i18n="leaderboard.title">Leaderboard</h3>
             <div data-field="leaderboard"></div>
         </div>
     </div>
@@ -86,66 +99,91 @@
 
 <template id="tpl-screen-paused">
     <div class="screen">
-        <h2 class="screen__title">PAUZA</h2>
-        <p class="screen__hint">Naciśnij <kbd class="kbd">P</kbd>, aby wznowić</p>
-        <p class="screen__hint">Naciśnij <kbd class="kbd">O</kbd>, aby otworzyć opcje</p>
-        <button class="options__resume button button--accent" data-role="resume-button" type="button">Wznów</button>
+        <h2 class="screen__title" data-i18n="screens.paused.title">PAUSED</h2>
+        <p class="screen__hint">
+            <span data-i18n="screens.paused.resumeHintBefore">Press</span> <kbd class="kbd">P</kbd> <span
+                data-i18n="screens.paused.resumeHintAfter">to resume</span>
+        </p>
+        <p class="screen__hint">
+            <span data-i18n="screens.paused.optionsHintBefore">Press</span> <kbd class="kbd">O</kbd> <span
+                data-i18n="screens.paused.optionsHintAfter">to open options</span>
+        </p>
+        <button class="options__resume button button--accent" data-i18n="screens.paused.resumeButton"
+                data-role="resume-button" type="button">Resume
+        </button>
     </div>
 </template>
 
 <template id="tpl-screen-options">
     <div class="screen">
-        <h2 class="screen__title">OPCJE</h2>
-        <p class="screen__hint">Naciśnij <kbd class="kbd">O</kbd>, aby zamknąć</p>
+        <h2 class="screen__title" data-i18n="screens.options.title">OPTIONS</h2>
+        <p class="screen__hint">
+            <span data-i18n="screens.options.closeHintBefore">Press</span> <kbd class="kbd">O</kbd> <span
+                data-i18n="screens.options.closeHintAfter">to close</span>
+        </p>
 
         <div class="options">
-            <h3 class="options__title">Dźwięk</h3>
+            <h3 class="options__title" data-i18n="screens.options.languageTitle">Language</h3>
             <label class="options__row">
-                <span>Wycisz</span>
+                <span data-i18n="screens.options.language">Language</span>
+                <select class="options__input options__input--select" data-role="lang-select"></select>
+            </label>
+        </div>
+
+        <div class="options">
+            <h3 class="options__title" data-i18n="screens.options.soundTitle">Sound</h3>
+            <label class="options__row">
+                <span data-i18n="screens.options.mute">Mute</span>
                 <input class="options__input options__input--checkbox" data-role="mute-checkbox" type="checkbox">
             </label>
             <label class="options__row">
-                <span>Głośność</span>
+                <span data-i18n="screens.options.volume">Volume</span>
                 <input class="options__input options__input--range" data-role="volume-slider"
                        max="100" min="0" type="range">
             </label>
         </div>
 
         <div class="options">
-            <h3 class="options__title">Wydajność</h3>
+            <h3 class="options__title" data-i18n="screens.options.performanceTitle">Performance</h3>
             <label class="options__row">
-                <span>Poświata (blur)</span>
+                <span data-i18n="screens.options.glow">Glow (blur)</span>
                 <input class="options__input options__input--checkbox" data-role="glow-checkbox" type="checkbox">
             </label>
             <label class="options__row">
-                <span>Przezroczystość</span>
+                <span data-i18n="screens.options.transparency">Transparency</span>
                 <input class="options__input options__input--checkbox" data-role="transparency-checkbox"
                        type="checkbox">
             </label>
             <label class="options__row">
-                <span>Zakłócenia VHS (szum)</span>
+                <span data-i18n="screens.options.vhs">VHS noise</span>
                 <input class="options__input options__input--checkbox" data-role="vhs-checkbox" type="checkbox">
             </label>
         </div>
 
-        <button class="options__resume button button--accent" data-role="options-close-button" type="button">Zamknij
+        <button class="options__resume button button--accent" data-i18n="screens.options.close"
+                data-role="options-close-button" type="button">Close
         </button>
     </div>
 </template>
 
 <template id="tpl-screen-gameover-entry">
     <div class="screen">
-        <h2 class="screen__title">KONIEC GRY</h2>
+        <h2 class="screen__title" data-i18n="screens.gameOverEntry.title">GAME OVER</h2>
         <p class="screen__hint">
-            Wynik: <strong class="screen__hint-highlight" data-field="score"></strong>
-            &middot; poziom <span data-field="level"></span> &middot; <span data-field="lines"></span> linii
+            <span data-i18n="screens.gameOverEntry.scoreLabel">Score:</span>
+            <strong class="screen__hint-highlight" data-field="score"></strong>
+            &middot; <span data-i18n="screens.gameOverEntry.levelLabel">level</span> <span data-field="level"></span>
+            &middot; <span data-field="lines"></span> <span data-i18n="screens.gameOverEntry.linesLabel">lines</span>
         </p>
         <form autocomplete="on" class="score-form" data-role="score-form">
-            <input class="score-form__input" data-role="name-input" maxlength="16" placeholder="Twój nick" type="text">
-            <button class="score-form__button button button--primary" type="submit">Kontynuuj</button>
+            <input class="score-form__input" data-i18n-placeholder="screens.gameOverEntry.namePlaceholder"
+                   data-role="name-input" maxlength="16" placeholder="Your nickname" type="text">
+            <button class="score-form__button button button--primary" data-i18n="screens.gameOverEntry.submit"
+                    type="submit">Continue
+            </button>
         </form>
         <div class="leaderboard">
-            <h3 class="leaderboard__title">Tabela wyników</h3>
+            <h3 class="leaderboard__title" data-i18n="leaderboard.title">Leaderboard</h3>
             <div data-field="leaderboard"></div>
         </div>
     </div>
@@ -153,14 +191,19 @@
 
 <template id="tpl-screen-gameover-saved">
     <div class="screen">
-        <h2 class="screen__title">WYNIK ZAPISANY</h2>
-        <p class="screen__hint">Wybierz poziom trudności</p>
+        <h2 class="screen__title" data-i18n="screens.gameOverSaved.title">SCORE SAVED</h2>
+        <p class="screen__hint" data-i18n="screens.idle.hint">Choose difficulty</p>
         <div class="difficulty" data-field="difficulty" data-role="difficulty-select"></div>
-        <p class="screen__hint screen__hint--tiny">Przełącz strzałkami <kbd class="kbd">&lt;</kbd> <kbd
-                class="kbd">&gt;</kbd></p>
-        <p class="screen__hint">Naciśnij <kbd class="kbd">Enter</kbd>, aby zagrać ponownie</p>
+        <p class="screen__hint screen__hint--tiny">
+            <span data-i18n="screens.common.switchHint">Switch with arrows</span> <kbd class="kbd">&lt;</kbd> <kbd
+                class="kbd">&gt;</kbd>
+        </p>
+        <p class="screen__hint">
+            <span data-i18n="screens.gameOverSaved.playAgainHintBefore">Press</span> <kbd class="kbd">Enter</kbd> <span
+                data-i18n="screens.gameOverSaved.playAgainHintAfter">to play again</span>
+        </p>
         <div class="leaderboard">
-            <h3 class="leaderboard__title">Tabela wyników</h3>
+            <h3 class="leaderboard__title" data-i18n="leaderboard.title">Leaderboard</h3>
             <div data-field="leaderboard"></div>
         </div>
     </div>
@@ -174,7 +217,7 @@
 </template>
 
 <template id="tpl-leaderboard-empty">
-    <p class="leaderboard__empty">Brak wyników — zagraj pierwszy!</p>
+    <p class="leaderboard__empty" data-i18n="leaderboard.empty">No scores yet — be the first to play!</p>
 </template>
 
 <template id="tpl-leaderboard-table">
@@ -182,11 +225,11 @@
         <thead>
         <tr class="leaderboard__row">
             <th class="leaderboard__heading">&nbsp;#</th>
-            <th class="leaderboard__heading">Nick</th>
-            <th class="leaderboard__heading">Wynik</th>
-            <th class="leaderboard__heading">Poz.</th>
-            <th class="leaderboard__heading">Linie</th>
-            <th class="leaderboard__heading leaderboard__heading--date">Data</th>
+            <th class="leaderboard__heading" data-i18n="leaderboard.headers.name">Name</th>
+            <th class="leaderboard__heading" data-i18n="leaderboard.headers.score">Score</th>
+            <th class="leaderboard__heading" data-i18n="leaderboard.headers.level">Lvl</th>
+            <th class="leaderboard__heading" data-i18n="leaderboard.headers.lines">Lines</th>
+            <th class="leaderboard__heading leaderboard__heading--date" data-i18n="leaderboard.headers.date">Date</th>
         </tr>
         </thead>
         <tbody data-field="rows"></tbody>
@@ -204,6 +247,6 @@
     </tr>
 </template>
 
-<script src="scripts/main.js?v=11" type="module"></script>
+<script src="scripts/main.js?v=12" type="module"></script>
 </body>
 </html>

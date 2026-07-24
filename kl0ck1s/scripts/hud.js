@@ -10,10 +10,11 @@ export class HUD {
      * @param {HTMLElement} elements.overlayEl
      * @param {HTMLElement} [elements.nextPieceCardEl]
      * @param {HTMLElement} [elements.statsStatusEl]
+     * @param {import("./i18n.js").I18n} [elements.i18n]
      */
     constructor({
                     scoreEl, levelEl, linesEl, bestEl, overlayEl,
-                    nextPieceCardEl = null, statsStatusEl = null,
+                    nextPieceCardEl = null, statsStatusEl = null, i18n = null,
                 }) {
         this.scoreEl = scoreEl;
         this.levelEl = levelEl;
@@ -22,6 +23,7 @@ export class HUD {
         this.overlayEl = overlayEl;
         this.nextPieceCardEl = nextPieceCardEl;
         this.statsStatusEl = statsStatusEl;
+        this.i18n = i18n;
     }
 
     setPlaying(isPlaying) {
@@ -29,7 +31,9 @@ export class HUD {
             this.nextPieceCardEl.classList.toggle("card--hidden", !isPlaying);
         }
         if (this.statsStatusEl) {
-            this.statsStatusEl.textContent = isPlaying ? "Aktualna gra" : "Ostatnia gra";
+            this.statsStatusEl.textContent = this.i18n
+                ? this.i18n.t(isPlaying ? "sidebar.statusLive" : "sidebar.statusLast")
+                : (isPlaying ? "Current game" : "Last game");
             this.statsStatusEl.classList.toggle("stats__status--live", isPlaying);
         }
     }

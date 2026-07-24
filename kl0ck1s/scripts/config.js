@@ -30,11 +30,11 @@ export const LEVEL_UP_BANNER_DURATION_MS = 750;
 export const LINE_CLEAR_ANIMATION_DURATION_MS = 260;
 
 export const DIFFICULTIES = Object.freeze({
-    easy: {label: "Easy", startLevel: 1},
-    medium: {label: "Medium", startLevel: 5},
-    hard: {label: "Hard", startLevel: 10},
-    expert: {label: "Expert", startLevel: 20},
-    pro: {label: "PRO", startLevel: 30},
+    easy: {startLevel: 1},
+    medium: {startLevel: 5},
+    hard: {startLevel: 10},
+    expert: {startLevel: 20},
+    pro: {startLevel: 30},
 });
 
 export const BOARD_BACKGROUNDS = Object.freeze({

@@ -13,8 +13,19 @@ export class Renderer {
      * @param {object} deps.boardConfig
      * @param {object} deps.klockominos
      * @param {number} deps.nextPreviewCellSize
+     * @param {import("./i18n.js").I18n} [deps.i18n]
      */
-    constructor({ctx, boardCanvas, nextCtx, nextCanvas, spriteCache, boardConfig, klockominos, nextPreviewCellSize}) {
+    constructor({
+                    ctx,
+                    boardCanvas,
+                    nextCtx,
+                    nextCanvas,
+                    spriteCache,
+                    boardConfig,
+                    klockominos,
+                    nextPreviewCellSize,
+                    i18n = null
+                }) {
         this.ctx = ctx;
         this.boardCanvas = boardCanvas;
         this.nextCtx = nextCtx;
@@ -23,6 +34,7 @@ export class Renderer {
         this.boardConfig = boardConfig;
         this.klockominos = klockominos;
         this.nextPreviewCellSize = nextPreviewCellSize;
+        this.i18n = i18n;
         this.glowEnabled = true;
         this.transparencyEnabled = true;
     }
@@ -182,7 +194,7 @@ export class Renderer {
         const centerX = boardCanvas.width / 2;
         const centerY = boardCanvas.height / 2;
         const fontSize = Math.max(18, Math.round(boardConfig.CELL_SIZE * 1.3));
-        const text = `POZIOM ${level}`;
+        const text = this.i18n ? this.i18n.t("game.levelUpBanner", {level}) : `LEVEL ${level}`;
 
         ctx.save();
         ctx.textAlign = "center";

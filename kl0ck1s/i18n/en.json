@@ -1,0 +1,99 @@
+{
+  "locale": "en-US",
+  "app": {
+    "subtitle": "Arrange the lines, score points."
+  },
+  "sidebar": {
+    "nextPiece": "Next piece",
+    "score": "Score",
+    "level": "Level",
+    "lines": "Lines",
+    "best": "Best",
+    "statusLive": "Current game",
+    "statusLast": "Last game"
+  },
+  "controls": {
+    "toggle": "Controls",
+    "rotate": "Rotate",
+    "moveLeftRight": "Move left / right",
+    "softDrop": "Soft drop",
+    "hardDrop": "Hard drop",
+    "pause": "Pause",
+    "start": "Start / new game",
+    "mute": "Mute sound",
+    "options": "Options",
+    "spaceKey": "Space"
+  },
+  "screens": {
+    "common": {
+      "switchHint": "Switch with arrows"
+    },
+    "idle": {
+      "hint": "Choose difficulty",
+      "startHintBefore": "Press",
+      "startHintAfter": "to start"
+    },
+    "paused": {
+      "title": "PAUSED",
+      "resumeHintBefore": "Press",
+      "resumeHintAfter": "to resume",
+      "optionsHintBefore": "Press",
+      "optionsHintAfter": "to open options",
+      "resumeButton": "Resume"
+    },
+    "options": {
+      "title": "OPTIONS",
+      "closeHintBefore": "Press",
+      "closeHintAfter": "to close",
+      "languageTitle": "Language",
+      "language": "Language",
+      "soundTitle": "Sound",
+      "mute": "Mute",
+      "volume": "Volume",
+      "performanceTitle": "Performance",
+      "glow": "Glow (blur)",
+      "transparency": "Transparency",
+      "vhs": "VHS noise",
+      "close": "Close"
+    },
+    "loading": {
+      "leaderboardHint": "Loading leaderboard..."
+    },
+    "gameOverEntry": {
+      "title": "GAME OVER",
+      "scoreLabel": "Score:",
+      "levelLabel": "level",
+      "linesLabel": "lines",
+      "namePlaceholder": "Your nickname",
+      "submit": "Continue"
+    },
+    "gameOverSaved": {
+      "title": "SCORE SAVED",
+      "playAgainHintBefore": "Press",
+      "playAgainHintAfter": "to play again"
+    }
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "empty": "No scores yet \u2014 be the first to play!",
+    "headers": {
+      "name": "Name",
+      "score": "Score",
+      "level": "Lvl",
+      "lines": "Lines",
+      "date": "Date"
+    },
+    "defaultName": "Player"
+  },
+  "difficulty": {
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "expert": "Expert",
+    "pro": "PRO",
+    "levelPrefix": "level {level}"
+  },
+  "game": {
+    "levelUpBanner": "LEVEL {level}"
+  }
+}

@@ -34,6 +34,7 @@ export class Game {
     };
 
     static SETTINGS_KEY = "klockis-settings";
+    static APP_NAME = "Kl0ck1's";
 
     constructor({
                     board,
@@ -52,6 +53,7 @@ export class Game {
                     settingsStore = null,
                     vhsNoise = null,
                     dom = (typeof document !== "undefined" ? document : null),
+                    i18n,
                 }) {
         this.board = board;
         this.bag = bag;
@@ -69,9 +71,11 @@ export class Game {
         this.settingsStore = settingsStore ?? leaderboard.store;
         this.vhsNoise = vhsNoise;
         this.dom = dom;
+        this.i18n = i18n;
         this.settings = this.defaultSettings();
         this.vhsEnabled = false;
         this.previousStateBeforeOptions = null;
+        this.isPlayingSession = false;
     }
 
     get stats() {
@@ -145,8 +149,11 @@ export class Game {
 
     async showIdleScreen() {
         this.state = "idle";
+        this.isPlayingSession = false;
         this.hud.setPlaying(false);
-        this.hud.showScreen(this.screens.loading("Kl0ck1's", "Wczytywanie tabeli wyników...", this.dom));
+        this.hud.showScreen(this.screens.loading(
+            Game.APP_NAME, this.i18n.t("screens.loading.leaderboardHint"), this.dom
+        ));
 
         const list = await this.leaderboard.load();
         if (this.state !== "idle") return;
@@ -158,7 +165,9 @@ export class Game {
     renderIdleScreen(list) {
         this.currentIdleList = list;
         this.hud.showScreen(
-            this.screens.idle(list, this.difficulty, this.difficulties, (l, h) => this.renderLeaderboard(l, h), this.dom)
+            this.screens.idle(
+                list, this.difficulty, this.difficulties, (l, h) => this.renderLeaderboard(l, h), this.dom, this.i18n
+            )
         );
         this.bindDifficultyButtons(() => this.renderIdleScreen(list));
     }
@@ -198,6 +207,7 @@ export class Game {
     start() {
         this.prepareNewRound();
         this.state = "running";
+        this.isPlayingSession = true;
         this.hud.setPlaying(true);
         this.hud.hideOverlay();
     }
@@ -219,9 +229,12 @@ export class Game {
 
     async gameOver() {
         this.state = "gameover-entry";
+        this.isPlayingSession = false;
         this.hud.setPlaying(false);
         this.soundManager.play("gameOver");
-        this.hud.showScreen(this.screens.loading("KONIEC GRY", "Wczytywanie tabeli wyników...", this.dom));
+        this.hud.showScreen(this.screens.loading(
+            this.i18n.t("screens.gameOverEntry.title"), this.i18n.t("screens.loading.leaderboardHint"), this.dom
+        ));
 
         const [list, lastName] = await Promise.all([
             this.leaderboard.load(),
@@ -230,7 +243,9 @@ export class Game {
         if (this.state !== "gameover-entry") return;
 
         this.hud.showScreen(
-            this.screens.gameOverEntry(this.stats, list, (l, h) => this.renderLeaderboard(l, h), this.dom)
+            this.screens.gameOverEntry(
+                this.stats, list, (l, h) => this.renderLeaderboard(l, h), this.dom, this.i18n
+            )
         );
         this.bindScoreForm(lastName);
     }
@@ -251,7 +266,7 @@ export class Game {
             if (button) button.disabled = true;
 
             const typedName = input.value.trim().slice(0, 16);
-            const name = typedName || "Gracz";
+            const name = typedName || this.i18n.t("leaderboard.defaultName");
             const entry = {
                 name,
                 score: this.score,
@@ -277,7 +292,8 @@ export class Game {
         this.currentGameOverSaved = {list, entry};
         this.hud.showScreen(
             this.screens.gameOverSaved(
-                list, entry, (l, h) => this.renderLeaderboard(l, h), this.difficulty, this.difficulties, this.dom
+                list, entry, (l, h) => this.renderLeaderboard(l, h),
+                this.difficulty, this.difficulties, this.dom, this.i18n
             )
         );
         this.bindDifficultyButtons(() => this.renderGameOverSaved(list, entry));
@@ -294,7 +310,7 @@ export class Game {
     }
 
     renderPauseMenu() {
-        this.hud.showScreen(this.screens.paused(this.dom));
+        this.hud.showScreen(this.screens.paused(this.dom, this.i18n));
         this.bindPauseMenu();
     }
 
@@ -402,7 +418,7 @@ export class Game {
     }
 
     renderOptionsMenu() {
-        this.hud.showScreen(this.screens.options(this.settings, this.dom));
+        this.hud.showScreen(this.screens.options(this.settings, this.dom, this.i18n));
         this.bindOptionsMenu();
     }
 
@@ -459,6 +475,21 @@ export class Game {
         if (closeButton) {
             closeButton.addEventListener("click", () => this.toggleOptions());
         }
+
+        this.bindLangSelect();
+    }
+
+    bindLangSelect() {
+        if (!this.dom) return;
+        const select = this.dom.querySelector('[data-role="lang-select"]');
+        if (!select) return;
+
+        select.addEventListener("change", async () => {
+            const lang = select.value;
+            if (lang === this.i18n.lang) return;
+            await this.i18n.setLanguage(lang);
+            this.refreshLanguage();
+        });
     }
 
     toggleControlsList() {
@@ -472,6 +503,25 @@ export class Game {
         const title = this.dom.querySelector('[data-role="controls-toggle"]');
         if (!title) return;
         title.addEventListener("click", () => this.toggleControlsList());
+    }
+
+    refreshLanguage() {
+        if (this.dom) this.i18n.applyStatic(this.dom);
+        this.hud.setPlaying(this.isPlayingSession);
+        this.refreshCurrentScreen();
+    }
+
+    refreshCurrentScreen() {
+        if (this.state === "idle") {
+            this.renderIdleScreen(this.currentIdleList ?? []);
+        } else if (this.state === "paused") {
+            this.renderPauseMenu();
+        } else if (this.state === "options") {
+            this.renderOptionsMenu();
+        } else if (this.state === "gameover-saved" && this.currentGameOverSaved) {
+            const {list, entry} = this.currentGameOverSaved;
+            this.renderGameOverSaved(list, entry);
+        }
     }
 
     handleEnter() {

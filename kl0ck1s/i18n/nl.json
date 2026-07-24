@@ -1,0 +1,99 @@
+{
+  "locale": "nl-NL",
+  "app": {
+    "subtitle": "Leg de lijnen, scoor punten."
+  },
+  "sidebar": {
+    "nextPiece": "Volgend blok",
+    "score": "Score",
+    "level": "Niveau",
+    "lines": "Lijnen",
+    "best": "Beste",
+    "statusLive": "Huidige spel",
+    "statusLast": "Laatste spel"
+  },
+  "controls": {
+    "toggle": "Bediening",
+    "rotate": "Draaien",
+    "moveLeftRight": "Links / rechts bewegen",
+    "softDrop": "Zacht laten vallen",
+    "hardDrop": "Snel laten vallen",
+    "pause": "Pauze",
+    "start": "Start / nieuw spel",
+    "mute": "Geluid dempen",
+    "options": "Opties",
+    "spaceKey": "Spatie"
+  },
+  "screens": {
+    "common": {
+      "switchHint": "Wissel met pijltjes"
+    },
+    "idle": {
+      "hint": "Kies moeilijkheidsgraad",
+      "startHintBefore": "Druk op",
+      "startHintAfter": "om te starten"
+    },
+    "paused": {
+      "title": "GEPAUZEERD",
+      "resumeHintBefore": "Druk op",
+      "resumeHintAfter": "om verder te gaan",
+      "optionsHintBefore": "Druk op",
+      "optionsHintAfter": "om opties te openen",
+      "resumeButton": "Verdergaan"
+    },
+    "options": {
+      "title": "OPTIES",
+      "closeHintBefore": "Druk op",
+      "closeHintAfter": "om te sluiten",
+      "languageTitle": "Taal",
+      "language": "Taal",
+      "soundTitle": "Geluid",
+      "mute": "Dempen",
+      "volume": "Volume",
+      "performanceTitle": "Prestaties",
+      "glow": "Gloed (vervaging)",
+      "transparency": "Transparantie",
+      "vhs": "VHS-ruis",
+      "close": "Sluiten"
+    },
+    "loading": {
+      "leaderboardHint": "Scorebord laden..."
+    },
+    "gameOverEntry": {
+      "title": "GAME OVER",
+      "scoreLabel": "Score:",
+      "levelLabel": "niveau",
+      "linesLabel": "lijnen",
+      "namePlaceholder": "Jouw bijnaam",
+      "submit": "Doorgaan"
+    },
+    "gameOverSaved": {
+      "title": "SCORE OPGESLAGEN",
+      "playAgainHintBefore": "Druk op",
+      "playAgainHintAfter": "om opnieuw te spelen"
+    }
+  },
+  "leaderboard": {
+    "title": "Scorebord",
+    "empty": "Nog geen scores — wees de eerste!",
+    "headers": {
+      "name": "Naam",
+      "score": "Score",
+      "level": "Niv.",
+      "lines": "Lijnen",
+      "date": "Datum"
+    },
+    "defaultName": "Speler"
+  },
+  "difficulty": {
+    "easy": "Makkelijk",
+    "medium": "Gemiddeld",
+    "hard": "Moeilijk",
+    "expert": "Expert",
+    "pro": "PRO",
+    "levelPrefix": "niveau {level}"
+  },
+  "game": {
+    "levelUpBanner": "NIVEAU {level}"
+  }
+}

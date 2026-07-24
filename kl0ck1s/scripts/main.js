@@ -26,6 +26,11 @@ import {Renderer} from "./renderer.js";
 import {HUD} from "./hud.js";
 import {VhsNoise} from "./vhs-noise.js";
 import {Game} from "./game.js";
+import {I18n} from "./i18n.js";
+
+const i18n = new I18n();
+await i18n.init();
+i18n.applyStatic(document);
 
 /** @type {HTMLCanvasElement} */
 const boardCanvas = document.getElementById("klockis-board");
@@ -78,6 +83,7 @@ const renderer = new Renderer({
     boardConfig: BOARD_CONFIG,
     klockominos: KLOCKOMINOS,
     nextPreviewCellSize: NEXT_PREVIEW_CELL_SIZE,
+    i18n,
 });
 
 const hud = new HUD({
@@ -88,11 +94,12 @@ const hud = new HUD({
     overlayEl: document.getElementById("overlay"),
     nextPieceCardEl: document.querySelector('[data-role="next-piece-card"]'),
     statsStatusEl: document.querySelector('[data-role="stats-status"]'),
+    i18n,
 });
 
 const soundManager = new SoundManager(SOUND_FILES);
 const store = new PersistentStore();
-const leaderboard = new Leaderboard(store);
+const leaderboard = new Leaderboard(store, document, i18n);
 const board = new Board(BOARD_CONFIG.COLS, BOARD_CONFIG.ROWS);
 const bag = new PieceBag(KLOCKOMINO_TYPES);
 
@@ -112,6 +119,7 @@ const game = new Game({
     lineClearAnimationDuration: LINE_CLEAR_ANIMATION_DURATION_MS,
     settingsStore: store,
     vhsNoise,
+    i18n,
 });
 
 game.init();

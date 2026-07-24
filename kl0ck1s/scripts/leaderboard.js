@@ -5,9 +5,10 @@ export class Leaderboard {
     static NAME_KEY = "klockis-last-name";
     static MAX_ENTRIES = 10;
 
-    constructor(store, dom = (typeof document !== "undefined" ? document : null)) {
+    constructor(store, dom = (typeof document !== "undefined" ? document : null), i18n = null) {
         this.store = store;
         this.dom = dom;
+        this.i18n = i18n;
         this.cache = [];
         this.lastNameCache = "";
     }
@@ -50,7 +51,8 @@ export class Leaderboard {
 
     formatDate(iso) {
         const date = new Date(iso);
-        return date.toLocaleString("pl-PL", {
+        const locale = this.i18n?.locale || "en-US";
+        return date.toLocaleString(locale, {
             day: "2-digit", month: "2-digit", year: "numeric",
             hour: "2-digit", minute: "2-digit",
         });

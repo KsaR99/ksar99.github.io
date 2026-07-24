@@ -1,0 +1,99 @@
+{
+  "locale": "pl-PL",
+  "app": {
+    "subtitle": "U\u0142\u00f3\u017c linie, zdobywaj punkty."
+  },
+  "sidebar": {
+    "nextPiece": "Nast\u0119pny klocek",
+    "score": "Wynik",
+    "level": "Poziom",
+    "lines": "Linie",
+    "best": "Rekord",
+    "statusLive": "Aktualna gra",
+    "statusLast": "Ostatnia gra"
+  },
+  "controls": {
+    "toggle": "Sterowanie",
+    "rotate": "Obr\u00f3t",
+    "moveLeftRight": "Ruch lewo / prawo",
+    "softDrop": "Szybszy spadek",
+    "hardDrop": "Natychmiastowy spadek",
+    "pause": "Pauza",
+    "start": "Start / nowa gra",
+    "mute": "Wycisz d\u017awi\u0119k",
+    "options": "Opcje",
+    "spaceKey": "Spacja"
+  },
+  "screens": {
+    "common": {
+      "switchHint": "Prze\u0142\u0105cz strza\u0142kami"
+    },
+    "idle": {
+      "hint": "Wybierz poziom trudno\u015bci",
+      "startHintBefore": "Naci\u015bnij",
+      "startHintAfter": ", aby rozpocz\u0105\u0107"
+    },
+    "paused": {
+      "title": "PAUZA",
+      "resumeHintBefore": "Naci\u015bnij",
+      "resumeHintAfter": ", aby wznowi\u0107",
+      "optionsHintBefore": "Naci\u015bnij",
+      "optionsHintAfter": ", aby otworzy\u0107 opcje",
+      "resumeButton": "Wzn\u00f3w"
+    },
+    "options": {
+      "title": "OPCJE",
+      "closeHintBefore": "Naci\u015bnij",
+      "closeHintAfter": ", aby zamkn\u0105\u0107",
+      "languageTitle": "J\u0119zyk",
+      "language": "J\u0119zyk",
+      "soundTitle": "D\u017awi\u0119k",
+      "mute": "Wycisz",
+      "volume": "G\u0142o\u015bno\u015b\u0107",
+      "performanceTitle": "Wydajno\u015b\u0107",
+      "glow": "Po\u015bwiata (blur)",
+      "transparency": "Przezroczysto\u015b\u0107",
+      "vhs": "Zak\u0142\u00f3cenia VHS (szum)",
+      "close": "Zamknij"
+    },
+    "loading": {
+      "leaderboardHint": "Wczytywanie tabeli wynik\u00f3w..."
+    },
+    "gameOverEntry": {
+      "title": "KONIEC GRY",
+      "scoreLabel": "Wynik:",
+      "levelLabel": "poziom",
+      "linesLabel": "linii",
+      "namePlaceholder": "Tw\u00f3j nick",
+      "submit": "Kontynuuj"
+    },
+    "gameOverSaved": {
+      "title": "WYNIK ZAPISANY",
+      "playAgainHintBefore": "Naci\u015bnij",
+      "playAgainHintAfter": ", aby zagra\u0107 ponownie"
+    }
+  },
+  "leaderboard": {
+    "title": "Tabela wynik\u00f3w",
+    "empty": "Brak wynik\u00f3w \u2014 zagraj pierwszy!",
+    "headers": {
+      "name": "Nick",
+      "score": "Wynik",
+      "level": "Poz.",
+      "lines": "Linie",
+      "date": "Data"
+    },
+    "defaultName": "Gracz"
+  },
+  "difficulty": {
+    "easy": "\u0141atwy",
+    "medium": "\u015aredni",
+    "hard": "Trudny",
+    "expert": "Ekspert",
+    "pro": "PRO",
+    "levelPrefix": "poziom {level}"
+  },
+  "game": {
+    "levelUpBanner": "POZIOM {level}"
+  }
+}

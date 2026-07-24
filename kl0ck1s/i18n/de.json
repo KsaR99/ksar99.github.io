@@ -1,0 +1,99 @@
+{
+  "locale": "de-DE",
+  "app": {
+    "subtitle": "Ordne die Reihen, sammle Punkte."
+  },
+  "sidebar": {
+    "nextPiece": "Nächster Stein",
+    "score": "Punkte",
+    "level": "Level",
+    "lines": "Reihen",
+    "best": "Bestwert",
+    "statusLive": "Aktuelles Spiel",
+    "statusLast": "Letztes Spiel"
+  },
+  "controls": {
+    "toggle": "Steuerung",
+    "rotate": "Drehen",
+    "moveLeftRight": "Links / rechts bewegen",
+    "softDrop": "Sanftes Fallen",
+    "hardDrop": "Hartes Fallen",
+    "pause": "Pause",
+    "start": "Start / neues Spiel",
+    "mute": "Ton stummschalten",
+    "options": "Optionen",
+    "spaceKey": "Leertaste"
+  },
+  "screens": {
+    "common": {
+      "switchHint": "Mit Pfeiltasten wechseln"
+    },
+    "idle": {
+      "hint": "Schwierigkeit wählen",
+      "startHintBefore": "Drücke",
+      "startHintAfter": "zum Starten"
+    },
+    "paused": {
+      "title": "PAUSE",
+      "resumeHintBefore": "Drücke",
+      "resumeHintAfter": "zum Fortsetzen",
+      "optionsHintBefore": "Drücke",
+      "optionsHintAfter": "um Optionen zu öffnen",
+      "resumeButton": "Fortsetzen"
+    },
+    "options": {
+      "title": "OPTIONEN",
+      "closeHintBefore": "Drücke",
+      "closeHintAfter": "zum Schließen",
+      "languageTitle": "Sprache",
+      "language": "Sprache",
+      "soundTitle": "Ton",
+      "mute": "Stumm",
+      "volume": "Lautstärke",
+      "performanceTitle": "Leistung",
+      "glow": "Leuchten (Unschärfe)",
+      "transparency": "Transparenz",
+      "vhs": "VHS-Rauschen",
+      "close": "Schließen"
+    },
+    "loading": {
+      "leaderboardHint": "Bestenliste wird geladen..."
+    },
+    "gameOverEntry": {
+      "title": "GAME OVER",
+      "scoreLabel": "Punkte:",
+      "levelLabel": "Level",
+      "linesLabel": "Reihen",
+      "namePlaceholder": "Dein Spitzname",
+      "submit": "Weiter"
+    },
+    "gameOverSaved": {
+      "title": "PUNKTZAHL GESPEICHERT",
+      "playAgainHintBefore": "Drücke",
+      "playAgainHintAfter": "um erneut zu spielen"
+    }
+  },
+  "leaderboard": {
+    "title": "Bestenliste",
+    "empty": "Noch keine Punkte — sei der Erste!",
+    "headers": {
+      "name": "Name",
+      "score": "Punkte",
+      "level": "Lvl",
+      "lines": "Reihen",
+      "date": "Datum"
+    },
+    "defaultName": "Spieler"
+  },
+  "difficulty": {
+    "easy": "Leicht",
+    "medium": "Mittel",
+    "hard": "Schwer",
+    "expert": "Experte",
+    "pro": "PRO",
+    "levelPrefix": "Level {level}"
+  },
+  "game": {
+    "levelUpBanner": "LEVEL {level}"
+  }
+}

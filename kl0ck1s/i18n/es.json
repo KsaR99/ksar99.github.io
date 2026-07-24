@@ -1,0 +1,99 @@
+{
+  "locale": "es-ES",
+  "app": {
+    "subtitle": "Ordena las líneas, consigue puntos."
+  },
+  "sidebar": {
+    "nextPiece": "Siguiente pieza",
+    "score": "Puntuación",
+    "level": "Nivel",
+    "lines": "Líneas",
+    "best": "Récord",
+    "statusLive": "Partida actual",
+    "statusLast": "Última partida"
+  },
+  "controls": {
+    "toggle": "Controles",
+    "rotate": "Girar",
+    "moveLeftRight": "Mover izquierda / derecha",
+    "softDrop": "Caída suave",
+    "hardDrop": "Caída rápida",
+    "pause": "Pausa",
+    "start": "Iniciar / nueva partida",
+    "mute": "Silenciar sonido",
+    "options": "Opciones",
+    "spaceKey": "Espacio"
+  },
+  "screens": {
+    "common": {
+      "switchHint": "Cambia con las flechas"
+    },
+    "idle": {
+      "hint": "Elige la dificultad",
+      "startHintBefore": "Pulsa",
+      "startHintAfter": "para empezar"
+    },
+    "paused": {
+      "title": "PAUSA",
+      "resumeHintBefore": "Pulsa",
+      "resumeHintAfter": "para continuar",
+      "optionsHintBefore": "Pulsa",
+      "optionsHintAfter": "para abrir opciones",
+      "resumeButton": "Continuar"
+    },
+    "options": {
+      "title": "OPCIONES",
+      "closeHintBefore": "Pulsa",
+      "closeHintAfter": "para cerrar",
+      "languageTitle": "Idioma",
+      "language": "Idioma",
+      "soundTitle": "Sonido",
+      "mute": "Silenciar",
+      "volume": "Volumen",
+      "performanceTitle": "Rendimiento",
+      "glow": "Brillo (desenfoque)",
+      "transparency": "Transparencia",
+      "vhs": "Ruido VHS",
+      "close": "Cerrar"
+    },
+    "loading": {
+      "leaderboardHint": "Cargando clasificación..."
+    },
+    "gameOverEntry": {
+      "title": "FIN DE LA PARTIDA",
+      "scoreLabel": "Puntuación:",
+      "levelLabel": "nivel",
+      "linesLabel": "líneas",
+      "namePlaceholder": "Tu apodo",
+      "submit": "Continuar"
+    },
+    "gameOverSaved": {
+      "title": "PUNTUACIÓN GUARDADA",
+      "playAgainHintBefore": "Pulsa",
+      "playAgainHintAfter": "para jugar de nuevo"
+    }
+  },
+  "leaderboard": {
+    "title": "Clasificación",
+    "empty": "Aún no hay puntuaciones — ¡sé el primero en jugar!",
+    "headers": {
+      "name": "Nombre",
+      "score": "Puntos",
+      "level": "Niv.",
+      "lines": "Líneas",
+      "date": "Fecha"
+    },
+    "defaultName": "Jugador"
+  },
+  "difficulty": {
+    "easy": "Fácil",
+    "medium": "Medio",
+    "hard": "Difícil",
+    "expert": "Experto",
+    "pro": "PRO",
+    "levelPrefix": "nivel {level}"
+  },
+  "game": {
+    "levelUpBanner": "NIVEL {level}"
+  }
+}

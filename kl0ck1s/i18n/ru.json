@@ -1,0 +1,99 @@
+{
+  "locale": "ru-RU",
+  "app": {
+    "subtitle": "Складывайте линии, набирайте очки."
+  },
+  "sidebar": {
+    "nextPiece": "Следующая фигура",
+    "score": "Очки",
+    "level": "Уровень",
+    "lines": "Линии",
+    "best": "Рекорд",
+    "statusLive": "Текущая игра",
+    "statusLast": "Последняя игра"
+  },
+  "controls": {
+    "toggle": "Управление",
+    "rotate": "Поворот",
+    "moveLeftRight": "Движение влево / вправо",
+    "softDrop": "Плавное падение",
+    "hardDrop": "Мгновенное падение",
+    "pause": "Пауза",
+    "start": "Старт / новая игра",
+    "mute": "Выключить звук",
+    "options": "Настройки",
+    "spaceKey": "Пробел"
+  },
+  "screens": {
+    "common": {
+      "switchHint": "Переключайте стрелками"
+    },
+    "idle": {
+      "hint": "Выберите сложность",
+      "startHintBefore": "Нажмите",
+      "startHintAfter": "чтобы начать"
+    },
+    "paused": {
+      "title": "ПАУЗА",
+      "resumeHintBefore": "Нажмите",
+      "resumeHintAfter": "чтобы продолжить",
+      "optionsHintBefore": "Нажмите",
+      "optionsHintAfter": "чтобы открыть настройки",
+      "resumeButton": "Продолжить"
+    },
+    "options": {
+      "title": "НАСТРОЙКИ",
+      "closeHintBefore": "Нажмите",
+      "closeHintAfter": "чтобы закрыть",
+      "languageTitle": "Язык",
+      "language": "Язык",
+      "soundTitle": "Звук",
+      "mute": "Без звука",
+      "volume": "Громкость",
+      "performanceTitle": "Производительность",
+      "glow": "Свечение (размытие)",
+      "transparency": "Прозрачность",
+      "vhs": "VHS-шум",
+      "close": "Закрыть"
+    },
+    "loading": {
+      "leaderboardHint": "Загрузка таблицы лидеров..."
+    },
+    "gameOverEntry": {
+      "title": "ИГРА ОКОНЧЕНА",
+      "scoreLabel": "Очки:",
+      "levelLabel": "уровень",
+      "linesLabel": "линий",
+      "namePlaceholder": "Ваш ник",
+      "submit": "Продолжить"
+    },
+    "gameOverSaved": {
+      "title": "РЕЗУЛЬТАТ СОХРАНЁН",
+      "playAgainHintBefore": "Нажмите",
+      "playAgainHintAfter": "чтобы сыграть снова"
+    }
+  },
+  "leaderboard": {
+    "title": "Таблица лидеров",
+    "empty": "Пока нет результатов — станьте первым!",
+    "headers": {
+      "name": "Имя",
+      "score": "Очки",
+      "level": "Ур.",
+      "lines": "Линии",
+      "date": "Дата"
+    },
+    "defaultName": "Игрок"
+  },
+  "difficulty": {
+    "easy": "Лёгкий",
+    "medium": "Средний",
+    "hard": "Сложный",
+    "expert": "Эксперт",
+    "pro": "PRO",
+    "levelPrefix": "уровень {level}"
+  },
+  "game": {
+    "levelUpBanner": "УРОВЕНЬ {level}"
+  }
+}
