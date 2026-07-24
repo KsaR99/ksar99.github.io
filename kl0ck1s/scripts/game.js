@@ -193,7 +193,7 @@ export class Game {
 
         if (this.state === "idle") {
             this.renderIdleScreen(this.currentIdleList);
-        } else if (this.state === "gameover-saved" && this.currentGameOverSaved) {
+        } else if (this.state === "gameOver-saved" && this.currentGameOverSaved) {
             const {list, entry} = this.currentGameOverSaved;
             this.renderGameOverSaved(list, entry);
         }
@@ -228,7 +228,7 @@ export class Game {
     }
 
     async gameOver() {
-        this.state = "gameover-entry";
+        this.state = "gameOver-entry";
         this.isPlayingSession = false;
         this.hud.setPlaying(false);
         this.soundManager.play("gameOver");
@@ -240,7 +240,7 @@ export class Game {
             this.leaderboard.load(),
             this.leaderboard.loadLastName(),
         ]);
-        if (this.state !== "gameover-entry") return;
+        if (this.state !== "gameOver-entry") return;
 
         this.hud.showScreen(
             this.screens.gameOverEntry(
@@ -284,7 +284,7 @@ export class Game {
                 this.leaderboard.add(entry),
             ]);
 
-            this.state = "gameover-saved";
+            this.state = "gameOver-saved";
             this.hud.update(this.stats);
             this.renderGameOverSaved(list, entry);
         }, {once: true});
@@ -405,14 +405,14 @@ export class Game {
                 this.renderPauseMenu();
             } else if (previousState === "idle") {
                 this.renderIdleScreen(this.currentIdleList ?? []);
-            } else if (previousState === "gameover-saved" && this.currentGameOverSaved) {
+            } else if (previousState === "gameOver-saved" && this.currentGameOverSaved) {
                 const {list, entry} = this.currentGameOverSaved;
                 this.renderGameOverSaved(list, entry);
             }
             return;
         }
 
-        if (!["idle", "running", "paused", "gameover-saved"].includes(this.state)) return;
+        if (!["idle", "running", "paused", "gameOver-saved"].includes(this.state)) return;
 
         this.previousStateBeforeOptions = this.state;
         this.state = "options";
@@ -520,14 +520,14 @@ export class Game {
             this.renderPauseMenu();
         } else if (this.state === "options") {
             this.renderOptionsMenu();
-        } else if (this.state === "gameover-saved" && this.currentGameOverSaved) {
+        } else if (this.state === "gameOver-saved" && this.currentGameOverSaved) {
             const {list, entry} = this.currentGameOverSaved;
             this.renderGameOverSaved(list, entry);
         }
     }
 
     handleEnter() {
-        if (this.state === "idle" || this.state === "gameover-saved") {
+        if (this.state === "idle" || this.state === "gameOver-saved") {
             this.start();
         }
     }
@@ -626,7 +626,7 @@ export class Game {
     }
 
     handleHorizontalArrow(dir) {
-        if (this.state === "idle" || this.state === "gameover-saved") {
+        if (this.state === "idle" || this.state === "gameOver-saved") {
             this.changeDifficulty(dir);
         } else {
             this.moveHorizontal(dir);
