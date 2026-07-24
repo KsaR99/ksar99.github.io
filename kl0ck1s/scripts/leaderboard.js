@@ -1,5 +1,7 @@
 "use strict";
 
+import {formatNumber} from "./utils.js";
+
 export class Leaderboard {
     static SCORES_KEY = "klockis-scores";
     static NAME_KEY = "klockis-last-name";
@@ -72,7 +74,7 @@ export class Leaderboard {
             row.querySelector(".leaderboard__row").classList.toggle("leaderboard__row--new", entry === highlightEntry);
             row.querySelector('[data-field="rank"]').innerHTML = (i < 3 ? podiumBadges[i] : `&nbsp;${i + 1}`);
             row.querySelector('[data-field="name"]').textContent = entry.name;
-            row.querySelector('[data-field="score"]').textContent = entry.score;
+            row.querySelector('[data-field="score"]').textContent = formatNumber(entry.score);
             row.querySelector('[data-field="level"]').textContent = entry.level;
             row.querySelector('[data-field="lines"]').textContent = entry.lines;
             row.querySelector('[data-field="date"]').textContent = this.formatDate(entry.date);

@@ -31,12 +31,12 @@
     "idle": {
       "hint": "Wybierz poziom trudno\u015bci",
       "startHintBefore": "Naci\u015bnij",
-      "startHintAfter": ", aby rozpocz\u0105\u0107"
+      "startHintAfter": " aby rozpocz\u0105\u0107"
     },
     "paused": {
       "title": "PAUZA",
       "resumeHintBefore": "Naci\u015bnij",
-      "resumeHintAfter": ", aby wznowi\u0107",
+      "resumeHintAfter": " aby wznowi\u0107",
       "optionsHintBefore": "Naci\u015bnij",
       "optionsHintAfter": ", aby otworzy\u0107 opcje",
       "resumeButton": "Wzn\u00f3w"
@@ -70,7 +70,7 @@
     "gameOverSaved": {
       "title": "WYNIK ZAPISANY",
       "playAgainHintBefore": "Naci\u015bnij",
-      "playAgainHintAfter": ", aby zagra\u0107 ponownie"
+      "playAgainHintAfter": " aby zagra\u0107 ponownie"
     }
   },
   "leaderboard": {
