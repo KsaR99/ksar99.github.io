@@ -35,7 +35,7 @@ export class VhsNoise {
 
         for (let i = 0; i < data.length; i += 4) {
             const shade = Math.random() < 0.5 ? 255 : 0;
-            const alpha = Math.floor(Math.random() * 15);
+            const alpha = Math.floor(Math.random() * 25);
             data[i] = shade;
             data[i + 1] = shade;
             data[i + 2] = shade;
