@@ -253,13 +253,15 @@ export class Game {
     bindScoreForm(lastName) {
         if (!this.dom) return;
         const form = this.dom.querySelector('[data-role="score-form"]');
-        const input = this.dom.querySelector('[data-role="name-input"]');
+        const input = form?.querySelector('[data-role="name-input"]');
         const button = form?.querySelector("button") ?? null;
         if (!form || !input) return;
 
         input.value = lastName || "";
         input.focus();
-        input.select();
+        input.addEventListener("input", (e) => {
+            e.target.value = e.target.value.trim();
+        });
 
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
@@ -275,7 +277,7 @@ export class Game {
                 date: new Date().toISOString(),
             };
 
-            const nameSavePromise = typedName ? this.leaderboard.setLastName(typedName) : Promise.resolve();
+            const nameSavePromise = typedName ? this.leaderboard.setLastName(typedName) : await Promise.resolve();
 
             const [, list] = await Promise.all([
                 nameSavePromise,
@@ -743,7 +745,7 @@ export class Game {
             action();
         });
 
-        this.dom.addEventListener("keyup", (event) => stopRepeat(event.code));
+        this.dom.addEventListener("keyup", (event) => stopRepeat(event.code), {passive: true});
 
         if (typeof window !== "undefined") {
             window.addEventListener("blur", () => {
