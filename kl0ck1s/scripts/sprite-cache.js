@@ -5,7 +5,7 @@ export function createBlockSprite(color, size, canvasFactory = () => document.cr
     sprite.width = size;
     sprite.height = size;
 
-    const sctx = sprite.getContext("2d");
+    const sctx = sprite.getContext("2d", {alpha: false});
     sctx.imageSmoothingEnabled = false;
 
     const bevel = Math.max(2, Math.round(size * 0.16));

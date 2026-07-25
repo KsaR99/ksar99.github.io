@@ -34,11 +34,11 @@ i18n.applyStatic(document);
 
 /** @type {HTMLCanvasElement} */
 const boardCanvas = document.getElementById("klockis-board");
-const ctx = boardCanvas.getContext("2d");
+const ctx = boardCanvas.getContext("2d", {alpha: false, desynchronized: true});
 
 /** @type {HTMLCanvasElement} */
 const nextCanvas = document.getElementById("next-piece-canvas");
-const nextCtx = nextCanvas.getContext("2d");
+const nextCtx = nextCanvas.getContext("2d", {alpha: false});
 nextCtx.imageSmoothingEnabled = false;
 
 function getVerticalChrome() {

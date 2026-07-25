@@ -259,7 +259,7 @@ export class Game {
         input.value = lastName || "";
         input.focus();
         input.addEventListener("input", (e) => {
-            e.target.value = e.target.value.trim();
+            e.target.value = e.target.value.trim().replace(" ", "");
         });
 
         form.addEventListener("submit", async (event) => {
