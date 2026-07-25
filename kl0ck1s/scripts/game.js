@@ -90,6 +90,7 @@ export class Game {
     static getKickTable(type) {
         if (type === "I") return Game.I_KICKS;
         if (type === "O") return Game.O_KICKS;
+
         return Game.JLSTZ_KICKS;
     }
 
@@ -408,6 +409,7 @@ export class Game {
                 const {list, entry} = this.currentGameOverSaved;
                 this.renderGameOverSaved(list, entry);
             }
+
             return;
         }
 
@@ -488,6 +490,7 @@ export class Game {
         select.addEventListener("change", async () => {
             const lang = select.value;
             if (lang === this.i18n.lang) return;
+
             await this.i18n.setLanguage(lang);
             this.refreshLanguage();
         });

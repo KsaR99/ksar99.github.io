@@ -77,7 +77,7 @@ export class Renderer {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx} = this;
 
-        ctx.strokeStyle = "oklch(1 0 0 / 25%)";
+        ctx.strokeStyle = "oklch(1 0 0 / 30%)";
         ctx.lineWidth = 1;
 
         for (let x = 0; x <= board.cols; x++) {

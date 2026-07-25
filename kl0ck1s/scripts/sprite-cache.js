@@ -5,39 +5,39 @@ export function createBlockSprite(color, size, canvasFactory = () => document.cr
     sprite.width = size;
     sprite.height = size;
 
-    const sctx = sprite.getContext("2d", {alpha: false});
-    sctx.imageSmoothingEnabled = false;
+    const spriteCtx = sprite.getContext("2d", {alpha: false});
+    spriteCtx.imageSmoothingEnabled = false;
 
     const bevel = Math.max(2, Math.round(size * 0.16));
 
-    sctx.fillStyle = color;
-    sctx.fillRect(0, 0, size, size);
+    spriteCtx.fillStyle = color;
+    spriteCtx.fillRect(0, 0, size, size);
 
-    sctx.fillStyle = "oklch(1 0 0 / 35%)";
-    sctx.beginPath();
-    sctx.moveTo(0, 0);
-    sctx.lineTo(size, 0);
-    sctx.lineTo(size - bevel, bevel);
-    sctx.lineTo(bevel, bevel);
-    sctx.lineTo(bevel, size - bevel);
-    sctx.lineTo(0, size);
-    sctx.closePath();
-    sctx.fill();
+    spriteCtx.fillStyle = "oklch(1 0 0 / 40%)";
+    spriteCtx.beginPath();
+    spriteCtx.moveTo(0, 0);
+    spriteCtx.lineTo(size, 0);
+    spriteCtx.lineTo(size - bevel, bevel);
+    spriteCtx.lineTo(bevel, bevel);
+    spriteCtx.lineTo(bevel, size - bevel);
+    spriteCtx.lineTo(0, size);
+    spriteCtx.closePath();
+    spriteCtx.fill();
 
-    sctx.fillStyle = "oklch(0 0 0 / 35%)";
-    sctx.beginPath();
-    sctx.moveTo(size, 0);
-    sctx.lineTo(size, size);
-    sctx.lineTo(0, size);
-    sctx.lineTo(bevel, size - bevel);
-    sctx.lineTo(size - bevel, size - bevel);
-    sctx.lineTo(size - bevel, bevel);
-    sctx.closePath();
-    sctx.fill();
+    spriteCtx.fillStyle = "oklch(0 0 0 / 25%)";
+    spriteCtx.beginPath();
+    spriteCtx.moveTo(size, 0);
+    spriteCtx.lineTo(size, size);
+    spriteCtx.lineTo(0, size);
+    spriteCtx.lineTo(bevel, size - bevel);
+    spriteCtx.lineTo(size - bevel, size - bevel);
+    spriteCtx.lineTo(size - bevel, bevel);
+    spriteCtx.closePath();
+    spriteCtx.fill();
 
-    sctx.strokeStyle = "oklch(0 0 0 / 30%)";
-    sctx.lineWidth = 1;
-    sctx.strokeRect(0.5, 0.5, size - 1, size - 1);
+    spriteCtx.strokeStyle = "oklch(0.5 0 0 / 30%)";
+    spriteCtx.lineWidth = 1;
+    spriteCtx.strokeRect(0.5, 0.5, size - 1, size - 1);
 
     return sprite;
 }
