@@ -52,7 +52,7 @@ export class Game {
                     lineClearAnimationDuration,
                     settingsStore = null,
                     vhsNoise = null,
-                    dom = (typeof document !== "undefined" ? document : null),
+                    dom = globalThis.document ?? null,
                     i18n,
                 }) {
         this.board = board;
@@ -98,9 +98,8 @@ export class Game {
     }
 
     prefersReducedMotion() {
-        const view = this.dom?.defaultView ?? (typeof window !== "undefined" ? window : null);
-        if (!view?.matchMedia) return false;
-        return view.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const media = globalThis.matchMedia;
+        return media ? media("(prefers-reduced-motion: reduce)").matches : false;
     }
 
     init() {
@@ -747,7 +746,7 @@ export class Game {
 
         this.dom.addEventListener("keyup", (event) => stopRepeat(event.code), {passive: true});
 
-        if (typeof window !== "undefined") {
+        if (globalThis.window) {
             window.addEventListener("blur", () => {
                 heldTimers.forEach((timers) => {
                     if (timers.timeoutId !== undefined) clearTimeout(timers.timeoutId);

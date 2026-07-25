@@ -23,9 +23,9 @@ export class I18n {
      */
     constructor({
                     basePath = "i18n/",
-                    storage = (typeof localStorage !== "undefined" ? localStorage : null),
-                    navigatorRef = (typeof navigator !== "undefined" ? navigator : null),
-                    documentRef = (typeof document !== "undefined" ? document : null),
+                    storage = globalThis.localStorage ?? null,
+                    navigatorRef = globalThis.navigator ?? null,
+                    documentRef = globalThis.document ?? null,
                 } = {}) {
         this.basePath = basePath;
         this.storage = storage;
@@ -124,7 +124,7 @@ export class I18n {
     t(key, vars = {}) {
         const value = key
             .split(".")
-            .reduce((node, part) => (node && typeof node === "object" ? node[part] : undefined), this.dict);
+            .reduce((node, part) => node?.[part], this.dict);
 
         if (typeof value !== "string") return key;
 

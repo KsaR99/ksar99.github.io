@@ -7,7 +7,7 @@ export class Leaderboard {
     static NAME_KEY = "klockis-last-name";
     static MAX_ENTRIES = 10;
 
-    constructor(store, dom = (typeof document !== "undefined" ? document : null), i18n = null) {
+    constructor(store, dom = globalThis.document ?? null, i18n = null) {
         this.store = store;
         this.dom = dom;
         this.i18n = i18n;

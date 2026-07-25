@@ -2,8 +2,8 @@
 
 export class PersistentStore {
     constructor({
-                    storage = (typeof window !== "undefined" ? window.storage : null),
-                    fallback = (typeof localStorage !== "undefined" ? localStorage : null),
+                    storage = globalThis.storage ?? null,
+                    fallback = globalThis.localStorage ?? null,
                 } = {}) {
         this.storage = storage;
         this.fallback = fallback;

@@ -1,7 +1,7 @@
 "use strict";
 
 export class SoundManager {
-    constructor(soundFiles, {AudioCtor = (typeof Audio !== "undefined" ? Audio : null), volume = 1.0} = {}) {
+    constructor(soundFiles, {AudioCtor = globalThis.Audio ?? null, volume = 1.0} = {}) {
         /**
          * @type {Record<string, string>}
          */

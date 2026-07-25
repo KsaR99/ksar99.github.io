@@ -17,6 +17,9 @@ const SCANLINE_COLORS = [
 
 const OVERLAP_THRESHOLD = 3;
 
+const NOISE_SIZE = 256;
+const NOISE_MASK = NOISE_SIZE - 1;
+
 export class VhsNoise {
     constructor(canvas) {
         this.canvas = canvas;
@@ -34,7 +37,23 @@ export class VhsNoise {
             hidden: false
         }));
 
+        this._noisePixel = new Uint32Array(NOISE_SIZE);
+        this._noiseSkip = new Uint8Array(NOISE_SIZE);
+        this._noiseScanColor = new Uint32Array(NOISE_SIZE);
+        this._noiseOffset = 0;
+        this._regenNoise();
+
         this._loop = this.loop.bind(this);
+    }
+
+    _regenNoise() {
+        for (let i = 0; i < NOISE_SIZE; i++) {
+            const shade = Math.random() < 0.5 ? 255 : 0;
+            const alpha = Math.random() * 20;
+            this._noisePixel[i] = packRGBA(shade, shade, shade, alpha);
+            this._noiseSkip[i] = Math.random() < 0.15 ? 1 : 0;
+            this._noiseScanColor[i] = SCANLINE_COLORS[Math.floor(Math.random() * SCANLINE_COLORS.length)];
+        }
     }
 
     resize(width, height) {
@@ -78,13 +97,21 @@ export class VhsNoise {
         const width = canvas.width;
         const height = canvas.height;
 
+        this._regenNoise();
+        const noisePixel = this._noisePixel;
+        const offset = (this._noiseOffset + 1) & NOISE_MASK;
+        this._noiseOffset = offset;
+
+        let t = offset;
         for (let i = 0; i < buf32.length; i += 4) {
-            const shade = Math.random() < 0.5 ? 255 : 0;
-            const alpha = (Math.random() * 20);
-            buf32[i] = packRGBA(shade, shade, shade, alpha);
+            buf32[i] = noisePixel[t];
+            t = (t + 1) & NOISE_MASK;
         }
 
         this.updateOverlaps();
+
+        const noiseSkip = this._noiseSkip;
+        const noiseScanColor = this._noiseScanColor;
 
         for (const line of this.scanlines) {
             if (!line.hidden) {
@@ -95,9 +122,10 @@ export class VhsNoise {
                     if (row < 0 || row >= height) continue;
 
                     let idx = row * width;
-                    for (let x = 0; x < width; x++, idx++) {
-                        if (Math.random() < 0.15) continue;
-                        buf32[idx] = SCANLINE_COLORS[Math.floor(Math.random() * SCANLINE_COLORS.length)];
+                    let t2 = (offset + row) & NOISE_MASK;
+                    for (let x = 0; x < width; x++, idx++, t2 = (t2 + 1) & NOISE_MASK) {
+                        if (noiseSkip[t2]) continue;
+                        buf32[idx] = noiseScanColor[t2];
                     }
                 }
             }
