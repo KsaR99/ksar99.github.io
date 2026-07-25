@@ -104,7 +104,7 @@ export class Game {
 
     init() {
         this.soundManager.init();
-        this.loadSettings();
+        this.loadSettings().then();
         this.applyDifficultyTheme();
         this.prepareNewRound();
         this.showIdleScreen().then();
@@ -740,7 +740,7 @@ export class Game {
                 return;
             }
 
-            if (event.code === "Space" && event.repeat) return;
+            if (event.repeat && event.code === "Space") return;
             action();
         });
 
