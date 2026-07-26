@@ -74,14 +74,13 @@ body.perf-no-glow .screen__title {
 
 .board__canvas {
     display: block;
-    background: oklch(13.191% 0.01866 276.772);
     border-radius: var(--radius);
     border: 1px solid oklch(0 0 0 / 85%);
 }
 
 .board__overlay {
     position: absolute;
-    inset: 0.1rem;
+    inset: 0;
     z-index: 2;
     display: none;
     flex-direction: column;

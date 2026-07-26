@@ -31,10 +31,10 @@ export const LINE_CLEAR_ANIMATION_DURATION_MS = 260;
 
 export const DIFFICULTIES = Object.freeze({
     easy: {startLevel: 1},
-    medium: {startLevel: 5},
-    hard: {startLevel: 10},
-    expert: {startLevel: 20},
-    pro: {startLevel: 30},
+    medium: {startLevel: 10, groundedTime: 2500},
+    hard: {startLevel: 15, groundedTime: 2000},
+    expert: {startLevel: 20, groundedTime: 1500},
+    pro: {startLevel: 30, groundedTime: 1000},
 });
 
 export const BOARD_BACKGROUNDS = Object.freeze({

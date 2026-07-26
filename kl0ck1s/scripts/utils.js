@@ -33,6 +33,20 @@ export function dropIntervalForLevel(level, scoring = SCORING) {
     );
 }
 
+export function tierForLevel(level, difficulties) {
+    let tier = null;
+    let bestStart = -Infinity;
+
+    for (const [key, def] of Object.entries(difficulties)) {
+        if (def.startLevel <= level && def.startLevel > bestStart) {
+            bestStart = def.startLevel;
+            tier = key;
+        }
+    }
+
+    return tier;
+}
+
 export function formatNumber(number, decimals = 1) {
     const units = [
         ["b", 1e9],

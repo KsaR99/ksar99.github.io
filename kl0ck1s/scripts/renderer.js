@@ -48,8 +48,8 @@ export class Renderer {
     }
 
     setTheme(backgroundColor) {
-        this.boardCanvas.style.background = backgroundColor;
-        this.nextCanvas.style.background = backgroundColor;
+        this.boardCanvas.style.backgroundColor = backgroundColor;
+        this.nextCanvas.style.backgroundColor = backgroundColor;
     }
 
     drawCell(context, x, y, color, size, glow = false) {

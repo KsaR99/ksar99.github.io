@@ -1,7 +1,7 @@
 "use strict";
 
 import {Piece} from "./piece.js";
-import {dropIntervalForLevel, formatNumber} from "./utils.js";
+import {dropIntervalForLevel, formatNumber, tierForLevel} from "./utils.js";
 import {levelForLines, pointsForHardDrop, pointsForLineClear, pointsForSoftDrop, pointsForSpin} from "./scoring.js";
 
 export class Game {
@@ -134,6 +134,7 @@ export class Game {
         this.lines = 0;
         this.startLevel = startLevel;
         this.level = startLevel;
+        this.levelTier = tierForLevel(this.level, this.difficulties);
         this.dropInterval = dropIntervalForLevel(startLevel, this.scoring);
         this.dropCounter = 0;
         this.lockDelayTimer = 0;
@@ -152,6 +153,7 @@ export class Game {
         this.next = this.bag.next();
         this.renderer.drawNext(this.next);
 
+        this.applyLevelTheme();
         this.hud.update(this.stats);
     }
 
@@ -209,6 +211,11 @@ export class Game {
 
     applyDifficultyTheme() {
         const color = this.boardBackgrounds?.[this.difficulty];
+        if (color) this.renderer.setTheme(color);
+    }
+
+    applyLevelTheme() {
+        const color = this.boardBackgrounds?.[this.levelTier];
         if (color) this.renderer.setTheme(color);
     }
 
@@ -589,6 +596,8 @@ export class Game {
         if (newLevel !== this.level) {
             this.level = newLevel;
             this.dropInterval = dropIntervalForLevel(this.level, this.scoring);
+            this.levelTier = tierForLevel(this.level, this.difficulties);
+            this.applyLevelTheme();
 
             this.soundManager.play("levelUp");
             this.levelUpLevel = this.level;
@@ -844,14 +853,14 @@ export class Game {
         if (resting) {
             this.lockDelayTimer += delta;
             this.groundedTime += delta;
-            if (this.lockDelayTimer >= this.scoring.LOCK_DELAY || this.groundedTime >= this.scoring.MAX_GROUNDED_TIME) {
+            const maxGroundedTime = this.difficulties[this.levelTier]?.groundedTime ?? this.scoring.MAX_GROUNDED_TIME;
+            if (this.lockDelayTimer >= this.scoring.LOCK_DELAY || this.groundedTime >= maxGroundedTime) {
                 this.lockCurrentPiece();
             }
             return;
         }
 
         this.lockDelayTimer = 0;
-        this.groundedTime = 0;
         this.dropCounter += delta;
         if (this.dropCounter > this.dropInterval) {
             this.current.y += 1;
