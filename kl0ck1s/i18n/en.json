@@ -31,7 +31,8 @@
     "idle": {
       "hint": "Choose difficulty",
       "startHintBefore": "Press",
-      "startHintAfter": "to start"
+      "startHintAfter": "to start",
+      "namePlaceholder": "Your nickname"
     },
     "paused": {
       "title": "PAUSED",
@@ -64,7 +65,8 @@
       "scoreLabel": "Score:",
       "levelLabel": "level",
       "linesLabel": "lines",
-      "namePlaceholder": "Your nickname",
+      "todayBestLabel": "Today's best:",
+      "todayBestBy": "by",
       "submit": "Continue"
     },
     "gameOverSaved": {

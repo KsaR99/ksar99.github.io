@@ -31,7 +31,8 @@
     "idle": {
       "hint": "Wybierz poziom trudno\u015bci",
       "startHintBefore": "Naci\u015bnij",
-      "startHintAfter": " aby rozpocz\u0105\u0107"
+      "startHintAfter": " aby rozpocz\u0105\u0107",
+      "namePlaceholder": "Tw\u00f3j nick"
     },
     "paused": {
       "title": "PAUZA",
@@ -64,7 +65,8 @@
       "scoreLabel": "Wynik:",
       "levelLabel": "poziom",
       "linesLabel": "linii",
-      "namePlaceholder": "Tw\u00f3j nick",
+      "todayBestLabel": "Dzisiejszy najlepszy wynik:",
+      "todayBestBy": "przez",
       "submit": "Kontynuuj"
     },
     "gameOverSaved": {

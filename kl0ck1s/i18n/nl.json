@@ -31,7 +31,8 @@
     "idle": {
       "hint": "Kies moeilijkheidsgraad",
       "startHintBefore": "Druk op",
-      "startHintAfter": "om te starten"
+      "startHintAfter": "om te starten",
+      "namePlaceholder": "Jouw bijnaam"
     },
     "paused": {
       "title": "GEPAUZEERD",
@@ -64,7 +65,8 @@
       "scoreLabel": "Score:",
       "levelLabel": "niveau",
       "linesLabel": "lijnen",
-      "namePlaceholder": "Jouw bijnaam",
+      "todayBestLabel": "Beste van vandaag:",
+      "todayBestBy": "door",
       "submit": "Doorgaan"
     },
     "gameOverSaved": {

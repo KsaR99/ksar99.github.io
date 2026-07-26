@@ -35,6 +35,7 @@ export class Game {
 
     static SETTINGS_KEY = "klockis-settings";
     static APP_NAME = "Kl0ck1's";
+    static NICKNAME_PATTERN = /^[a-zA-Z0-9_-]{3,16}$/;
     static COUNTDOWN_STEPS = [
         {number: 3, tint: "red"},
         {number: 2, tint: "yellow"},
@@ -165,9 +166,13 @@ export class Game {
             Game.APP_NAME, this.i18n.t("screens.loading.leaderboardHint"), this.dom
         ));
 
-        const list = await this.leaderboard.load();
+        const [list, lastName] = await Promise.all([
+            this.leaderboard.load(),
+            this.leaderboard.loadLastName(),
+        ]);
         if (this.state !== "idle") return;
 
+        this.playerName = lastName;
         this.renderIdleScreen(list);
         this.hud.update(this.stats);
     }
@@ -176,10 +181,27 @@ export class Game {
         this.currentIdleList = list;
         this.hud.showScreen(
             this.screens.idle(
-                list, this.difficulty, this.difficulties, (l, h) => this.renderLeaderboard(l, h), this.dom, this.i18n
+                list, this.difficulty, this.difficulties, (l, h) => this.renderLeaderboard(l, h), this.dom, this.i18n, this.playerName
             )
         );
         this.bindDifficultyButtons(() => this.renderIdleScreen(list));
+        this.bindNameInput();
+    }
+
+    bindNameInput() {
+        if (!this.dom) return;
+        const input = this.dom.querySelector('[data-role="name-input"]');
+        if (!input) return;
+
+        input.value = this.playerName || "";
+        input.addEventListener("input", (e) => {
+            e.target.value = e.target.value.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 16);
+            this.playerName = e.target.value;
+            input.classList.remove("nickname-form__input--invalid");
+        });
+        input.addEventListener("change", () => {
+            this.leaderboard.setLastName(this.playerName);
+        });
     }
 
     bindDifficultyButtons(onChange) {
@@ -281,58 +303,43 @@ export class Game {
             this.i18n.t("screens.gameOverEntry.title"), this.i18n.t("screens.loading.leaderboardHint"), this.dom
         ));
 
-        const [list, lastName] = await Promise.all([
-            this.leaderboard.load(),
-            this.leaderboard.loadLastName(),
-        ]);
+        await this.leaderboard.load();
         if (this.state !== "gameOver-entry") return;
 
+        const name = this.playerName || this.i18n.t("leaderboard.defaultName");
+        const entry = {
+            name,
+            score: this.score,
+            level: this.level,
+            lines: this.lines,
+            date: new Date().toISOString(),
+        };
+
+        const list = await this.leaderboard.add(entry);
+        if (this.state !== "gameOver-entry") return;
+
+        this.currentGameOverEntry = {list, entry};
         this.hud.showScreen(
             this.screens.gameOverEntry(
-                this.stats, list, (l, h) => this.renderLeaderboard(l, h), this.dom, this.i18n
+                this.stats, list, entry, this.leaderboard.todayBestEntry(), (l, h) => this.renderLeaderboard(l, h), this.dom, this.i18n
             )
         );
-        this.bindScoreForm(lastName);
+        this.bindGameOverContinue();
     }
 
-    bindScoreForm(lastName) {
+    bindGameOverContinue() {
         if (!this.dom) return;
-        const form = this.dom.querySelector('[data-role="score-form"]');
-        const input = form?.querySelector('[data-role="name-input"]');
-        const button = form?.querySelector("button") ?? null;
-        if (!form || !input) return;
+        const button = this.dom.querySelector('[data-role="gameover-continue-button"]');
+        if (!button) return;
+        button.addEventListener("click", () => this.continueFromGameOverEntry(), {once: true});
+    }
 
-        input.value = lastName || "";
-        input.focus();
-        input.addEventListener("input", (e) => {
-            e.target.value = e.target.value.trim().replace(" ", "");
-        });
-
-        form.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            if (button) button.disabled = true;
-
-            const typedName = input.value.trim().slice(0, 16);
-            const name = typedName || this.i18n.t("leaderboard.defaultName");
-            const entry = {
-                name,
-                score: this.score,
-                level: this.level,
-                lines: this.lines,
-                date: new Date().toISOString(),
-            };
-
-            const nameSavePromise = typedName ? this.leaderboard.setLastName(typedName) : await Promise.resolve();
-
-            const [, list] = await Promise.all([
-                nameSavePromise,
-                this.leaderboard.add(entry),
-            ]);
-
-            this.state = "gameOver-saved";
-            this.hud.update(this.stats);
-            this.renderGameOverSaved(list, entry);
-        }, {once: true});
+    continueFromGameOverEntry() {
+        if (this.state !== "gameOver-entry" || !this.currentGameOverEntry) return;
+        const {list, entry} = this.currentGameOverEntry;
+        this.state = "gameOver-saved";
+        this.hud.update(this.stats);
+        this.renderGameOverSaved(list, entry);
     }
 
     renderGameOverSaved(list, entry) {
@@ -340,10 +347,11 @@ export class Game {
         this.hud.showScreen(
             this.screens.gameOverSaved(
                 list, entry, (l, h) => this.renderLeaderboard(l, h),
-                this.difficulty, this.difficulties, this.dom, this.i18n
+                this.difficulty, this.difficulties, this.dom, this.i18n, this.playerName
             )
         );
         this.bindDifficultyButtons(() => this.renderGameOverSaved(list, entry));
+        this.bindNameInput();
     }
 
     togglePause() {
@@ -575,8 +583,26 @@ export class Game {
 
     handleEnter() {
         if (this.state === "idle" || this.state === "gameOver-saved") {
+            if (!this.isNicknameValid()) return;
+            if (this.playerName) this.leaderboard.setLastName(this.playerName);
             this.startCountdown();
+        } else if (this.state === "gameOver-entry") {
+            this.continueFromGameOverEntry();
         }
+    }
+
+    isNicknameValid() {
+        if (!this.dom) return true;
+        const input = this.dom.querySelector('[data-role="name-input"]');
+        if (!input) return true;
+
+        const valid = Game.NICKNAME_PATTERN.test(this.playerName || "");
+        input.classList.toggle("nickname-form__input--invalid", !valid);
+        if (!valid) {
+            input.reportValidity();
+            input.focus();
+        }
+        return valid;
     }
 
     addScore(points) {
@@ -782,7 +808,7 @@ export class Game {
         };
 
         this.dom.addEventListener("keydown", (event) => {
-            if (isTypingInField(event)) return;
+            if (isTypingInField(event) && event.code !== "Enter") return;
 
             if (PREVENT_DEFAULT_KEYS.has(event.code)) event.preventDefault();
 

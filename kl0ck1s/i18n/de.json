@@ -31,7 +31,8 @@
     "idle": {
       "hint": "Schwierigkeit wählen",
       "startHintBefore": "Drücke",
-      "startHintAfter": "zum Starten"
+      "startHintAfter": "zum Starten",
+      "namePlaceholder": "Dein Spitzname"
     },
     "paused": {
       "title": "PAUSE",
@@ -64,7 +65,8 @@
       "scoreLabel": "Punkte:",
       "levelLabel": "Level",
       "linesLabel": "Reihen",
-      "namePlaceholder": "Dein Spitzname",
+      "todayBestLabel": "Heutiger Bestwert:",
+      "todayBestBy": "von",
       "submit": "Weiter"
     },
     "gameOverSaved": {

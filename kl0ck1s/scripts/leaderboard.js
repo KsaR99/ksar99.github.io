@@ -51,6 +51,11 @@ export class Leaderboard {
         return this.cache.length ? this.cache[0].score : 0;
     }
 
+    todayBestEntry() {
+        const today = new Date().toDateString();
+        return this.cache.find((entry) => new Date(entry.date).toDateString() === today) || null;
+    }
+
     formatDate(iso) {
         const date = new Date(iso);
         const locale = this.i18n?.locale || "en-US";

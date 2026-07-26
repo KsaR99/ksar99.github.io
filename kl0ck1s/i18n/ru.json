@@ -31,7 +31,8 @@
     "idle": {
       "hint": "Выберите сложность",
       "startHintBefore": "Нажмите",
-      "startHintAfter": "чтобы начать"
+      "startHintAfter": "чтобы начать",
+      "namePlaceholder": "Ваш ник"
     },
     "paused": {
       "title": "ПАУЗА",
@@ -64,7 +65,8 @@
       "scoreLabel": "Очки:",
       "levelLabel": "уровень",
       "linesLabel": "линий",
-      "namePlaceholder": "Ваш ник",
+      "todayBestLabel": "Лучший результат сегодня:",
+      "todayBestBy": "от",
       "submit": "Продолжить"
     },
     "gameOverSaved": {

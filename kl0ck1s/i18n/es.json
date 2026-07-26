@@ -31,7 +31,8 @@
     "idle": {
       "hint": "Elige la dificultad",
       "startHintBefore": "Pulsa",
-      "startHintAfter": "para empezar"
+      "startHintAfter": "para empezar",
+      "namePlaceholder": "Tu apodo"
     },
     "paused": {
       "title": "PAUSA",
@@ -64,7 +65,8 @@
       "scoreLabel": "Puntuación:",
       "levelLabel": "nivel",
       "linesLabel": "líneas",
-      "namePlaceholder": "Tu apodo",
+      "todayBestLabel": "Mejor de hoy:",
+      "todayBestBy": "de",
       "submit": "Continuar"
     },
     "gameOverSaved": {

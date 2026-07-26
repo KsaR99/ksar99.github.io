@@ -1,5 +1,7 @@
 "use strict";
 
+import {formatNumber} from "./utils.js";
+
 function clone(dom, templateId) {
     return dom.getElementById(templateId).content.cloneNode(true);
 }
@@ -23,9 +25,10 @@ export const Screens = {
         return screen;
     },
 
-    idle(list, selectedDifficulty, difficulties, renderLeaderboard, dom = document, i18n) {
+    idle(list, selectedDifficulty, difficulties, renderLeaderboard, dom = document, i18n, playerName = "") {
         const screen = clone(dom, "tpl-screen-idle");
         fillDifficultyButtons(dom, screen.querySelector('[data-field="difficulty"]'), selectedDifficulty, difficulties, i18n);
+        screen.querySelector('[data-role="name-input"]').value = playerName;
         screen.querySelector('[data-field="leaderboard"]').appendChild(renderLeaderboard(list));
         i18n.applyStatic(screen);
         return screen;
@@ -70,19 +73,30 @@ export const Screens = {
         return screen;
     },
 
-    gameOverEntry(stats, list, renderLeaderboard, dom = document, i18n) {
+    gameOverEntry(stats, list, highlightEntry, todayBestEntry, renderLeaderboard, dom = document, i18n) {
         const screen = clone(dom, "tpl-screen-gameover-entry");
+        screen.querySelector('[data-field="playerName"]').textContent = highlightEntry?.name ?? "";
         screen.querySelector('[data-field="score"]').textContent = stats.score;
         screen.querySelector('[data-field="level"]').textContent = stats.level;
         screen.querySelector('[data-field="lines"]').textContent = stats.lines;
-        screen.querySelector('[data-field="leaderboard"]').appendChild(renderLeaderboard(list));
+
+        const todayBestRow = screen.querySelector('[data-role="today-best-row"]');
+        if (todayBestEntry) {
+            screen.querySelector('[data-field="todayBest"]').textContent = formatNumber(todayBestEntry.score);
+            screen.querySelector('[data-field="todayBestName"]').textContent = todayBestEntry.name;
+        } else if (todayBestRow) {
+            todayBestRow.remove();
+        }
+
+        screen.querySelector('[data-field="leaderboard"]').appendChild(renderLeaderboard(list, highlightEntry));
         i18n.applyStatic(screen);
         return screen;
     },
 
-    gameOverSaved(list, highlightEntry, renderLeaderboard, selectedDifficulty, difficulties, dom = document, i18n) {
+    gameOverSaved(list, highlightEntry, renderLeaderboard, selectedDifficulty, difficulties, dom = document, i18n, playerName = "") {
         const screen = clone(dom, "tpl-screen-gameover-saved");
         fillDifficultyButtons(dom, screen.querySelector('[data-field="difficulty"]'), selectedDifficulty, difficulties, i18n);
+        screen.querySelector('[data-role="name-input"]').value = playerName;
         screen.querySelector('[data-field="leaderboard"]').appendChild(renderLeaderboard(list, highlightEntry));
         i18n.applyStatic(screen);
         return screen;

@@ -455,13 +455,13 @@ body.perf-no-glow .board__vhs--active::after {
     padding: 0.5em 1.25em;
 }
 
-.score-form {
+.nickname-form {
     display: flex;
     gap: 0.5rem;
     width: 100%;
 }
 
-.score-form__input {
+.nickname-form__input {
     flex: 1;
     min-width: 0;
     background: oklch(22.054% 0.02402 273.436);
@@ -475,6 +475,14 @@ body.perf-no-glow .board__vhs--active::after {
     &:focus {
         outline: 2px solid var(--accent-2);
         outline-offset: 1px;
+    }
+}
+
+.nickname-form__input--invalid {
+    border-color: oklch(0.6489 0.237 26.97);
+
+    &:focus {
+        outline-color: oklch(0.6489 0.237 26.97);
     }
 }
 
