@@ -35,6 +35,11 @@ export class Game {
 
     static SETTINGS_KEY = "klockis-settings";
     static APP_NAME = "Kl0ck1's";
+    static COUNTDOWN_STEPS = [
+        {number: 3, tint: "red"},
+        {number: 2, tint: "yellow"},
+        {number: 1, tint: "green"},
+    ];
 
     constructor({
                     board,
@@ -50,6 +55,7 @@ export class Game {
                     scoring,
                     levelUpBannerDuration,
                     lineClearAnimationDuration,
+                    countdownStepDuration = 500,
                     settingsStore = null,
                     vhsNoise = null,
                     dom = globalThis.document ?? null,
@@ -68,11 +74,13 @@ export class Game {
         this.scoring = scoring;
         this.levelUpBannerDuration = levelUpBannerDuration;
         this.lineClearAnimationDuration = lineClearAnimationDuration;
+        this.countdownStepDuration = countdownStepDuration;
         this.settingsStore = settingsStore ?? leaderboard.store;
         this.vhsNoise = vhsNoise;
         this.dom = dom;
         this.i18n = i18n;
         this.settings = this.defaultSettings();
+        this.lastTime = 0;
         this.vhsEnabled = false;
         this.previousStateBeforeOptions = null;
         this.isPlayingSession = false;
@@ -133,7 +141,7 @@ export class Game {
         this.groundedTime = 0;
         this.lastAction = null;
         this.pendingSpin = null;
-        this.lastTime = 0;
+        this.rotationAnim = null;
         this.hardDropUsed = false;
         this.clearingLines = [];
         this.clearingTimer = 0;
@@ -204,8 +212,37 @@ export class Game {
         if (color) this.renderer.setTheme(color);
     }
 
-    start() {
+    startCountdown() {
         this.prepareNewRound();
+        this.state = "countdown";
+        this.isPlayingSession = false;
+        this.hud.setPlaying(false);
+        this.countdownIndex = 0;
+        this.countdownTimer = 0;
+
+        const {number, tint} = Game.COUNTDOWN_STEPS[this.countdownIndex];
+        this.hud.showScreen(
+            this.screens.countdown(number, tint, this.dom, this.i18n),
+            {transparentOverlay: true}
+        );
+    }
+
+    advanceCountdownStep() {
+        const {number, tint} = Game.COUNTDOWN_STEPS[this.countdownIndex];
+        if (!this.hud.updateCountdown(number, tint)) {
+            this.renderCountdownStep();
+        }
+    }
+
+    renderCountdownStep() {
+        const {number, tint} = Game.COUNTDOWN_STEPS[this.countdownIndex];
+        this.hud.showScreen(
+            this.screens.countdown(number, tint, this.dom, this.i18n),
+            {transparentOverlay: true}
+        );
+    }
+
+    start() {
         this.state = "running";
         this.isPlayingSession = true;
         this.hud.setPlaying(true);
@@ -220,6 +257,7 @@ export class Game {
         this.lockDelayResets = 0;
         this.groundedTime = 0;
         this.lastAction = null;
+        this.rotationAnim = null;
         this.renderer.drawNext(this.next);
 
         if (this.board.collides(this.current, 0, 0)) {
@@ -530,7 +568,7 @@ export class Game {
 
     handleEnter() {
         if (this.state === "idle" || this.state === "gameOver-saved") {
-            this.start();
+            this.startCountdown();
         }
     }
 
@@ -669,12 +707,17 @@ export class Game {
 
         for (const [dx, dy] of kicks) {
             if (!this.board.collides(this.current, dx, dy, rotatedShape)) {
+                const fromX = this.current.x;
+                const fromY = this.current.y;
+
                 this.current.shape = rotatedShape;
                 this.current.x += dx;
                 this.current.y += dy;
                 this.current.rotationState = toState;
                 this.lastAction = "rotate";
                 if (this.board.collides(this.current, 0, 1)) this.resetLockDelay();
+
+                this.rotationAnim = {fromX, fromY, toX: this.current.x, toY: this.current.y, elapsed: 0, duration: 60};
                 return;
             }
         }
@@ -698,7 +741,7 @@ export class Game {
         };
 
         const PREVENT_DEFAULT_KEYS = new Set([
-            "ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Space",
+            "ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Space", "Enter",
         ]);
 
         const REPEATABLE_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowDown"]);
@@ -761,8 +804,29 @@ export class Game {
     }
 
     update(delta) {
+        if (this.rotationAnim) {
+            this.rotationAnim.elapsed += delta;
+            if (this.rotationAnim.elapsed >= this.rotationAnim.duration) {
+                this.rotationAnim = null;
+            }
+        }
+
         if (this.levelUpTimer > 0) {
             this.levelUpTimer = Math.max(0, this.levelUpTimer - delta);
+        }
+
+        if (this.state === "countdown") {
+            this.countdownTimer += delta;
+            if (this.countdownTimer >= this.countdownStepDuration) {
+                this.countdownTimer = 0;
+                this.countdownIndex += 1;
+                if (this.countdownIndex >= Game.COUNTDOWN_STEPS.length) {
+                    this.start();
+                } else {
+                    this.advanceCountdownStep();
+                }
+            }
+            return;
         }
 
         if (this.state === "clearing") {
@@ -795,6 +859,21 @@ export class Game {
         }
     }
 
+    getRenderedPiece() {
+        if (!this.rotationAnim) return this.current;
+
+        const t = Math.min(1, this.rotationAnim.elapsed / this.rotationAnim.duration);
+        const {fromX, fromY, toX, toY} = this.rotationAnim;
+
+        const rendered = Object.create(Object.getPrototypeOf(this.current));
+        Object.assign(rendered, this.current, {
+            x: fromX + (toX - fromX) * t,
+            y: fromY + (toY - fromY) * t,
+        });
+
+        return rendered;
+    }
+
     render() {
         this.updateVhsOverlay();
         this.renderer.drawBoard(this.board);
@@ -804,7 +883,7 @@ export class Game {
 
         if (this.state === "running" || this.state === "paused" || showPieceBehindOptions) {
             if (this.state === "running") this.renderer.drawGhost(this.current, this.board);
-            this.renderer.drawPiece(this.current);
+            this.renderer.drawPiece(this.getRenderedPiece());
         } else if (this.state === "clearing") {
             const progress = Math.min(1, this.clearingTimer / this.lineClearAnimationDuration);
             this.renderer.drawClearingLines(this.clearingLines, progress);
@@ -816,7 +895,7 @@ export class Game {
     }
 
     loop(time = 0) {
-        const delta = time - this.lastTime;
+        const delta = Math.min(time - this.lastTime, 100);
         this.lastTime = time;
 
         this.update(delta);

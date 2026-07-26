@@ -63,6 +63,13 @@ export const Screens = {
         return screen;
     },
 
+    countdown(number, tint, dom = document, i18n) {
+        const screen = clone(dom, "tpl-screen-countdown");
+        screen.querySelector('[data-role="countdown-screen"]').dataset.tint = tint;
+        screen.querySelector('[data-field="number"]').textContent = number;
+        return screen;
+    },
+
     gameOverEntry(stats, list, renderLeaderboard, dom = document, i18n) {
         const screen = clone(dom, "tpl-screen-gameover-entry");
         screen.querySelector('[data-field="score"]').textContent = stats.score;

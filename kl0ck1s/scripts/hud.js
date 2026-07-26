@@ -45,13 +45,32 @@ export class HUD {
         this.bestEl.textContent = best;
     }
 
-    showScreen(node) {
+    showScreen(node, {transparentOverlay = false} = {}) {
         this.overlayEl.replaceChildren(node);
         this.overlayEl.classList.add("board__overlay--visible");
+        this.overlayEl.classList.toggle("board__overlay--transparent", transparentOverlay);
+    }
+
+    updateCountdown(number, tint) {
+        const screen = this.overlayEl.querySelector('[data-role="countdown-screen"]');
+        if (!screen) return false;
+
+        screen.dataset.tint = tint;
+
+        const numberEl = screen.querySelector('[data-field="number"]');
+        if (numberEl) {
+            numberEl.textContent = number;
+            numberEl.classList.remove("countdown__number");
+            void numberEl.offsetWidth;
+            numberEl.classList.add("countdown__number");
+        }
+
+        return true;
     }
 
     hideOverlay() {
         this.overlayEl.classList.remove("board__overlay--visible");
+        this.overlayEl.classList.remove("board__overlay--transparent");
         this.overlayEl.replaceChildren();
     }
 }
