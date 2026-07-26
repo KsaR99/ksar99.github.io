@@ -88,11 +88,21 @@ export class Game {
     }
 
     get stats() {
+        const linesPerLevel = this.scoring.LINES_PER_LEVEL;
+        const progressPercent = linesPerLevel
+            ? Math.floor(((this.lines % linesPerLevel) / linesPerLevel) * 100)
+            : 0;
+
         return {
             score: formatNumber(this.score),
             level: this.level,
             lines: this.lines,
             best: formatNumber(this.leaderboard.bestScore()),
+            difficulty: this.i18n.t("sidebar.difficultyValue", {
+                level: this.level,
+                percent: progressPercent,
+                difficulty: this.i18n.t(`difficulty.${this.levelTier}`),
+            }),
         };
     }
 
@@ -112,9 +122,9 @@ export class Game {
         return media ? media("(prefers-reduced-motion: reduce)").matches : false;
     }
 
-    init() {
+    async init() {
         this.soundManager.init();
-        this.loadSettings().then();
+        await this.loadSettings();
         this.applyDifficultyTheme();
         this.prepareNewRound();
         this.showIdleScreen().then();
@@ -162,6 +172,7 @@ export class Game {
         this.state = "idle";
         this.isPlayingSession = false;
         this.hud.setPlaying(false);
+        this.hud.setHasPlayedBefore(false);
         this.hud.showScreen(this.screens.loading(
             Game.APP_NAME, this.i18n.t("screens.loading.leaderboardHint"), this.dom
         ));
@@ -204,14 +215,22 @@ export class Game {
         });
     }
 
+    setDifficulty(difficulty) {
+        this.difficulty = difficulty;
+        this.levelTier = difficulty;
+        this.applyDifficultyTheme();
+        this.settings.difficulty = difficulty;
+        this.saveSettings();
+        this.hud.update(this.stats);
+    }
+
     bindDifficultyButtons(onChange) {
         if (!this.dom) return;
         this.dom
             .querySelectorAll('[data-role="difficulty-button"]')
             .forEach((btn) =>
                 btn.addEventListener("click", ({currentTarget}) => {
-                    this.difficulty = currentTarget.dataset.difficulty;
-                    this.applyDifficultyTheme();
+                    this.setDifficulty(currentTarget.dataset.difficulty);
                     onChange();
                 })
             );
@@ -220,8 +239,8 @@ export class Game {
     changeDifficulty(dir) {
         const keys = Object.keys(this.difficulties);
         const currentIndex = keys.indexOf(this.difficulty);
-        this.difficulty = keys[(currentIndex + dir + keys.length) % keys.length];
-        this.applyDifficultyTheme();
+        const nextDifficulty = keys[(currentIndex + dir + keys.length) % keys.length];
+        this.setDifficulty(nextDifficulty);
 
         if (this.state === "idle") {
             this.renderIdleScreen(this.currentIdleList);
@@ -246,6 +265,7 @@ export class Game {
         this.state = "countdown";
         this.isPlayingSession = false;
         this.hud.setPlaying(false);
+        this.hud.setHasPlayedBefore(true);
         this.countdownIndex = 0;
         this.countdownTimer = 0;
 
@@ -413,6 +433,9 @@ export class Game {
         }
 
         this.settings = settings;
+        if (settings.difficulty && this.difficulties[settings.difficulty]) {
+            this.difficulty = settings.difficulty;
+        }
         this.soundManager.setVolume(settings.volume);
         this.soundManager.setMuted(settings.muted);
         this.applyPerformanceSettings();

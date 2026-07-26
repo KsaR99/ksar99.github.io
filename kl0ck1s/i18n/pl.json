@@ -1,12 +1,13 @@
 {
   "locale": "pl-PL",
   "app": {
-    "subtitle": "U\u0142\u00f3\u017c linie, zdobywaj punkty."
+    "subtitle": "Ułóż linie, zdobywaj punkty."
   },
   "sidebar": {
-    "nextPiece": "Nast\u0119pny klocek",
+    "nextPiece": "Następny klocek",
+    "difficulty": "Poziom trudności",
+    "difficultyValue": "{difficulty} {level}: {percent}%",
     "score": "Wynik",
-    "level": "Poziom",
     "lines": "Linie",
     "best": "Rekord",
     "statusLive": "Aktualna gra",
@@ -14,53 +15,53 @@
   },
   "controls": {
     "toggle": "Sterowanie",
-    "rotate": "Obr\u00f3t",
+    "rotate": "Obrót",
     "moveLeftRight": "Ruch lewo / prawo",
     "softDrop": "Szybszy spadek",
     "hardDrop": "Natychmiastowy spadek",
     "pause": "Pauza",
     "start": "Start / nowa gra",
-    "mute": "Wycisz d\u017awi\u0119k",
+    "mute": "Wycisz dźwięk",
     "options": "Opcje",
     "spaceKey": "Spacja"
   },
   "screens": {
     "common": {
-      "switchHint": "Prze\u0142\u0105cz strza\u0142kami"
+      "switchHint": "Przełącz strzałkami"
     },
     "idle": {
-      "hint": "Wybierz poziom trudno\u015bci",
-      "startHintBefore": "Naci\u015bnij",
-      "startHintAfter": " aby rozpocz\u0105\u0107",
-      "namePlaceholder": "Tw\u00f3j nick"
+      "hint": "Wybierz poziom trudności",
+      "startHintBefore": "Naciśnij",
+      "startHintAfter": " aby rozpocząć",
+      "namePlaceholder": "Twój nick"
     },
     "paused": {
       "title": "PAUZA",
-      "resumeHintBefore": "Naci\u015bnij",
-      "resumeHintAfter": " aby wznowi\u0107",
-      "optionsHintBefore": "Naci\u015bnij",
-      "optionsHintAfter": ", aby otworzy\u0107 opcje",
-      "resumeButton": "Wzn\u00f3w"
+      "resumeHintBefore": "Naciśnij",
+      "resumeHintAfter": " aby wznowić",
+      "optionsHintBefore": "Naciśnij",
+      "optionsHintAfter": ", aby otworzyć opcje",
+      "resumeButton": "Wznów"
     },
     "options": {
       "title": "OPCJE",
-      "closeHintBefore": "Naci\u015bnij",
-      "closeHintAfter": " aby zamkn\u0105\u0107",
-      "languageTitle": "J\u0119zyk",
-      "language": "J\u0119zyk",
-      "soundTitle": "D\u017awi\u0119k",
+      "closeHintBefore": "Naciśnij",
+      "closeHintAfter": " aby zamknąć",
+      "languageTitle": "Język",
+      "language": "Język",
+      "soundTitle": "Dźwięk",
       "mute": "Wycisz",
-      "volume": "G\u0142o\u015bno\u015b\u0107",
-      "layoutTitle": "Uk\u0142ad",
+      "volume": "Głośność",
+      "layoutTitle": "Układ",
       "hudRight": "HUD po prawej",
-      "performanceTitle": "Wydajno\u015b\u0107",
-      "glow": "Po\u015bwiata (blur)",
-      "transparency": "Przezroczysto\u015b\u0107",
-      "vhs": "Zak\u0142\u00f3cenia VHS (szum)",
+      "performanceTitle": "Wydajność",
+      "glow": "Poświata (blur)",
+      "transparency": "Przezroczystość",
+      "vhs": "Zakłócenia VHS (szum)",
       "close": "Zamknij"
     },
     "loading": {
-      "leaderboardHint": "Wczytywanie tabeli wynik\u00f3w..."
+      "leaderboardHint": "Wczytywanie tabeli wyników..."
     },
     "gameOverEntry": {
       "title": "KONIEC GRY",
@@ -73,13 +74,13 @@
     },
     "gameOverSaved": {
       "title": "WYNIK ZAPISANY",
-      "playAgainHintBefore": "Naci\u015bnij",
-      "playAgainHintAfter": " aby zagra\u0107 ponownie"
+      "playAgainHintBefore": "Naciśnij",
+      "playAgainHintAfter": " aby zagrać ponownie"
     }
   },
   "leaderboard": {
-    "title": "Tabela wynik\u00f3w",
-    "empty": "Brak wynik\u00f3w \u2014 zagraj pierwszy!",
+    "title": "Tabela wyników",
+    "empty": "Brak wyników — zagraj pierwszy!",
     "headers": {
       "name": "Nick",
       "score": "Wynik",
@@ -90,8 +91,8 @@
     "defaultName": "Gracz"
   },
   "difficulty": {
-    "easy": "\u0141atwy",
-    "medium": "\u015aredni",
+    "easy": "Łatwy",
+    "medium": "Średni",
     "hard": "Trudny",
     "expert": "Ekspert",
     "pro": "PRO",

@@ -4,26 +4,40 @@ export class HUD {
     /**
      * @param {object} elements
      * @param {HTMLElement} elements.scoreEl
-     * @param {HTMLElement} elements.levelEl
      * @param {HTMLElement} elements.linesEl
      * @param {HTMLElement} elements.bestEl
      * @param {HTMLElement} elements.overlayEl
      * @param {HTMLElement} [elements.nextPieceCardEl]
      * @param {HTMLElement} [elements.statsStatusEl]
+     * @param {HTMLElement} [elements.difficultyEl]
+     * @param {HTMLElement} [elements.linesStatEl]
+     * @param {HTMLElement} [elements.difficultyStatEl]
      * @param {import("./i18n.js").I18n} [elements.i18n]
      */
     constructor({
-                    scoreEl, levelEl, linesEl, bestEl, overlayEl,
-                    nextPieceCardEl = null, statsStatusEl = null, i18n = null,
+                    scoreEl, linesEl, bestEl, overlayEl,
+                    nextPieceCardEl = null, statsStatusEl = null, difficultyEl = null,
+                    linesStatEl = null, difficultyStatEl = null, i18n = null,
                 }) {
         this.scoreEl = scoreEl;
-        this.levelEl = levelEl;
         this.linesEl = linesEl;
         this.bestEl = bestEl;
         this.overlayEl = overlayEl;
         this.nextPieceCardEl = nextPieceCardEl;
         this.statsStatusEl = statsStatusEl;
+        this.difficultyEl = difficultyEl;
+        this.linesStatEl = linesStatEl;
+        this.difficultyStatEl = difficultyStatEl;
         this.i18n = i18n;
+    }
+
+    setHasPlayedBefore(hasPlayedBefore) {
+        if (this.linesStatEl) {
+            this.linesStatEl.classList.toggle("card--hidden", !hasPlayedBefore);
+        }
+        if (this.difficultyStatEl) {
+            this.difficultyStatEl.classList.toggle("card--hidden", !hasPlayedBefore);
+        }
     }
 
     setPlaying(isPlaying) {
@@ -38,11 +52,13 @@ export class HUD {
         }
     }
 
-    update({score, level, lines, best}) {
+    update({score, lines, best, difficulty}) {
         this.scoreEl.textContent = score;
-        this.levelEl.textContent = level;
         this.linesEl.textContent = lines;
         this.bestEl.textContent = best;
+        if (this.difficultyEl && difficulty !== undefined) {
+            this.difficultyEl.textContent = difficulty;
+        }
     }
 
     showScreen(node, {transparentOverlay = false} = {}) {

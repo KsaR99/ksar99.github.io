@@ -5,8 +5,9 @@
   },
   "sidebar": {
     "nextPiece": "Следующая фигура",
+    "difficulty": "Сложность",
+    "difficultyValue": "{difficulty} {level}: {percent}%",
     "score": "Очки",
-    "level": "Уровень",
     "lines": "Линии",
     "best": "Рекорд",
     "statusLive": "Текущая игра",

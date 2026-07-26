@@ -5,8 +5,9 @@
   },
   "sidebar": {
     "nextPiece": "Volgend blok",
+    "difficulty": "Moeilijkheidsgraad",
+    "difficultyValue": "{difficulty} {level}: {percent}%",
     "score": "Score",
-    "level": "Niveau",
     "lines": "Lijnen",
     "best": "Beste",
     "statusLive": "Huidige spel",

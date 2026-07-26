@@ -5,8 +5,9 @@
   },
   "sidebar": {
     "nextPiece": "Siguiente pieza",
+    "difficulty": "Dificultad",
+    "difficultyValue": "{difficulty} {level}: {percent}%",
     "score": "Puntuación",
-    "level": "Nivel",
     "lines": "Líneas",
     "best": "Récord",
     "statusLive": "Partida actual",

@@ -5,8 +5,9 @@
   },
   "sidebar": {
     "nextPiece": "Nächster Stein",
+    "difficulty": "Schwierigkeit",
+    "difficultyValue": "{difficulty} {level}: {percent}%",
     "score": "Punkte",
-    "level": "Level",
     "lines": "Reihen",
     "best": "Bestwert",
     "statusLive": "Aktuelles Spiel",

@@ -88,12 +88,14 @@ const renderer = new Renderer({
 
 const hud = new HUD({
     scoreEl: document.getElementById("score-value"),
-    levelEl: document.getElementById("level-value"),
     linesEl: document.getElementById("lines-value"),
     bestEl: document.getElementById("best-value"),
     overlayEl: document.getElementById("overlay"),
     nextPieceCardEl: document.querySelector('[data-role="next-piece-card"]'),
     statsStatusEl: document.querySelector('[data-role="stats-status"]'),
+    difficultyEl: document.getElementById("difficulty-value"),
+    linesStatEl: document.querySelector('[data-role="lines-stat"]'),
+    difficultyStatEl: document.querySelector('[data-role="difficulty-stat"]'),
     i18n,
 });
 

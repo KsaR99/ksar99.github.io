@@ -5,8 +5,9 @@
   },
   "sidebar": {
     "nextPiece": "Next piece",
+    "difficulty": "Difficulty",
+    "difficultyValue": "{difficulty} {level}: {percent}%",
     "score": "Score",
-    "level": "Level",
     "lines": "Lines",
     "best": "Best",
     "statusLive": "Current game",
@@ -79,7 +80,7 @@
   },
   "leaderboard": {
     "title": "Leaderboard",
-    "empty": "No scores yet \u2014 be the first to play!",
+    "empty": "No scores yet — be the first to play!",
     "headers": {
       "name": "Name",
       "score": "Score",
