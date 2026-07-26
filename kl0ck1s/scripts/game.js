@@ -304,6 +304,7 @@ export class Game {
         ));
 
         await this.leaderboard.load();
+        await this.leaderboard.loadTodayBest();
         if (this.state !== "gameOver-entry") return;
 
         const name = this.playerName || this.i18n.t("leaderboard.defaultName");
@@ -318,6 +319,7 @@ export class Game {
         const todayBestBeforeThisGame = this.leaderboard.todayBestEntry();
 
         const list = await this.leaderboard.add(entry);
+        await this.leaderboard.recordIfTodayBest(entry);
         if (this.state !== "gameOver-entry") return;
 
         this.currentGameOverEntry = {list, entry};

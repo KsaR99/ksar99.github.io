@@ -5,6 +5,7 @@ import {formatNumber} from "./utils.js";
 export class Leaderboard {
     static SCORES_KEY = "klockis-scores";
     static NAME_KEY = "klockis-last-name";
+    static TODAY_BEST_KEY = "klockis-today-best";
     static MAX_ENTRIES = 10;
 
     constructor(store, dom = globalThis.document ?? null, i18n = null) {
@@ -13,6 +14,33 @@ export class Leaderboard {
         this.i18n = i18n;
         this.cache = [];
         this.lastNameCache = "";
+        this.todayBestCache = null;
+    }
+
+    isToday(iso) {
+        return new Date(iso).toDateString() === new Date().toDateString();
+    }
+
+    async loadTodayBest() {
+        let stored = null;
+        try {
+            const raw = await this.store.get(Leaderboard.TODAY_BEST_KEY);
+            stored = raw ? JSON.parse(raw) : null;
+        } catch {
+            stored = null;
+        }
+        this.todayBestCache = stored && this.isToday(stored.date) ? stored : null;
+        return this.todayBestCache;
+    }
+
+    async recordIfTodayBest(entry) {
+        const current = this.todayBestCache;
+        const currentIsToday = current && this.isToday(current.date);
+        if (!currentIsToday || entry.score > current.score) {
+            this.todayBestCache = entry;
+            await this.store.set(Leaderboard.TODAY_BEST_KEY, JSON.stringify(entry));
+        }
+        return this.todayBestCache;
     }
 
     async load() {
@@ -52,8 +80,7 @@ export class Leaderboard {
     }
 
     todayBestEntry() {
-        const today = new Date().toDateString();
-        return this.cache.find((entry) => new Date(entry.date).toDateString() === today) || null;
+        return this.todayBestCache;
     }
 
     formatDate(iso) {
