@@ -51,6 +51,8 @@
       "soundTitle": "Ton",
       "mute": "Stumm",
       "volume": "Lautstärke",
+      "layoutTitle": "Layout",
+      "hudRight": "HUD rechts",
       "performanceTitle": "Leistung",
       "glow": "Leuchten (Unschärfe)",
       "transparency": "Transparenz",

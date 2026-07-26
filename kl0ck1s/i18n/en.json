@@ -51,6 +51,8 @@
       "soundTitle": "Sound",
       "mute": "Mute",
       "volume": "Volume",
+      "layoutTitle": "Layout",
+      "hudRight": "HUD on the right",
       "performanceTitle": "Performance",
       "glow": "Glow (blur)",
       "transparency": "Transparency",

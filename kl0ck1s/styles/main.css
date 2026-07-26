@@ -45,12 +45,29 @@ body {
 
 .app__board {
     flex: 0 0 auto;
+    order: 2;
 }
 
 .app__sidebar {
     width: clamp(11.5rem, 22vw, 13.75rem);
     max-width: 90vw;
     flex: 0 1 13.75rem;
+}
+
+.sidebar--stats {
+    order: 1;
+}
+
+.sidebar--controls {
+    order: 3;
+}
+
+body.hud-right .sidebar--stats {
+    order: 3;
+}
+
+body.hud-right .sidebar--controls {
+    order: 1;
 }
 
 .board {

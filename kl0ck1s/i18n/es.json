@@ -51,6 +51,8 @@
       "soundTitle": "Sonido",
       "mute": "Silenciar",
       "volume": "Volumen",
+      "layoutTitle": "Diseño",
+      "hudRight": "HUD a la derecha",
       "performanceTitle": "Rendimiento",
       "glow": "Brillo (desenfoque)",
       "transparency": "Transparencia",

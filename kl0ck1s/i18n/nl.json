@@ -51,6 +51,8 @@
       "soundTitle": "Geluid",
       "mute": "Dempen",
       "volume": "Volume",
+      "layoutTitle": "Lay-out",
+      "hudRight": "HUD rechts",
       "performanceTitle": "Prestaties",
       "glow": "Gloed (vervaging)",
       "transparency": "Transparantie",

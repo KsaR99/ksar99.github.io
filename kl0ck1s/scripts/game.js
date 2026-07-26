@@ -104,7 +104,7 @@ export class Game {
     }
 
     defaultSettings() {
-        return {volume: 1, muted: false, glow: true, transparency: true, vhs: true};
+        return {volume: 1, muted: false, glow: true, transparency: true, vhs: true, hudRight: false};
     }
 
     prefersReducedMotion() {
@@ -431,6 +431,7 @@ export class Game {
         if (body) {
             body.classList.toggle("perf-no-glow", !glow);
             body.classList.toggle("perf-no-transparency", !transparency);
+            body.classList.toggle("hud-right", Boolean(this.settings.hudRight));
         }
 
         this.vhsEnabled = vhs;
@@ -486,6 +487,7 @@ export class Game {
         if (!this.dom) return;
         const muteCheckbox = this.dom.querySelector('[data-role="mute-checkbox"]');
         const volumeSlider = this.dom.querySelector('[data-role="volume-slider"]');
+        const hudRightCheckbox = this.dom.querySelector('[data-role="hud-right-checkbox"]');
         const glowCheckbox = this.dom.querySelector('[data-role="glow-checkbox"]');
         const transparencyCheckbox = this.dom.querySelector('[data-role="transparency-checkbox"]');
         const vhsCheckbox = this.dom.querySelector('[data-role="vhs-checkbox"]');
@@ -504,6 +506,14 @@ export class Game {
             volumeSlider.addEventListener("input", () => {
                 this.settings.volume = volumeSlider.value / 100;
                 this.soundManager.setVolume(this.settings.volume);
+                this.saveSettings();
+            });
+        }
+
+        if (hudRightCheckbox) {
+            hudRightCheckbox.addEventListener("change", () => {
+                this.settings.hudRight = hudRightCheckbox.checked;
+                this.applyPerformanceSettings();
                 this.saveSettings();
             });
         }

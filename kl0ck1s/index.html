@@ -8,7 +8,7 @@
 </head>
 <body>
 <div class="app">
-    <div class="app__sidebar sidebar">
+    <div class="app__sidebar sidebar sidebar--stats">
         <div class="card">
             <p class="brand__title">Kl0ck1's</p>
             <p class="brand__subtitle" data-i18n="app.subtitle">Arrange the lines, score points.</p>
@@ -48,7 +48,7 @@
         <div class="board__overlay" id="overlay"></div>
     </div>
 
-    <div class="app__sidebar sidebar">
+    <div class="app__sidebar sidebar sidebar--controls">
         <div class="card">
             <h3 class="card__title controls__toggle" data-role="controls-toggle">
                 <span data-i18n="controls.toggle">Controls</span>
@@ -158,6 +158,14 @@
                 <span data-i18n="screens.options.volume">Volume</span>
                 <input class="options__input options__input--range" data-role="volume-slider"
                        max="100" min="0" type="range">
+            </label>
+        </div>
+
+        <div class="options">
+            <h3 class="options__title" data-i18n="screens.options.layoutTitle">Layout</h3>
+            <label class="options__row">
+                <span data-i18n="screens.options.hudRight">HUD on the right</span>
+                <input class="options__input options__input--checkbox" data-role="hud-right-checkbox" type="checkbox">
             </label>
         </div>
 

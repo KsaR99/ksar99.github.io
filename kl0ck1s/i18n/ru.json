@@ -51,6 +51,8 @@
       "soundTitle": "Звук",
       "mute": "Без звука",
       "volume": "Громкость",
+      "layoutTitle": "Макет",
+      "hudRight": "HUD справа",
       "performanceTitle": "Производительность",
       "glow": "Свечение (размытие)",
       "transparency": "Прозрачность",
