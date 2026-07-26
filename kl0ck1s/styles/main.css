@@ -8,8 +8,8 @@
     --accent-2: oklch(0.73 0.23 159.98);
     --good: oklch(0.93 0.21 101.98);
 
-    --font-display: monospace;
-    --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-display: "Noto Sans Mono", monospace;
+    --font-body: "Inter", system-ui, -apple-system, sans-serif;
 
     --gap: 0.1rem;
     --radius: 0.5rem;
@@ -321,8 +321,7 @@ body.perf-no-glow .board__vhs--active::after {
 .card__title {
     margin-bottom: 0.25em;
     font-size: 0.9rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-weight: 400;
     text-align: left;
     color: var(--muted);
 
@@ -360,8 +359,6 @@ body.perf-no-glow .board__vhs--active::after {
 }
 
 .stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
     word-wrap: anywhere;
 }
 
@@ -371,16 +368,7 @@ body.perf-no-glow .board__vhs--active::after {
     color: var(--accent-2);
 }
 
-.stats > div:nth-of-type(even) {
-    text-align: right;
-}
-
-.stats > div:nth-of-type(odd) {
-    text-align: left;
-}
-
 .stats__status {
-    grid-column: 1 / -1;
     font-size: 1.1rem;
     font-weight: 700;
     text-transform: uppercase;
