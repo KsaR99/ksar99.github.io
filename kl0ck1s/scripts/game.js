@@ -742,6 +742,7 @@ export class Game {
             ArrowUp: () => this.rotate(),
             Space: () => this.hardDrop(),
             Enter: () => this.handleEnter(),
+            Escape: () => this.togglePause(),
             KeyH: () => this.toggleControlsList(),
             KeyM: () => this.toggleSound(),
             KeyO: () => this.toggleOptions(),
@@ -750,7 +751,7 @@ export class Game {
         };
 
         const PREVENT_DEFAULT_KEYS = new Set([
-            "ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Space", "Enter",
+            "ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Space", "Enter", "Escape"
         ]);
 
         const REPEATABLE_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowDown"]);
