@@ -195,11 +195,14 @@ export class Renderer {
         const centerY = boardCanvas.height / 2;
         const fontSize = Math.max(18, Math.round(boardConfig.CELL_SIZE * 1.3));
         const text = this.i18n ? this.i18n.t("game.levelUpBanner", {level}) : `LEVEL ${level}`;
+        const fontBody = getComputedStyle(document.documentElement)
+            .getPropertyValue("--font-body")
+            .trim();
 
         ctx.save();
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.font = `bold ${fontSize}px monospace, "Courier New"`;
+        ctx.font = `bold ${fontSize}px ${fontBody}`;
 
         const paddingX = fontSize * 0.6;
         const paddingY = fontSize * 0.35;

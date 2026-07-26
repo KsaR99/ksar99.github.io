@@ -221,7 +221,7 @@ body.perf-no-glow .board__vhs--active::after {
 }
 
 .screen__title {
-    font-family: "Courier New", monospace;
+    font-family: var(--font-display);
     font-size: clamp(1.25rem, 4vw, 1.75rem);
     color: var(--accent-2);
     text-shadow: 0 0 0.6rem oklch(0.85 0.35 147.32);
