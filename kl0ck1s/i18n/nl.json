@@ -57,7 +57,12 @@
       "performanceTitle": "Prestaties",
       "glow": "Gloed (vervaging)",
       "transparency": "Transparantie",
-      "vhs": "VHS-ruis",
+      "effect": "Schermfilter",
+      "effectNone": "Geen",
+      "effectVhs": "VHS-ruis",
+      "effectMatrix": "Matrix",
+      "effectRain": "Regen",
+      "effectSnow": "Sneeuw",
       "close": "Sluiten"
     },
     "loading": {

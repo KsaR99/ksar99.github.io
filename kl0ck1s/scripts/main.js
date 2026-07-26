@@ -25,6 +25,9 @@ import {SoundManager} from "./sound-manager.js";
 import {Renderer} from "./renderer.js";
 import {HUD} from "./hud.js";
 import {VhsNoise} from "./vhs-noise.js";
+import {MatrixRain} from "./matrix-rain.js";
+import {Rain} from "./rain.js";
+import {Snow} from "./snow.js";
 import {Game} from "./game.js";
 import {I18n} from "./i18n.js";
 
@@ -66,9 +69,17 @@ function resizeBoardCanvas() {
     boardCanvas.height = BOARD_CONFIG.CELL_SIZE * BOARD_CONFIG.ROWS;
     ctx.imageSmoothingEnabled = false;
     vhsNoise.resize(boardCanvas.width, boardCanvas.height);
+    matrixRain.resize(boardCanvas.width, boardCanvas.height);
+    rain.resize(boardCanvas.width, boardCanvas.height);
+    snow.resize(boardCanvas.width, boardCanvas.height);
 }
 
-const vhsNoise = new VhsNoise(document.getElementById("vhs-noise-canvas"));
+const effectCanvas = document.getElementById("filter-canvas");
+const effectCtx = effectCanvas.getContext("2d", {colorSpace: "display-p3", willReadFrequently: true});
+const vhsNoise = new VhsNoise(effectCanvas, effectCtx);
+const matrixRain = new MatrixRain(effectCanvas, effectCtx);
+const rain = new Rain(effectCanvas, effectCtx);
+const snow = new Snow(effectCanvas, effectCtx);
 
 resizeBoardCanvas();
 
@@ -121,6 +132,9 @@ const game = new Game({
     lineClearAnimationDuration: LINE_CLEAR_ANIMATION_DURATION_MS,
     settingsStore: store,
     vhsNoise,
+    matrixRain,
+    rain,
+    snow,
     i18n,
 });
 

@@ -57,7 +57,12 @@
       "performanceTitle": "Производительность",
       "glow": "Свечение (размытие)",
       "transparency": "Прозрачность",
-      "vhs": "VHS-шум",
+      "effect": "Фильтр экрана",
+      "effectNone": "Нет",
+      "effectVhs": "Шум VHS",
+      "effectMatrix": "Матрица",
+      "effectRain": "Дождь",
+      "effectSnow": "Снег",
       "close": "Закрыть"
     },
     "loading": {

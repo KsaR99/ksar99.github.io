@@ -57,7 +57,12 @@
       "performanceTitle": "Rendimiento",
       "glow": "Brillo (desenfoque)",
       "transparency": "Transparencia",
-      "vhs": "Ruido VHS",
+      "effect": "Filtro de pantalla",
+      "effectNone": "Ninguno",
+      "effectVhs": "Ruido VHS",
+      "effectMatrix": "Matrix",
+      "effectRain": "Lluvia",
+      "effectSnow": "Nieve",
       "close": "Cerrar"
     },
     "loading": {

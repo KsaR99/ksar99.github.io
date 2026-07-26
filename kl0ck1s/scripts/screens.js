@@ -50,7 +50,9 @@ export const Screens = {
         screen.querySelector('[data-role="hud-right-checkbox"]').checked = settings.hudRight;
         screen.querySelector('[data-role="glow-checkbox"]').checked = settings.glow;
         screen.querySelector('[data-role="transparency-checkbox"]').checked = settings.transparency;
-        screen.querySelector('[data-role="vhs-checkbox"]').checked = settings.vhs;
+
+        const effectSelect = screen.querySelector('[data-role="effect-select"]');
+        if (effectSelect) effectSelect.value = settings.effect ?? "vhs";
 
         const langSelect = screen.querySelector('[data-role="lang-select"]');
         if (langSelect) {

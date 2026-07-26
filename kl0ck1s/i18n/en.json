@@ -57,7 +57,12 @@
       "performanceTitle": "Performance",
       "glow": "Glow (blur)",
       "transparency": "Transparency",
-      "vhs": "VHS noise",
+      "effect": "Screen filter",
+      "effectNone": "None",
+      "effectVhs": "VHS noise",
+      "effectMatrix": "Matrix",
+      "effectRain": "Rain",
+      "effectSnow": "Snow",
       "close": "Close"
     },
     "loading": {

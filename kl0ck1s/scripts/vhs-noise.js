@@ -21,9 +21,9 @@ const NOISE_SIZE = 256;
 const NOISE_MASK = NOISE_SIZE - 1;
 
 export class VhsNoise {
-    constructor(canvas) {
+    constructor(canvas, ctx = null) {
         this.canvas = canvas;
-        this.ctx = canvas.getContext("2d", {colorSpace: "display-p3", willReadFrequently: true});
+        this.ctx = ctx ?? canvas.getContext("2d", {colorSpace: "display-p3", willReadFrequently: true});
         this.active = false;
         this.rafId = null;
         this.frameCount = 0;
@@ -69,7 +69,7 @@ export class VhsNoise {
 
         this.scanlines.forEach((line) => {
             line.y = Math.random() * h;
-            line.speed = 0.4 + Math.random() * 1.2;
+            line.speed = 1.0 + Math.random() * 0.8;
             line.hidden = false;
         });
     }
@@ -117,7 +117,7 @@ export class VhsNoise {
             if (!line.hidden) {
                 const y = Math.floor(line.y);
 
-                for (let yy = 0; yy < 2; yy++) {
+                for (let yy = 0; yy < 3; yy++) {
                     const row = y + yy;
                     if (row < 0 || row >= height) continue;
 
@@ -159,6 +159,7 @@ export class VhsNoise {
     }
 
     stop() {
+        if (!this.active) return;
         this.active = false;
         if (this.rafId !== null) cancelAnimationFrame(this.rafId);
         this.rafId = null;

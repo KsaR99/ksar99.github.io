@@ -59,6 +59,9 @@ export class Game {
                     countdownStepDuration = 500,
                     settingsStore = null,
                     vhsNoise = null,
+                    matrixRain = null,
+                    rain = null,
+                    snow = null,
                     dom = globalThis.document ?? null,
                     i18n,
                 }) {
@@ -78,11 +81,14 @@ export class Game {
         this.countdownStepDuration = countdownStepDuration;
         this.settingsStore = settingsStore ?? leaderboard.store;
         this.vhsNoise = vhsNoise;
+        this.matrixRain = matrixRain;
+        this.rain = rain;
+        this.snow = snow;
         this.dom = dom;
         this.i18n = i18n;
         this.settings = this.defaultSettings();
         this.lastTime = 0;
-        this.vhsEnabled = false;
+        this.activeEffect = "none";
         this.previousStateBeforeOptions = null;
         this.isPlayingSession = false;
     }
@@ -114,7 +120,7 @@ export class Game {
     }
 
     defaultSettings() {
-        return {volume: 1, muted: false, glow: true, transparency: true, vhs: true, hudRight: false};
+        return {volume: 1, muted: false, glow: true, transparency: true, effect: "vhs", hudRight: false};
     }
 
     prefersReducedMotion() {
@@ -419,9 +425,9 @@ export class Game {
         let hasStoredSettings = false;
 
         try {
-            const raw = await this.settingsStore.get(Game.SETTINGS_KEY);
-            if (raw) {
-                settings = {...settings, ...JSON.parse(raw)};
+            const storedRaw = await this.settingsStore.get(Game.SETTINGS_KEY);
+            if (storedRaw) {
+                settings = {...settings, ...JSON.parse(storedRaw)};
                 hasStoredSettings = true;
             }
         } catch {
@@ -429,7 +435,7 @@ export class Game {
         }
 
         if (!hasStoredSettings && this.prefersReducedMotion()) {
-            settings.vhs = false;
+            settings.effect = "none";
         }
 
         this.settings = settings;
@@ -446,7 +452,7 @@ export class Game {
     }
 
     applyPerformanceSettings() {
-        const {glow, transparency, vhs} = this.settings;
+        const {glow, transparency, effect} = this.settings;
         this.renderer.setGlowEnabled(glow);
         this.renderer.setTransparencyEnabled(transparency);
 
@@ -457,20 +463,39 @@ export class Game {
             body.classList.toggle("hud-right", Boolean(this.settings.hudRight));
         }
 
-        this.vhsEnabled = vhs;
-        this.updateVhsOverlay();
+        this.activeEffect = effect ?? "none";
+        this.updateEffectOverlay();
     }
 
-    updateVhsOverlay() {
+    updateEffectOverlay() {
         if (!this.dom) return;
-        const vhsEl = this.dom.getElementById("vhs-overlay");
-        const active = Boolean(this.vhsEnabled) && (this.state === "running" || this.state === "clearing");
+        const overlayEl = this.dom.getElementById("filter-overlay");
+        const effect = this.activeEffect;
+        const active = effect !== "none" && (this.state === "running" || this.state === "clearing");
 
-        if (vhsEl) vhsEl.classList.toggle("board__vhs--active", active);
+        if (overlayEl) {
+            overlayEl.classList.toggle("board__filter--active", active);
+            overlayEl.dataset.effect = effect;
+        }
 
         if (this.vhsNoise) {
-            if (active) this.vhsNoise.start();
+            if (active && effect === "vhs") this.vhsNoise.start();
             else this.vhsNoise.stop();
+        }
+
+        if (this.matrixRain) {
+            if (active && effect === "matrix") this.matrixRain.start();
+            else this.matrixRain.stop();
+        }
+
+        if (this.rain) {
+            if (active && effect === "rain") this.rain.start();
+            else this.rain.stop();
+        }
+
+        if (this.snow) {
+            if (active && effect === "snow") this.snow.start();
+            else this.snow.stop();
         }
     }
 
@@ -513,7 +538,7 @@ export class Game {
         const hudRightCheckbox = this.dom.querySelector('[data-role="hud-right-checkbox"]');
         const glowCheckbox = this.dom.querySelector('[data-role="glow-checkbox"]');
         const transparencyCheckbox = this.dom.querySelector('[data-role="transparency-checkbox"]');
-        const vhsCheckbox = this.dom.querySelector('[data-role="vhs-checkbox"]');
+        const effectSelect = this.dom.querySelector('[data-role="effect-select"]');
         const closeButton = this.dom.querySelector('[data-role="options-close-button"]');
 
         if (muteCheckbox) {
@@ -557,9 +582,9 @@ export class Game {
             });
         }
 
-        if (vhsCheckbox) {
-            vhsCheckbox.addEventListener("change", () => {
-                this.settings.vhs = vhsCheckbox.checked;
+        if (effectSelect) {
+            effectSelect.addEventListener("change", () => {
+                this.settings.effect = effectSelect.value;
                 this.applyPerformanceSettings();
                 this.saveSettings();
             });
@@ -948,7 +973,7 @@ export class Game {
     }
 
     render() {
-        this.updateVhsOverlay();
+        this.updateEffectOverlay();
         this.renderer.drawBoard(this.board);
 
         const showPieceBehindOptions = this.state === "options"

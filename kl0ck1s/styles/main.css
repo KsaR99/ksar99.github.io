@@ -129,7 +129,7 @@ body.perf-no-transparency .board__overlay--transparent {
     background: oklch(13.191% 0.01866 276.772);
 }
 
-.board__vhs {
+.board__filter {
     position: absolute;
     inset: 0.1rem;
     z-index: 1;
@@ -140,12 +140,7 @@ body.perf-no-transparency .board__overlay--transparent {
     transition: opacity 0.2s ease;
 }
 
-.board__vhs--active {
-    opacity: 1;
-    animation: vhs-flicker 5s infinite steps(40);
-}
-
-.board__vhs-noise {
+.board__filter-canvas {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -153,7 +148,15 @@ body.perf-no-transparency .board__overlay--transparent {
     display: block;
 }
 
-.board__vhs--active::after {
+.board__filter--active {
+    opacity: 1;
+}
+
+.board__filter--active[data-effect="vhs"] {
+    animation: vhs-flicker 5s infinite steps(40);
+}
+
+.board__filter--active[data-effect="vhs"]::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -163,12 +166,12 @@ body.perf-no-transparency .board__overlay--transparent {
     animation: vhs-roll 7s linear infinite;
 }
 
-body.perf-no-glow .board__vhs--active {
+body.perf-no-glow .board__filter--active[data-effect="vhs"] {
     animation: none;
     opacity: 0.55;
 }
 
-body.perf-no-glow .board__vhs--active::after {
+body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     animation: none;
 }
 
@@ -203,8 +206,8 @@ body.perf-no-glow .board__vhs--active::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .board__vhs--active,
-    .board__vhs--active::after {
+    .board__filter--active[data-effect="vhs"],
+    .board__filter--active[data-effect="vhs"]::after {
         animation: none !important;
     }
 }

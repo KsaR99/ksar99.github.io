@@ -57,7 +57,12 @@
       "performanceTitle": "Leistung",
       "glow": "Leuchten (Unschärfe)",
       "transparency": "Transparenz",
-      "vhs": "VHS-Rauschen",
+      "effect": "Bildschirmfilter",
+      "effectNone": "Kein",
+      "effectVhs": "VHS-Rauschen",
+      "effectMatrix": "Matrix",
+      "effectRain": "Regen",
+      "effectSnow": "Schnee",
       "close": "Schließen"
     },
     "loading": {

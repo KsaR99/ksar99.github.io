@@ -1,0 +1,88 @@
+"use strict";
+
+const DROP_COLOR = "rgba(180, 205, 255, 0.55)";
+const DENSITY = 0.12; // drops per pixel of width
+
+export class Rain {
+    constructor(canvas, ctx = null) {
+        this.canvas = canvas;
+        this.ctx = ctx ?? canvas.getContext("2d");
+        this.active = false;
+        this.rafId = null;
+        this.frameCount = 0;
+        this.drops = [];
+        this._loop = this.loop.bind(this);
+    }
+
+    _spawnDrop(width, height, initial = false) {
+        return {
+            x: Math.random() * width,
+            y: initial ? Math.random() * height : Math.random() * -height,
+            length: 10 + Math.random() * 14,
+            speed: 6 + Math.random() * 6,
+            drift: -0.5 + Math.random(),
+        };
+    }
+
+    resize(width, height) {
+        const w = Math.max(1, Math.round(width));
+        const h = Math.max(1, Math.round(height));
+        if (this._lastWidth === w && this._lastHeight === h && this.drops.length) return;
+        this._lastWidth = w;
+        this._lastHeight = h;
+
+        this.canvas.width = w;
+        this.canvas.height = h;
+
+        const count = Math.max(8, Math.round(w * DENSITY));
+        this.drops = Array.from({length: count}, () => this._spawnDrop(w, h, true));
+        this.ctx.clearRect(0, 0, w, h);
+    }
+
+    drawFrame() {
+        const {ctx, canvas, drops} = this;
+        if (!drops.length || canvas.width === 0 || canvas.height === 0) return;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = DROP_COLOR;
+        ctx.lineWidth = 1;
+        ctx.lineCap = "round";
+
+        drops.forEach((drop) => {
+            ctx.beginPath();
+            ctx.moveTo(drop.x, drop.y);
+            ctx.lineTo(drop.x + drop.drift * 2, drop.y + drop.length);
+            ctx.stroke();
+
+            drop.x += drop.drift;
+            drop.y += drop.speed;
+
+            if (drop.y - drop.length > canvas.height) {
+                Object.assign(drop, this._spawnDrop(canvas.width, 0));
+                drop.y = -drop.length;
+            }
+        });
+    }
+
+    loop() {
+        if (!this.active) return;
+        this.frameCount = (this.frameCount + 1) % 2;
+        if (this.frameCount === 0) this.drawFrame();
+        this.rafId = requestAnimationFrame(this._loop);
+    }
+
+    start() {
+        if (this.active) return;
+        this.active = true;
+        this.frameCount = 0;
+        this.rafId = requestAnimationFrame(this._loop);
+    }
+
+    stop() {
+        if (!this.active) return;
+        this.active = false;
+        if (this.rafId !== null) cancelAnimationFrame(this.rafId);
+        this.rafId = null;
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
