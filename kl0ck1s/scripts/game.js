@@ -315,13 +315,15 @@ export class Game {
             date: new Date().toISOString(),
         };
 
+        const todayBestBeforeThisGame = this.leaderboard.todayBestEntry();
+
         const list = await this.leaderboard.add(entry);
         if (this.state !== "gameOver-entry") return;
 
         this.currentGameOverEntry = {list, entry};
         this.hud.showScreen(
             this.screens.gameOverEntry(
-                this.stats, list, entry, this.leaderboard.todayBestEntry(), (l, h) => this.renderLeaderboard(l, h), this.dom, this.i18n
+                this.stats, list, entry, todayBestBeforeThisGame, (l, h) => this.renderLeaderboard(l, h), this.dom, this.i18n
             )
         );
         this.bindGameOverContinue();

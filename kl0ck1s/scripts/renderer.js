@@ -201,14 +201,26 @@ export class Renderer {
         ctx.textBaseline = "middle";
         ctx.font = `bold ${fontSize}px monospace, "Courier New"`;
 
-        ctx.shadowColor = "oklch(0 0 0 / 90%)";
+        const paddingX = fontSize * 0.6;
+        const paddingY = fontSize * 0.35;
+        const textWidth = ctx.measureText(text).width;
+        const boxWidth = textWidth + paddingX * 2;
+        const boxHeight = fontSize + paddingY * 2;
+
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = "oklch(0 0 0 / 25%)";
+        ctx.beginPath();
+        ctx.roundRect(centerX - boxWidth / 2, centerY - boxHeight / 2, boxWidth, boxHeight, fontSize * 0.2);
+        ctx.fill();
+
+        ctx.shadowColor = "oklch(0.391 0.005 17.389 / 0.9)";
         ctx.shadowBlur = fontSize * 0.3;
-        ctx.fillStyle = "oklch(0 0 0 / 90%)";
+        ctx.fillStyle = "oklch(0 0 0 / 25%)";
         ctx.fillText(text, centerX, centerY);
 
         if (this.glowEnabled) {
             ctx.shadowBlur = fontSize * 0.2;
-            ctx.shadowColor = "oklch(0.911 0.237 130 / 0.95)";
+            ctx.shadowColor = "oklch(0.386 0.021 125.81 / 0.95)";
         } else {
             ctx.shadowBlur = 0;
         }
