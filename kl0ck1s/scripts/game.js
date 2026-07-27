@@ -144,18 +144,18 @@ export class Game {
 
     /** Tracks the "drought": how many pieces in a row have appeared since the last "I" piece. */
     registerPieceSpawn(type) {
-        this.piecesSpawned += 1;
+        ++this.piecesSpawned;
 
         if (type === "I") {
             if (this.drought > 0) {
                 this.droughtTotal += this.drought;
-                this.droughtCount += 1;
+                ++this.droughtCount;
             }
             this.drought = 0;
             return;
         }
 
-        this.drought += 1;
+        ++this.drought;
         this.maxDrought = Math.max(this.maxDrought, this.drought);
     }
 
@@ -842,10 +842,10 @@ export class Game {
 
     registerSpin(spin, cleared) {
         if (spin.type === "T") {
-            if (spin.mini) this.spinCounts.tMini += 1;
-            else this.spinCounts.t += 1;
+            if (spin.mini) ++this.spinCounts.tMini;
+            else ++this.spinCounts.t;
         } else {
-            this.spinCounts.other += 1;
+            ++this.spinCounts.other;
         }
         this.addScore(pointsForSpin(spin.type, cleared, this.level, spin.mini));
     }
@@ -877,7 +877,7 @@ export class Game {
         if (this.pendingSpin) this.registerSpin(this.pendingSpin, cleared);
         this.registerLineClears(cleared, false);
 
-        this.currentCombo += 1;
+        ++this.currentCombo;
         this.maxCombo = Math.max(this.maxCombo, this.currentCombo);
 
         this.pendingSpin = null;
@@ -890,7 +890,7 @@ export class Game {
     resetLockDelay() {
         if (this.lockDelayResets >= this.scoring.LOCK_DELAY_MAX_RESETS) return;
         this.lockDelayTimer = 0;
-        this.lockDelayResets += 1;
+        ++this.lockDelayResets;
     }
 
     moveHorizontal(dir) {
@@ -914,7 +914,7 @@ export class Game {
         if (this.state !== "running") return;
         if (this.board.collides(this.current, 0, 1)) return;
 
-        this.current.y += 1;
+        ++this.current.y;
         this.lastAction = "move";
         this.addScore(pointsForSoftDrop(this.scoring));
         this.dropCounter = 0;
@@ -1064,7 +1064,7 @@ export class Game {
             this.countdownTimer += delta;
             if (this.countdownTimer >= this.countdownStepDuration) {
                 this.countdownTimer = 0;
-                this.countdownIndex += 1;
+                ++this.countdownIndex;
                 if (this.countdownIndex >= Game.COUNTDOWN_STEPS.length) {
                     this.start();
                 } else {
@@ -1099,7 +1099,7 @@ export class Game {
         this.lockDelayTimer = 0;
         this.dropCounter += delta;
         if (this.dropCounter > this.dropInterval) {
-            this.current.y += 1;
+            ++this.current.y;
             this.dropCounter = 0;
         }
     }

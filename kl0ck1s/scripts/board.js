@@ -63,7 +63,7 @@ export class Board {
     getDropOffset(piece) {
         let offset = 0;
         while (!this.collides(piece, 0, offset + 1)) {
-            offset++;
+            ++offset;
         }
         return offset;
     }
@@ -92,7 +92,7 @@ export class Board {
 
         this.grid = this.grid.filter((row) => {
             const isFull = row.every((cell) => cell !== null);
-            if (isFull) cleared++;
+            if (isFull) ++cleared;
             return !isFull;
         });
 

@@ -71,7 +71,7 @@ export class MatrixRain {
             }
 
             col.y += col.speed * FONT_SIZE * FALL_SPEED;
-            col.tick++;
+            ++col.tick;
             if (col.tick >= col.switchEvery) {
                 col.tick = 0;
                 col.charIndex = (col.charIndex + 1) % CHARS.length;
