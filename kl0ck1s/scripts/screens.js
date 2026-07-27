@@ -52,6 +52,8 @@ export const Screens = {
         screen.querySelector('[data-role="grid-checkbox"]').checked = settings.gridLines;
         screen.querySelector('[data-role="glow-checkbox"]').checked = settings.glow;
         screen.querySelector('[data-role="transparency-checkbox"]').checked = settings.transparency;
+        const skipCountdownCheckbox = screen.querySelector('[data-role="skip-countdown-checkbox"]');
+        if (skipCountdownCheckbox) skipCountdownCheckbox.checked = Boolean(settings.skipCountdown);
 
         const effectSelect = screen.querySelector('[data-role="effect-select"]');
         if (effectSelect) effectSelect.value = settings.effect ?? "vhs";

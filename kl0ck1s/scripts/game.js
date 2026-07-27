@@ -147,7 +147,7 @@ export class Game {
     defaultSettings() {
         return {
             volume: 1, muted: false, glow: true, transparency: true, effect: "vhs", hudRight: false,
-            ghost: true, gridLines: true,
+            ghost: true, gridLines: true, skipCountdown: false,
         };
     }
 
@@ -312,10 +312,16 @@ export class Game {
 
     startCountdown() {
         this.prepareNewRound();
+        this.hud.setHasPlayedBefore(true);
+
+        if (this.settings.skipCountdown) {
+            this.start();
+            return;
+        }
+
         this.state = "countdown";
         this.isPlayingSession = false;
         this.hud.setPlaying(false);
-        this.hud.setHasPlayedBefore(true);
         this.countdownIndex = 0;
         this.countdownTimer = 0;
 
@@ -443,6 +449,13 @@ export class Game {
             this.state = "running";
             this.hud.hideOverlay();
         }
+    }
+
+    restart() {
+        if (!["running", "paused", "clearing", "countdown", "gameOver-entry", "gameOver-saved"].includes(this.state)) {
+            return;
+        }
+        this.startCountdown();
     }
 
     handleEscape() {
@@ -605,6 +618,7 @@ export class Game {
         const glowCheckbox = this.dom.querySelector('[data-role="glow-checkbox"]');
         const transparencyCheckbox = this.dom.querySelector('[data-role="transparency-checkbox"]');
         const effectSelect = this.dom.querySelector('[data-role="effect-select"]');
+        const skipCountdownCheckbox = this.dom.querySelector('[data-role="skip-countdown-checkbox"]');
         const closeButton = this.dom.querySelector('[data-role="options-close-button"]');
 
         if (muteCheckbox) {
@@ -668,6 +682,13 @@ export class Game {
             effectSelect.addEventListener("change", () => {
                 this.settings.effect = effectSelect.value;
                 this.applyPerformanceSettings();
+                this.saveSettings();
+            });
+        }
+
+        if (skipCountdownCheckbox) {
+            skipCountdownCheckbox.addEventListener("change", () => {
+                this.settings.skipCountdown = skipCountdownCheckbox.checked;
                 this.saveSettings();
             });
         }
@@ -931,6 +952,7 @@ export class Game {
             KeyO: () => this.toggleOptions(),
             KeyP: () => this.togglePause(),
             KeyZ: () => this.rotate(),
+            KeyR: () => this.restart(),
         };
 
         const PREVENT_DEFAULT_KEYS = new Set([

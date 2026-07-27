@@ -25,7 +25,8 @@
     "start": "Iniciar / nueva partida",
     "mute": "Silenciar sonido",
     "options": "Opciones",
-    "spaceKey": "Espacio"
+    "spaceKey": "Espacio",
+    "restart": "Reiniciar"
   },
   "screens": {
     "common": {
@@ -56,6 +57,8 @@
       "volume": "Volumen",
       "layoutTitle": "Diseño",
       "hudRight": "HUD a la derecha",
+      "gameplayTitle": "Jugabilidad",
+      "skipCountdown": "Omitir cuenta atrás",
       "graphicsTitle": "Gráficos",
       "ghost": "Pieza fantasma",
       "gridLines": "Líneas de cuadrícula",

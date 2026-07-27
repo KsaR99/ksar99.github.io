@@ -25,7 +25,8 @@
     "start": "Start / new game",
     "mute": "Mute sound",
     "options": "Options",
-    "spaceKey": "Space"
+    "spaceKey": "Space",
+    "restart": "Restart"
   },
   "screens": {
     "common": {
@@ -56,6 +57,8 @@
       "volume": "Volume",
       "layoutTitle": "Layout",
       "hudRight": "HUD on the right",
+      "gameplayTitle": "Gameplay",
+      "skipCountdown": "Skip countdown",
       "graphicsTitle": "Graphics",
       "ghost": "Ghost piece",
       "gridLines": "Grid lines",

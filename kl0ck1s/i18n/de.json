@@ -25,7 +25,8 @@
     "start": "Start / neues Spiel",
     "mute": "Ton stummschalten",
     "options": "Optionen",
-    "spaceKey": "Leertaste"
+    "spaceKey": "Leertaste",
+    "restart": "Neustart"
   },
   "screens": {
     "common": {
@@ -56,6 +57,8 @@
       "volume": "Lautstärke",
       "layoutTitle": "Layout",
       "hudRight": "HUD rechts",
+      "gameplayTitle": "Gameplay",
+      "skipCountdown": "Countdown überspringen",
       "graphicsTitle": "Grafik",
       "ghost": "Geisterstein",
       "gridLines": "Gitterlinien",

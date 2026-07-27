@@ -25,7 +25,8 @@
     "start": "Start / nieuw spel",
     "mute": "Geluid dempen",
     "options": "Opties",
-    "spaceKey": "Spatie"
+    "spaceKey": "Spatie",
+    "restart": "Herstart"
   },
   "screens": {
     "common": {
@@ -56,6 +57,8 @@
       "volume": "Volume",
       "layoutTitle": "Lay-out",
       "hudRight": "HUD rechts",
+      "gameplayTitle": "Gameplay",
+      "skipCountdown": "Aftellen overslaan",
       "graphicsTitle": "Grafica",
       "ghost": "Spookblok",
       "gridLines": "Rasterlijnen",

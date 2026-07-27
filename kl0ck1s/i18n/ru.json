@@ -25,7 +25,8 @@
     "start": "Старт / новая игра",
     "mute": "Выключить звук",
     "options": "Настройки",
-    "spaceKey": "Пробел"
+    "spaceKey": "Пробел",
+    "restart": "Рестарт"
   },
   "screens": {
     "common": {
@@ -56,6 +57,8 @@
       "volume": "Громкость",
       "layoutTitle": "Макет",
       "hudRight": "HUD справа",
+      "gameplayTitle": "Геймплей",
+      "skipCountdown": "Пропустить отсчёт",
       "graphicsTitle": "Графика",
       "ghost": "Призрак фигуры",
       "gridLines": "Линии сетки",

@@ -25,7 +25,8 @@
     "start": "Start / nowa gra",
     "mute": "Wycisz dźwięk",
     "options": "Opcje",
-    "spaceKey": "Spacja"
+    "spaceKey": "Spacja",
+    "restart": "Restart"
   },
   "screens": {
     "common": {
@@ -56,6 +57,8 @@
       "volume": "Głośność",
       "layoutTitle": "Układ",
       "hudRight": "HUD po prawej",
+      "gameplayTitle": "Rozgrywka",
+      "skipCountdown": "Pomiń odliczanie",
       "graphicsTitle": "Grafika",
       "ghost": "Duszek",
       "gridLines": "Linie siatki",
