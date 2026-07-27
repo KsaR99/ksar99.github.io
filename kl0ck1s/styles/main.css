@@ -562,39 +562,8 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 
 .leaderboard__table {
     width: 100%;
-    table-layout: fixed;
     border-collapse: collapse;
-}
-
-.leaderboard__heading,
-.leaderboard__cell {
-    padding: 0.2rem 0.25rem;
-    font-size: 0.85rem;
-    text-align: left;
-    border-bottom: 1px solid var(--line);
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-.leaderboard__heading:nth-child(1),
-.leaderboard__cell:nth-child(1) {
-    width: 4ch;
-}
-
-.leaderboard__heading:nth-child(3),
-.leaderboard__cell:nth-child(3) {
-    width: 8ch;
-}
-
-.leaderboard__heading:nth-child(4),
-.leaderboard__cell:nth-child(4) {
-    width: 6ch;
-}
-
-.leaderboard__heading:nth-child(5),
-.leaderboard__cell:nth-child(5) {
-    max-width: 5ch;
+    font-size: 0.75rem;
 }
 
 .leaderboard__cell[data-field="rank"] {
@@ -602,7 +571,13 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     user-select: none;
 }
 
-.leaderboard__row:last-child .leaderboard__cell {
+.leaderboard__heading, .leaderboard__cell {
+    font-size: 0.85rem;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+}
+
+.leaderboard__row .leaderboard__cell {
     border-bottom: none;
 }
 
@@ -619,10 +594,9 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     font-weight: 700;
 }
 
-.leaderboard__cell--date,
-.leaderboard__heading--date {
-    width: 17ch;
+.leaderboard__cell--date, .leaderboard__heading--date {
     color: var(--muted);
+    white-space: nowrap;
     text-align: right;
 }
 
@@ -633,8 +607,7 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 }
 
 @media (width <= 30rem) {
-    .leaderboard__cell--date,
-    .leaderboard__heading--date {
+    .leaderboard__cell--date, .leaderboard__heading--date {
         display: none;
     }
 }
