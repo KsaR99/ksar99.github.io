@@ -27,11 +27,13 @@ export class PersistentStore {
     async set(key, value) {
         if (this.hasStorage) {
             try {
-                return this.storage.set(key, value, false);
+                await this.storage.set(key, value, false);
+                return;
             } catch {
-                // to fallback
+                // fallback
             }
         }
+
         this.fallback?.setItem(key, value);
     }
 }

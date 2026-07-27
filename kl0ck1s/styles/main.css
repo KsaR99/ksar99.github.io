@@ -88,6 +88,8 @@ body.perf-no-glow .screen__title {
 
 .board__canvas {
     display: block;
+    position: relative;
+    z-index: 2;
     border-radius: var(--radius);
     border: 1px solid oklch(0 0 0 / 85%);
 }

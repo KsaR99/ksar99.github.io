@@ -346,7 +346,7 @@ export class Game {
 
         const {number, tint} = Game.COUNTDOWN_STEPS[this.countdownIndex];
         this.hud.showScreen(
-            this.screens.countdown(number, tint, this.dom, this.i18n),
+            this.screens.countdown(number, tint, this.dom),
             {transparentOverlay: true}
         );
     }
@@ -361,7 +361,7 @@ export class Game {
     renderCountdownStep() {
         const {number, tint} = Game.COUNTDOWN_STEPS[this.countdownIndex];
         this.hud.showScreen(
-            this.screens.countdown(number, tint, this.dom, this.i18n),
+            this.screens.countdown(number, tint, this.dom),
             {transparentOverlay: true}
         );
     }
@@ -963,6 +963,7 @@ export class Game {
     bindControls() {
         if (!this.dom) return;
 
+        /** @type {Record<string, () => void>} */
         const KEY_ACTIONS = {
             ArrowLeft: () => this.handleHorizontalArrow(-1),
             ArrowRight: () => this.handleHorizontalArrow(1),

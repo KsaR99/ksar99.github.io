@@ -73,7 +73,7 @@ export const Screens = {
         return screen;
     },
 
-    countdown(number, tint, dom = document, i18n) {
+    countdown(number, tint, dom = document) {
         const screen = clone(dom, "tpl-screen-countdown");
         screen.querySelector('[data-role="countdown-screen"]').dataset.tint = tint;
         screen.querySelector('[data-field="number"]').textContent = number;

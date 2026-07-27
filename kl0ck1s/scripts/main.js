@@ -142,7 +142,7 @@ const game = new Game({
     i18n,
 });
 
-game.init();
+void game.init().catch(console.error);
 
 function handleViewportResize() {
     resizeBoardCanvas();

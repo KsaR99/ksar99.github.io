@@ -38,18 +38,18 @@ export const DIFFICULTIES = Object.freeze({
 });
 
 export const BOARD_BACKGROUNDS = Object.freeze({
-    easy: "oklch(0.22 0 0)",
-    medium: "oklch(0.20 0 0)",
-    hard: "oklch(0.15 0 0)",
-    expert: "oklch(0.10 0 0)",
-    pro: "oklch(0 0 0)",
+    easy: "oklch(0.22 0 0 / 0.1)",
+    medium: "oklch(0.20 0 0 / 0.1)",
+    hard: "oklch(0.15 0 0 / 0.1)",
+    expert: "oklch(0.10 0 0 / 0.1)",
+    pro: "oklch(0 0 0 / 0.1)",
 });
 
 export const DEFAULT_DIFFICULTY = "hard";
 
 export const KLOCKOMINOS = Object.freeze({
     I: {
-        color: "oklch(0.905399 0.15455 194.76)",
+        color: "oklch(0.905 0.154 194.7 / 0.9)",
         states: [
             [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
             [[0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0]],
@@ -58,7 +58,7 @@ export const KLOCKOMINOS = Object.freeze({
         ],
     },
     J: {
-        color: "oklch(0.5635 0.2408 260.82)",
+        color: "oklch(0.563 0.240 260.8 / 0.9)",
         states: [
             [[1, 0, 0], [1, 1, 1], [0, 0, 0]],
             [[0, 1, 1], [0, 1, 0], [0, 1, 0]],
@@ -67,7 +67,7 @@ export const KLOCKOMINOS = Object.freeze({
         ],
     },
     L: {
-        color: "oklch(0.772 0.1738 64.55)",
+        color: "oklch(0.772 0.173 64.55 / 0.9)",
         states: [
             [[0, 0, 1], [1, 1, 1], [0, 0, 0]],
             [[0, 1, 0], [0, 1, 0], [0, 1, 1]],
@@ -76,7 +76,7 @@ export const KLOCKOMINOS = Object.freeze({
         ],
     },
     O: {
-        color: "oklch(0.968 0.211 109.77)",
+        color: "oklch(0.968 0.211 109.7 / 0.9)",
         states: [
             [[1, 1], [1, 1]],
             [[1, 1], [1, 1]],
@@ -94,7 +94,7 @@ export const KLOCKOMINOS = Object.freeze({
         ],
     },
     T: {
-        color: "oklch(0.5812 0.2986 307.03)",
+        color: "oklch(0.581 0.298 307 / 0.9)",
         states: [
             [[0, 1, 0], [1, 1, 1], [0, 0, 0]],
             [[0, 1, 0], [0, 1, 1], [0, 1, 0]],
@@ -103,7 +103,7 @@ export const KLOCKOMINOS = Object.freeze({
         ],
     },
     Z: {
-        color: "oklch(0.6489 0.237 26.97)",
+        color: "oklch(0.648 0.237 27 / 0.9)",
         states: [
             [[1, 1, 0], [0, 1, 1], [0, 0, 0]],
             [[0, 0, 1], [0, 1, 1], [0, 1, 0]],
