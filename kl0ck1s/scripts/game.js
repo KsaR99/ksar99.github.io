@@ -221,6 +221,12 @@ export class Game {
     setDifficulty(difficulty) {
         this.difficulty = difficulty;
         this.levelTier = difficulty;
+
+        if (this.state === "idle" || this.state === "gameOver-saved") {
+            this.level = this.difficulties[difficulty].startLevel;
+            this.lines = 0;
+        }
+
         this.applyDifficultyTheme();
         this.settings.difficulty = difficulty;
         this.saveSettings();
@@ -345,7 +351,11 @@ export class Game {
         await this.leaderboard.recordIfTodayBest(entry);
         if (this.state !== "gameOver-entry") return;
 
-        this.currentGameOverEntry = {list, entry};
+        this.renderGameOverEntry(list, entry, todayBestBeforeThisGame);
+    }
+
+    renderGameOverEntry(list, entry, todayBestBeforeThisGame) {
+        this.currentGameOverEntry = {list, entry, todayBestBeforeThisGame};
         this.hud.showScreen(
             this.screens.gameOverEntry(
                 this.stats, list, entry, todayBestBeforeThisGame, (l, h) => this.renderLeaderboard(l, h), this.dom, this.i18n
@@ -365,6 +375,8 @@ export class Game {
         if (this.state !== "gameOver-entry" || !this.currentGameOverEntry) return;
         const {list, entry} = this.currentGameOverEntry;
         this.state = "gameOver-saved";
+        this.level = this.difficulties[this.difficulty].startLevel;
+        this.lines = 0;
         this.hud.update(this.stats);
         this.renderGameOverSaved(list, entry);
     }
@@ -388,6 +400,14 @@ export class Game {
         } else if (this.state === "paused") {
             this.state = "running";
             this.hud.hideOverlay();
+        }
+    }
+
+    handleEscape() {
+        if (this.state === "options") {
+            this.toggleOptions();
+        } else {
+            this.togglePause();
         }
     }
 
@@ -511,12 +531,15 @@ export class Game {
             } else if (previousState === "gameOver-saved" && this.currentGameOverSaved) {
                 const {list, entry} = this.currentGameOverSaved;
                 this.renderGameOverSaved(list, entry);
+            } else if (previousState === "gameOver-entry" && this.currentGameOverEntry) {
+                const {list, entry, todayBestBeforeThisGame} = this.currentGameOverEntry;
+                this.renderGameOverEntry(list, entry, todayBestBeforeThisGame);
             }
 
             return;
         }
 
-        if (!["idle", "running", "paused", "gameOver-saved"].includes(this.state)) return;
+        if (!["idle", "running", "paused", "gameOver-saved", "gameOver-entry"].includes(this.state)) return;
 
         this.previousStateBeforeOptions = this.state;
         this.state = "options";
@@ -828,7 +851,7 @@ export class Game {
             ArrowUp: () => this.rotate(),
             Space: () => this.hardDrop(),
             Enter: () => this.handleEnter(),
-            Escape: () => this.togglePause(),
+            Escape: () => this.handleEscape(),
             KeyH: () => this.toggleControlsList(),
             KeyM: () => this.toggleSound(),
             KeyO: () => this.toggleOptions(),

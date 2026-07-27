@@ -110,11 +110,6 @@ body.perf-no-glow .screen__title {
 
 .board__overlay--visible {
     display: flex;
-    backdrop-filter: blur(3px); /* @todo: respect if disabled */
-
-    &:has(.screen--countdown) {
-        backdrop-filter: none;
-    }
 }
 
 body.perf-no-transparency .board__overlay {
@@ -484,6 +479,7 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     border-radius: 0.25rem;
     font-family: var(--font-display);
     font-size: 0.8875rem;
+    font-weight: 500;
     color: var(--text);
 }
 
