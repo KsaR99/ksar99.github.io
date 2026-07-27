@@ -37,6 +37,8 @@ export class Renderer {
         this.i18n = i18n;
         this.glowEnabled = true;
         this.transparencyEnabled = true;
+        this.ghostEnabled = true;
+        this.gridEnabled = true;
     }
 
     setGlowEnabled(enabled) {
@@ -45,6 +47,14 @@ export class Renderer {
 
     setTransparencyEnabled(enabled) {
         this.transparencyEnabled = enabled;
+    }
+
+    setGhostEnabled(enabled) {
+        this.ghostEnabled = enabled;
+    }
+
+    setGridEnabled(enabled) {
+        this.gridEnabled = enabled;
     }
 
     setTheme(backgroundColor) {
@@ -100,7 +110,7 @@ export class Renderer {
         const {ctx, boardCanvas} = this;
 
         ctx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
-        this.drawGrid(board);
+        if (this.gridEnabled) this.drawGrid(board);
 
         for (const [y, row] of board.grid.entries()) {
             for (const [x, color] of row.entries()) {
@@ -122,6 +132,8 @@ export class Renderer {
     }
 
     drawGhost(piece, board) {
+        if (!this.ghostEnabled) return;
+
         const offset = board.getDropOffset(piece);
         if (offset === 0) return;
 

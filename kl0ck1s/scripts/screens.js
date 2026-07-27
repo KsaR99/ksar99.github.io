@@ -48,6 +48,8 @@ export const Screens = {
         volumeSlider.value = Math.round(settings.volume * 100);
         volumeSlider.disabled = settings.muted;
         screen.querySelector('[data-role="hud-right-checkbox"]').checked = settings.hudRight;
+        screen.querySelector('[data-role="ghost-checkbox"]').checked = settings.ghost;
+        screen.querySelector('[data-role="grid-checkbox"]').checked = settings.gridLines;
         screen.querySelector('[data-role="glow-checkbox"]').checked = settings.glow;
         screen.querySelector('[data-role="transparency-checkbox"]').checked = settings.transparency;
 

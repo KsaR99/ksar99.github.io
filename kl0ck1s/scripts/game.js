@@ -117,7 +117,10 @@ export class Game {
     }
 
     defaultSettings() {
-        return {volume: 1, muted: false, glow: true, transparency: true, effect: "vhs", hudRight: false};
+        return {
+            volume: 1, muted: false, glow: true, transparency: true, effect: "vhs", hudRight: false,
+            ghost: true, gridLines: true,
+        };
     }
 
     prefersReducedMotion() {
@@ -469,9 +472,11 @@ export class Game {
     }
 
     applyPerformanceSettings() {
-        const {glow, transparency, effect} = this.settings;
+        const {glow, transparency, effect, ghost, gridLines} = this.settings;
         this.renderer.setGlowEnabled(glow);
         this.renderer.setTransparencyEnabled(transparency);
+        this.renderer.setGhostEnabled(ghost);
+        this.renderer.setGridEnabled(gridLines);
 
         const body = this.dom?.body;
         if (body) {
@@ -556,6 +561,8 @@ export class Game {
         const muteCheckbox = this.dom.querySelector('[data-role="mute-checkbox"]');
         const volumeSlider = this.dom.querySelector('[data-role="volume-slider"]');
         const hudRightCheckbox = this.dom.querySelector('[data-role="hud-right-checkbox"]');
+        const ghostCheckbox = this.dom.querySelector('[data-role="ghost-checkbox"]');
+        const gridCheckbox = this.dom.querySelector('[data-role="grid-checkbox"]');
         const glowCheckbox = this.dom.querySelector('[data-role="glow-checkbox"]');
         const transparencyCheckbox = this.dom.querySelector('[data-role="transparency-checkbox"]');
         const effectSelect = this.dom.querySelector('[data-role="effect-select"]');
@@ -581,6 +588,22 @@ export class Game {
         if (hudRightCheckbox) {
             hudRightCheckbox.addEventListener("change", () => {
                 this.settings.hudRight = hudRightCheckbox.checked;
+                this.applyPerformanceSettings();
+                this.saveSettings();
+            });
+        }
+
+        if (ghostCheckbox) {
+            ghostCheckbox.addEventListener("change", () => {
+                this.settings.ghost = ghostCheckbox.checked;
+                this.applyPerformanceSettings();
+                this.saveSettings();
+            });
+        }
+
+        if (gridCheckbox) {
+            gridCheckbox.addEventListener("change", () => {
+                this.settings.gridLines = gridCheckbox.checked;
                 this.applyPerformanceSettings();
                 this.saveSettings();
             });
