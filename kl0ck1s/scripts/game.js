@@ -105,6 +105,7 @@ export class Game {
         const elapsedSeconds = this.elapsedMs / 1000;
         const pps = elapsedSeconds > 0 ? this.piecesSpawned / elapsedSeconds : 0;
         const efficiencyValue = this.lines > 0 ? this.score / this.lines : 0;
+        const droughtAvgValue = this.droughtCount > 0 ? this.droughtTotal / this.droughtCount : 0;
 
         return {
             score: formatNumber(this.score),
@@ -116,6 +117,10 @@ export class Game {
             gameTime: formatDuration(this.elapsedMs),
             drought: this.drought,
             maxDrought: this.maxDrought,
+            droughtTotal: this.droughtTotal,
+            droughtAvg: droughtAvgValue.toFixed(1),
+            burn: this.burn,
+            transitionScore: this.transitionScore !== null ? formatNumber(this.transitionScore) : "—",
             tetrisRate: `${tetrisRatePercent.toFixed(1)}%`,
             singles: this.clearCounts[1],
             doubles: this.clearCounts[2],
@@ -140,7 +145,17 @@ export class Game {
     /** Tracks the "drought": how many pieces in a row have appeared since the last "I" piece. */
     registerPieceSpawn(type) {
         this.piecesSpawned += 1;
-        this.drought = type === "I" ? 0 : this.drought + 1;
+
+        if (type === "I") {
+            if (this.drought > 0) {
+                this.droughtTotal += this.drought;
+                this.droughtCount += 1;
+            }
+            this.drought = 0;
+            return;
+        }
+
+        this.drought += 1;
         this.maxDrought = Math.max(this.maxDrought, this.drought);
     }
 
@@ -197,6 +212,10 @@ export class Game {
         this.elapsedMs = 0;
         this.drought = 0;
         this.maxDrought = 0;
+        this.droughtTotal = 0;
+        this.droughtCount = 0;
+        this.burn = 0;
+        this.transitionScore = null;
         this.clearCounts = {1: 0, 2: 0, 3: 0, 4: 0};
         this.piecesSpawned = 0;
         this.spinCounts = {t: 0, tMini: 0, other: 0};
@@ -780,6 +799,7 @@ export class Game {
         if (cleared === 0) return;
 
         this.clearCounts[cleared] = (this.clearCounts[cleared] ?? 0) + 1;
+        this.burn = cleared === 4 ? 0 : this.burn + cleared;
 
         if (playSound) this.soundManager.play("lineClear");
 
@@ -792,6 +812,10 @@ export class Game {
             this.dropInterval = dropIntervalForLevel(this.level, this.scoring);
             this.levelTier = tierForLevel(this.level, this.difficulties);
             this.applyLevelTheme();
+
+            if (this.transitionScore === null) {
+                this.transitionScore = this.score;
+            }
 
             this.soundManager.play("levelUp");
             this.levelUpLevel = this.level;

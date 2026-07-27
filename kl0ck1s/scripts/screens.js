@@ -89,6 +89,19 @@ export const Screens = {
 
         screen.querySelector('[data-field="gameTime"]').textContent = stats.gameTime;
         screen.querySelector('[data-field="maxDrought"]').textContent = stats.maxDrought;
+
+        const droughtTotalEl = screen.querySelector('[data-field="droughtTotal"]');
+        if (droughtTotalEl) droughtTotalEl.textContent = stats.droughtTotal;
+
+        const droughtAvgEl = screen.querySelector('[data-field="droughtAvg"]');
+        if (droughtAvgEl) droughtAvgEl.textContent = stats.droughtAvg;
+
+        const burnEl = screen.querySelector('[data-field="burn"]');
+        if (burnEl) burnEl.textContent = stats.burn;
+
+        const transitionEl = screen.querySelector('[data-field="transitionScore"]');
+        if (transitionEl) transitionEl.textContent = stats.transitionScore;
+
         screen.querySelector('[data-field="tetrisRate"]').textContent = stats.tetrisRate;
         screen.querySelector('[data-field="clearBreakdown"]').textContent =
             `${stats.singles} / ${stats.doubles} / ${stats.triples} / ${stats.tetrises}`;
