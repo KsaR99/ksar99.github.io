@@ -376,6 +376,10 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     font-family: var(--font-display);
     font-size: 0.95rem;
     color: var(--accent-2);
+
+    &[id="time-value"], &[id="pps-value"], &#score-value {
+        text-rendering: optimizeSpeed;
+    }
 }
 
 .stats__status {
@@ -391,10 +395,6 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 
 .stats__status--live {
     color: var(--good);
-}
-
-#score-value {
-    text-rendering: optimizeSpeed;
 }
 
 .card--hidden {

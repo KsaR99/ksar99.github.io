@@ -85,6 +85,17 @@ export const Screens = {
         screen.querySelector('[data-field="level"]').textContent = stats.level;
         screen.querySelector('[data-field="lines"]').textContent = stats.lines;
 
+        screen.querySelector('[data-field="gameTime"]').textContent = stats.gameTime;
+        screen.querySelector('[data-field="maxDrought"]').textContent = stats.maxDrought;
+        screen.querySelector('[data-field="tetrisRate"]').textContent = stats.tetrisRate;
+        screen.querySelector('[data-field="clearBreakdown"]').textContent =
+            `${stats.singles} / ${stats.doubles} / ${stats.triples} / ${stats.tetrises}`;
+        screen.querySelector('[data-field="pps"]').textContent = stats.pps;
+        screen.querySelector('[data-field="spinsBreakdown"]').textContent =
+            `${stats.tSpins} / ${stats.tSpinMinis} / ${stats.otherSpins}`;
+        screen.querySelector('[data-field="maxCombo"]').textContent = stats.maxCombo;
+        screen.querySelector('[data-field="efficiency"]').textContent = stats.efficiency;
+
         const todayBestRow = screen.querySelector('[data-role="today-best-row"]');
         if (todayBestEntry) {
             screen.querySelector('[data-field="todayBest"]').textContent = formatNumber(todayBestEntry.score);

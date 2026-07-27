@@ -1,7 +1,7 @@
 "use strict";
 
 import {Piece} from "./piece.js";
-import {dropIntervalForLevel, formatNumber, tierForLevel} from "./utils.js";
+import {dropIntervalForLevel, formatDuration, formatNumber, tierForLevel} from "./utils.js";
 import {levelForLines, pointsForHardDrop, pointsForLineClear, pointsForSoftDrop, pointsForSpin} from "./scoring.js";
 
 export class Game {
@@ -99,6 +99,13 @@ export class Game {
             ? Math.floor(((this.lines % linesPerLevel) / linesPerLevel) * 100)
             : 0;
 
+        const totalClears = Object.values(this.clearCounts).reduce((sum, n) => sum + n, 0);
+        const tetrisRatePercent = totalClears ? (this.clearCounts[4] / totalClears) * 100 : 0;
+
+        const elapsedSeconds = this.elapsedMs / 1000;
+        const pps = elapsedSeconds > 0 ? this.piecesSpawned / elapsedSeconds : 0;
+        const efficiencyValue = this.lines > 0 ? this.score / this.lines : 0;
+
         return {
             score: formatNumber(this.score),
             level: this.level,
@@ -106,6 +113,20 @@ export class Game {
             best: formatNumber(this.leaderboard.bestScore()),
             difficulty: `${this.i18n.t(`difficulty.${this.levelTier}`)} ${this.level}`,
             difficultyPercent: progressPercent,
+            gameTime: formatDuration(this.elapsedMs),
+            drought: this.drought,
+            maxDrought: this.maxDrought,
+            tetrisRate: `${tetrisRatePercent.toFixed(1)}%`,
+            singles: this.clearCounts[1],
+            doubles: this.clearCounts[2],
+            triples: this.clearCounts[3],
+            tetrises: this.clearCounts[4],
+            pps: pps.toFixed(2),
+            tSpins: this.spinCounts.t,
+            tSpinMinis: this.spinCounts.tMini,
+            otherSpins: this.spinCounts.other,
+            maxCombo: this.maxCombo,
+            efficiency: formatNumber(Math.round(efficiencyValue)),
         };
     }
 
@@ -114,6 +135,13 @@ export class Game {
         if (type === "O") return Game.O_KICKS;
 
         return Game.JLSTZ_KICKS;
+    }
+
+    /** Tracks the "drought": how many pieces in a row have appeared since the last "I" piece. */
+    registerPieceSpawn(type) {
+        this.piecesSpawned += 1;
+        this.drought = type === "I" ? 0 : this.drought + 1;
+        this.maxDrought = Math.max(this.maxDrought, this.drought);
     }
 
     defaultSettings() {
@@ -166,7 +194,17 @@ export class Game {
         this.levelUpTimer = 0;
         this.levelUpLevel = null;
 
+        this.elapsedMs = 0;
+        this.drought = 0;
+        this.maxDrought = 0;
+        this.clearCounts = {1: 0, 2: 0, 3: 0, 4: 0};
+        this.piecesSpawned = 0;
+        this.spinCounts = {t: 0, tMini: 0, other: 0};
+        this.currentCombo = 0;
+        this.maxCombo = 0;
+
         this.current = new Piece(this.bag.next(), {cols: this.board.cols});
+        this.registerPieceSpawn(this.current.type);
         this.next = this.bag.next();
         this.renderer.drawNext(this.next);
 
@@ -312,6 +350,7 @@ export class Game {
 
     spawnNext() {
         this.current = new Piece(this.next, {cols: this.board.cols});
+        this.registerPieceSpawn(this.current.type);
         this.next = this.bag.next();
         this.hardDropUsed = false;
         this.lockDelayTimer = 0;
@@ -719,6 +758,8 @@ export class Game {
     registerLineClears(cleared, playSound = true) {
         if (cleared === 0) return;
 
+        this.clearCounts[cleared] = (this.clearCounts[cleared] ?? 0) + 1;
+
         if (playSound) this.soundManager.play("lineClear");
 
         this.lines += cleared;
@@ -755,6 +796,12 @@ export class Game {
     }
 
     registerSpin(spin, cleared) {
+        if (spin.type === "T") {
+            if (spin.mini) this.spinCounts.tMini += 1;
+            else this.spinCounts.t += 1;
+        } else {
+            this.spinCounts.other += 1;
+        }
         this.addScore(pointsForSpin(spin.type, cleared, this.level, spin.mini));
     }
 
@@ -768,6 +815,7 @@ export class Game {
 
         if (fullRows.length === 0) {
             if (spin) this.registerSpin(spin, 0);
+            this.currentCombo = 0;
             this.spawnNext();
             return;
         }
@@ -783,6 +831,9 @@ export class Game {
         const cleared = this.board.clearFullLines();
         if (this.pendingSpin) this.registerSpin(this.pendingSpin, cleared);
         this.registerLineClears(cleared, false);
+
+        this.currentCombo += 1;
+        this.maxCombo = Math.max(this.maxCombo, this.currentCombo);
 
         this.pendingSpin = null;
         this.clearingLines = [];
@@ -955,6 +1006,11 @@ export class Game {
 
         if (this.levelUpTimer > 0) {
             this.levelUpTimer = Math.max(0, this.levelUpTimer - delta);
+        }
+
+        if (this.state === "running" || this.state === "clearing") {
+            this.elapsedMs += delta;
+            this.hud.update(this.stats);
         }
 
         if (this.state === "countdown") {

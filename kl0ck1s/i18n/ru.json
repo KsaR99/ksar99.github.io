@@ -8,6 +8,10 @@
     "score": "Очки",
     "lines": "Линии",
     "best": "Рекорд",
+    "time": "Время",
+    "drought": "Засуха",
+    "tetrisRate": "TRT",
+    "pps": "PPS",
     "statusLive": "Текущая игра",
     "statusLast": "Последняя игра"
   },
@@ -76,7 +80,16 @@
       "linesLabel": "линий",
       "todayBestLabel": "Лучший результат сегодня:",
       "todayBestBy": "от",
-      "submit": "Продолжить"
+      "submit": "Продолжить",
+      "statsTitle": "Статистика сессии",
+      "gameTimeLabel": "Время игры",
+      "droughtLabel": "Макс. засуха",
+      "tetrisRateLabel": "Тетрис-рейт (TRT)",
+      "clearsLabel": "Очистки (1/2/3/4 линии)",
+      "ppsLabel": "PPS",
+      "spinsLabel": "Спины (T / T-мини / другие)",
+      "maxComboLabel": "Макс. комбо",
+      "efficiencyLabel": "Эффективность (очки/линию)"
     },
     "gameOverSaved": {
       "title": "РЕЗУЛЬТАТ СОХРАНЁН",

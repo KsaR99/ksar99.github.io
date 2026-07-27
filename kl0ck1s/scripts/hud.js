@@ -13,11 +13,16 @@ export class HUD {
      * @param {HTMLElement} [elements.difficultyBarEl]
      * @param {HTMLElement} [elements.statsCardEl]
      * @param {import("./i18n.js").I18n} [elements.i18n]
+     * @param {HTMLElement} [elements.timeEl]
+     * @param {HTMLElement} [elements.droughtEl]
+     * @param {HTMLElement} [elements.tetrisRateEl]
+     * @param {HTMLElement} [elements.ppsEl]
      */
     constructor({
                     scoreEl, linesEl, bestEl, overlayEl,
                     nextPieceCardEl = null, statsStatusEl = null, difficultyEl = null,
                     difficultyBarEl = null, statsCardEl = null, i18n = null,
+                    timeEl = null, droughtEl = null, tetrisRateEl = null, ppsEl = null,
                 }) {
         this.scoreEl = scoreEl;
         this.linesEl = linesEl;
@@ -29,6 +34,10 @@ export class HUD {
         this.difficultyBarEl = difficultyBarEl;
         this.statsCardEl = statsCardEl;
         this.i18n = i18n;
+        this.timeEl = timeEl;
+        this.droughtEl = droughtEl;
+        this.tetrisRateEl = tetrisRateEl;
+        this.ppsEl = ppsEl;
     }
 
     setHasPlayedBefore(hasPlayedBefore) {
@@ -49,7 +58,7 @@ export class HUD {
         }
     }
 
-    update({score, lines, best, difficulty, difficultyPercent}) {
+    update({score, lines, best, difficulty, difficultyPercent, gameTime, drought, tetrisRate, pps}) {
         this.scoreEl.textContent = score;
         this.linesEl.textContent = lines;
         this.bestEl.textContent = best;
@@ -58,6 +67,18 @@ export class HUD {
         }
         if (this.difficultyBarEl && difficultyPercent !== undefined) {
             this.difficultyBarEl.style.width = `${difficultyPercent}%`;
+        }
+        if (this.timeEl && gameTime !== undefined) {
+            this.timeEl.textContent = gameTime;
+        }
+        if (this.droughtEl && drought !== undefined) {
+            this.droughtEl.textContent = drought;
+        }
+        if (this.tetrisRateEl && tetrisRate !== undefined) {
+            this.tetrisRateEl.textContent = tetrisRate;
+        }
+        if (this.ppsEl && pps !== undefined) {
+            this.ppsEl.textContent = pps;
         }
     }
 

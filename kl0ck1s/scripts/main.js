@@ -108,6 +108,10 @@ const hud = new HUD({
     difficultyBarEl: document.getElementById("difficulty-bar"),
     statsCardEl: document.querySelector('[data-role="stats-card"]'),
     i18n,
+    timeEl: document.getElementById("time-value"),
+    droughtEl: document.getElementById("drought-value"),
+    tetrisRateEl: document.getElementById("trt-value"),
+    ppsEl: document.getElementById("pps-value"),
 });
 
 const soundManager = new SoundManager(SOUND_FILES);

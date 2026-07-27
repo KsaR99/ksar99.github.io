@@ -8,6 +8,10 @@
     "score": "Puntuación",
     "lines": "Líneas",
     "best": "Récord",
+    "time": "Tiempo",
+    "drought": "Sequía",
+    "tetrisRate": "TRT",
+    "pps": "PPS",
     "statusLive": "Partida actual",
     "statusLast": "Última partida"
   },
@@ -76,7 +80,16 @@
       "linesLabel": "líneas",
       "todayBestLabel": "Mejor de hoy:",
       "todayBestBy": "de",
-      "submit": "Continuar"
+      "submit": "Continuar",
+      "statsTitle": "Estadísticas de la partida",
+      "gameTimeLabel": "Tiempo de partida",
+      "droughtLabel": "Sequía máxima",
+      "tetrisRateLabel": "Tasa de Tetris (TRT)",
+      "clearsLabel": "Líneas (1/2/3/4 a la vez)",
+      "ppsLabel": "PPS",
+      "spinsLabel": "Spins (T / T-mini / otros)",
+      "maxComboLabel": "Combo más largo",
+      "efficiencyLabel": "Eficiencia (pts/línea)"
     },
     "gameOverSaved": {
       "title": "PUNTUACIÓN GUARDADA",

@@ -8,6 +8,10 @@
     "score": "Punkte",
     "lines": "Reihen",
     "best": "Bestwert",
+    "time": "Zeit",
+    "drought": "Dürre",
+    "tetrisRate": "TRT",
+    "pps": "PPS",
     "statusLive": "Aktuelles Spiel",
     "statusLast": "Letztes Spiel"
   },
@@ -76,7 +80,16 @@
       "linesLabel": "Reihen",
       "todayBestLabel": "Heutiger Bestwert:",
       "todayBestBy": "von",
-      "submit": "Weiter"
+      "submit": "Weiter",
+      "statsTitle": "Sitzungsstatistik",
+      "gameTimeLabel": "Spielzeit",
+      "droughtLabel": "Längste Dürre",
+      "tetrisRateLabel": "Tetris-Rate (TRT)",
+      "clearsLabel": "Reihen (1/2/3/4 gleichzeitig)",
+      "ppsLabel": "PPS",
+      "spinsLabel": "Spins (T / T-Mini / sonstige)",
+      "maxComboLabel": "Längste Combo",
+      "efficiencyLabel": "Effizienz (Pkt./Reihe)"
     },
     "gameOverSaved": {
       "title": "PUNKTZAHL GESPEICHERT",

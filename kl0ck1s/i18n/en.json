@@ -8,6 +8,10 @@
     "score": "Score",
     "lines": "Lines",
     "best": "Best",
+    "time": "Time",
+    "drought": "Drought",
+    "tetrisRate": "TRT",
+    "pps": "PPS",
     "statusLive": "Current game",
     "statusLast": "Last game"
   },
@@ -76,7 +80,16 @@
       "linesLabel": "lines",
       "todayBestLabel": "Today's best:",
       "todayBestBy": "by",
-      "submit": "Continue"
+      "submit": "Continue",
+      "statsTitle": "Session stats",
+      "gameTimeLabel": "Time",
+      "droughtLabel": "Max drought",
+      "tetrisRateLabel": "Tetris rate (TRT)",
+      "clearsLabel": "Clears (1/2/3/4 lines)",
+      "ppsLabel": "PPS",
+      "spinsLabel": "Spins (T / T-mini / other)",
+      "maxComboLabel": "Longest combo",
+      "efficiencyLabel": "Efficiency (pts/line)"
     },
     "gameOverSaved": {
       "title": "SCORE SAVED",

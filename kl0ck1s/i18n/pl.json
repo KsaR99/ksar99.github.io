@@ -8,6 +8,10 @@
     "score": "Wynik",
     "lines": "Linie",
     "best": "Rekord",
+    "time": "Czas",
+    "drought": "Posucha",
+    "tetrisRate": "TRT",
+    "pps": "PPS",
     "statusLive": "Aktualna gra",
     "statusLast": "Ostatnia gra"
   },
@@ -76,7 +80,16 @@
       "linesLabel": "linii",
       "todayBestLabel": "Dzisiejszy najlepszy wynik:",
       "todayBestBy": "przez",
-      "submit": "Kontynuuj"
+      "submit": "Kontynuuj",
+      "statsTitle": "Statystyki sesji",
+      "gameTimeLabel": "Czas gry",
+      "droughtLabel": "Najdłuższa posucha",
+      "tetrisRateLabel": "Wskaźnik Tetris (TRT)",
+      "clearsLabel": "Czyszczenia (1/2/3/4 linie)",
+      "ppsLabel": "PPS",
+      "spinsLabel": "Spiny (T / T-mini / inne)",
+      "maxComboLabel": "Najdłuższe combo",
+      "efficiencyLabel": "Efektywność (pkt/linię)"
     },
     "gameOverSaved": {
       "title": "WYNIK ZAPISANY",

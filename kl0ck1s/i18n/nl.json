@@ -8,6 +8,10 @@
     "score": "Score",
     "lines": "Lijnen",
     "best": "Beste",
+    "time": "Tijd",
+    "drought": "Droogte",
+    "tetrisRate": "TRT",
+    "pps": "PPS",
     "statusLive": "Huidige spel",
     "statusLast": "Laatste spel"
   },
@@ -76,7 +80,16 @@
       "linesLabel": "lijnen",
       "todayBestLabel": "Beste van vandaag:",
       "todayBestBy": "door",
-      "submit": "Doorgaan"
+      "submit": "Doorgaan",
+      "statsTitle": "Sessiestatistieken",
+      "gameTimeLabel": "Speeltijd",
+      "droughtLabel": "Langste droogte",
+      "tetrisRateLabel": "Tetris-percentage (TRT)",
+      "clearsLabel": "Lijnen (1/2/3/4 tegelijk)",
+      "ppsLabel": "PPS",
+      "spinsLabel": "Spins (T / T-mini / overig)",
+      "maxComboLabel": "Langste combo",
+      "efficiencyLabel": "Efficiëntie (pt/lijn)"
     },
     "gameOverSaved": {
       "title": "SCORE OPGESLAGEN",

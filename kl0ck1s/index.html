@@ -32,6 +32,22 @@
                 <h3 class="card__title" data-i18n="sidebar.lines">Lines</h3>
                 <div class="stats__value" id="lines-value">0</div>
             </div>
+            <div class="stats__row" data-role="time-stat">
+                <h3 class="card__title" data-i18n="sidebar.time">Time</h3>
+                <div class="stats__value" id="time-value">00:00</div>
+            </div>
+            <div class="stats__row" data-role="drought-stat">
+                <h3 class="card__title" data-i18n="sidebar.drought">Drought</h3>
+                <div class="stats__value" id="drought-value">0</div>
+            </div>
+            <div class="stats__row" data-role="trt-stat">
+                <h3 class="card__title" data-i18n="sidebar.tetrisRate">TRT</h3>
+                <div class="stats__value" id="trt-value">0.0%</div>
+            </div>
+            <div class="stats__row" data-role="pps-stat">
+                <h3 class="card__title" data-i18n="sidebar.pps">PPS</h3>
+                <div class="stats__value" id="pps-value">0.00</div>
+            </div>
             <div data-role="difficulty-stat">
                 <div class="progress-bar progress-bar--difficulty">
                     <div class="progress-bar__fill" id="difficulty-bar"></div>
@@ -235,6 +251,41 @@
         <button class="button button--primary" data-i18n="screens.gameOverEntry.submit"
                 data-role="gameover-continue-button" type="button">Continue
         </button>
+        <div class="options" data-role="stats-detail">
+            <h3 class="options__title" data-i18n="screens.gameOverEntry.statsTitle">Session stats</h3>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.gameTimeLabel">Time</span>
+                <strong data-field="gameTime"></strong>
+            </div>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.droughtLabel">Max drought</span>
+                <strong data-field="maxDrought"></strong>
+            </div>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.tetrisRateLabel">Tetris rate (TRT)</span>
+                <strong data-field="tetrisRate"></strong>
+            </div>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.clearsLabel">Clears (1/2/3/4 lines)</span>
+                <strong data-field="clearBreakdown"></strong>
+            </div>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.ppsLabel">PPS</span>
+                <strong data-field="pps"></strong>
+            </div>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.spinsLabel">Spins (T / T-mini / other)</span>
+                <strong data-field="spinsBreakdown"></strong>
+            </div>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.maxComboLabel">Longest combo</span>
+                <strong data-field="maxCombo"></strong>
+            </div>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.efficiencyLabel">Efficiency (pts/line)</span>
+                <strong data-field="efficiency"></strong>
+            </div>
+        </div>
         <div class="leaderboard">
             <h3 class="leaderboard__title" data-i18n="leaderboard.title">Leaderboard</h3>
             <div data-field="leaderboard"></div>
