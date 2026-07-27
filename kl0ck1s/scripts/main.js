@@ -106,8 +106,7 @@ const hud = new HUD({
     statsStatusEl: document.querySelector('[data-role="stats-status"]'),
     difficultyEl: document.getElementById("difficulty-value"),
     difficultyBarEl: document.getElementById("difficulty-bar"),
-    linesStatEl: document.querySelector('[data-role="lines-stat"]'),
-    difficultyStatEl: document.querySelector('[data-role="difficulty-stat"]'),
+    statsCardEl: document.querySelector('[data-role="stats-card"]'),
     i18n,
 });
 

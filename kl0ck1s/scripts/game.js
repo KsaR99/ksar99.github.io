@@ -321,7 +321,6 @@ export class Game {
         this.state = "gameOver-entry";
         this.isPlayingSession = false;
         this.hud.setPlaying(false);
-        this.hud.setHasPlayedBefore(false);
         this.soundManager.play("gameOver");
         this.hud.showScreen(this.screens.loading(
             this.i18n.t("screens.gameOverEntry.title"), this.i18n.t("screens.loading.leaderboardHint"), this.dom

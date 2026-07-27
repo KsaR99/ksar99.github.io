@@ -11,14 +11,13 @@ export class HUD {
      * @param {HTMLElement} [elements.statsStatusEl]
      * @param {HTMLElement} [elements.difficultyEl]
      * @param {HTMLElement} [elements.difficultyBarEl]
-     * @param {HTMLElement} [elements.linesStatEl]
-     * @param {HTMLElement} [elements.difficultyStatEl]
+     * @param {HTMLElement} [elements.statsCardEl]
      * @param {import("./i18n.js").I18n} [elements.i18n]
      */
     constructor({
                     scoreEl, linesEl, bestEl, overlayEl,
                     nextPieceCardEl = null, statsStatusEl = null, difficultyEl = null,
-                    difficultyBarEl = null, linesStatEl = null, difficultyStatEl = null, i18n = null,
+                    difficultyBarEl = null, statsCardEl = null, i18n = null,
                 }) {
         this.scoreEl = scoreEl;
         this.linesEl = linesEl;
@@ -28,17 +27,13 @@ export class HUD {
         this.statsStatusEl = statsStatusEl;
         this.difficultyEl = difficultyEl;
         this.difficultyBarEl = difficultyBarEl;
-        this.linesStatEl = linesStatEl;
-        this.difficultyStatEl = difficultyStatEl;
+        this.statsCardEl = statsCardEl;
         this.i18n = i18n;
     }
 
     setHasPlayedBefore(hasPlayedBefore) {
-        if (this.linesStatEl) {
-            this.linesStatEl.classList.toggle("card--hidden", !hasPlayedBefore);
-        }
-        if (this.difficultyStatEl) {
-            this.difficultyStatEl.classList.toggle("card--hidden", !hasPlayedBefore);
+        if (this.statsCardEl) {
+            this.statsCardEl.classList.toggle("card--hidden", !hasPlayedBefore);
         }
     }
 
