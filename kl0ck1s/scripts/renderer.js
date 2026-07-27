@@ -5,6 +5,7 @@ import {lightenOklch, trimShape, withAlpha} from "./utils.js";
 export class Renderer {
     /**
      * @param {object} deps
+     * @param {HTMLDivElement} boardDiv
      * @param {CanvasRenderingContext2D} deps.ctx
      * @param {HTMLCanvasElement} deps.boardCanvas
      * @param {CanvasRenderingContext2D} deps.nextCtx
@@ -16,6 +17,7 @@ export class Renderer {
      * @param {import("./i18n.js").I18n} [deps.i18n]
      */
     constructor({
+                    boardDiv,
                     ctx,
                     boardCanvas,
                     nextCtx,
@@ -26,6 +28,7 @@ export class Renderer {
                     nextPreviewCellSize,
                     i18n = null
                 }) {
+        this.boardDiv = boardDiv;
         this.ctx = ctx;
         this.boardCanvas = boardCanvas;
         this.nextCtx = nextCtx;
@@ -58,8 +61,9 @@ export class Renderer {
     }
 
     setTheme(backgroundColor) {
-        this.boardCanvas.style.backgroundColor = backgroundColor;
-        this.nextCanvas.style.backgroundColor = backgroundColor;
+        this.boardDiv.style.backgroundColor = backgroundColor;
+        // this.boardCanvas.style.backgroundColor = backgroundColor;
+        // this.nextCanvas.style.backgroundColor = backgroundColor;
     }
 
     drawCell(context, x, y, color, size, glow = false) {

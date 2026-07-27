@@ -38,11 +38,11 @@ export const DIFFICULTIES = Object.freeze({
 });
 
 export const BOARD_BACKGROUNDS = Object.freeze({
-    easy: "oklch(0.22 0 0 / 0.1)",
-    medium: "oklch(0.20 0 0 / 0.1)",
-    hard: "oklch(0.15 0 0 / 0.1)",
-    expert: "oklch(0.10 0 0 / 0.1)",
-    pro: "oklch(0 0 0 / 0.1)",
+    easy: "oklch(0.22 0 0)",
+    medium: "oklch(0.20 0 0)",
+    hard: "oklch(0.15 0 0)",
+    expert: "oklch(0.10 0 0)",
+    pro: "oklch(0 0 0)",
 });
 
 export const DEFAULT_DIFFICULTY = "hard";

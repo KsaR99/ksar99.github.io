@@ -35,6 +35,8 @@ const i18n = new I18n();
 await i18n.init();
 i18n.applyStatic(document);
 
+const boardDiv = document.querySelector(".board");
+
 /** @type {HTMLCanvasElement} */
 const boardCanvas = document.getElementById("klockis-board");
 const ctx = boardCanvas.getContext("2d");
@@ -45,10 +47,9 @@ const nextCtx = nextCanvas.getContext("2d");
 nextCtx.imageSmoothingEnabled = false;
 
 function getVerticalChrome() {
-    const board = document.querySelector(".board");
-    const bodyStyle = getComputedStyle(document.body);
-    const boardStyle = getComputedStyle(board);
 
+    const bodyStyle = getComputedStyle(document.body);
+    const boardStyle = getComputedStyle(boardDiv);
     const bodyPadding = parseFloat(bodyStyle.paddingTop) + parseFloat(bodyStyle.paddingBottom);
     const boardBorder = parseFloat(boardStyle.borderTopWidth) + parseFloat(boardStyle.borderBottomWidth);
 
@@ -86,6 +87,7 @@ resizeBoardCanvas();
 const spriteCache = new SpriteCache(KLOCKOMINOS, () => document.createElement("canvas"));
 
 const renderer = new Renderer({
+    boardDiv,
     ctx,
     boardCanvas,
     nextCtx,
