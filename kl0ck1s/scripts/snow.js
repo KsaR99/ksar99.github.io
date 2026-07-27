@@ -1,6 +1,6 @@
 "use strict";
 
-const FLAKE_COLOR = "rgba(255, 255, 255, 0.85)";
+const FLAKE_COLOR = "oklch(1 0 0 / 85%)";
 const DENSITY = 1 / 6000; // flakes per square pixel
 
 export class Snow {

@@ -1,6 +1,6 @@
 "use strict";
 
-const DROP_COLOR = "rgba(180, 205, 255, 0.55)";
+const DROP_COLOR = "oklch(0.84 0.07 264 / 55%)";
 const DENSITY = 0.12; // drops per pixel of width
 
 export class Rain {

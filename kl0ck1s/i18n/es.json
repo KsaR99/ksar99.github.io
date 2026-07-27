@@ -5,8 +5,6 @@
   },
   "sidebar": {
     "nextPiece": "Siguiente pieza",
-    "difficulty": "Dificultad",
-    "difficultyValue": "{difficulty} {level}: {percent}%",
     "score": "Puntuación",
     "lines": "Líneas",
     "best": "Récord",

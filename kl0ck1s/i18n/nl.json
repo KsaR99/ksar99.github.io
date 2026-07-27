@@ -5,8 +5,6 @@
   },
   "sidebar": {
     "nextPiece": "Volgend blok",
-    "difficulty": "Moeilijkheidsgraad",
-    "difficultyValue": "{difficulty} {level}: {percent}%",
     "score": "Score",
     "lines": "Lijnen",
     "best": "Beste",

@@ -5,8 +5,6 @@
   },
   "sidebar": {
     "nextPiece": "Następny klocek",
-    "difficulty": "Poziom trudności",
-    "difficultyValue": "{difficulty} {level}: {percent}%",
     "score": "Wynik",
     "lines": "Linie",
     "best": "Rekord",

@@ -10,6 +10,7 @@ export class HUD {
      * @param {HTMLElement} [elements.nextPieceCardEl]
      * @param {HTMLElement} [elements.statsStatusEl]
      * @param {HTMLElement} [elements.difficultyEl]
+     * @param {HTMLElement} [elements.difficultyBarEl]
      * @param {HTMLElement} [elements.linesStatEl]
      * @param {HTMLElement} [elements.difficultyStatEl]
      * @param {import("./i18n.js").I18n} [elements.i18n]
@@ -17,7 +18,7 @@ export class HUD {
     constructor({
                     scoreEl, linesEl, bestEl, overlayEl,
                     nextPieceCardEl = null, statsStatusEl = null, difficultyEl = null,
-                    linesStatEl = null, difficultyStatEl = null, i18n = null,
+                    difficultyBarEl = null, linesStatEl = null, difficultyStatEl = null, i18n = null,
                 }) {
         this.scoreEl = scoreEl;
         this.linesEl = linesEl;
@@ -26,6 +27,7 @@ export class HUD {
         this.nextPieceCardEl = nextPieceCardEl;
         this.statsStatusEl = statsStatusEl;
         this.difficultyEl = difficultyEl;
+        this.difficultyBarEl = difficultyBarEl;
         this.linesStatEl = linesStatEl;
         this.difficultyStatEl = difficultyStatEl;
         this.i18n = i18n;
@@ -52,12 +54,15 @@ export class HUD {
         }
     }
 
-    update({score, lines, best, difficulty}) {
+    update({score, lines, best, difficulty, difficultyPercent}) {
         this.scoreEl.textContent = score;
         this.linesEl.textContent = lines;
         this.bestEl.textContent = best;
         if (this.difficultyEl && difficulty !== undefined) {
             this.difficultyEl.textContent = difficulty;
+        }
+        if (this.difficultyBarEl && difficultyPercent !== undefined) {
+            this.difficultyBarEl.style.width = `${difficultyPercent}%`;
         }
     }
 

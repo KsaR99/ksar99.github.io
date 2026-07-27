@@ -5,8 +5,6 @@
   },
   "sidebar": {
     "nextPiece": "Next piece",
-    "difficulty": "Difficulty",
-    "difficultyValue": "{difficulty} {level}: {percent}%",
     "score": "Score",
     "lines": "Lines",
     "best": "Best",

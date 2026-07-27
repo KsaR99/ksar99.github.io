@@ -20,21 +20,23 @@
 
         <div class="card stats" data-role="stats-card">
             <p class="stats__status" data-i18n="sidebar.statusLast" data-role="stats-status">Last game</p>
-            <div>
+            <div class="stats__row">
                 <h3 class="card__title" data-i18n="sidebar.best">Best</h3>
                 <div class="stats__value" id="best-value">0</div>
             </div>
-            <div>
+            <div class="stats__row">
                 <h3 class="card__title" data-i18n="sidebar.score">Score</h3>
                 <div class="stats__value" id="score-value">0</div>
             </div>
-            <div data-role="lines-stat">
+            <div class="stats__row" data-role="lines-stat">
                 <h3 class="card__title" data-i18n="sidebar.lines">Lines</h3>
                 <div class="stats__value" id="lines-value">0</div>
             </div>
             <div data-role="difficulty-stat">
-                <h3 class="card__title" data-i18n="sidebar.difficulty">Difficulty</h3>
-                <div class="stats__value" id="difficulty-value">-</div>
+                <div class="progress-bar progress-bar--difficulty">
+                    <div class="progress-bar__fill" id="difficulty-bar"></div>
+                    <div class="progress-bar__label" id="difficulty-value">-</div>
+                </div>
             </div>
         </div>
 
@@ -104,7 +106,7 @@
         <div class="difficulty" data-field="difficulty" data-role="difficulty-select"></div>
         <div class="nickname-form">
             <input class="nickname-form__input" data-i18n-placeholder="screens.idle.namePlaceholder"
-                   data-role="name-input" maxlength="16" pattern="[a-zA-Z0-9_-]{3,16}" placeholder="Your nickname"
+                   data-role="name-input" maxlength="16" pattern="[a-zA-Z0-9_-]" placeholder="Your nickname"
                    required type="text">
         </div>
 
@@ -239,7 +241,7 @@
         <div class="difficulty" data-field="difficulty" data-role="difficulty-select"></div>
         <div class="nickname-form">
             <input class="nickname-form__input" data-i18n-placeholder="screens.idle.namePlaceholder"
-                   data-role="name-input" maxlength="16" pattern="[a-zA-Z0-9_-]{3,16}" placeholder="Your nickname"
+                   data-role="name-input" maxlength="16" pattern="[a-zA-Z0-9_-]" placeholder="Your nickname"
                    required type="text">
         </div>
         <p class="screen__hint">

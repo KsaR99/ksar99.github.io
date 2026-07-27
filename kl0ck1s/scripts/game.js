@@ -104,11 +104,8 @@ export class Game {
             level: this.level,
             lines: this.lines,
             best: formatNumber(this.leaderboard.bestScore()),
-            difficulty: this.i18n.t("sidebar.difficultyValue", {
-                level: this.level,
-                percent: progressPercent,
-                difficulty: this.i18n.t(`difficulty.${this.levelTier}`),
-            }),
+            difficulty: `${this.i18n.t(`difficulty.${this.levelTier}`)} ${this.level}`,
+            difficultyPercent: progressPercent,
         };
     }
 
@@ -324,6 +321,7 @@ export class Game {
         this.state = "gameOver-entry";
         this.isPlayingSession = false;
         this.hud.setPlaying(false);
+        this.hud.setHasPlayedBefore(false);
         this.soundManager.play("gameOver");
         this.hud.showScreen(this.screens.loading(
             this.i18n.t("screens.gameOverEntry.title"), this.i18n.t("screens.loading.leaderboardHint"), this.dom
@@ -627,6 +625,7 @@ export class Game {
     refreshLanguage() {
         if (this.dom) this.i18n.applyStatic(this.dom);
         this.hud.setPlaying(this.isPlayingSession);
+        this.hud.update(this.stats);
         this.refreshCurrentScreen();
     }
 

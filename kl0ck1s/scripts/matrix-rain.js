@@ -3,9 +3,9 @@
 const CHARS = "Kl0ck1's";
 const FONT_SIZE = 15;
 const FALL_SPEED = 0.35; // rows per rendered frame (frame is throttled below)
-const HEAD_COLOR = "rgb(214, 255, 214)";
-const BODY_COLOR = "rgb(20, 200, 90)";
-const DIM_COLOR = "rgb(10, 110, 55)";
+const HEAD_COLOR = "oklch(0.96 0.068 145)";
+const BODY_COLOR = "oklch(0.72 0.20 149)";
+const DIM_COLOR = "oklch(0.47 0.120 150)";
 
 export class MatrixRain {
     constructor(canvas, ctx = null) {
