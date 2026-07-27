@@ -1,8 +1,0 @@
-~~ TRT - Tetris Rate. The percentage of lines that was cleared by Tetrises, over all the lines that was cleared by the player.
-!!! BRN - Burn. The number of lines cleared between 2 Tetrises, since the most optimal way to score is to clear the most amount of Tetrises.
-!!! TRNS - Transition. The score they had when they cleared their first 180 lines, which is the number of lines you need to clear, from going to Level 18 to Level 19. The gravity drastically increase during that level-up.
-~ PPL - Points per Line. The score of the player, divided by the number of lines they cleared.
-~ D. - Droughts. A Drought is when a player has gone more than 12 pieces without having an I-piece. (“Long bar” is the wrong term for the piece)
-!!! D. TOTAL - Total of Droughts during the game.
-!!! D. AVG - The average of the number of pieces from all Droughts during that game.
-!!! D. MAX - The number of pieces within the biggest Drought the player had during the game.
