@@ -62,16 +62,16 @@ export class PieceController {
      * ignored) would sit at its default column until the mouse moves again —
      * felt like the mouse control freezing or lagging after a hard drop.
      *
-     * Only does this if the mouse is the input currently steering the piece
-     * (i.e. it moved more recently than any keyboard movement/rotate/drop).
-     * Otherwise a resting pointer (e.g. player switched to keyboard controls
-     * mid-game while mouseControl is still on) would keep yanking every new
-     * piece back to wherever the mouse happens to sit.
+     * Only does this if a pointer source is the one currently steering (per
+     * the shared SteeringArbiter) - i.e. it steered more recently than any
+     * keyboard movement/rotate/drop. Otherwise a resting pointer (e.g. the
+     * player switched to keyboard controls mid-game while mouseControl is
+     * still on) would keep yanking every new piece back to wherever it sits.
      */
     snapToPointer() {
         const game = this.game;
         if (!game.settings?.mouseControl) return;
-        if (!game.usingMouseSteering) return;
+        if (!game.steeringArbiter?.isPointerSteering()) return;
         if (game.pointerClientX == null) return;
 
         const column = game.renderer.columnFromClientX(game.pointerClientX);
