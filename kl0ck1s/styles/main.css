@@ -1,5 +1,6 @@
 :root {
     --bg: oklch(16.001% 0.01778 268.478);
+    --bg-2: oklch(13.191% 0.01866 276.772);
     --panel: oklch(20.28% 0.0193 271.4);
     --line: oklch(28.15% 0.0276 273.6);
     --text: oklch(93.08% 0.0139 264.5);
@@ -24,6 +25,8 @@
     --z-fab: 20;
     --z-drawer: 30;
     --z-scrim: 25;
+    --fab-row-h: 3.1rem;
+    --mobile-chrome-h: 5.6rem;
 }
 
 * {
@@ -77,7 +80,7 @@ body {
     min-height: 0;
     min-width: 0;
     width: 100%;
-    padding-top: calc(var(--safe-t) + 0.5rem);
+    padding-top: calc(var(--safe-t) + var(--mobile-chrome-h) + 0.5rem);
     padding-bottom: calc(var(--touch-bar-h) + var(--safe-b) + 0.5rem);
 }
 
@@ -102,48 +105,101 @@ body {
     overflow-y: auto;
     background: var(--bg);
     border: 1px solid var(--line);
-    transition: transform 0.25s ease;
+    /* left/right (not transform) on purpose: a transform here would make
+       this element a containing block for its position:fixed descendants
+       (the next-piece/difficulty mini readouts below), trapping them
+       inside the drawer's own off-screen position instead of letting them
+       sit fixed against the real viewport. */
+    transition: left 0.25s ease, right 0.25s ease;
 }
 
 .sidebar--stats {
-    left: 0;
+    left: -105%;
     padding-left: calc(var(--safe-l) + 0.75rem);
     border-radius: 0 var(--radius) var(--radius) 0;
-    transform: translateX(-105%);
 }
 
 .sidebar--controls {
-    right: 0;
+    right: -105%;
     padding-right: calc(var(--safe-r) + 0.75rem);
     border-radius: var(--radius) 0 0 var(--radius);
-    transform: translateX(105%);
 }
 
-.app__sidebar--open {
-    transform: translateX(0);
+.sidebar--stats.app__sidebar--open {
+    left: 0;
+}
+
+.sidebar--controls.app__sidebar--open {
+    right: 0;
 }
 
 body.hud-right .sidebar--stats {
     left: auto;
-    right: 0;
+    right: -105%;
     padding-left: 0.75rem;
     padding-right: calc(var(--safe-r) + 0.75rem);
     border-radius: var(--radius) 0 0 var(--radius);
-    transform: translateX(105%);
 }
 
 body.hud-right .sidebar--controls {
     right: auto;
-    left: 0;
+    left: -105%;
     padding-right: 0.75rem;
     padding-left: calc(var(--safe-l) + 0.75rem);
     border-radius: 0 var(--radius) var(--radius) 0;
-    transform: translateX(-105%);
 }
 
-body.hud-right .sidebar--stats.app__sidebar--open,
+body.hud-right .sidebar--stats.app__sidebar--open {
+    right: 0;
+}
+
 body.hud-right .sidebar--controls.app__sidebar--open {
-    transform: translateX(0);
+    left: 0;
+}
+
+/* Next piece + level/progress mini-readout: pulled out of the (hidden)
+   stats drawer and pinned as a transparent strip above the board, so
+   they stay visible during play without spending sidebar space. Same
+   elements/IDs as the sidebar versions - no JS changes needed, the game
+   code keeps updating #next-piece-canvas / #difficulty-bar as before. */
+[data-role="next-piece-card"] {
+    position: fixed;
+    top: calc(var(--safe-t) + var(--fab-row-h) + 0.4rem);
+    left: calc(var(--safe-l) + 0.5rem);
+    z-index: var(--z-fab);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.4rem;
+    height: 3.4rem;
+    padding: 0;
+    background: oklch(from var(--bg-2) l c h / 0.6);
+    border-radius: var(--radius);
+    backdrop-filter: blur(4px);
+}
+
+[data-role="next-piece-card"] .card__title {
+    display: none;
+}
+
+[data-role="next-piece-card"] .next-piece__canvas {
+    width: 2.6rem;
+    height: 2.6rem;
+    background: transparent;
+}
+
+[data-role="difficulty-stat"] {
+    position: fixed;
+    top: calc(var(--safe-t) + var(--fab-row-h) + 0.65rem);
+    left: calc(var(--safe-l) + 4.3rem);
+    right: calc(var(--safe-r) + 0.5rem);
+    z-index: var(--z-fab);
+}
+
+[data-role="difficulty-stat"] .progress-bar--difficulty {
+    height: 1.6rem;
+    background: oklch(from var(--bg-2) l c h / 0.6);
+    backdrop-filter: blur(4px);
 }
 
 .board {
@@ -178,9 +234,10 @@ body.perf-no-glow .screen__title {
     display: none;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 0.625rem;
-    background: oklch(13.191% 0.01866 276.772 / 0.8);
+    padding-top: 0.75rem;
+    background: oklch(from var(--bg-2) l c h / 0.8);
     border-radius: var(--radius);
     overflow-y: auto;
     width: 100%;
@@ -192,7 +249,7 @@ body.perf-no-glow .screen__title {
 }
 
 body.perf-no-transparency .board__overlay {
-    background: oklch(13.191% 0.01866 276.772);
+    background: var(--bg-2);
 }
 
 .board__overlay--transparent {
@@ -200,7 +257,7 @@ body.perf-no-transparency .board__overlay {
 }
 
 body.perf-no-transparency .board__overlay--transparent {
-    background: oklch(13.191% 0.01866 276.772);
+    background: var(--bg-2);
 }
 
 .board__filter {
@@ -444,7 +501,7 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 .next-piece__canvas {
     display: block;
     margin: 0 auto;
-    background: oklch(13.191% 0.01866 276.772);
+    background: var(--bg-2);
     border-radius: 0.25rem;
 }
 
@@ -599,7 +656,7 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 
 .button--accent {
     background: var(--accent-2);
-    color: oklch(13.191% 0.01866 276.772);
+    color: var(--bg-2);
     padding: 0.5em 1.25em;
 }
 
@@ -806,6 +863,10 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     align-self: center;
 }
 
+.options__row:has([data-role="mouse-control-checkbox"]) {
+    display: none;
+}
+
 /* ============================================================
    Mobile chrome: FAB buttons, drawer scrim, on-screen touch
    controls. Hidden again in the desktop override below.
@@ -836,7 +897,7 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     justify-content: center;
     border: 1px solid var(--line);
     border-radius: 999px;
-    background: oklch(13.191% 0.01866 276.772 / 0.72);
+    background: oklch(from var(--bg-2) l c h / 0.72);
     color: var(--text);
     font-size: 1.15rem;
     line-height: 1;
@@ -907,7 +968,7 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     display: flex;
     align-items: stretch;
     gap: 0.5rem;
-    background: linear-gradient(0deg, oklch(13.191% 0.01866 276.772 / 0.92) 0%, oklch(13.191% 0.01866 276.772 / 0.75) 70%, transparent 100%);
+    background: linear-gradient(0deg,  oklch(from var(--bg-2) l c h / 0.92) 0%,  oklch(from var(--bg-2) l c h / 0.65) 70%, transparent 100%);
     touch-action: none;
     user-select: none;
 }
@@ -1011,6 +1072,45 @@ body.faux-fullscreen .mobile-fabs__group:first-child:focus-within {
         display: block;
         width: auto;
         padding: 0;
+    }
+
+    .board__overlay {
+        justify-content: center;
+        padding-top: 0;
+    }
+
+    .options__row:has([data-role="mouse-control-checkbox"]) {
+        display: flex;
+    }
+
+    [data-role="next-piece-card"] {
+        position: static;
+        width: auto;
+        height: auto;
+        padding: 0.64rem 1rem;
+        background: var(--panel);
+        border-radius: var(--radius);
+        backdrop-filter: none;
+    }
+
+    [data-role="next-piece-card"] .card__title {
+        display: block;
+    }
+
+    [data-role="next-piece-card"] .next-piece__canvas {
+        width: 96px;
+        height: 96px;
+        background: var(--bg-2);
+    }
+
+    [data-role="difficulty-stat"] {
+        position: static;
+    }
+
+    [data-role="difficulty-stat"] .progress-bar--difficulty {
+        height: 1.5rem;
+        background: oklch(25.03% 0.027 271);
+        backdrop-filter: none;
     }
 
     .app__sidebar {
