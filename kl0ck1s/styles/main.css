@@ -550,7 +550,6 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 
 .leaderboard {
     width: 100%;
-    margin-top: 2rem;
 }
 
 .leaderboard__title {
