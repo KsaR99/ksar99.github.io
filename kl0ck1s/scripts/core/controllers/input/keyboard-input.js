@@ -12,7 +12,7 @@ const REPEAT_INTERVAL_MS = 50;
 
 // Keys that move/rotate/drop the piece. Using one of these should win over
 // pointer steering for a short window - see SteeringArbiter.markKeyboardSteer.
-const MOVEMENT_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Space", "KeyZ"]);
+const MOVEMENT_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Space", "KeyZ", "KeyA"]);
 
 function isTypingInField(event) {
     const tag = event.target.tagName;
@@ -57,6 +57,7 @@ export class KeyboardInput extends InputSource {
             KeyO: () => game.screenFlow.toggleOptions(),
             KeyP: () => game.screenFlow.togglePause(),
             KeyZ: () => game.pieceController.rotate(),
+            KeyA: () => game.pieceController.rotate180(),
             KeyR: () => game.screenFlow.restart(),
             KeyX: () => game.screenFlow.exitToMenu(),
         };

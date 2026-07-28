@@ -8,26 +8,46 @@ export const T_FRONT_CORNERS = [
     ["topLeft", "bottomLeft"],
 ];
 
-export const JLSTZ_KICKS = {
+/**
+ * Derives the reverse-rotation (counterclockwise) kicks from a table of
+ * forward (clockwise) kicks. The kick that undoes a "from>to" rotation is the
+ * exact inverse translation of the kick that performed it, so "to>from" is
+ * just "from>to" with each offset negated. This lets the source tables below
+ * only list the four clockwise transitions while still supporting rotate(-1).
+ */
+function invertKicks(kicks) {
+    return kicks.map(([dx, dy]) => [-dx, -dy]);
+}
+
+function withReverse(cwTable) {
+    const withBoth = {...cwTable};
+    for (const [key, offsets] of Object.entries(cwTable)) {
+        const [from, to] = key.split(">");
+        withBoth[`${to}>${from}`] = invertKicks(offsets);
+    }
+    return withBoth;
+}
+
+export const JLSTZ_KICKS = withReverse({
     "0>1": [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]],
     "1>2": [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]],
     "2>3": [[0, 0], [1, 0], [1, -1], [0, 2], [1, 2]],
     "3>0": [[0, 0], [-1, 0], [-1, -1], [0, 2], [-1, 2]],
-};
+});
 
-export const I_KICKS = {
+export const I_KICKS = withReverse({
     "0>1": [[0, 0], [-2, 0], [1, 0], [-2, -1], [1, 2]],
     "1>2": [[0, 0], [-1, 0], [2, 0], [-1, 2], [2, -1]],
     "2>3": [[0, 0], [2, 0], [-1, 0], [2, 1], [-1, -2]],
     "3>0": [[0, 0], [1, 0], [-2, 0], [1, -2], [-2, 1]],
-};
+});
 
-export const O_KICKS = {
+export const O_KICKS = withReverse({
     "0>1": [[0, 0]],
     "1>2": [[0, 0]],
     "2>3": [[0, 0]],
     "3>0": [[0, 0]],
-};
+});
 
 export function getKickTable(type) {
     if (type === "I") return I_KICKS;

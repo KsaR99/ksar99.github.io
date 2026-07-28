@@ -189,14 +189,44 @@ export class PieceController {
         game.dropCounter = 0;
     }
 
-    rotate() {
+    /**
+     * 180° kicks aren't part of official SRS (see rotate() below), so instead
+     * of a hand-guessed per-piece table, this derives the one geometrically
+     * correct base offset straight from the mask data we already have: J, L,
+     * S, T and Z all occupy the *top* half of their 3×3 box in state 0 but
+     * the *bottom* half in state 2 (I is the same story in its 4×4 box, top
+     * vs bottom row-pair) - a plain "try (0,0) first" kick table doesn't know
+     * this and effectively lets the piece silently drop/shift a cell when
+     * flipped, which is what looked like a "wrong" rotation for e.g. Z.
+     * Comparing the tight bounds of the from/to masks gives the exact shift
+     * needed to land the shape back in the same absolute board position
+     * before trying any further wall-kick leniency.
+     */
+    get180Kicks(piece, rotatedMask) {
+        const fromBounds = getTightBounds(piece.mask, piece.width, piece.height);
+        const toBounds = getTightBounds(rotatedMask, piece.width, piece.height);
+        const baseDx = fromBounds.minX - toBounds.minX;
+        const baseDy = fromBounds.minY - toBounds.minY;
+
+        // Small extra nudges tried after the base correction, for leniency
+        // near walls/stacks - same spirit as a normal 5-offset kick table.
+        return [[0, 0], [1, 0], [-1, 0], [0, -1], [0, 1]]
+            .map(([nx, ny]) => [baseDx + nx, baseDy + ny]);
+    }
+
+    /**
+     * @param {number} [dir=1] - +1 for clockwise, -1 for counterclockwise, ±2 for 180°
+     */
+    rotate(dir = 1) {
         const game = this.game;
         if (game.state !== "running") return;
 
-        const rotatedMask = game.current.rotated();
+        const rotatedMask = game.current.rotated(dir);
         const fromState = game.current.rotationState;
-        const toState = (fromState + 1) % 4;
-        const kicks = getKickTable(game.current.type)[`${fromState}>${toState}`];
+        const toState = (fromState + dir + 4) % 4;
+        const kicks = Math.abs(dir) === 2
+            ? this.get180Kicks(game.current, rotatedMask)
+            : getKickTable(game.current.type)[`${fromState}>${toState}`] ?? [[0, 0]];
 
         for (const [dx, dy] of kicks) {
             if (!game.board.collides(game.current, dx, dy, rotatedMask)) {
@@ -210,10 +240,25 @@ export class PieceController {
                 game.lastAction = "rotate";
                 if (game.board.collides(game.current, 0, 1)) this.resetLockDelay();
 
-                game.rotationAnim = {fromX, fromY, toX: game.current.x, toY: game.current.y, elapsed: 0, duration: 60};
+                // Skip the position tween for 180s. The tween interpolates
+                // x/y while the mask has already swapped to its new shape,
+                // which is invisible for 90° turns (the shape looks
+                // different anyway) but shows up as a visible "jump" for
+                // pieces with true 180° self-symmetry (I, S, Z) - mid-tween,
+                // the new mask's internal row/column offset combined with
+                // the not-yet-arrived position briefly misaligns the shape
+                // even though the start and end positions are both correct.
+                game.rotationAnim = Math.abs(dir) === 2
+                    ? null
+                    : {fromX, fromY, toX: game.current.x, toY: game.current.y, elapsed: 0, duration: 60};
                 return;
             }
         }
+    }
+
+    /** Convenience wrapper for a 180° rotation - see rotate(). */
+    rotate180() {
+        this.rotate(2);
     }
 
     detectSpin() {

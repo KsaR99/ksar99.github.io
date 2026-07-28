@@ -18,6 +18,7 @@
     "controls": {
         "toggle": "Steuerung",
         "rotate": "Drehen",
+        "rotate180": "180°-Drehung",
         "moveLeftRight": "Links / rechts bewegen",
         "softDrop": "Sanftes Fallen",
         "hardDrop": "Hartes Fallen",

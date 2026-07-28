@@ -18,6 +18,7 @@
     "controls": {
         "toggle": "Controls",
         "rotate": "Rotate",
+        "rotate180": "Rotate 180°",
         "moveLeftRight": "Move left / right",
         "softDrop": "Soft drop",
         "hardDrop": "Hard drop",

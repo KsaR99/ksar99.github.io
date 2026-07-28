@@ -18,6 +18,7 @@
     "controls": {
         "toggle": "Bediening",
         "rotate": "Draaien",
+        "rotate180": "180° draaien",
         "moveLeftRight": "Links / rechts bewegen",
         "softDrop": "Zacht laten vallen",
         "hardDrop": "Snel laten vallen",

@@ -23,7 +23,10 @@ export class Piece {
         this.y = 0;
     }
 
-    rotated() {
-        return KLOCKOMINOS[this.type].states[(this.rotationState + 1) % 4];
+    /**
+     * @param {number} [dir=1] - +1 for clockwise, -1 for counterclockwise
+     */
+    rotated(dir = 1) {
+        return KLOCKOMINOS[this.type].states[(this.rotationState + dir + 4) % 4];
     }
 }

@@ -18,6 +18,7 @@
     "controls": {
         "toggle": "Sterowanie",
         "rotate": "Obrót",
+        "rotate180": "Obrót 180°",
         "moveLeftRight": "Ruch lewo / prawo",
         "softDrop": "Szybszy spadek",
         "hardDrop": "Natychmiastowy spadek",
