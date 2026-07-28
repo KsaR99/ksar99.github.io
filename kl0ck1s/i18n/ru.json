@@ -1,130 +1,130 @@
 {
-  "locale": "ru-RU",
-  "app": {
-    "subtitle": "Складывайте линии, набирайте очки."
-  },
-  "sidebar": {
-    "nextPiece": "Следующая фигура",
-    "score": "Очки",
-    "lines": "Линии",
-    "best": "Рекорд",
-    "time": "Время",
-    "drought": "Засуха",
-    "tetrisRate": "TRT",
-    "pps": "PPS",
-    "statusLive": "Текущая игра",
-    "statusLast": "Последняя игра"
-  },
-  "controls": {
-    "toggle": "Управление",
-    "rotate": "Поворот",
-    "moveLeftRight": "Движение влево / вправо",
-    "softDrop": "Плавное падение",
-    "hardDrop": "Мгновенное падение",
-    "pause": "Пауза",
-    "start": "Старт / новая игра",
-    "mute": "Выключить звук",
-    "options": "Настройки",
-    "spaceKey": "Пробел",
-    "restart": "Рестарт"
-  },
-  "screens": {
-    "common": {
-      "switchHint": "Переключайте стрелками"
+    "locale": "ru-RU",
+    "app": {
+        "subtitle": "Складывайте линии, набирайте очки."
     },
-    "idle": {
-      "hint": "Выберите сложность",
-      "startHintBefore": "Нажмите",
-      "startHintAfter": "чтобы начать",
-      "namePlaceholder": "Ваш ник"
+    "sidebar": {
+        "nextPiece": "Следующая фигура",
+        "score": "Очки",
+        "lines": "Линии",
+        "best": "Рекорд",
+        "time": "Время",
+        "drought": "Засуха",
+        "tetrisRate": "TRT",
+        "pps": "PPS",
+        "statusLive": "Текущая игра",
+        "statusLast": "Последняя игра"
     },
-    "paused": {
-      "title": "ПАУЗА",
-      "resumeHintBefore": "Нажмите",
-      "resumeHintAfter": "чтобы продолжить",
-      "optionsHintBefore": "Нажмите",
-      "optionsHintAfter": "чтобы открыть настройки",
-      "resumeButton": "Продолжить"
+    "controls": {
+        "toggle": "Управление",
+        "rotate": "Поворот",
+        "moveLeftRight": "Движение влево / вправо",
+        "softDrop": "Плавное падение",
+        "hardDrop": "Мгновенное падение",
+        "pause": "Пауза",
+        "start": "Старт / новая игра",
+        "mute": "Выключить звук",
+        "options": "Настройки",
+        "spaceKey": "Пробел",
+        "restart": "Рестарт"
     },
-    "options": {
-      "title": "НАСТРОЙКИ",
-      "closeHintBefore": "Нажмите",
-      "closeHintAfter": "чтобы закрыть",
-      "languageTitle": "Язык",
-      "language": "Язык",
-      "soundTitle": "Звук",
-      "mute": "Без звука",
-      "volume": "Громкость",
-      "layoutTitle": "Макет",
-      "hudRight": "HUD справа",
-      "gameplayTitle": "Геймплей",
-      "skipCountdown": "Пропустить отсчёт",
-      "graphicsTitle": "Графика",
-      "ghost": "Призрак фигуры",
-      "gridLines": "Линии сетки",
-      "performanceTitle": "Производительность",
-      "glow": "Свечение (размытие)",
-      "transparency": "Прозрачность",
-      "effect": "Фильтр экрана",
-      "effectNone": "Нет",
-      "effectVhs": "Шум VHS",
-      "effectMatrix": "Матрица",
-      "effectRain": "Дождь",
-      "effectSnow": "Снег",
-      "close": "Закрыть"
+    "screens": {
+        "common": {
+            "switchHint": "Переключайте стрелками"
+        },
+        "idle": {
+            "hint": "Выберите сложность",
+            "startHintBefore": "Нажмите",
+            "startHintAfter": "чтобы начать",
+            "namePlaceholder": "Ваш ник"
+        },
+        "paused": {
+            "title": "ПАУЗА",
+            "resumeHintBefore": "Нажмите",
+            "resumeHintAfter": "чтобы продолжить",
+            "optionsHintBefore": "Нажмите",
+            "optionsHintAfter": "чтобы открыть настройки",
+            "resumeButton": "Продолжить"
+        },
+        "options": {
+            "title": "НАСТРОЙКИ",
+            "closeHintBefore": "Нажмите",
+            "closeHintAfter": "чтобы закрыть",
+            "languageTitle": "Язык",
+            "language": "Язык",
+            "soundTitle": "Звук",
+            "mute": "Без звука",
+            "volume": "Громкость",
+            "layoutTitle": "Макет",
+            "hudRight": "HUD справа",
+            "gameplayTitle": "Геймплей",
+            "skipCountdown": "Пропустить отсчёт",
+            "graphicsTitle": "Графика",
+            "ghost": "Призрак фигуры",
+            "gridLines": "Линии сетки",
+            "performanceTitle": "Производительность",
+            "glow": "Свечение (размытие)",
+            "transparency": "Прозрачность",
+            "effect": "Фильтр экрана",
+            "effectNone": "Нет",
+            "effectVhs": "Шум VHS",
+            "effectMatrix": "Матрица",
+            "effectRain": "Дождь",
+            "effectSnow": "Снег",
+            "close": "Закрыть"
+        },
+        "loading": {
+            "leaderboardHint": "Загрузка таблицы лидеров..."
+        },
+        "gameOverEntry": {
+            "title": "ИГРА ОКОНЧЕНА",
+            "scoreLabel": "Очки:",
+            "levelLabel": "уровень",
+            "linesLabel": "линий",
+            "todayBestLabel": "Лучший результат сегодня:",
+            "todayBestBy": "от",
+            "submit": "Продолжить",
+            "statsTitle": "Статистика сессии",
+            "gameTimeLabel": "Время игры",
+            "droughtLabel": "D.MAX",
+            "droughtTotalLabel": "D.TOTAL",
+            "droughtAvgLabel": "D.AVG",
+            "burnLabel": "BRN",
+            "transitionLabel": "TRNS",
+            "tetrisRateLabel": "Тетрис-рейт (TRT)",
+            "clearsLabel": "Очистки (1/2/3/4 линии)",
+            "ppsLabel": "PPS",
+            "spinsLabel": "Спины (T / T-мини / другие)",
+            "maxComboLabel": "Макс. комбо",
+            "efficiencyLabel": "Эффективность (очки/линию)"
+        },
+        "gameOverSaved": {
+            "title": "РЕЗУЛЬТАТ СОХРАНЁН",
+            "playAgainHintBefore": "Нажмите",
+            "playAgainHintAfter": "чтобы сыграть снова"
+        }
     },
-    "loading": {
-      "leaderboardHint": "Загрузка таблицы лидеров..."
+    "leaderboard": {
+        "title": "Таблица лидеров",
+        "empty": "Пока нет результатов — станьте первым!",
+        "headers": {
+            "name": "Имя",
+            "score": "Очки",
+            "level": "Ур.",
+            "lines": "Линии",
+            "date": "Дата"
+        },
+        "defaultName": "Игрок"
     },
-    "gameOverEntry": {
-      "title": "ИГРА ОКОНЧЕНА",
-      "scoreLabel": "Очки:",
-      "levelLabel": "уровень",
-      "linesLabel": "линий",
-      "todayBestLabel": "Лучший результат сегодня:",
-      "todayBestBy": "от",
-      "submit": "Продолжить",
-      "statsTitle": "Статистика сессии",
-      "gameTimeLabel": "Время игры",
-      "droughtLabel": "D.MAX",
-      "droughtTotalLabel": "D.TOTAL",
-      "droughtAvgLabel": "D.AVG",
-      "burnLabel": "BRN",
-      "transitionLabel": "TRNS",
-      "tetrisRateLabel": "Тетрис-рейт (TRT)",
-      "clearsLabel": "Очистки (1/2/3/4 линии)",
-      "ppsLabel": "PPS",
-      "spinsLabel": "Спины (T / T-мини / другие)",
-      "maxComboLabel": "Макс. комбо",
-      "efficiencyLabel": "Эффективность (очки/линию)"
+    "difficulty": {
+        "easy": "Лёгкий",
+        "medium": "Средний",
+        "hard": "Сложный",
+        "expert": "Эксперт",
+        "pro": "PRO",
+        "levelPrefix": "уровень {level}"
     },
-    "gameOverSaved": {
-      "title": "РЕЗУЛЬТАТ СОХРАНЁН",
-      "playAgainHintBefore": "Нажмите",
-      "playAgainHintAfter": "чтобы сыграть снова"
+    "game": {
+        "levelUpBanner": "УРОВЕНЬ {level}"
     }
-  },
-  "leaderboard": {
-    "title": "Таблица лидеров",
-    "empty": "Пока нет результатов — станьте первым!",
-    "headers": {
-      "name": "Имя",
-      "score": "Очки",
-      "level": "Ур.",
-      "lines": "Линии",
-      "date": "Дата"
-    },
-    "defaultName": "Игрок"
-  },
-  "difficulty": {
-    "easy": "Лёгкий",
-    "medium": "Средний",
-    "hard": "Сложный",
-    "expert": "Эксперт",
-    "pro": "PRO",
-    "levelPrefix": "уровень {level}"
-  },
-  "game": {
-    "levelUpBanner": "УРОВЕНЬ {level}"
-  }
 }

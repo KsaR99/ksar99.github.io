@@ -1,6 +1,6 @@
 "use strict";
 
-import {formatNumber} from "./utils.js";
+import {formatNumber} from "../shared/utils.js";
 
 function clone(dom, templateId) {
     return dom.getElementById(templateId).content.cloneNode(true);

@@ -1,6 +1,6 @@
 "use strict";
 
-import {lightenOklch, trimShape, withAlpha} from "./utils.js";
+import {lightenOklch, trimShape, withAlpha} from "../shared/utils.js";
 
 export class Renderer {
     /**
@@ -14,7 +14,7 @@ export class Renderer {
      * @param {object} deps.boardConfig
      * @param {object} deps.klockominos
      * @param {number} deps.nextPreviewCellSize
-     * @param {import("./i18n.js").I18n} [deps.i18n]
+     * @param {import("../services/i18n.js").I18n} [deps.i18n]
      */
     constructor({
                     boardDiv,

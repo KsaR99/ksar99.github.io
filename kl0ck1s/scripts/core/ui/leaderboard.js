@@ -1,6 +1,6 @@
 "use strict";
 
-import {formatNumber} from "./utils.js";
+import {formatNumber} from "../shared/utils.js";
 
 export class Leaderboard {
     static SCORES_KEY = "klockis-scores";

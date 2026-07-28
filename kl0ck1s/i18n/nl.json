@@ -1,130 +1,130 @@
 {
-  "locale": "nl-NL",
-  "app": {
-    "subtitle": "Leg de lijnen, scoor punten."
-  },
-  "sidebar": {
-    "nextPiece": "Volgend blok",
-    "score": "Score",
-    "lines": "Lijnen",
-    "best": "Beste",
-    "time": "Tijd",
-    "drought": "Droogte",
-    "tetrisRate": "TRT",
-    "pps": "PPS",
-    "statusLive": "Huidige spel",
-    "statusLast": "Laatste spel"
-  },
-  "controls": {
-    "toggle": "Bediening",
-    "rotate": "Draaien",
-    "moveLeftRight": "Links / rechts bewegen",
-    "softDrop": "Zacht laten vallen",
-    "hardDrop": "Snel laten vallen",
-    "pause": "Pauze",
-    "start": "Start / nieuw spel",
-    "mute": "Geluid dempen",
-    "options": "Opties",
-    "spaceKey": "Spatie",
-    "restart": "Herstart"
-  },
-  "screens": {
-    "common": {
-      "switchHint": "Wissel met pijltjes"
+    "locale": "nl-NL",
+    "app": {
+        "subtitle": "Leg de lijnen, scoor punten."
     },
-    "idle": {
-      "hint": "Kies moeilijkheidsgraad",
-      "startHintBefore": "Druk op",
-      "startHintAfter": "om te starten",
-      "namePlaceholder": "Jouw bijnaam"
+    "sidebar": {
+        "nextPiece": "Volgend blok",
+        "score": "Score",
+        "lines": "Lijnen",
+        "best": "Beste",
+        "time": "Tijd",
+        "drought": "Droogte",
+        "tetrisRate": "TRT",
+        "pps": "PPS",
+        "statusLive": "Huidige spel",
+        "statusLast": "Laatste spel"
     },
-    "paused": {
-      "title": "GEPAUZEERD",
-      "resumeHintBefore": "Druk op",
-      "resumeHintAfter": "om verder te gaan",
-      "optionsHintBefore": "Druk op",
-      "optionsHintAfter": "om opties te openen",
-      "resumeButton": "Verdergaan"
+    "controls": {
+        "toggle": "Bediening",
+        "rotate": "Draaien",
+        "moveLeftRight": "Links / rechts bewegen",
+        "softDrop": "Zacht laten vallen",
+        "hardDrop": "Snel laten vallen",
+        "pause": "Pauze",
+        "start": "Start / nieuw spel",
+        "mute": "Geluid dempen",
+        "options": "Opties",
+        "spaceKey": "Spatie",
+        "restart": "Herstart"
     },
-    "options": {
-      "title": "OPTIES",
-      "closeHintBefore": "Druk op",
-      "closeHintAfter": "om te sluiten",
-      "languageTitle": "Taal",
-      "language": "Taal",
-      "soundTitle": "Geluid",
-      "mute": "Dempen",
-      "volume": "Volume",
-      "layoutTitle": "Lay-out",
-      "hudRight": "HUD rechts",
-      "gameplayTitle": "Gameplay",
-      "skipCountdown": "Aftellen overslaan",
-      "graphicsTitle": "Grafica",
-      "ghost": "Spookblok",
-      "gridLines": "Rasterlijnen",
-      "performanceTitle": "Prestaties",
-      "glow": "Gloed (vervaging)",
-      "transparency": "Transparantie",
-      "effect": "Schermfilter",
-      "effectNone": "Geen",
-      "effectVhs": "VHS-ruis",
-      "effectMatrix": "Matrix",
-      "effectRain": "Regen",
-      "effectSnow": "Sneeuw",
-      "close": "Sluiten"
+    "screens": {
+        "common": {
+            "switchHint": "Wissel met pijltjes"
+        },
+        "idle": {
+            "hint": "Kies moeilijkheidsgraad",
+            "startHintBefore": "Druk op",
+            "startHintAfter": "om te starten",
+            "namePlaceholder": "Jouw bijnaam"
+        },
+        "paused": {
+            "title": "GEPAUZEERD",
+            "resumeHintBefore": "Druk op",
+            "resumeHintAfter": "om verder te gaan",
+            "optionsHintBefore": "Druk op",
+            "optionsHintAfter": "om opties te openen",
+            "resumeButton": "Verdergaan"
+        },
+        "options": {
+            "title": "OPTIES",
+            "closeHintBefore": "Druk op",
+            "closeHintAfter": "om te sluiten",
+            "languageTitle": "Taal",
+            "language": "Taal",
+            "soundTitle": "Geluid",
+            "mute": "Dempen",
+            "volume": "Volume",
+            "layoutTitle": "Lay-out",
+            "hudRight": "HUD rechts",
+            "gameplayTitle": "Gameplay",
+            "skipCountdown": "Aftellen overslaan",
+            "graphicsTitle": "Grafica",
+            "ghost": "Spookblok",
+            "gridLines": "Rasterlijnen",
+            "performanceTitle": "Prestaties",
+            "glow": "Gloed (vervaging)",
+            "transparency": "Transparantie",
+            "effect": "Schermfilter",
+            "effectNone": "Geen",
+            "effectVhs": "VHS-ruis",
+            "effectMatrix": "Matrix",
+            "effectRain": "Regen",
+            "effectSnow": "Sneeuw",
+            "close": "Sluiten"
+        },
+        "loading": {
+            "leaderboardHint": "Scorebord laden..."
+        },
+        "gameOverEntry": {
+            "title": "GAME OVER",
+            "scoreLabel": "Score:",
+            "levelLabel": "niveau",
+            "linesLabel": "lijnen",
+            "todayBestLabel": "Beste van vandaag:",
+            "todayBestBy": "door",
+            "submit": "Doorgaan",
+            "statsTitle": "Sessiestatistieken",
+            "gameTimeLabel": "Speeltijd",
+            "droughtLabel": "D.MAX",
+            "droughtTotalLabel": "D.TOTAL",
+            "droughtAvgLabel": "D.AVG",
+            "burnLabel": "BRN",
+            "transitionLabel": "TRNS",
+            "tetrisRateLabel": "Tetris-percentage (TRT)",
+            "clearsLabel": "Lijnen (1/2/3/4 tegelijk)",
+            "ppsLabel": "PPS",
+            "spinsLabel": "Spins (T / T-mini / overig)",
+            "maxComboLabel": "Langste combo",
+            "efficiencyLabel": "Efficiëntie (pt/lijn)"
+        },
+        "gameOverSaved": {
+            "title": "SCORE OPGESLAGEN",
+            "playAgainHintBefore": "Druk op",
+            "playAgainHintAfter": "om opnieuw te spelen"
+        }
     },
-    "loading": {
-      "leaderboardHint": "Scorebord laden..."
+    "leaderboard": {
+        "title": "Scorebord",
+        "empty": "Nog geen scores — wees de eerste!",
+        "headers": {
+            "name": "Naam",
+            "score": "Score",
+            "level": "Niv.",
+            "lines": "Lijnen",
+            "date": "Datum"
+        },
+        "defaultName": "Speler"
     },
-    "gameOverEntry": {
-      "title": "GAME OVER",
-      "scoreLabel": "Score:",
-      "levelLabel": "niveau",
-      "linesLabel": "lijnen",
-      "todayBestLabel": "Beste van vandaag:",
-      "todayBestBy": "door",
-      "submit": "Doorgaan",
-      "statsTitle": "Sessiestatistieken",
-      "gameTimeLabel": "Speeltijd",
-      "droughtLabel": "D.MAX",
-      "droughtTotalLabel": "D.TOTAL",
-      "droughtAvgLabel": "D.AVG",
-      "burnLabel": "BRN",
-      "transitionLabel": "TRNS",
-      "tetrisRateLabel": "Tetris-percentage (TRT)",
-      "clearsLabel": "Lijnen (1/2/3/4 tegelijk)",
-      "ppsLabel": "PPS",
-      "spinsLabel": "Spins (T / T-mini / overig)",
-      "maxComboLabel": "Langste combo",
-      "efficiencyLabel": "Efficiëntie (pt/lijn)"
+    "difficulty": {
+        "easy": "Makkelijk",
+        "medium": "Gemiddeld",
+        "hard": "Moeilijk",
+        "expert": "Expert",
+        "pro": "PRO",
+        "levelPrefix": "niveau {level}"
     },
-    "gameOverSaved": {
-      "title": "SCORE OPGESLAGEN",
-      "playAgainHintBefore": "Druk op",
-      "playAgainHintAfter": "om opnieuw te spelen"
+    "game": {
+        "levelUpBanner": "NIVEAU {level}"
     }
-  },
-  "leaderboard": {
-    "title": "Scorebord",
-    "empty": "Nog geen scores — wees de eerste!",
-    "headers": {
-      "name": "Naam",
-      "score": "Score",
-      "level": "Niv.",
-      "lines": "Lijnen",
-      "date": "Datum"
-    },
-    "defaultName": "Speler"
-  },
-  "difficulty": {
-    "easy": "Makkelijk",
-    "medium": "Gemiddeld",
-    "hard": "Moeilijk",
-    "expert": "Expert",
-    "pro": "PRO",
-    "levelPrefix": "niveau {level}"
-  },
-  "game": {
-    "levelUpBanner": "NIVEAU {level}"
-  }
 }

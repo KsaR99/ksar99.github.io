@@ -2,12 +2,12 @@
 
 const CHARS = "Kl0ck1's";
 const FONT_SIZE = 15;
-const FALL_SPEED = 0.35; // rows per rendered frame (frame is throttled below)
+const FALL_SPEED = 0.30; // rows per rendered frame (frame is throttled below)
 const HEAD_COLOR = "oklch(0.96 0.068 145)";
 const BODY_COLOR = "oklch(0.72 0.20 149)";
 const DIM_COLOR = "oklch(0.47 0.120 150)";
 
-export class MatrixRain {
+export class MatrixEffect {
     constructor(canvas, ctx = null) {
         this.canvas = canvas;
         this.ctx = ctx ?? canvas.getContext("2d");

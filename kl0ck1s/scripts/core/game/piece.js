@@ -1,7 +1,7 @@
 "use strict";
 
-import {BOARD_CONFIG, KLOCKOMINOS} from "./config.js";
-import {cloneShape} from "./utils.js";
+import {BOARD_CONFIG, KLOCKOMINOS} from "../shared/config.js";
+import {cloneShape} from "../shared/utils.js";
 
 export class Piece {
     /**

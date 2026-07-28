@@ -12,7 +12,7 @@ export class HUD {
      * @param {HTMLElement} [elements.difficultyEl]
      * @param {HTMLElement} [elements.difficultyBarEl]
      * @param {HTMLElement} [elements.statsCardEl]
-     * @param {import("./i18n.js").I18n} [elements.i18n]
+     * @param {import("../services/i18n.js").I18n} [elements.i18n]
      * @param {HTMLElement} [elements.timeEl]
      * @param {HTMLElement} [elements.droughtEl]
      * @param {HTMLElement} [elements.tetrisRateEl]

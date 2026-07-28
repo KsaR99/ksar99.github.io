@@ -12,24 +12,24 @@ import {
     NEXT_PREVIEW_CELL_SIZE,
     SCORING,
     SOUND_FILES,
-} from "./config.js";
+} from "../core/shared/config.js";
 
-import {calculateCellSize} from "./board-sizing.js";
-import {Board} from "./board.js";
-import {PieceBag} from "./piece-bag.js";
-import {PersistentStore} from "./persistent-store.js";
-import {Leaderboard} from "./leaderboard.js";
-import {Screens} from "./screens.js";
-import {SpriteCache} from "./sprite-cache.js";
-import {SoundManager} from "./sound-manager.js";
-import {Renderer} from "./renderer.js";
-import {HUD} from "./hud.js";
-import {VhsNoise} from "./vhs-noise.js";
-import {MatrixRain} from "./matrix-rain.js";
-import {Rain} from "./rain.js";
-import {Snow} from "./snow.js";
-import {Game} from "./game.js";
-import {I18n} from "./i18n.js";
+import {calculateCellSize} from "../core/rendering/board-sizing.js";
+import {Board} from "../core/game/board.js";
+import {PieceBag} from "../core/game/piece-bag.js";
+import {PersistentStore} from "../core/services/persistent-store.js";
+import {Leaderboard} from "../core/ui/leaderboard.js";
+import {Screens} from "../core/ui/screens.js";
+import {SpriteCache} from "../core/rendering/sprite-cache.js";
+import {SoundManager} from "../core/services/sound-manager.js";
+import {Renderer} from "../core/rendering/renderer.js";
+import {HUD} from "../core/ui/hud.js";
+import {VhsNoise} from "../core/effects/vhs-noise.js";
+import {MatrixEffect} from "../core/effects/matrix-effect.js";
+import {Rain} from "../core/effects/rain.js";
+import {Snow} from "../core/effects/snow.js";
+import {Game} from "../core/game/game.js";
+import {I18n} from "../core/services/i18n.js";
 
 const i18n = new I18n();
 await i18n.init();
@@ -78,7 +78,7 @@ function resizeBoardCanvas() {
 const effectCanvas = document.getElementById("filter-canvas");
 const effectCtx = effectCanvas.getContext("2d", {colorSpace: "display-p3", willReadFrequently: true});
 const vhsNoise = new VhsNoise(effectCanvas, effectCtx);
-const matrixRain = new MatrixRain(effectCanvas, effectCtx);
+const matrixRain = new MatrixEffect(effectCanvas, effectCtx);
 const rain = new Rain(effectCanvas, effectCtx);
 const snow = new Snow(effectCanvas, effectCtx);
 

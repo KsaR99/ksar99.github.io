@@ -1,130 +1,130 @@
 {
-  "locale": "pl-PL",
-  "app": {
-    "subtitle": "Ułóż linie, zdobywaj punkty."
-  },
-  "sidebar": {
-    "nextPiece": "Następny klocek",
-    "score": "Wynik",
-    "lines": "Linie",
-    "best": "Rekord",
-    "time": "Czas",
-    "drought": "Posucha",
-    "tetrisRate": "TRT",
-    "pps": "PPS",
-    "statusLive": "Aktualna gra",
-    "statusLast": "Ostatnia gra"
-  },
-  "controls": {
-    "toggle": "Sterowanie",
-    "rotate": "Obrót",
-    "moveLeftRight": "Ruch lewo / prawo",
-    "softDrop": "Szybszy spadek",
-    "hardDrop": "Natychmiastowy spadek",
-    "pause": "Pauza",
-    "start": "Start / nowa gra",
-    "mute": "Wycisz dźwięk",
-    "options": "Opcje",
-    "spaceKey": "Spacja",
-    "restart": "Restart"
-  },
-  "screens": {
-    "common": {
-      "switchHint": "Przełącz strzałkami"
+    "locale": "pl-PL",
+    "app": {
+        "subtitle": "Ułóż linie, zdobywaj punkty."
     },
-    "idle": {
-      "hint": "Wybierz poziom trudności",
-      "startHintBefore": "Naciśnij",
-      "startHintAfter": " aby rozpocząć",
-      "namePlaceholder": "Twój nick"
+    "sidebar": {
+        "nextPiece": "Następny klocek",
+        "score": "Wynik",
+        "lines": "Linie",
+        "best": "Rekord",
+        "time": "Czas",
+        "drought": "Posucha",
+        "tetrisRate": "TRT",
+        "pps": "PPS",
+        "statusLive": "Aktualna gra",
+        "statusLast": "Ostatnia gra"
     },
-    "paused": {
-      "title": "PAUZA",
-      "resumeHintBefore": "Naciśnij",
-      "resumeHintAfter": " aby wznowić",
-      "optionsHintBefore": "Naciśnij",
-      "optionsHintAfter": ", aby otworzyć opcje",
-      "resumeButton": "Wznów"
+    "controls": {
+        "toggle": "Sterowanie",
+        "rotate": "Obrót",
+        "moveLeftRight": "Ruch lewo / prawo",
+        "softDrop": "Szybszy spadek",
+        "hardDrop": "Natychmiastowy spadek",
+        "pause": "Pauza",
+        "start": "Start / nowa gra",
+        "mute": "Wycisz dźwięk",
+        "options": "Opcje",
+        "spaceKey": "Spacja",
+        "restart": "Restart"
     },
-    "options": {
-      "title": "OPCJE",
-      "closeHintBefore": "Naciśnij",
-      "closeHintAfter": " aby zamknąć",
-      "languageTitle": "Język",
-      "language": "Język",
-      "soundTitle": "Dźwięk",
-      "mute": "Wycisz",
-      "volume": "Głośność",
-      "layoutTitle": "Układ",
-      "hudRight": "HUD po prawej",
-      "gameplayTitle": "Rozgrywka",
-      "skipCountdown": "Pomiń odliczanie",
-      "graphicsTitle": "Grafika",
-      "ghost": "Duszek",
-      "gridLines": "Linie siatki",
-      "performanceTitle": "Wydajność",
-      "glow": "Poświata (blur)",
-      "transparency": "Przezroczystość",
-      "effect": "Filtr ekranu",
-      "effectNone": "Brak",
-      "effectVhs": "Szum VHS",
-      "effectMatrix": "Matrix",
-      "effectRain": "Deszcz",
-      "effectSnow": "Śnieg",
-      "close": "Zamknij"
+    "screens": {
+        "common": {
+            "switchHint": "Przełącz strzałkami"
+        },
+        "idle": {
+            "hint": "Wybierz poziom trudności",
+            "startHintBefore": "Naciśnij",
+            "startHintAfter": " aby rozpocząć",
+            "namePlaceholder": "Twój nick"
+        },
+        "paused": {
+            "title": "PAUZA",
+            "resumeHintBefore": "Naciśnij",
+            "resumeHintAfter": " aby wznowić",
+            "optionsHintBefore": "Naciśnij",
+            "optionsHintAfter": ", aby otworzyć opcje",
+            "resumeButton": "Wznów"
+        },
+        "options": {
+            "title": "OPCJE",
+            "closeHintBefore": "Naciśnij",
+            "closeHintAfter": " aby zamknąć",
+            "languageTitle": "Język",
+            "language": "Język",
+            "soundTitle": "Dźwięk",
+            "mute": "Wycisz",
+            "volume": "Głośność",
+            "layoutTitle": "Układ",
+            "hudRight": "HUD po prawej",
+            "gameplayTitle": "Rozgrywka",
+            "skipCountdown": "Pomiń odliczanie",
+            "graphicsTitle": "Grafika",
+            "ghost": "Duszek",
+            "gridLines": "Linie siatki",
+            "performanceTitle": "Wydajność",
+            "glow": "Poświata (blur)",
+            "transparency": "Przezroczystość",
+            "effect": "Filtr ekranu",
+            "effectNone": "Brak",
+            "effectVhs": "Szum VHS",
+            "effectMatrix": "Matrix",
+            "effectRain": "Deszcz",
+            "effectSnow": "Śnieg",
+            "close": "Zamknij"
+        },
+        "loading": {
+            "leaderboardHint": "Wczytywanie tabeli wyników..."
+        },
+        "gameOverEntry": {
+            "title": "KONIEC GRY",
+            "scoreLabel": "Wynik:",
+            "levelLabel": "poziom",
+            "linesLabel": "linii",
+            "todayBestLabel": "Dzisiejszy najlepszy wynik:",
+            "todayBestBy": "przez",
+            "submit": "Kontynuuj",
+            "statsTitle": "Statystyki sesji",
+            "gameTimeLabel": "Czas gry",
+            "droughtLabel": "D.MAX",
+            "droughtTotalLabel": "D.TOTAL",
+            "droughtAvgLabel": "D.AVG",
+            "burnLabel": "BRN",
+            "transitionLabel": "TRNS",
+            "tetrisRateLabel": "Wskaźnik Tetris (TRT)",
+            "clearsLabel": "Czyszczenia (1/2/3/4 linie)",
+            "ppsLabel": "PPS",
+            "spinsLabel": "Spiny (T / T-mini / inne)",
+            "maxComboLabel": "Najdłuższe combo",
+            "efficiencyLabel": "Efektywność (pkt/linię)"
+        },
+        "gameOverSaved": {
+            "title": "WYNIK ZAPISANY",
+            "playAgainHintBefore": "Naciśnij",
+            "playAgainHintAfter": " aby zagrać ponownie"
+        }
     },
-    "loading": {
-      "leaderboardHint": "Wczytywanie tabeli wyników..."
+    "leaderboard": {
+        "title": "Tabela wyników",
+        "empty": "Brak wyników — zagraj pierwszy!",
+        "headers": {
+            "name": "Nick",
+            "score": "Wynik",
+            "level": "Poz.",
+            "lines": "Linie",
+            "date": "Data"
+        },
+        "defaultName": "Gracz"
     },
-    "gameOverEntry": {
-      "title": "KONIEC GRY",
-      "scoreLabel": "Wynik:",
-      "levelLabel": "poziom",
-      "linesLabel": "linii",
-      "todayBestLabel": "Dzisiejszy najlepszy wynik:",
-      "todayBestBy": "przez",
-      "submit": "Kontynuuj",
-      "statsTitle": "Statystyki sesji",
-      "gameTimeLabel": "Czas gry",
-      "droughtLabel": "D.MAX",
-      "droughtTotalLabel": "D.TOTAL",
-      "droughtAvgLabel": "D.AVG",
-      "burnLabel": "BRN",
-      "transitionLabel": "TRNS",
-      "tetrisRateLabel": "Wskaźnik Tetris (TRT)",
-      "clearsLabel": "Czyszczenia (1/2/3/4 linie)",
-      "ppsLabel": "PPS",
-      "spinsLabel": "Spiny (T / T-mini / inne)",
-      "maxComboLabel": "Najdłuższe combo",
-      "efficiencyLabel": "Efektywność (pkt/linię)"
+    "difficulty": {
+        "easy": "Łatwy",
+        "medium": "Średni",
+        "hard": "Trudny",
+        "expert": "Ekspert",
+        "pro": "PRO",
+        "levelPrefix": "poziom {level}"
     },
-    "gameOverSaved": {
-      "title": "WYNIK ZAPISANY",
-      "playAgainHintBefore": "Naciśnij",
-      "playAgainHintAfter": " aby zagrać ponownie"
+    "game": {
+        "levelUpBanner": "POZIOM {level}"
     }
-  },
-  "leaderboard": {
-    "title": "Tabela wyników",
-    "empty": "Brak wyników — zagraj pierwszy!",
-    "headers": {
-      "name": "Nick",
-      "score": "Wynik",
-      "level": "Poz.",
-      "lines": "Linie",
-      "date": "Data"
-    },
-    "defaultName": "Gracz"
-  },
-  "difficulty": {
-    "easy": "Łatwy",
-    "medium": "Średni",
-    "hard": "Trudny",
-    "expert": "Ekspert",
-    "pro": "PRO",
-    "levelPrefix": "poziom {level}"
-  },
-  "game": {
-    "levelUpBanner": "POZIOM {level}"
-  }
 }

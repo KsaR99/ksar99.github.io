@@ -1,6 +1,6 @@
 "use strict";
 
-import {SCORING, SPIN_POINTS} from "./config.js";
+import {SCORING, SPIN_POINTS} from "../shared/config.js";
 
 export function pointsForLineClear(cleared, level, scoring = SCORING) {
     return (scoring.POINTS_PER_LINES[cleared] ?? 0) * level;

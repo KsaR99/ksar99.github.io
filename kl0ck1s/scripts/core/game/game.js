@@ -1,7 +1,7 @@
 "use strict";
 
 import {Piece} from "./piece.js";
-import {dropIntervalForLevel, formatDuration, formatNumber, tierForLevel} from "./utils.js";
+import {dropIntervalForLevel, formatDuration, formatNumber, tierForLevel} from "../shared/utils.js";
 import {levelForLines, pointsForHardDrop, pointsForLineClear, pointsForSoftDrop, pointsForSpin} from "./scoring.js";
 
 export class Game {
