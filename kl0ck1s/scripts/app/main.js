@@ -24,12 +24,12 @@ import {SpriteCache} from "../core/rendering/sprite-cache.js";
 import {SoundManager} from "../core/services/sound-manager.js";
 import {Renderer} from "../core/rendering/renderer.js";
 import {HUD} from "../core/ui/hud.js";
-import {VhsNoise} from "../core/effects/vhs-noise.js";
-import {MatrixEffect} from "../core/effects/matrix-effect.js";
-import {Rain} from "../core/effects/rain.js";
-import {Snow} from "../core/effects/snow.js";
 import {Game} from "../core/game/game.js";
 import {I18n} from "../core/services/i18n.js";
+
+// Disable right click, for the mouse control.
+document.querySelector(".app")
+    .addEventListener('contextmenu', event => event.preventDefault());
 
 const i18n = new I18n();
 await i18n.init();
@@ -69,20 +69,11 @@ function resizeBoardCanvas() {
     boardCanvas.width = BOARD_CONFIG.CELL_SIZE * BOARD_CONFIG.COLS;
     boardCanvas.height = BOARD_CONFIG.CELL_SIZE * BOARD_CONFIG.ROWS;
     ctx.imageSmoothingEnabled = false;
-    vhsNoise.resize(boardCanvas.width, boardCanvas.height);
-    matrixRain.resize(boardCanvas.width, boardCanvas.height);
-    rain.resize(boardCanvas.width, boardCanvas.height);
-    snow.resize(boardCanvas.width, boardCanvas.height);
+    game.effectOverlay.resize(boardCanvas.width, boardCanvas.height);
 }
 
 const effectCanvas = document.getElementById("filter-canvas");
 const effectCtx = effectCanvas.getContext("2d", {colorSpace: "display-p3", willReadFrequently: true});
-const vhsNoise = new VhsNoise(effectCanvas, effectCtx);
-const matrixRain = new MatrixEffect(effectCanvas, effectCtx);
-const rain = new Rain(effectCanvas, effectCtx);
-const snow = new Snow(effectCanvas, effectCtx);
-
-resizeBoardCanvas();
 
 const spriteCache = new SpriteCache(KLOCKOMINOS, () => document.createElement("canvas"));
 
@@ -137,13 +128,12 @@ const game = new Game({
     levelUpBannerDuration: LEVEL_UP_BANNER_DURATION_MS,
     lineClearAnimationDuration: LINE_CLEAR_ANIMATION_DURATION_MS,
     settingsStore: store,
-    vhsNoise,
-    matrixRain,
-    rain,
-    snow,
+    effectCanvas,
+    effectCtx,
     i18n,
 });
 
+resizeBoardCanvas();
 void game.init().catch(console.error);
 
 function handleViewportResize() {

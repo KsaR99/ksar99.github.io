@@ -42,6 +42,12 @@ export class Renderer {
         this.transparencyEnabled = true;
         this.ghostEnabled = true;
         this.gridEnabled = true;
+        this.boardCanvasRect = null;
+    }
+
+    /** Re-caches the board canvas's bounding rect. Call whenever the canvas is resized or repositioned. */
+    refreshBoardCanvasRect() {
+        this.boardCanvasRect = this.boardCanvas.getBoundingClientRect();
     }
 
     setGlowEnabled(enabled) {
@@ -60,10 +66,23 @@ export class Renderer {
         this.gridEnabled = enabled;
     }
 
+    /**
+     * Translates a mouse event's clientX into a board column, accounting for
+     * the canvas's backing-store size vs. its on-screen CSS size (they can
+     * differ, e.g. on high-DPI displays or when the canvas is scaled by CSS).
+     * Not clamped to the board width — callers rely on collision checks to
+     * stop movement at the edges.
+     */
+    columnFromClientX(clientX) {
+        const rect = this.boardCanvas.getBoundingClientRect();
+        const scaleX = this.boardCanvas.width / rect.width;
+        const x = (clientX - rect.left) * scaleX;
+
+        return Math.floor(x / this.boardConfig.CELL_SIZE);
+    }
+
     setTheme(backgroundColor) {
         this.boardDiv.style.backgroundColor = backgroundColor;
-        // this.boardCanvas.style.backgroundColor = backgroundColor;
-        // this.nextCanvas.style.backgroundColor = backgroundColor;
     }
 
     drawCell(context, x, y, color, size, glow = false) {
@@ -113,6 +132,7 @@ export class Renderer {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx, boardCanvas} = this;
 
+        this.refreshBoardCanvasRect();
         ctx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
         if (this.gridEnabled) this.drawGrid(board);
 
