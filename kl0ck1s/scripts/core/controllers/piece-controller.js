@@ -125,7 +125,15 @@ export class PieceController {
         // piece can never be pushed far enough left to put its visible edge
         // at column 0.
         const offsetX = bounds.minX || 0;
-        targetColumn -= Math.floor(bounds.width / 2);
+        // Centers the piece under the cursor. For odd widths this is exact.
+        // For even widths there's no single center column, so a choice has
+        // to be made either way - floor(width/2) here would put the cursor
+        // over the piece's *right*-of-center column, making every even-width
+        // shape (O, horizontal I, ...) consistently land half a cell to the
+        // left of where the cursor actually was. floor((width-1)/2) instead
+        // puts the cursor over the *left*-of-center column, matching where
+        // players actually expect the piece to land.
+        targetColumn -= Math.floor((bounds.width - 1) / 2);
         targetColumn = Math.max(
             0,
             Math.min(targetColumn, game.board.cols - bounds.width)

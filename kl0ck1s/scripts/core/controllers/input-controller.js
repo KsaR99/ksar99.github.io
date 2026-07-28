@@ -127,7 +127,8 @@ export class InputController {
 
     /**
      * Mouse controls: moving the pointer left/right steers the current piece
-     * toward the column under it, right click rotates, left click hard-drops.
+     * toward the column under it, right click rotates, left click hard-drops,
+     * middle click soft-drops (repeating while held, like the down arrow).
      * Column math (canvas rect + cell size) lives on the renderer, which owns
      * that geometry — this controller only maps input to piece actions.
      */
@@ -139,6 +140,17 @@ export class InputController {
         if (!canvas) return;
 
         canvas.addEventListener("contextmenu", (event) => event.preventDefault());
+
+        // Middle click doubles as soft drop, repeating while held (mirrors the
+        // keyboard's ArrowDown repeat) rather than firing once per click.
+        const SOFT_DROP_REPEAT_INTERVAL_MS = 50;
+        let softDropIntervalId;
+
+        const stopMouseSoftDrop = () => {
+            if (softDropIntervalId === undefined) return;
+            clearInterval(softDropIntervalId);
+            softDropIntervalId = undefined;
+        };
 
         game.dom.addEventListener("mousemove", (event) => {
             if (!game.settings?.mouseControl) return;
@@ -162,8 +174,41 @@ export class InputController {
                 game.pieceController.rotate();
             } else if (event.button === 0) {
                 event.preventDefault();
+
+                // Don't trust whatever column the last processed mousemove
+                // left the piece at — under fast movement, mousemove events
+                // (each doing its own collision-check walk) can back up in
+                // the queue, so the piece may still be catching up to the
+                // pointer when the click fires. Snap to the click's own
+                // coordinates first so the drop always lands under the
+                // cursor, not under a stale earlier position.
+                const column = game.renderer.columnFromClientX(event.clientX);
+                if (column !== null && column !== undefined) {
+                    game.usingMouseSteering = true;
+                    game.pieceController.moveToColumn(column);
+                }
+
                 game.pieceController.hardDrop();
+            } else if (event.button === 1) {
+                event.preventDefault();
+                stopMouseSoftDrop();
+                game.pieceController.softDrop();
+                softDropIntervalId = setInterval(() => game.pieceController.softDrop(), SOFT_DROP_REPEAT_INTERVAL_MS);
             }
         });
+
+        // Middle-click also triggers "auxclick" and, without the mousedown
+        // preventDefault above, the browser's autoscroll icon — stop that too.
+        canvas.addEventListener("auxclick", (event) => {
+            if (event.button === 1) event.preventDefault();
+        });
+
+        game.dom.addEventListener("mouseup", (event) => {
+            if (event.button === 1) stopMouseSoftDrop();
+        });
+
+        if (globalThis.window) {
+            window.addEventListener("blur", stopMouseSoftDrop);
+        }
     }
 }
