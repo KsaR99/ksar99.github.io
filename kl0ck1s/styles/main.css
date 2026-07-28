@@ -13,6 +13,17 @@
 
     --gap: 0.1rem;
     --radius: 0.5rem;
+
+    /* --- Mobile chrome (touch bar, drawers, FABs) --- */
+    --bp-desktop: 48rem;
+    --touch-bar-h: clamp(3.75rem, 9svh, 4.75rem);
+    --safe-t: env(safe-area-inset-top, 0px);
+    --safe-b: env(safe-area-inset-bottom, 0px);
+    --safe-l: env(safe-area-inset-left, 0px);
+    --safe-r: env(safe-area-inset-right, 0px);
+    --z-fab: 20;
+    --z-drawer: 30;
+    --z-scrim: 25;
 }
 
 * {
@@ -33,41 +44,106 @@ body {
     background: radial-gradient(circle at 50% 0, oklch(21.93% 0.0285 270.9) 0, var(--bg) 60%);
     font-family: var(--font-body);
     color: var(--text);
-    padding: 0.25rem;
+    padding: 0;
+    overflow: hidden;
 }
 
+/* ============================================================
+   Layout — mobile-first.
+   Base rules below target small/touch screens: the board is the
+   dominant element and both sidebars become off-canvas drawers
+   that slide in on demand instead of competing for width. The
+   desktop override near the bottom of this file restores the
+   original three-column row layout.
+   ============================================================ */
+
 .app {
+    position: relative;
     display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 0.75rem;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100%;
+    gap: 0;
 }
 
 .app__board {
-    flex: 0 0 auto;
-    order: 2;
+    order: 1;
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    padding-top: calc(var(--safe-t) + 0.5rem);
+    padding-bottom: calc(var(--touch-bar-h) + var(--safe-b) + 0.5rem);
 }
 
 .app__sidebar {
-    width: clamp(11.5rem, 22vw, 13.75rem);
-    max-width: 90vw;
-    flex: 0 1 13.75rem;
+    width: min(20rem, 85vw);
+    max-width: 85vw;
+}
+
+.app__sidebar.sidebar--stats,
+.app__sidebar.sidebar--controls {
+    width: min(20rem, 85vw);
+    flex: none;
+}
+
+.sidebar--stats,
+.sidebar--controls {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: var(--z-drawer);
+    padding: calc(var(--safe-t) + 0.75rem) 0.75rem 0.75rem;
+    overflow-y: auto;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    transition: transform 0.25s ease;
 }
 
 .sidebar--stats {
-    order: 1;
+    left: 0;
+    padding-left: calc(var(--safe-l) + 0.75rem);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    transform: translateX(-105%);
 }
 
 .sidebar--controls {
-    order: 3;
+    right: 0;
+    padding-right: calc(var(--safe-r) + 0.75rem);
+    border-radius: var(--radius) 0 0 var(--radius);
+    transform: translateX(105%);
+}
+
+.app__sidebar--open {
+    transform: translateX(0);
 }
 
 body.hud-right .sidebar--stats {
-    order: 3;
+    left: auto;
+    right: 0;
+    padding-left: 0.75rem;
+    padding-right: calc(var(--safe-r) + 0.75rem);
+    border-radius: var(--radius) 0 0 var(--radius);
+    transform: translateX(105%);
 }
 
 body.hud-right .sidebar--controls {
-    order: 1;
+    right: auto;
+    left: 0;
+    padding-right: 0.75rem;
+    padding-left: calc(var(--safe-l) + 0.75rem);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    transform: translateX(-105%);
+}
+
+body.hud-right .sidebar--stats.app__sidebar--open,
+body.hud-right .sidebar--controls.app__sidebar--open {
+    transform: translateX(0);
 }
 
 .board {
@@ -92,6 +168,7 @@ body.perf-no-glow .screen__title {
     z-index: 2;
     border-radius: var(--radius);
     border: 1px solid oklch(0 0 0 / 85%);
+    touch-action: none;
 }
 
 .board__overlay {
@@ -727,4 +804,261 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 
 .options__resume {
     align-self: center;
+}
+
+/* ============================================================
+   Mobile chrome: FAB buttons, drawer scrim, on-screen touch
+   controls. Hidden again in the desktop override below.
+   ============================================================ */
+
+.mobile-fabs {
+    position: fixed;
+    top: calc(var(--safe-t) + 0.5rem);
+    left: calc(var(--safe-l) + 0.5rem);
+    right: calc(var(--safe-r) + 0.5rem);
+    z-index: var(--z-fab);
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+}
+
+.mobile-fabs__group {
+    display: flex;
+    gap: 0.4rem;
+    pointer-events: auto;
+}
+
+.mobile-fab {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: oklch(13.191% 0.01866 276.772 / 0.72);
+    color: var(--text);
+    font-size: 1.15rem;
+    line-height: 1;
+    backdrop-filter: blur(4px);
+    cursor: pointer;
+    user-select: none;
+}
+
+.mobile-fab:active {
+    background: var(--panel);
+    border-color: var(--accent-2);
+}
+
+.drawer-close {
+    position: absolute;
+    top: calc(var(--safe-t) + 0.6rem);
+    width: 1.75rem;
+    height: 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--panel);
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.sidebar--stats .drawer-close {
+    right: 0.6rem;
+}
+
+.sidebar--controls .drawer-close {
+    left: 0.6rem;
+}
+
+.mobile-fab[aria-pressed="true"] {
+    color: oklch(0 0 0);
+    background: var(--accent-2);
+    border-color: var(--accent-2);
+}
+
+.drawer-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-scrim);
+    background: oklch(0 0 0 / 55%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.drawer-scrim--visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.touch-controls {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--z-fab);
+    height: calc(var(--touch-bar-h) + var(--safe-b));
+    padding: 0.4rem calc(var(--safe-r) + 0.5rem) calc(var(--safe-b) + 0.4rem) calc(var(--safe-l) + 0.5rem);
+    display: flex;
+    align-items: stretch;
+    gap: 0.5rem;
+    background: linear-gradient(0deg, oklch(13.191% 0.01866 276.772 / 0.92) 0%, oklch(13.191% 0.01866 276.772 / 0.75) 70%, transparent 100%);
+    touch-action: none;
+    user-select: none;
+}
+
+.touch-controls__group {
+    display: flex;
+    gap: 0.4rem;
+    flex: 1 1 auto;
+}
+
+.touch-controls__group--move {
+    flex: 1.3 1 auto;
+}
+
+.touch-controls__btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 1.4rem;
+    font-family: var(--font-display);
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.touch-controls__btn:active {
+    background: oklch(25.039% 0.02732 271.986);
+    border-color: var(--accent-2);
+    color: var(--accent-2);
+}
+
+.touch-controls__btn--wide {
+    flex: 1.6;
+}
+
+.touch-controls__btn-label {
+    font-size: 0.7rem;
+    font-family: var(--font-body);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+/* Full-screen polish: reclaim the little chrome we still have. */
+.app:fullscreen,
+.app:-webkit-full-screen {
+    background: var(--bg);
+}
+
+.app:fullscreen .app__board,
+.app:-webkit-full-screen .app__board {
+    padding-top: calc(var(--safe-t) + 0.25rem);
+}
+
+body:has(.app:fullscreen) {
+    padding: 0;
+}
+
+/* Fallback for browsers without a usable Fullscreen API (older iOS Safari):
+   same "get out of the way" effect achieved with plain CSS instead. */
+body.faux-fullscreen {
+    padding: 0;
+}
+
+body.faux-fullscreen .mobile-fabs__group:first-child {
+    opacity: 0.35;
+    transition: opacity 0.2s ease;
+}
+
+body.faux-fullscreen .mobile-fabs__group:first-child:active,
+body.faux-fullscreen .mobile-fabs__group:first-child:focus-within {
+    opacity: 1;
+}
+
+/* ============================================================
+   Desktop override — restores the original 3-column row layout
+   and hides every mobile-only control.
+   ============================================================ */
+@media (width >= 48rem) {
+    body {
+        overflow: visible;
+        padding: 0.25rem;
+    }
+
+    .app {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: center;
+        width: auto;
+        height: auto;
+        gap: 0.75rem;
+    }
+
+    .app__board {
+        order: 2;
+        flex: 0 0 auto;
+        display: block;
+        width: auto;
+        padding: 0;
+    }
+
+    .app__sidebar {
+        width: clamp(11.5rem, 22vw, 13.75rem);
+        max-width: 90vw;
+        flex: 0 1 13.75rem;
+    }
+
+    .sidebar--stats,
+    .sidebar--controls {
+        position: static;
+        z-index: auto;
+        padding: 0;
+        overflow-y: visible;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        transform: none;
+        display: flex;
+        flex-direction: column;
+        gap: var(--gap);
+    }
+
+    .sidebar--stats {
+        order: 1;
+    }
+
+    .sidebar--controls {
+        order: 3;
+    }
+
+    body.hud-right .sidebar--stats,
+    body.hud-right .sidebar--controls {
+        transform: none;
+    }
+
+    body.hud-right .sidebar--stats {
+        order: 3;
+    }
+
+    body.hud-right .sidebar--controls {
+        order: 1;
+    }
+
+    .mobile-fabs,
+    .drawer-scrim,
+    .touch-controls,
+    .drawer-close {
+        display: none;
+    }
 }

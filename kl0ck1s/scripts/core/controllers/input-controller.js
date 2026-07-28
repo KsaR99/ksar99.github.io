@@ -3,18 +3,13 @@
 import {SteeringArbiter} from "./input/steering-arbiter.js";
 import {KeyboardInput} from "./input/keyboard-input.js";
 import {MouseInput} from "./input/mouse-input.js";
+import {TouchInput} from "./input/touch-input.js";
 
 /**
  * Composition root for input. Owns the shared SteeringArbiter and wires up
- * each input source (keyboard, mouse, and - later - touch, for mobile)
- * against it. Callers (main.js) keep using the same bindControls() /
- * bindMouseControls() / bindControlsToggle() surface as before.
- *
- * To add mobile support: create a TouchInput implementing the same
- * InputSource contract as KeyboardInput/MouseInput (see input/input-source.js),
- * instantiate it here alongside `this.mouse`, and add a `bindTouchControls()`
- * method that calls `this.touch.bind()` - no changes needed to the existing
- * sources or to the SteeringArbiter.
+ * each input source (keyboard, mouse, touch) against it. Callers (main.js)
+ * keep using the same bindControls() / bindMouseControls() /
+ * bindControlsToggle() / bindTouchControls() surface.
  */
 export class InputController {
     constructor(game) {
@@ -26,6 +21,9 @@ export class InputController {
             onToggleControlsList: () => this.toggleControlsList(),
         });
         this.mouse = new MouseInput(game, this.steeringArbiter);
+        this.touch = new TouchInput(game, this.steeringArbiter, {
+            getAction: (code) => this.keyboard.keyActions[code],
+        });
     }
 
     /** Toggles the collapsed/expanded state of the sidebar controls list. UI concern, not tied to any input source. */
@@ -62,5 +60,14 @@ export class InputController {
 
     bindMouseControls() {
         this.mouse.bind();
+    }
+
+    /** Binds on-canvas touch gestures (drag/tap/swipe) and the on-screen touch-controls button bar. */
+    bindTouchControls() {
+        const game = this.game;
+        this.touch.bind();
+        if (!game.dom) return;
+        const bar = game.dom.querySelector('[data-role="touch-controls"]');
+        if (bar) this.touch.bindButtons(bar);
     }
 }

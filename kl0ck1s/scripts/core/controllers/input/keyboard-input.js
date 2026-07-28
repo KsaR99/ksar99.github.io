@@ -12,7 +12,9 @@ const REPEAT_INTERVAL_MS = 50;
 
 // Keys that move/rotate/drop the piece. Using one of these should win over
 // pointer steering for a short window - see SteeringArbiter.markKeyboardSteer.
-const MOVEMENT_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Space", "KeyZ", "KeyA"]);
+// Exported so other discrete-press sources (e.g. the touch button bar) can
+// apply the same rule without duplicating the list.
+export const MOVEMENT_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Space", "KeyZ", "KeyA"]);
 
 function isTypingInField(event) {
     const tag = event.target.tagName;

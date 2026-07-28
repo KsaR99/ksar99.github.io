@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport">
     <title>Kl0ck1's</title>
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
@@ -12,8 +12,22 @@
     <link href="styles/main.css?v=15" rel="stylesheet">
 </head>
 <body>
-<div class="app">
+<div class="app" id="app-root">
+    <div class="mobile-fabs">
+        <div class="mobile-fabs__group">
+            <button aria-label="Stats" class="mobile-fab" data-role="fab-stats" type="button">📊</button>
+            <button aria-label="Controls" class="mobile-fab" data-role="fab-controls" type="button">❓</button>
+        </div>
+        <div class="mobile-fabs__group">
+            <button aria-label="Fullscreen" aria-pressed="false" class="mobile-fab" data-role="fab-fullscreen"
+                    type="button">⛶
+            </button>
+        </div>
+    </div>
+    <div class="drawer-scrim" data-role="drawer-scrim"></div>
+
     <div class="app__sidebar sidebar sidebar--stats">
+        <button aria-label="Close" class="drawer-close" data-role="drawer-close" type="button">✕</button>
         <div class="card">
             <p class="brand__title">Kl0ck1's</p>
             <p class="brand__subtitle" data-i18n="app.subtitle">Arrange the lines, score points.</p>
@@ -72,6 +86,7 @@
     </div>
 
     <div class="app__sidebar sidebar sidebar--controls">
+        <button aria-label="Close" class="drawer-close" data-role="drawer-close" type="button">✕</button>
         <div class="card">
             <h3 class="card__title controls__toggle" data-role="controls-toggle">
                 <span data-i18n="controls.toggle">Controls</span>
@@ -127,6 +142,23 @@
                                                                            data-key-action="KeyO">O</kbd>
                 </li>
             </ul>
+        </div>
+    </div>
+
+    <div class="touch-controls" data-role="touch-controls">
+        <div class="touch-controls__group touch-controls__group--move">
+            <button aria-label="Left" class="touch-controls__btn" data-key-action="ArrowLeft" type="button">◄</button>
+            <button aria-label="Right" class="touch-controls__btn" data-key-action="ArrowRight" type="button">►</button>
+            <button aria-label="Soft drop" class="touch-controls__btn" data-key-action="ArrowDown" type="button">▼
+            </button>
+        </div>
+        <div class="touch-controls__group touch-controls__group--actions">
+            <button aria-label="Rotate" class="touch-controls__btn" data-key-action="ArrowUp" type="button">⟳</button>
+            <button aria-label="Hard drop" class="touch-controls__btn touch-controls__btn--wide"
+                    data-key-action="Space" type="button">
+                <span class="touch-controls__btn-label">DROP</span>
+            </button>
+            <button aria-label="Pause" class="touch-controls__btn" data-key-action="KeyP" type="button">❚❚</button>
         </div>
     </div>
 </div>
@@ -426,6 +458,100 @@
     </tr>
 </template>
 
+<script>
+    // Mobile chrome: stats/controls drawers + fullscreen toggle.
+    // Deliberately independent of the game module (main.js) — pure DOM/CSS,
+    // so it keeps working no matter how the game bundle is wired up.
+    (function () {
+        const appRoot = document.getElementById("app-root");
+        const scrim = document.querySelector('[data-role="drawer-scrim"]');
+        const drawers = {
+            stats: document.querySelector(".sidebar--stats"),
+            controls: document.querySelector(".sidebar--controls"),
+        };
+        const fabStats = document.querySelector('[data-role="fab-stats"]');
+        const fabControls = document.querySelector('[data-role="fab-controls"]');
+        const fabFullscreen = document.querySelector('[data-role="fab-fullscreen"]');
+
+        function notifyResize() {
+            // Let any size-aware canvas/renderer recompute after the CSS
+            // transition finishes (drawers are transform-only, so they
+            // don't actually resize .app__board, but a toggle is still a
+            // reasonable moment for anything listening on resize to re-check).
+            requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
+        }
+
+        function closeDrawers() {
+            Object.values(drawers).forEach((el) => el && el.classList.remove("app__sidebar--open"));
+            if (fabStats) fabStats.setAttribute("aria-pressed", "false");
+            if (fabControls) fabControls.setAttribute("aria-pressed", "false");
+            if (scrim) scrim.classList.remove("drawer-scrim--visible");
+        }
+
+        function toggleDrawer(name, fab) {
+            const el = drawers[name];
+            if (!el) return;
+            const isOpen = el.classList.contains("app__sidebar--open");
+            closeDrawers();
+            if (!isOpen) {
+                el.classList.add("app__sidebar--open");
+                if (fab) fab.setAttribute("aria-pressed", "true");
+                if (scrim) scrim.classList.add("drawer-scrim--visible");
+            }
+            notifyResize();
+        }
+
+        if (fabStats) fabStats.addEventListener("click", () => toggleDrawer("stats", fabStats));
+        if (fabControls) fabControls.addEventListener("click", () => toggleDrawer("controls", fabControls));
+        if (scrim) scrim.addEventListener("click", () => {
+            closeDrawers();
+            notifyResize();
+        });
+        document.querySelectorAll('[data-role="drawer-close"]').forEach((btn) => {
+            btn.addEventListener("click", () => {
+                closeDrawers();
+                notifyResize();
+            });
+        });
+
+        function isFullscreen() {
+            return Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+        }
+
+        function setFullscreenPressed(pressed) {
+            if (fabFullscreen) fabFullscreen.setAttribute("aria-pressed", String(pressed));
+        }
+
+        if (fabFullscreen && appRoot) {
+            fabFullscreen.addEventListener("click", async () => {
+                try {
+                    if (!isFullscreen()) {
+                        if (appRoot.requestFullscreen) await appRoot.requestFullscreen();
+                        else if (appRoot.webkitRequestFullscreen) appRoot.webkitRequestFullscreen();
+                        else document.body.classList.toggle("faux-fullscreen");
+                    } else if (document.exitFullscreen) {
+                        await document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else {
+                        document.body.classList.toggle("faux-fullscreen");
+                    }
+                } catch (err) {
+                    // Fullscreen can be denied (no user gesture, iframe
+                    // restrictions, etc.) — fall back to the CSS-only mode
+                    // rather than leaving the button inert.
+                    document.body.classList.toggle("faux-fullscreen");
+                }
+                notifyResize();
+            });
+
+            document.addEventListener("fullscreenchange", () => setFullscreenPressed(isFullscreen()));
+            document.addEventListener("webkitfullscreenchange", () => setFullscreenPressed(isFullscreen()));
+        }
+
+        window.addEventListener("orientationchange", notifyResize);
+    })();
+</script>
 <script src="scripts/app/main.js?v=15" type="module"></script>
 </body>
 </html>

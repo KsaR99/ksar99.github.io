@@ -130,6 +130,7 @@ export class Game {
         this.prepareNewRound();
         this.screenFlow.showIdleScreen().then();
         this.inputController.bindControls();
+        this.inputController.bindTouchControls();
         this.inputController.bindControlsToggle();
         this.inputController.bindMouseControls();
         requestAnimationFrame(this.loop.bind(this));
