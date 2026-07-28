@@ -347,6 +347,7 @@ export class ScreenFlow {
         const transparencyCheckbox = game.dom.querySelector('[data-role="transparency-checkbox"]');
         const effectSelect = game.dom.querySelector('[data-role="effect-select"]');
         const skipCountdownCheckbox = game.dom.querySelector('[data-role="skip-countdown-checkbox"]');
+        const mouseControlCheckbox = game.dom.querySelector('[data-role="mouse-control-checkbox"]');
         const closeButton = game.dom.querySelector('[data-role="options-close-button"]');
 
         if (muteCheckbox) {
@@ -417,6 +418,13 @@ export class ScreenFlow {
         if (skipCountdownCheckbox) {
             skipCountdownCheckbox.addEventListener("change", () => {
                 game.settings.skipCountdown = skipCountdownCheckbox.checked;
+                settingsController.saveSettings();
+            });
+        }
+
+        if (mouseControlCheckbox) {
+            mouseControlCheckbox.addEventListener("change", () => {
+                game.settings.mouseControl = mouseControlCheckbox.checked;
                 settingsController.saveSettings();
             });
         }

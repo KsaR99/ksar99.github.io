@@ -55,6 +55,9 @@ export const Screens = {
         const skipCountdownCheckbox = screen.querySelector('[data-role="skip-countdown-checkbox"]');
         if (skipCountdownCheckbox) skipCountdownCheckbox.checked = Boolean(settings.skipCountdown);
 
+        const mouseControlCheckbox = screen.querySelector('[data-role="mouse-control-checkbox"]');
+        if (mouseControlCheckbox) mouseControlCheckbox.checked = Boolean(settings.mouseControl);
+
         const effectSelect = screen.querySelector('[data-role="effect-select"]');
         if (effectSelect) effectSelect.value = settings.effect ?? "vhs";
 

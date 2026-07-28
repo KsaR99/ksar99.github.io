@@ -55,6 +55,14 @@ export class InputController {
         const REPEAT_INTERVAL_MS = 50;
         const heldTimers = new Map();
 
+        // Keys that move/rotate/drop the piece. Using one of these should win
+        // over mouse steering for a short window, otherwise a mouse that's
+        // merely resting near its last position (or drifting a pixel) fires
+        // a mousemove that immediately snaps the piece back under it, undoing
+        // whatever the keyboard just did.
+        const MOVEMENT_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Space", "KeyZ"]);
+        const MOUSE_STEER_SUPPRESS_MS = 200;
+
         const stopRepeat = (code) => {
             const timers = heldTimers.get(code);
             if (!timers) return;
@@ -82,8 +90,16 @@ export class InputController {
 
             if (PREVENT_DEFAULT_KEYS.has(event.code)) event.preventDefault();
 
-            const action = KEY_ACTIONS[event.code];
-            if (!action) return;
+            const baseAction = KEY_ACTIONS[event.code];
+            if (!baseAction) return;
+
+            const action = MOVEMENT_KEYS.has(event.code)
+                ? () => {
+                    game.mouseSteerSuppressUntil = Date.now() + MOUSE_STEER_SUPPRESS_MS;
+                    game.usingMouseSteering = false;
+                    baseAction();
+                }
+                : baseAction;
 
             if (REPEATABLE_KEYS.has(event.code)) {
                 if (event.repeat) return;
@@ -125,15 +141,20 @@ export class InputController {
         canvas.addEventListener("contextmenu", (event) => event.preventDefault());
 
         game.dom.addEventListener("mousemove", (event) => {
+            if (!game.settings?.mouseControl) return;
+
             game.pointerClientX = event.clientX;
             if (game.state !== "running") return;
+            if (game.mouseSteerSuppressUntil && Date.now() < game.mouseSteerSuppressUntil) return;
 
             const column = game.renderer.columnFromClientX(event.clientX);
             if (column === null || column === undefined) return;
+            game.usingMouseSteering = true;
             game.pieceController.moveToColumn(column);
         });
 
         game.dom.addEventListener("mousedown", (event) => {
+            if (!game.settings?.mouseControl) return;
             if (game.state !== "running") return;
 
             if (event.button === 2) {

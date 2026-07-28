@@ -3,7 +3,7 @@
 import {Piece} from "../game/piece.js";
 import {pointsForHardDrop, pointsForSoftDrop} from "../game/scoring.js";
 import {getKickTable, T_FRONT_CORNERS} from "../game/game-constants.js";
-import {trimShape} from "../shared/utils.js";
+import {getTightBounds} from "../shared/utils.js";
 
 /**
  * Owns everything about the currently falling piece: movement, rotation (with
@@ -61,9 +61,17 @@ export class PieceController {
      * spawning right after a line-clear animation (during which mousemove is
      * ignored) would sit at its default column until the mouse moves again —
      * felt like the mouse control freezing or lagging after a hard drop.
+     *
+     * Only does this if the mouse is the input currently steering the piece
+     * (i.e. it moved more recently than any keyboard movement/rotate/drop).
+     * Otherwise a resting pointer (e.g. player switched to keyboard controls
+     * mid-game while mouseControl is still on) would keep yanking every new
+     * piece back to wherever the mouse happens to sit.
      */
     snapToPointer() {
         const game = this.game;
+        if (!game.settings?.mouseControl) return;
+        if (!game.usingMouseSteering) return;
         if (game.pointerClientX == null) return;
 
         const column = game.renderer.columnFromClientX(game.pointerClientX);
@@ -108,25 +116,33 @@ export class PieceController {
         const game = this.game;
         if (game.state !== "running") return;
 
-        const trimmedShape = trimShape(game.current.shape);
-        const pieceWidth = trimmedShape[0].length;
-        targetColumn -= Math.floor(pieceWidth / 2);
+        const bounds = getTightBounds(game.current.mask, game.current.width, game.current.height);
+        // bounds.minX is the piece's visible shape offset *within* its mask
+        // grid (nonzero for shapes that aren't flush with the mask's left
+        // edge, e.g. some rotation states of J/L/S/Z). targetColumn below is
+        // in "visible column" space, but game.current.x is the mask's own
+        // origin, so it has to be shifted back by that offset - otherwise the
+        // piece can never be pushed far enough left to put its visible edge
+        // at column 0.
+        const offsetX = bounds.minX || 0;
+        targetColumn -= Math.floor(bounds.width / 2);
         targetColumn = Math.max(
             0,
-            Math.min(targetColumn, game.board.cols - pieceWidth)
+            Math.min(targetColumn, game.board.cols - bounds.width)
         );
+        const targetX = targetColumn - offsetX;
 
-        if (targetColumn === game.current.x) return;
+        if (targetX === game.current.x) return;
 
         while (
-            game.current.x < targetColumn &&
+            game.current.x < targetX &&
             !game.board.collides(game.current, 1, 0)
             ) {
             game.current.x++;
         }
 
         while (
-            game.current.x > targetColumn &&
+            game.current.x > targetX &&
             !game.board.collides(game.current, -1, 0)
             ) {
             game.current.x--;
@@ -169,17 +185,17 @@ export class PieceController {
         const game = this.game;
         if (game.state !== "running") return;
 
-        const rotatedShape = game.current.rotated();
+        const rotatedMask = game.current.rotated();
         const fromState = game.current.rotationState;
         const toState = (fromState + 1) % 4;
         const kicks = getKickTable(game.current.type)[`${fromState}>${toState}`];
 
         for (const [dx, dy] of kicks) {
-            if (!game.board.collides(game.current, dx, dy, rotatedShape)) {
+            if (!game.board.collides(game.current, dx, dy, rotatedMask)) {
                 const fromX = game.current.x;
                 const fromY = game.current.y;
 
-                game.current.shape = rotatedShape;
+                game.current.mask = rotatedMask;
                 game.current.x += dx;
                 game.current.y += dy;
                 game.current.rotationState = toState;

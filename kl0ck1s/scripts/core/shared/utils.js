@@ -2,14 +2,27 @@
 
 import {SCORING} from "./config.js";
 
-export function cloneShape(shape) {
-    return shape.map((row) => row.slice());
+/** Iterates filled cells of a packed shape mask, calling cb(row, col) for each. */
+export function forEachShapeCell(mask, width, height, cb) {
+    for (let r = 0; r < height; r++) {
+        for (let c = 0; c < width; c++) {
+            if ((mask >> (r * width + c)) & 1) cb(r, c);
+        }
+    }
 }
 
-export function trimShape(shape) {
-    const rows = shape.map((row, r) => (row.some(Boolean) ? r : -1)).filter((r) => r !== -1);
-    const cols = shape[0].map((_, c) => (shape.some((row) => row[c]) ? c : -1)).filter((c) => c !== -1);
-    return rows.map((r) => cols.map((c) => shape[r][c]));
+/** Tight bounding box of the actually-filled cells within a shape's bounding box. */
+export function getTightBounds(mask, width, height) {
+    let minX = width, maxX = -1, minY = height, maxY = -1;
+
+    forEachShapeCell(mask, width, height, (r, c) => {
+        if (c < minX) minX = c;
+        if (c > maxX) maxX = c;
+        if (r < minY) minY = r;
+        if (r > maxY) maxY = r;
+    });
+
+    return {minX, minY, width: maxX - minX + 1, height: maxY - minY + 1};
 }
 
 export function withAlpha(color, alpha) {

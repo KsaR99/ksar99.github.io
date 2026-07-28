@@ -1,11 +1,10 @@
 "use strict";
 
 import {BOARD_CONFIG, KLOCKOMINOS} from "../shared/config.js";
-import {cloneShape} from "../shared/utils.js";
 
 export class Piece {
     /**
-     * @param {string} type - KLOCKOMINOS Key (eg. "T")
+     * @param {string} type - KLOCKOMINOS key (eg. "T")
      * @param {object} [options]
      * @param {number} [options.cols]
      */
@@ -15,14 +14,16 @@ export class Piece {
 
         this.type = type;
         this.color = def.color;
+        this.colorIndex = def.colorIndex;
+        this.width = def.width;
+        this.height = def.height;
         this.rotationState = 0;
-        this.shape = cloneShape(def.states[this.rotationState]);
-        this.x = Math.floor((cols - this.shape[0].length) / 2);
+        this.mask = def.states[this.rotationState];
+        this.x = Math.floor((cols - this.width) / 2);
         this.y = 0;
     }
 
     rotated() {
-        const states = KLOCKOMINOS[this.type].states;
-        return cloneShape(states[(this.rotationState + 1) % 4]);
+        return KLOCKOMINOS[this.type].states[(this.rotationState + 1) % 4];
     }
 }

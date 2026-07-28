@@ -1,6 +1,6 @@
 "use strict";
 
-import {lightenOklch, trimShape, withAlpha} from "../shared/utils.js";
+import {forEachShapeCell, getTightBounds, lightenOklch, withAlpha} from "../shared/utils.js";
 
 export class Renderer {
     /**
@@ -13,6 +13,7 @@ export class Renderer {
      * @param {import("./sprite-cache.js").SpriteCache} deps.spriteCache
      * @param {object} deps.boardConfig
      * @param {object} deps.klockominos
+     * @param {Array<string|null>} deps.colorPalette - colorIndex -> CSS color (index 0 = empty)
      * @param {number} deps.nextPreviewCellSize
      * @param {import("../services/i18n.js").I18n} [deps.i18n]
      */
@@ -25,6 +26,7 @@ export class Renderer {
                     spriteCache,
                     boardConfig,
                     klockominos,
+                    colorPalette,
                     nextPreviewCellSize,
                     i18n = null
                 }) {
@@ -36,6 +38,7 @@ export class Renderer {
         this.spriteCache = spriteCache;
         this.boardConfig = boardConfig;
         this.klockominos = klockominos;
+        this.colorPalette = colorPalette;
         this.nextPreviewCellSize = nextPreviewCellSize;
         this.i18n = i18n;
         this.glowEnabled = true;
@@ -136,22 +139,20 @@ export class Renderer {
         ctx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
         if (this.gridEnabled) this.drawGrid(board);
 
-        for (const [y, row] of board.grid.entries()) {
-            for (const [x, color] of row.entries()) {
-                color && this.drawCell(ctx, x, y, color, size);
+        for (let y = 0; y < board.rows; y++) {
+            for (let x = 0; x < board.cols; x++) {
+                const colorIndex = board.colors[y * board.cols + x];
+                if (colorIndex) this.drawCell(ctx, x, y, this.colorPalette[colorIndex], size);
             }
         }
     }
 
     drawPiece(piece) {
         const size = this.boardConfig.CELL_SIZE;
-        piece.shape.forEach((row, r) => {
-            row.forEach((cell, c) => {
-                if (!cell) return;
-                const y = piece.y + r;
-                if (y < 0) return;
-                this.drawCell(this.ctx, piece.x + c, y, piece.color, size, true);
-            });
+        forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
+            const y = piece.y + r;
+            if (y < 0) return;
+            this.drawCell(this.ctx, piece.x + c, y, piece.color, size, true);
         });
     }
 
@@ -164,44 +165,28 @@ export class Renderer {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx} = this;
         const strokeColor = withAlpha(piece.color, 0.6);
+        const ghostColor = this.transparencyEnabled ? piece.color : lightenOklch(piece.color);
 
         if (this.transparencyEnabled) {
             ctx.save();
             ctx.globalAlpha = 0.3;
-
-            piece.shape.forEach((row, r) => {
-                row.forEach((cell, c) => {
-                    if (!cell) return;
-                    const y = piece.y + r + offset;
-                    if (y < 0) return;
-                    this.drawCell(ctx, piece.x + c, y, piece.color, size);
-                });
-            });
-
-            ctx.restore();
-        } else {
-            const ghostColor = lightenOklch(piece.color);
-
-            piece.shape.forEach((row, r) => {
-                row.forEach((cell, c) => {
-                    if (!cell) return;
-                    const y = piece.y + r + offset;
-                    if (y < 0) return;
-                    this.drawCell(ctx, piece.x + c, y, ghostColor, size);
-                });
-            });
         }
+
+        forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
+            const y = piece.y + r + offset;
+            if (y < 0) return;
+            this.drawCell(ctx, piece.x + c, y, ghostColor, size);
+        });
+
+        if (this.transparencyEnabled) ctx.restore();
 
         ctx.strokeStyle = strokeColor;
         ctx.lineWidth = 1;
-        piece.shape.forEach((row, r) => {
-            row.forEach((cell, c) => {
-                if (!cell) return;
-                const y = piece.y + r + offset;
-                if (y < 0) return;
-                const x = piece.x + c;
-                ctx.strokeRect(x * size + 0.5, y * size + 0.5, size - 1, size - 1);
-            });
+        forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
+            const y = piece.y + r + offset;
+            if (y < 0) return;
+            const x = piece.x + c;
+            ctx.strokeRect(x * size + 0.5, y * size + 0.5, size - 1, size - 1);
         });
     }
 
@@ -273,18 +258,14 @@ export class Renderer {
         nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
         if (!type) return;
 
-        const {states, color} = this.klockominos[type];
-        const shape = trimShape(states[0]);
-        const w = shape[0].length;
-        const h = shape.length;
-        const offsetX = (nextCanvas.width / nextPreviewCellSize - w) / 2;
-        const offsetY = (nextCanvas.height / nextPreviewCellSize - h) / 2;
+        const {states, width, height, color} = this.klockominos[type];
+        const mask = states[0];
+        const bounds = getTightBounds(mask, width, height);
+        const offsetX = (nextCanvas.width / nextPreviewCellSize - bounds.width) / 2 - bounds.minX;
+        const offsetY = (nextCanvas.height / nextPreviewCellSize - bounds.height) / 2 - bounds.minY;
 
-        shape.forEach((row, r) => {
-            row.forEach((cell, c) => {
-                if (!cell) return;
-                this.drawCell(nextCtx, offsetX + c, offsetY + r, color, nextPreviewCellSize);
-            });
+        forEachShapeCell(mask, width, height, (r, c) => {
+            this.drawCell(nextCtx, offsetX + c, offsetY + r, color, nextPreviewCellSize);
         });
     }
 }

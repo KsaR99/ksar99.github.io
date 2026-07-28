@@ -47,7 +47,22 @@ export const BOARD_BACKGROUNDS = Object.freeze({
 
 export const DEFAULT_DIFFICULTY = "hard";
 
-export const KLOCKOMINOS = Object.freeze({
+/** Packs a 2D 0/1 grid into a single integer bitmask, bit index = r*width + c. */
+function packState(rows) {
+    const height = rows.length;
+    const width = rows[0].length;
+    let mask = 0;
+    for (let r = 0; r < height; r++) {
+        for (let c = 0; c < width; c++) {
+            if (rows[r][c]) mask |= 1 << (r * width + c);
+        }
+    }
+    return mask;
+}
+
+// Human-readable shape definitions. Only used at module-load time to build
+// the packed KLOCKOMINOS export below — nothing at runtime touches this.
+const KLOCKOMINOS_SOURCE = {
     I: {
         color: "oklch(0.905 0.154 194.7 / 0.9)",
         states: [
@@ -111,9 +126,36 @@ export const KLOCKOMINOS = Object.freeze({
             [[0, 1, 0], [1, 1, 0], [1, 0, 0]],
         ],
     },
-});
+};
+
+/**
+ * KLOCKOMINOS[type] = { color, colorIndex, width, height, states: [mask×4] }
+ * Each `states[i]` is an int; bit (r*width+c) tells if that cell is filled.
+ * width/height are constant across a piece's rotations (fixed bounding box),
+ * only the mask changes — this is what keeps board.collides/lockPiece simple.
+ */
+export const KLOCKOMINOS = Object.freeze(
+    Object.fromEntries(
+        Object.entries(KLOCKOMINOS_SOURCE).map(([type, def], index) => [
+            type,
+            Object.freeze({
+                color: def.color,
+                colorIndex: index + 1, // 0 is reserved for "empty" in Board.colors
+                width: def.states[0][0].length,
+                height: def.states[0].length,
+                states: def.states.map(packState),
+            }),
+        ])
+    )
+);
 
 export const KLOCKOMINO_TYPES = Object.keys(KLOCKOMINOS);
+
+/** colorIndex -> CSS color; index 0 = empty cell (null). Used by Renderer to draw the locked board. */
+export const COLOR_PALETTE = [
+    null,
+    ...KLOCKOMINO_TYPES.map((type) => KLOCKOMINOS[type].color),
+];
 
 export const NEXT_PREVIEW_CELL_SIZE = 22;
 

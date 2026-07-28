@@ -4,11 +4,15 @@ export class Board {
     constructor(cols, rows) {
         this.cols = cols;
         this.rows = rows;
-        this.grid = this.createEmptyGrid();
+        this.fullRowMask = (1 << cols) - 1;
+        this.reset();
     }
 
-    createEmptyGrid() {
-        return Array.from({length: this.rows}, () => Array(this.cols).fill(null));
+    /** occupancy[y] = bitmask of filled columns in row y (bit c = column c). */
+    /** colors[y*cols+x] = colorIndex (0 = empty), used only for rendering the locked board. */
+    reset() {
+        this.occupancy = new Uint32Array(this.rows);
+        this.colors = new Uint8Array(this.rows * this.cols);
     }
 
     isInsideCols(x) {
@@ -21,13 +25,15 @@ export class Board {
 
     isCellFree(x, y) {
         if (y < 0) return true;
-        return this.grid[y][x] === null;
+        return (this.occupancy[y] & (1 << x)) === 0;
     }
 
-    collides(piece, offsetX, offsetY, shape = piece.shape) {
-        for (let r = 0; r < shape.length; r++) {
-            for (let c = 0; c < shape[r].length; c++) {
-                if (!shape[r][c]) continue;
+    collides(piece, offsetX, offsetY, mask = piece.mask) {
+        const {width, height} = piece;
+
+        for (let r = 0; r < height; r++) {
+            for (let c = 0; c < width; c++) {
+                if (!((mask >> (r * width + c)) & 1)) continue;
 
                 const x = piece.x + c + offsetX;
                 const y = piece.y + r + offsetY;
@@ -46,8 +52,7 @@ export class Board {
     }
 
     getCornerFlags(piece) {
-        const width = piece.shape[0].length;
-        const height = piece.shape.length;
+        const {width, height} = piece;
         return {
             topLeft: this.isCornerBlocked(piece.x - 1, piece.y - 1),
             topRight: this.isCornerBlocked(piece.x + width, piece.y - 1),
@@ -70,40 +75,54 @@ export class Board {
 
     getFullLineIndices() {
         const indices = [];
-        this.grid.forEach((row, y) => {
-            if (row.every((cell) => cell !== null)) indices.push(y);
-        });
+        for (let y = 0; y < this.rows; y++) {
+            if (this.occupancy[y] === this.fullRowMask) indices.push(y);
+        }
         return indices;
     }
 
     lockPiece(piece) {
-        piece.shape.forEach((row, r) => {
-            row.forEach((cell, c) => {
-                if (!cell) return;
+        const {width, height, mask, colorIndex} = piece;
+
+        for (let r = 0; r < height; r++) {
+            for (let c = 0; c < width; c++) {
+                if (!((mask >> (r * width + c)) & 1)) continue;
+
                 const y = piece.y + r;
                 const x = piece.x + c;
-                if (y >= 0) this.grid[y][x] = piece.color;
-            });
-        });
+                if (y < 0) continue;
+
+                this.occupancy[y] |= (1 << x);
+                this.colors[y * this.cols + x] = colorIndex;
+            }
+        }
     }
 
     clearFullLines() {
-        let cleared = 0;
-
-        this.grid = this.grid.filter((row) => {
-            const isFull = row.every((cell) => cell !== null);
-            if (isFull) ++cleared;
-            return !isFull;
-        });
-
-        while (this.grid.length < this.rows) {
-            this.grid.unshift(Array(this.cols).fill(null));
+        const keptRows = [];
+        for (let y = 0; y < this.rows; y++) {
+            if (this.occupancy[y] !== this.fullRowMask) keptRows.push(y);
         }
 
-        return cleared;
-    }
+        const cleared = this.rows - keptRows.length;
+        if (cleared === 0) return 0;
 
-    reset() {
-        this.grid = this.createEmptyGrid();
+        const newOccupancy = new Uint32Array(this.rows);
+        const newColors = new Uint8Array(this.rows * this.cols);
+
+        // Rebuild bottom-up: kept rows keep their relative order, shifted down.
+        let dest = this.rows - 1;
+        for (let i = keptRows.length - 1; i >= 0; i--, dest--) {
+            const src = keptRows[i];
+            newOccupancy[dest] = this.occupancy[src];
+            newColors.set(
+                this.colors.subarray(src * this.cols, (src + 1) * this.cols),
+                dest * this.cols
+            );
+        }
+
+        this.occupancy = newOccupancy;
+        this.colors = newColors;
+        return cleared;
     }
 }

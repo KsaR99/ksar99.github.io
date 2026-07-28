@@ -15,7 +15,7 @@ export class SettingsController {
     defaultSettings() {
         return {
             volume: 1, muted: false, glow: true, transparency: true, effect: "vhs", hudRight: false,
-            ghost: true, gridLines: true, skipCountdown: false,
+            ghost: true, gridLines: true, skipCountdown: false, mouseControl: false,
         };
     }
 

@@ -3,6 +3,7 @@
 import {
     BOARD_BACKGROUNDS,
     BOARD_CONFIG,
+    COLOR_PALETTE,
     DEFAULT_DIFFICULTY,
     DIFFICULTIES,
     KLOCKOMINO_TYPES,
@@ -86,6 +87,7 @@ const renderer = new Renderer({
     spriteCache,
     boardConfig: BOARD_CONFIG,
     klockominos: KLOCKOMINOS,
+    colorPalette: COLOR_PALETTE,
     nextPreviewCellSize: NEXT_PREVIEW_CELL_SIZE,
     i18n,
 });
