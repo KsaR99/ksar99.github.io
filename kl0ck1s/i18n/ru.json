@@ -36,8 +36,7 @@
         },
         "idle": {
             "hint": "Выберите сложность",
-            "startHintBefore": "Нажмите",
-            "startHintAfter": "чтобы начать",
+            "startButton": "Старт",
             "namePlaceholder": "Ваш ник"
         },
         "paused": {
@@ -103,8 +102,7 @@
         },
         "gameOverSaved": {
             "title": "РЕЗУЛЬТАТ СОХРАНЁН",
-            "playAgainHintBefore": "Нажмите",
-            "playAgainHintAfter": "чтобы сыграть снова"
+            "playAgainButton": "Играть снова"
         }
     },
     "leaderboard": {

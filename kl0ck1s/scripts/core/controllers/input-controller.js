@@ -44,8 +44,20 @@ export class InputController {
         title.addEventListener("click", () => this.toggleControlsList());
     }
 
+    bindKeyActionElements(root) {
+        this.keyboard.bindKeyActionElements(root);
+    }
+
+    bindLegendShortcuts() {
+        const game = this.game;
+        if (!game.dom) return;
+        const sidebar = game.dom.querySelector(".sidebar--controls");
+        this.bindKeyActionElements(sidebar);
+    }
+
     bindControls() {
         this.keyboard.bind();
+        this.bindLegendShortcuts();
     }
 
     bindMouseControls() {

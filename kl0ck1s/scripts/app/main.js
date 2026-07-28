@@ -28,7 +28,7 @@ import {HUD} from "../core/ui/hud.js";
 import {Game} from "../core/game/game.js";
 import {I18n} from "../core/services/i18n.js";
 
-// Disable right click, for the mouse control.
+// Disable right click, for the mouse.
 document.querySelector(".app")
     .addEventListener('contextmenu', event => event.preventDefault());
 

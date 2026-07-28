@@ -490,6 +490,15 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     opacity: 0.7;
 }
 
+.kbd--clickable {
+    cursor: pointer;
+}
+
+.kbd--clickable:hover {
+    border-color: var(--accent-2);
+    color: var(--accent-2);
+}
+
 .button {
     border: none;
     border-radius: .4em;

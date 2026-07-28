@@ -36,8 +36,7 @@
         },
         "idle": {
             "hint": "Kies moeilijkheidsgraad",
-            "startHintBefore": "Druk op",
-            "startHintAfter": "om te starten",
+            "startButton": "Start",
             "namePlaceholder": "Jouw bijnaam"
         },
         "paused": {
@@ -103,8 +102,7 @@
         },
         "gameOverSaved": {
             "title": "SCORE OPGESLAGEN",
-            "playAgainHintBefore": "Druk op",
-            "playAgainHintAfter": "om opnieuw te spelen"
+            "playAgainButton": "Opnieuw spelen"
         }
     },
     "leaderboard": {

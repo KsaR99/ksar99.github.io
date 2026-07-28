@@ -36,8 +36,7 @@
         },
         "idle": {
             "hint": "Choose difficulty",
-            "startHintBefore": "Press",
-            "startHintAfter": "to start",
+            "startButton": "Start",
             "namePlaceholder": "Your nickname"
         },
         "paused": {
@@ -103,8 +102,7 @@
         },
         "gameOverSaved": {
             "title": "SCORE SAVED",
-            "playAgainHintBefore": "Press",
-            "playAgainHintAfter": "to play again"
+            "playAgainButton": "Play again"
         }
     },
     "leaderboard": {

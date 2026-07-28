@@ -63,6 +63,20 @@ export class KeyboardInput extends InputSource {
         };
     }
 
+    bindKeyActionElements(root) {
+        if (!root) return;
+        const keyActions = this.keyActions;
+        root.querySelectorAll("[data-key-action]").forEach((el) => {
+            const code = el.dataset.keyAction;
+            const action = keyActions[code];
+            if (!action) return;
+            el.addEventListener("click", () => {
+                if (MOVEMENT_KEYS.has(code)) this.steeringArbiter.markKeyboardSteer();
+                action();
+            });
+        });
+    }
+
     stopRepeat(code) {
         const timers = this.heldTimers.get(code);
         if (!timers) return;

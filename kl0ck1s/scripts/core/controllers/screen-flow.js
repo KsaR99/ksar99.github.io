@@ -48,6 +48,23 @@ export class ScreenFlow {
         );
         game.difficultyController.bindDifficultyButtons(() => this.renderIdleScreen(list));
         this.bindNameInput();
+        this.bindStartButton();
+        this.bindOverlayShortcuts();
+    }
+
+    bindOverlayShortcuts() {
+        const game = this.game;
+        if (!game.dom) return;
+        const overlay = game.dom.getElementById("overlay");
+        game.inputController.bindKeyActionElements(overlay);
+    }
+
+    bindStartButton() {
+        const game = this.game;
+        if (!game.dom) return;
+        const button = game.dom.querySelector('[data-role="start-button"]');
+        if (!button) return;
+        button.addEventListener("click", () => this.handleEnter());
     }
 
     bindNameInput() {
@@ -194,6 +211,8 @@ export class ScreenFlow {
         );
         game.difficultyController.bindDifficultyButtons(() => this.renderGameOverSaved(list, entry));
         this.bindNameInput();
+        this.bindStartButton();
+        this.bindOverlayShortcuts();
     }
 
     togglePause() {
@@ -233,9 +252,17 @@ export class ScreenFlow {
         const game = this.game;
         if (!game.dom) return;
         const resumeButton = game.dom.querySelector('[data-role="resume-button"]');
+        const resumeKey = game.dom.querySelector('[data-role="resume-key"]');
+        const optionsKey = game.dom.querySelector('[data-role="options-open-key"]');
 
         if (resumeButton) {
             resumeButton.addEventListener("click", () => this.togglePause());
+        }
+        if (resumeKey) {
+            resumeKey.addEventListener("click", () => this.togglePause());
+        }
+        if (optionsKey) {
+            optionsKey.addEventListener("click", () => this.toggleOptions());
         }
     }
 
@@ -355,6 +382,7 @@ export class ScreenFlow {
         const skipCountdownCheckbox = game.dom.querySelector('[data-role="skip-countdown-checkbox"]');
         const mouseControlCheckbox = game.dom.querySelector('[data-role="mouse-control-checkbox"]');
         const closeButton = game.dom.querySelector('[data-role="options-close-button"]');
+        const closeKey = game.dom.querySelector('[data-role="options-close-key"]');
 
         if (muteCheckbox) {
             muteCheckbox.addEventListener("change", () => {
@@ -437,6 +465,10 @@ export class ScreenFlow {
 
         if (closeButton) {
             closeButton.addEventListener("click", () => this.toggleOptions());
+        }
+
+        if (closeKey) {
+            closeKey.addEventListener("click", () => this.toggleOptions());
         }
 
         this.bindLangSelect();

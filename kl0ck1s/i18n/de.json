@@ -36,8 +36,7 @@
         },
         "idle": {
             "hint": "Schwierigkeit wählen",
-            "startHintBefore": "Drücke",
-            "startHintAfter": "zum Starten",
+            "startButton": "Start",
             "namePlaceholder": "Dein Spitzname"
         },
         "paused": {
@@ -103,8 +102,7 @@
         },
         "gameOverSaved": {
             "title": "PUNKTZAHL GESPEICHERT",
-            "playAgainHintBefore": "Drücke",
-            "playAgainHintAfter": "um erneut zu spielen"
+            "playAgainButton": "Erneut spielen"
         }
     },
     "leaderboard": {

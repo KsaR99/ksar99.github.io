@@ -36,8 +36,7 @@
         },
         "idle": {
             "hint": "Wybierz poziom trudności",
-            "startHintBefore": "Naciśnij",
-            "startHintAfter": " aby rozpocząć",
+            "startButton": "Start",
             "namePlaceholder": "Twój nick"
         },
         "paused": {
@@ -103,8 +102,7 @@
         },
         "gameOverSaved": {
             "title": "WYNIK ZAPISANY",
-            "playAgainHintBefore": "Naciśnij",
-            "playAgainHintAfter": " aby zagrać ponownie"
+            "playAgainButton": "Zagraj ponownie"
         }
     },
     "leaderboard": {

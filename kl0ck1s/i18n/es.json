@@ -36,8 +36,7 @@
         },
         "idle": {
             "hint": "Elige la dificultad",
-            "startHintBefore": "Pulsa",
-            "startHintAfter": "para empezar",
+            "startButton": "Iniciar",
             "namePlaceholder": "Tu apodo"
         },
         "paused": {
@@ -103,8 +102,7 @@
         },
         "gameOverSaved": {
             "title": "PUNTUACIÓN GUARDADA",
-            "playAgainHintBefore": "Pulsa",
-            "playAgainHintAfter": "para jugar de nuevo"
+            "playAgainButton": "Jugar de nuevo"
         }
     },
     "leaderboard": {
