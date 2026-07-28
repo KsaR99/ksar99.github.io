@@ -26,7 +26,8 @@
         "mute": "Geluid dempen",
         "options": "Opties",
         "spaceKey": "Spatie",
-        "restart": "Herstart"
+        "restart": "Herstart",
+        "exitToMenu": "Terug naar menu"
     },
     "screens": {
         "common": {

@@ -147,6 +147,12 @@ export class ScreenFlow {
         this.renderGameOverEntry(list, entry, todayBestBeforeThisGame);
     }
 
+    exitToMenu() {
+        const game = this.game;
+        if (!["running", "paused", "countdown", "clearing"].includes(game.state)) return;
+        this.showIdleScreen().then();
+    }
+
     renderGameOverEntry(list, entry, todayBestBeforeThisGame) {
         const game = this.game;
         game.currentGameOverEntry = {list, entry, todayBestBeforeThisGame};

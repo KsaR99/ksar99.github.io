@@ -26,7 +26,8 @@
         "mute": "Ton stummschalten",
         "options": "Optionen",
         "spaceKey": "Leertaste",
-        "restart": "Neustart"
+        "restart": "Neustart",
+        "exitToMenu": "Zum Menü zurückkehren"
     },
     "screens": {
         "common": {

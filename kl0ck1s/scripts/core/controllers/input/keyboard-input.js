@@ -58,6 +58,7 @@ export class KeyboardInput extends InputSource {
             KeyP: () => game.screenFlow.togglePause(),
             KeyZ: () => game.pieceController.rotate(),
             KeyR: () => game.screenFlow.restart(),
+            KeyX: () => game.screenFlow.exitToMenu(),
         };
     }
 

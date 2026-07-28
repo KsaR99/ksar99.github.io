@@ -26,7 +26,8 @@
         "mute": "Выключить звук",
         "options": "Настройки",
         "spaceKey": "Пробел",
-        "restart": "Рестарт"
+        "restart": "Рестарт",
+        "exitToMenu": "Выйти в меню"
     },
     "screens": {
         "common": {

@@ -26,7 +26,8 @@
         "mute": "Mute sound",
         "options": "Options",
         "spaceKey": "Space",
-        "restart": "Restart"
+        "restart": "Restart",
+        "exitToMenu": "Exit to menu"
     },
     "screens": {
         "common": {

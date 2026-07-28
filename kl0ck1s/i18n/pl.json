@@ -26,7 +26,8 @@
         "mute": "Wycisz dźwięk",
         "options": "Opcje",
         "spaceKey": "Spacja",
-        "restart": "Restart"
+        "restart": "Restart",
+        "exitToMenu": "Wyjdź do menu"
     },
     "screens": {
         "common": {
