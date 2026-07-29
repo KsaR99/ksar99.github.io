@@ -585,9 +585,9 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 .progress-bar__fill {
     height: 100%;
     width: 0;
-    background: var(--accent-2);
+    background: oklch(0.44 0.18 148.1);
     border-radius: inherit;
-    transition: width 0.2s ease;
+    transition: width 0.1s ease;
 }
 
 .progress-bar--difficulty {
@@ -606,11 +606,10 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: var(--font-display);
+    font-family: var(--font-body);
     font-size: 0.8125rem;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--text);
-    text-shadow: 1px 1px 2px oklch(0 0 0);
     user-select: none;
     pointer-events: none;
 }
