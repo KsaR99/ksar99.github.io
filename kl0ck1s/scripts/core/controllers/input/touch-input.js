@@ -4,7 +4,7 @@ import {InputSource} from "./input-source.js";
 import {MOVEMENT_KEYS} from "./keyboard-input.js";
 
 // Codes that make sense to auto-repeat while a touch-controls button is
-// held down, mirroring KeyboardInput's REPEATABLE_KEYS behavior.
+// held down, mirroring KeyboardInput's REPEATABLE_KEYS behaviour.
 const REPEATABLE_CODES = new Set(["ArrowLeft", "ArrowRight", "ArrowDown"]);
 const REPEAT_INITIAL_DELAY_MS = 120;
 const REPEAT_INTERVAL_MS = 16;
@@ -13,6 +13,11 @@ const REPEAT_INTERVAL_MS = 16;
 const TAP_MAX_MOVEMENT_PX = 12;
 const TAP_MAX_DURATION_MS = 250;
 const SWIPE_DOWN_THRESHOLD_RATIO = 0.22;
+
+// Fraction of the screen's width a drag needs to cover to steer the piece
+// all the way across the board - lets one-handed thumb reach control the
+// full board without needing to physically drag edge-to-edge.
+const DRAG_RANGE_RATIO = 1 / 3;
 
 /**
  * Touch input source for mobile. Two independent pieces:
@@ -47,6 +52,7 @@ export class TouchInput extends InputSource {
         this._startTime = 0;
         this._dragged = false;
         this._horizontalGesture = false;
+        this._dragSensitivity = 1;
 
         // Column the piece was last steered to - avoids re-computing/re-issuing
         // moveToColumn() on every touchmove when the finger is still hovering
@@ -108,7 +114,8 @@ export class TouchInput extends InputSource {
             }
         }
         if (this._dragged && this._horizontalGesture && game.state === "running") {
-            this.steerTo(touch.clientX);
+            const scaledClientX = this._startX + dx * this._dragSensitivity;
+            this.steerTo(scaledClientX);
         }
     }
 
@@ -138,6 +145,10 @@ export class TouchInput extends InputSource {
             this._dragged = false;
             this._horizontalGesture = false;
             this._lastSteerColumn = null;
+
+            const boardRect = canvas.getBoundingClientRect();
+            const screenWidth = window.visualViewport?.width ?? window.innerWidth;
+            this._dragSensitivity = boardRect.width / (screenWidth * DRAG_RANGE_RATIO);
         };
 
         const onTouchMove = (event) => {
