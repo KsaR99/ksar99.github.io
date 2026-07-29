@@ -4,15 +4,15 @@ import {InputSource} from "./input-source.js";
 import {MOVEMENT_KEYS} from "./keyboard-input.js";
 
 // Codes that make sense to auto-repeat while a touch-controls button is
-// held down, mirroring KeyboardInput's REPEATABLE_KEYS behaviour.
+// held down, mirroring KeyboardInput's REPEATABLE_KEYS behavior.
 const REPEATABLE_CODES = new Set(["ArrowLeft", "ArrowRight", "ArrowDown"]);
-const REPEAT_INITIAL_DELAY_MS = 100;
-const REPEAT_INTERVAL_MS = 50;
+const REPEAT_INITIAL_DELAY_MS = 120;
+const REPEAT_INTERVAL_MS = 16;
 
 // On-canvas gesture tuning.
 const TAP_MAX_MOVEMENT_PX = 12;
 const TAP_MAX_DURATION_MS = 250;
-const SWIPE_DOWN_THRESHOLD_PX = 40;
+const SWIPE_DOWN_THRESHOLD_RATIO = 0.22;
 
 /**
  * Touch input source for mobile. Two independent pieces:
@@ -46,6 +46,7 @@ export class TouchInput extends InputSource {
         this._startY = 0;
         this._startTime = 0;
         this._dragged = false;
+        this._horizontalGesture = false;
 
         // Column the piece was last steered to - avoids re-computing/re-issuing
         // moveToColumn() on every touchmove when the finger is still hovering
@@ -103,11 +104,10 @@ export class TouchInput extends InputSource {
         if (!this._dragged) {
             if (Math.abs(dx) > TAP_MAX_MOVEMENT_PX || Math.abs(dy) > TAP_MAX_MOVEMENT_PX) {
                 this._dragged = true;
+                this._horizontalGesture = Math.abs(dx) > Math.abs(dy);
             }
         }
-        // Only steer when the motion so far is more horizontal than
-        // vertical - see note in the original onTouchMove.
-        if (this._dragged && game.state === "running" && Math.abs(dx) > Math.abs(dy)) {
+        if (this._dragged && this._horizontalGesture && game.state === "running") {
             this.steerTo(touch.clientX);
         }
     }
@@ -136,6 +136,7 @@ export class TouchInput extends InputSource {
             this._startY = touch.clientY;
             this._startTime = Date.now();
             this._dragged = false;
+            this._horizontalGesture = false;
             this._lastSteerColumn = null;
         };
 
@@ -162,6 +163,7 @@ export class TouchInput extends InputSource {
             if (!touch) {
                 this._activeTouchId = null;
                 this._dragged = false;
+                this._horizontalGesture = false;
                 this._lastSteerColumn = null;
                 return;
             }
@@ -174,13 +176,18 @@ export class TouchInput extends InputSource {
             if (game.state === "running") {
                 if (!this._dragged && dt <= TAP_MAX_DURATION_MS) {
                     game.pieceController.rotate();
-                } else if (dy > SWIPE_DOWN_THRESHOLD_PX && Math.abs(dy) > Math.abs(dx)) {
-                    game.pieceController.hardDrop();
+                } else {
+                    const boardHeight = this.canvas.getBoundingClientRect().height;
+                    const swipeDownThreshold = boardHeight * SWIPE_DOWN_THRESHOLD_RATIO;
+                    if (dy > swipeDownThreshold && Math.abs(dy) > Math.abs(dx)) {
+                        game.pieceController.hardDrop();
+                    }
                 }
             }
 
             this._activeTouchId = null;
             this._dragged = false;
+            this._horizontalGesture = false;
             this._lastSteerColumn = null;
         };
 
