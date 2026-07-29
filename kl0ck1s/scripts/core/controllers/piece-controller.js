@@ -243,15 +243,26 @@ export class PieceController {
                 game.lastAction = "rotate";
                 if (game.board.collides(game.current, 0, 1)) this.resetLockDelay();
 
-                // Skip the position tween for 180s. The tween interpolates
-                // x/y while the mask has already swapped to its new shape,
-                // which is invisible for 90° turns (the shape looks
-                // different anyway) but shows up as a visible "jump" for
-                // pieces with true 180° self-symmetry (I, S, Z) - mid-tween,
-                // the new mask's internal row/column offset combined with
-                // the not-yet-arrived position briefly misaligns the shape
-                // even though the start and end positions are both correct.
-                game.rotationAnim = Math.abs(dir) === 2
+                // Skip the position tween for 180s (see comment below) and
+                // for any rotation that didn't actually move the piece (e.g.
+                // O, whose kick table is always [0,0] - so this is every
+                // single O rotation). With no from->to distance there's
+                // nothing to animate, and letting the tween run anyway would
+                // needlessly suppress the falling-piece interpolation in
+                // getRenderedPiece() for its whole duration - visible as a
+                // brief stutter in the fall, most noticeable on O since it
+                // hits this on every rotate press.
+                //
+                // For 180s specifically: the tween interpolates x/y while the
+                // mask has already swapped to its new shape, which is
+                // invisible for 90° turns (the shape looks different anyway)
+                // but shows up as a visible "jump" for pieces with true 180°
+                // self-symmetry (I, S, Z) - mid-tween, the new mask's
+                // internal row/column offset combined with the not-yet-
+                // arrived position briefly misaligns the shape even though
+                // the start and end positions are both correct.
+                const noPositionChange = game.current.x === fromX && game.current.y === fromY;
+                game.rotationAnim = (Math.abs(dir) === 2 || noPositionChange)
                     ? null
                     : {fromX, fromY, toX: game.current.x, toY: game.current.y, elapsed: 0, duration: 60};
                 return;
