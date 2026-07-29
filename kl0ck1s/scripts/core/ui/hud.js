@@ -38,47 +38,88 @@ export class HUD {
         this.droughtEl = droughtEl;
         this.tetrisRateEl = tetrisRateEl;
         this.ppsEl = ppsEl;
+
+        this._cache = {
+            score: undefined,
+            lines: undefined,
+            best: undefined,
+            difficulty: undefined,
+            difficultyPercent: undefined,
+            gameTime: undefined,
+            drought: undefined,
+            tetrisRate: undefined,
+            pps: undefined,
+            hasPlayedBefore: undefined,
+            isPlaying: undefined,
+            statsStatusText: undefined,
+        };
+    }
+
+    _setText(el, cacheKey, value) {
+        if (this._cache[cacheKey] === value) return;
+        this._cache[cacheKey] = value;
+        el.textContent = value;
     }
 
     setHasPlayedBefore(hasPlayedBefore) {
+        if (this._cache.hasPlayedBefore === hasPlayedBefore) return;
+        this._cache.hasPlayedBefore = hasPlayedBefore;
+
         if (this.statsCardEl) {
             this.statsCardEl.classList.toggle("card--hidden", !hasPlayedBefore);
         }
     }
 
     setPlaying(isPlaying) {
+        if (this._cache.isPlaying === isPlaying) return;
+        this._cache.isPlaying = isPlaying;
+
         if (this.nextPieceCardEl) {
             this.nextPieceCardEl.classList.toggle("card--hidden", !isPlaying);
         }
         if (this.statsStatusEl) {
-            this.statsStatusEl.textContent = this.i18n
+            const text = this.i18n
                 ? this.i18n.t(isPlaying ? "sidebar.statusLive" : "sidebar.statusLast")
                 : (isPlaying ? "Current game" : "Last game");
+
+            if (this._cache.statsStatusText !== text) {
+                this._cache.statsStatusText = text;
+                this.statsStatusEl.textContent = text;
+            }
             this.statsStatusEl.classList.toggle("stats__status--live", isPlaying);
         }
     }
 
     update({score, lines, best, difficulty, difficultyPercent, gameTime, drought, tetrisRate, pps}) {
-        this.scoreEl.textContent = score;
-        this.linesEl.textContent = lines;
-        this.bestEl.textContent = best;
+        this._setText(this.scoreEl, "score", score);
+        this._setText(this.linesEl, "lines", lines);
+        this._setText(this.bestEl, "best", best);
+
         if (this.difficultyEl && difficulty !== undefined) {
-            this.difficultyEl.textContent = difficulty;
+            this._setText(this.difficultyEl, "difficulty", difficulty);
         }
+
         if (this.difficultyBarEl && difficultyPercent !== undefined) {
-            this.difficultyBarEl.style.width = `${difficultyPercent}%`;
+            if (this._cache.difficultyPercent !== difficultyPercent) {
+                this._cache.difficultyPercent = difficultyPercent;
+                this.difficultyBarEl.style.width = `${difficultyPercent}%`;
+            }
         }
+
         if (this.timeEl && gameTime !== undefined) {
-            this.timeEl.textContent = gameTime;
+            this._setText(this.timeEl, "gameTime", gameTime);
         }
+
         if (this.droughtEl && drought !== undefined) {
-            this.droughtEl.textContent = drought;
+            this._setText(this.droughtEl, "drought", drought);
         }
+
         if (this.tetrisRateEl && tetrisRate !== undefined) {
-            this.tetrisRateEl.textContent = tetrisRate;
+            this._setText(this.tetrisRateEl, "tetrisRate", tetrisRate);
         }
+
         if (this.ppsEl && pps !== undefined) {
-            this.ppsEl.textContent = pps;
+            this._setText(this.ppsEl, "pps", pps);
         }
     }
 

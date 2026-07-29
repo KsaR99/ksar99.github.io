@@ -1128,9 +1128,20 @@ body.faux-fullscreen .mobile-fabs__group:first-child:focus-within {
 
     .card[data-role="next-piece-card"] {
         position: static;
+        inset: auto;
+        top: auto;
+        right: auto;
+        bottom: auto;
+        left: auto;
+        transform: none;
+
         width: auto;
         height: auto;
+        margin: 0;
         padding: 0.64rem 1rem;
+
+        z-index: auto;
+
         background: var(--panel);
         border-radius: var(--radius);
         backdrop-filter: none;
@@ -1141,15 +1152,29 @@ body.faux-fullscreen .mobile-fabs__group:first-child:focus-within {
     }
 
     [data-role="next-piece-card"] .next-piece__canvas {
+        display: block;
         width: 96px;
         height: 96px;
+        margin: 0 auto;
+        background: var(--bg-2);
     }
 
     [data-role="difficulty-stat"] {
         position: static;
+        inset: auto;
+        top: auto;
+        right: auto;
+        bottom: auto;
+        left: auto;
+
+        width: 100%;
+        height: auto;
+        margin-top: .5rem;
+        z-index: auto;
     }
 
     [data-role="difficulty-stat"] .progress-bar--difficulty {
+        width: 100%;
         height: 1.5rem;
         background: oklch(25.03% 0.027 271);
         backdrop-filter: none;
