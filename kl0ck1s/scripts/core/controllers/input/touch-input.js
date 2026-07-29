@@ -47,6 +47,17 @@ export class TouchInput extends InputSource {
         this._startTime = 0;
         this._dragged = false;
 
+        // Column the piece was last steered to - avoids re-computing/re-issuing
+        // moveToColumn() on every touchmove when the finger is still hovering
+        // over the same board column (very common during a fast drag).
+        this._lastSteerColumn = null;
+
+        // rAF coalescing: touchmove can fire many times per animation frame
+        // (especially during a fast swipe). We only keep the latest touch
+        // point and process it once per frame instead of once per event.
+        this._pendingTouch = null;
+        this._moveFrameId = null;
+
         this._buttonsRoot = null;
         this._buttonHandlers = [];
         this._heldTimers = new Map();
@@ -58,8 +69,47 @@ export class TouchInput extends InputSource {
         const game = this.game;
         const column = game.renderer.columnFromClientX(clientX);
         if (column === null || column === undefined) return;
+        if (column === this._lastSteerColumn) return; // same cell as last time - nothing to do
+        this._lastSteerColumn = column;
         this.steeringArbiter.markPointerSteer();
         game.pieceController.moveToColumn(column);
+    }
+
+    _cancelPendingMoveFrame() {
+        if (this._moveFrameId !== null) {
+            cancelAnimationFrame(this._moveFrameId);
+            this._moveFrameId = null;
+        }
+        this._pendingTouch = null;
+    }
+
+    _scheduleMoveFrame() {
+        if (this._moveFrameId !== null) return; // already scheduled for this frame
+        this._moveFrameId = requestAnimationFrame(() => {
+            this._moveFrameId = null;
+            this._processPendingTouch();
+        });
+    }
+
+    _processPendingTouch() {
+        const touch = this._pendingTouch;
+        this._pendingTouch = null;
+        if (!touch || this._activeTouchId === null) return;
+
+        const game = this.game;
+        const dx = touch.clientX - this._startX;
+        const dy = touch.clientY - this._startY;
+
+        if (!this._dragged) {
+            if (Math.abs(dx) > TAP_MAX_MOVEMENT_PX || Math.abs(dy) > TAP_MAX_MOVEMENT_PX) {
+                this._dragged = true;
+            }
+        }
+        // Only steer when the motion so far is more horizontal than
+        // vertical - see note in the original onTouchMove.
+        if (this._dragged && game.state === "running" && Math.abs(dx) > Math.abs(dy)) {
+            this.steerTo(touch.clientX);
+        }
     }
 
     bind() {
@@ -86,41 +136,33 @@ export class TouchInput extends InputSource {
             this._startY = touch.clientY;
             this._startTime = Date.now();
             this._dragged = false;
+            this._lastSteerColumn = null;
         };
 
         const onTouchMove = (event) => {
             if (this._activeTouchId === null) return;
             const touch = findActiveTouch(event.changedTouches);
             if (!touch) return;
+            // Must stay synchronous - preventDefault() has no effect if
+            // deferred to a later frame, and we'd lose scroll suppression.
             event.preventDefault();
 
-            if (!this._dragged) {
-                const dx = touch.clientX - this._startX;
-                const dy = touch.clientY - this._startY;
-                if (Math.abs(dx) > TAP_MAX_MOVEMENT_PX || Math.abs(dy) > TAP_MAX_MOVEMENT_PX) {
-                    this._dragged = true;
-                }
-            }
-            // Only steer when the motion so far is more horizontal than
-            // vertical. Without this, a straight-down swipe (meant purely
-            // as a hard-drop gesture) still counts as "dragged" the moment
-            // it crosses the movement threshold, and steerTo() would yank
-            // the piece over to the touch's starting X — even though X
-            // barely moved — before the drop happens. A dominant-direction
-            // check keeps vertical swipes from touching the column at all.
-            if (this._dragged && game.state === "running") {
-                const dx = touch.clientX - this._startX;
-                const dy = touch.clientY - this._startY;
-                if (Math.abs(dx) > Math.abs(dy)) this.steerTo(touch.clientX);
-            }
+            // Defer the actual math/steering to the next animation frame,
+            // keeping only the latest touch point. Collapses however many
+            // touchmove events land within one frame into a single update.
+            this._pendingTouch = touch;
+            this._scheduleMoveFrame();
         };
 
         const endTouch = (event) => {
             if (this._activeTouchId === null) return;
             const touch = findActiveTouch(event.changedTouches);
+            this._cancelPendingMoveFrame();
+
             if (!touch) {
                 this._activeTouchId = null;
                 this._dragged = false;
+                this._lastSteerColumn = null;
                 return;
             }
             event.preventDefault();
@@ -139,6 +181,7 @@ export class TouchInput extends InputSource {
 
             this._activeTouchId = null;
             this._dragged = false;
+            this._lastSteerColumn = null;
         };
 
         canvas.addEventListener("touchstart", onTouchStart, {passive: false});
@@ -151,6 +194,7 @@ export class TouchInput extends InputSource {
 
     unbind() {
         this.stopAllRepeats();
+        this._cancelPendingMoveFrame();
 
         if (this._canvasHandlers && this.canvas) {
             const {onTouchStart, onTouchMove, endTouch} = this._canvasHandlers;
@@ -162,6 +206,7 @@ export class TouchInput extends InputSource {
         this._canvasHandlers = null;
         this.canvas = null;
         this._activeTouchId = null;
+        this._lastSteerColumn = null;
 
         if (this._buttonsRoot) {
             this._buttonHandlers.forEach(({

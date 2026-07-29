@@ -46,11 +46,30 @@ export class Renderer {
         this.ghostEnabled = true;
         this.gridEnabled = true;
         this.boardCanvasRect = null;
+
+        // Precomputed once per resize instead of on every columnFromClientX()
+        // call - getBoundingClientRect() forces a layout reflow, and
+        // columnFromClientX() can be called dozens of times per second while
+        // a pointer/touch is dragging across the board.
+        this._boardScaleX = 1;
+
+        // Keeps boardCanvasRect fresh even while the game is paused/game-over
+        // (drawBoard() - which used to be the only place refreshing the
+        // rect - doesn't run in those states, so a resize while paused would
+        // otherwise leave a stale rect until the next drawBoard() call).
+        this._onWindowResize = () => this.refreshBoardCanvasRect();
+        window.addEventListener("resize", this._onWindowResize);
     }
 
     /** Re-caches the board canvas's bounding rect. Call whenever the canvas is resized or repositioned. */
     refreshBoardCanvasRect() {
         this.boardCanvasRect = this.boardCanvas.getBoundingClientRect();
+        this._boardScaleX = this.boardCanvas.width / this.boardCanvasRect.width;
+    }
+
+    /** Releases the resize listener. Call when the renderer/game is torn down. */
+    destroy() {
+        window.removeEventListener("resize", this._onWindowResize);
     }
 
     setGlowEnabled(enabled) {
@@ -75,12 +94,17 @@ export class Renderer {
      * differ, e.g. on high-DPI displays or when the canvas is scaled by CSS).
      * Not clamped to the board width — callers rely on collision checks to
      * stop movement at the edges.
+     *
+     * Uses the cached boardCanvasRect/scale instead of calling
+     * getBoundingClientRect() here - this can be invoked many times per
+     * second during a drag, and getBoundingClientRect() forces a layout
+     * reflow each time. The cache is kept fresh by drawBoard() every frame
+     * during play, and by the resize listener otherwise.
      */
     columnFromClientX(clientX) {
-        const rect = this.boardCanvas.getBoundingClientRect();
-        const scaleX = this.boardCanvas.width / rect.width;
-        const x = (clientX - rect.left) * scaleX;
+        if (!this.boardCanvasRect) this.refreshBoardCanvasRect();
 
+        const x = (clientX - this.boardCanvasRect.left) * this._boardScaleX;
         return Math.floor(x / this.boardConfig.CELL_SIZE);
     }
 
