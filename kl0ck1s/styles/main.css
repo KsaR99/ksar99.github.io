@@ -16,7 +16,6 @@
     --radius: 0.5rem;
 
     /* --- Mobile chrome (touch bar, drawers, FABs) --- */
-    --bp-desktop: 48rem;
     --touch-bar-h: clamp(3.75rem, 9svh, 4.75rem);
     --safe-t: env(safe-area-inset-top, 0px);
     --safe-b: env(safe-area-inset-bottom, 0px);

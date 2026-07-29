@@ -47,6 +47,14 @@ export class Renderer {
         this.gridEnabled = true;
         this.boardCanvasRect = null;
 
+        this.backgroundCanvas = document.createElement("canvas");
+        this.backgroundCtx = this.backgroundCanvas.getContext("2d", {colorSpace: "display-p3"});
+        this._bgVersion = -1;
+        this._bgSize = 0;
+        this._bgGrid = null;
+        this._bgRows = 0;
+        this._bgCols = 0;
+
         // Precomputed once per resize instead of on every columnFromClientX()
         // call - getBoundingClientRect() forces a layout reflow, and
         // columnFromClientX() can be called dozens of times per second while
@@ -112,47 +120,82 @@ export class Renderer {
         this.boardDiv.style.backgroundColor = backgroundColor;
     }
 
-    drawCell(context, x, y, color, size, glow = false) {
-        const sprite = this.spriteCache.get(color, size);
+    drawCell(context, x, y, color, size, {glow = false, ghost = false} = {}) {
         glow = glow && this.glowEnabled;
 
-        if (glow) {
-            context.save();
-            context.shadowColor = color;
-            context.shadowBlur = size * 0.6;
+        let sprite;
+        let drawSize = size;
+        let offset = 0;
+
+        if (ghost) {
+            sprite = this.spriteCache.getGhost(color, size);
+        } else if (glow) {
+            sprite = this.spriteCache.getGlow(color, size);
+            offset = this.spriteCache.glowPad;
+            drawSize = size + offset * 2;
+        } else {
+            sprite = this.spriteCache.get(color, size);
         }
 
         if (sprite) {
-            context.drawImage(sprite, x * size, y * size, size, size);
+            context.drawImage(sprite, x * size - offset, y * size - offset, drawSize, drawSize);
         } else {
-            // fallback.
             context.fillStyle = color;
             context.fillRect(x * size, y * size, size, size);
         }
-
-        if (glow) context.restore();
     }
 
-    drawGrid(board) {
+    drawGrid(board, context = this.ctx) {
         const size = this.boardConfig.CELL_SIZE;
-        const {ctx} = this;
 
-        ctx.strokeStyle = "oklch(1 0 0 / 30%)";
-        ctx.lineWidth = 1;
+        context.strokeStyle = "oklch(1 0 0 / 0.5)";
+        context.lineWidth = 1;
 
         for (let x = 0; x <= board.cols; x++) {
-            ctx.beginPath();
-            ctx.moveTo(x * size + 0.5, 0);
-            ctx.lineTo(x * size + 0.5, board.rows * size);
-            ctx.stroke();
+            context.beginPath();
+            context.moveTo(x * size + 0.5, 0);
+            context.lineTo(x * size + 0.5, board.rows * size);
+            context.stroke();
         }
 
         for (let y = 0; y <= board.rows; y++) {
-            ctx.beginPath();
-            ctx.moveTo(0, y * size + 0.5);
-            ctx.lineTo(board.cols * size, y * size + 0.5);
-            ctx.stroke();
+            context.beginPath();
+            context.moveTo(0, y * size + 0.5);
+            context.lineTo(board.cols * size, y * size + 0.5);
+            context.stroke();
         }
+    }
+
+    updateBoardBackground(board, size) {
+        const dirty = this._bgVersion !== board.version
+            || this._bgSize !== size
+            || this._bgGrid !== this.gridEnabled
+            || this._bgRows !== board.rows
+            || this._bgCols !== board.cols;
+
+        if (!dirty) return;
+
+        const width = board.cols * size;
+        const height = board.rows * size;
+        if (this.backgroundCanvas.width !== width) this.backgroundCanvas.width = width;
+        if (this.backgroundCanvas.height !== height) this.backgroundCanvas.height = height;
+
+        const bgCtx = this.backgroundCtx;
+        bgCtx.clearRect(0, 0, width, height);
+        if (this.gridEnabled) this.drawGrid(board, bgCtx);
+
+        for (let y = 0; y < board.rows; y++) {
+            for (let x = 0; x < board.cols; x++) {
+                const colorIndex = board.colors[y * board.cols + x];
+                if (colorIndex) this.drawCell(bgCtx, x, y, this.colorPalette[colorIndex], size);
+            }
+        }
+
+        this._bgVersion = board.version;
+        this._bgSize = size;
+        this._bgGrid = this.gridEnabled;
+        this._bgRows = board.rows;
+        this._bgCols = board.cols;
     }
 
     drawBoard(board) {
@@ -160,15 +203,10 @@ export class Renderer {
         const {ctx, boardCanvas} = this;
 
         this.refreshBoardCanvasRect();
-        ctx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
-        if (this.gridEnabled) this.drawGrid(board);
+        this.updateBoardBackground(board, size);
 
-        for (let y = 0; y < board.rows; y++) {
-            for (let x = 0; x < board.cols; x++) {
-                const colorIndex = board.colors[y * board.cols + x];
-                if (colorIndex) this.drawCell(ctx, x, y, this.colorPalette[colorIndex], size);
-            }
-        }
+        ctx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
+        ctx.drawImage(this.backgroundCanvas, 0, 0);
     }
 
     drawPiece(piece) {
@@ -176,7 +214,7 @@ export class Renderer {
         forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
             const y = piece.y + r;
             if (y < 0) return;
-            this.drawCell(this.ctx, piece.x + c, y, piece.color, size, true);
+            this.drawCell(this.ctx, piece.x + c, y, piece.color, size, {glow: true});
         });
     }
 
@@ -189,20 +227,16 @@ export class Renderer {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx} = this;
         const strokeColor = withAlpha(piece.color, 0.6);
-        const ghostColor = this.transparencyEnabled ? piece.color : lightenOklch(piece.color);
-
-        if (this.transparencyEnabled) {
-            ctx.save();
-            ctx.globalAlpha = 0.3;
-        }
 
         forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
             const y = piece.y + r + offset;
             if (y < 0) return;
-            this.drawCell(ctx, piece.x + c, y, ghostColor, size);
+            if (this.transparencyEnabled) {
+                this.drawCell(ctx, piece.x + c, y, piece.color, size, {ghost: true});
+            } else {
+                this.drawCell(ctx, piece.x + c, y, lightenOklch(piece.color), size);
+            }
         });
-
-        if (this.transparencyEnabled) ctx.restore();
 
         ctx.strokeStyle = strokeColor;
         ctx.lineWidth = 1;

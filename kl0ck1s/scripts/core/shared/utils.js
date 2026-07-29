@@ -26,17 +26,18 @@ export function getTightBounds(mask, width, height) {
 }
 
 export function withAlpha(color, alpha) {
-    return color.replace(/\)$/, ` / ${alpha})`);
+    return color.replace(/\s*\/\s*[^)]+\)$/, ")").replace(/\)$/, ` / ${alpha})`);
 }
 
-export function lightenOklch(color, amount = 0.16, maxLightness = 0.82) {
-    const match = color.match(/oklch\(([\d.]+)\s+([\d.]+)\s+([\d.]+)\)/);
+export function lightenOklch(color, amount = 0.9, maxLightness = 0.7) {
+    const match = color.match(/oklch\(([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+%?))?\)/);
     if (!match) return color;
 
-    const [, l, c, h] = match;
+    const [, l, c, h, a] = match;
     const lightened = Math.min(maxLightness, parseFloat(l) + amount);
     const fadedChroma = parseFloat(c) * 0.55;
-    return `oklch(${lightened} ${fadedChroma} ${h})`;
+    const alphaSuffix = a ? ` / ${a}` : "";
+    return `oklch(${lightened} ${fadedChroma} ${h}${alphaSuffix})`;
 }
 
 export function dropIntervalForLevel(level, scoring = SCORING) {

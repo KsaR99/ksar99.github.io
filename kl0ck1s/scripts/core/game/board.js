@@ -5,6 +5,7 @@ export class Board {
         this.cols = cols;
         this.rows = rows;
         this.fullRowMask = (1 << cols) - 1;
+        this.version = 0;
         this.reset();
     }
 
@@ -13,6 +14,7 @@ export class Board {
     reset() {
         this.occupancy = new Uint32Array(this.rows);
         this.colors = new Uint8Array(this.rows * this.cols);
+        this.version++;
     }
 
     isInsideCols(x) {
@@ -96,6 +98,8 @@ export class Board {
                 this.colors[y * this.cols + x] = colorIndex;
             }
         }
+
+        this.version++;
     }
 
     clearFullLines() {
@@ -123,6 +127,7 @@ export class Board {
 
         this.occupancy = newOccupancy;
         this.colors = newColors;
+        this.version++;
         return cleared;
     }
 }

@@ -7,8 +7,8 @@ const PREVENT_DEFAULT_KEYS = new Set([
 ]);
 
 const REPEATABLE_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowDown"]);
-const REPEAT_INITIAL_DELAY_MS = 100;
-const REPEAT_INTERVAL_MS = 50;
+const REPEAT_INITIAL_DELAY_MS = 120;
+const REPEAT_INTERVAL_MS = 16;
 
 // Keys that move/rotate/drop the piece. Using one of these should win over
 // pointer steering for a short window - see SteeringArbiter.markKeyboardSteer.
