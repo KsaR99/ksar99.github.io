@@ -340,7 +340,7 @@ export class Renderer {
         } else {
             ctx.shadowBlur = 0;
         }
-        ctx.fillStyle = "oklch(0.807 0.274 142.321)";
+        ctx.fillStyle = "oklch(0.807 0.274 142.3 / 0.7)";
         ctx.fillText(text, centerX, centerY);
         ctx.restore();
     }
