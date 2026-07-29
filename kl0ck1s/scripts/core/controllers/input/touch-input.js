@@ -17,7 +17,7 @@ const SWIPE_DOWN_THRESHOLD_RATIO = 0.22;
 // Fraction of the screen's width a drag needs to cover to steer the piece
 // all the way across the board - lets one-handed thumb reach control the
 // full board without needing to physically drag edge-to-edge.
-const DRAG_RANGE_RATIO = 1 / 2;
+const DRAG_RANGE_RATIO = 2 / 3;
 
 /**
  * Touch input source for mobile. Two independent pieces:
