@@ -25,6 +25,8 @@
     --z-fab: 3;
     --z-drawer: 30;
     --z-scrim: 25;
+    --fab-size: 2.5rem;
+    --fab-gap: 0.4rem;
     --fab-row-h: 3.1rem;
     --mobile-chrome-h: 5.6rem;
 }
@@ -162,18 +164,24 @@ body.hud-right .sidebar--controls.app__sidebar--open {
    they stay visible during play without spending sidebar space. Same
    elements/IDs as the sidebar versions - no JS changes needed, the game
    code keeps updating #next-piece-canvas / #difficulty-bar as before. */
-[data-role="next-piece-card"] {
+/* Combined with the .card class on purpose (not just [data-role=...]):
+   a bare attribute selector has the same specificity as .card, so
+   whichever rule happened to sit later in the file would silently win
+   and overwrite padding/background here. Compounding the selectors
+   makes this rule unambiguously win regardless of source order. */
+.card[data-role="next-piece-card"] {
     position: fixed;
-    top: calc(var(--safe-t) + var(--fab-row-h) + 0.4rem);
+    top: 50%;
+    transform: translateY(-50%);
     left: calc(var(--safe-l) + 0.5rem);
     z-index: var(--z-fab);
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 3.4rem;
-    height: 3.4rem;
+    width: 3rem;
+    height: 3rem;
     padding: 0;
-    background: oklch(from var(--bg-2) l c h / 0.6);
+    background: transparent;
     border-radius: var(--radius);
     backdrop-filter: blur(4px);
 }
@@ -190,16 +198,36 @@ body.hud-right .sidebar--controls.app__sidebar--open {
 
 [data-role="difficulty-stat"] {
     position: fixed;
-    top: calc(var(--safe-t) + var(--fab-row-h) + 0.65rem);
-    left: calc(var(--safe-l) + 4.3rem);
-    right: calc(var(--safe-r) + 0.5rem);
+    /* Same row as .mobile-fabs: aligned top, height matches a FAB button.
+       Horizontally it sits in the gap between the stats/controls group
+       (2 buttons + the gap between them) and the fullscreen group (1
+       button), with --fab-gap breathing room on each side. */
+    top: calc(var(--safe-t) + 0.5rem);
+    height: var(--fab-size);
+    left: calc(var(--safe-l) + 0.5rem + (var(--fab-size) * 2) + (var(--fab-gap) * 2));
+    right: calc(var(--safe-r) + 0.5rem + var(--fab-size) + var(--fab-gap));
     z-index: var(--z-fab);
 }
 
 [data-role="difficulty-stat"] .progress-bar--difficulty {
-    height: 1.6rem;
+    height: 100%;
     background: oklch(from var(--bg-2) l c h / 0.6);
     backdrop-filter: blur(4px);
+}
+
+/* Hide the floating HUD bits (next-piece mini icon + difficulty bar)
+   and the on-screen touch D-pad whenever a screen overlay is showing
+   (paused/options/idle/game over) — none of them make sense floating
+   over a menu screen. Mobile-only: on desktop the next-piece/difficulty
+   widgets live statically in the sidebar (stay visible regardless of
+   overlay state) and there's no touch D-pad at all — see the desktop
+   override below, which doesn't repeat this rule. */
+@media (width < 48rem) {
+    .app:has(.board__overlay--visible) [data-role="next-piece-card"],
+    .app:has(.board__overlay--visible) [data-role="difficulty-stat"],
+    .app:has(.board__overlay--visible) [data-role="touch-controls"] {
+        display: none;
+    }
 }
 
 .board {
@@ -350,7 +378,8 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     flex-direction: column;
     align-items: center;
     gap: 0.4rem;
-    padding: 4px;
+    justify-content: center;
+    height: 100%;
     width: 100%;
     background: oklch(0 0 0 / 15%);
     backdrop-filter: grayscale(1) blur(2px);
@@ -371,6 +400,7 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 }
 
 .screen__hint--tiny {
+    display: none;
     font-size: 0.6875rem;
     opacity: 0.75;
     margin-top: -0.25rem;
@@ -516,7 +546,7 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     font-size: 0.95rem;
     color: var(--accent-2);
 
-    &[id="time-value"], &[id="pps-value"], &#score-value {
+    &[id="time-value"], &[id="pps-value"], &[id="score-value"] {
         text-rendering: optimizeSpeed;
     }
 }
@@ -536,8 +566,16 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     color: var(--good);
 }
 
+/* !important is deliberate: this is a JS-toggled "hide this card"
+   utility class and must always win over any component-level display
+   rule that happens to target the same element (e.g. the compounded
+   .card[data-role="next-piece-card"] rule above), regardless of
+   selector specificity or source order. Without it, JS adding this
+   class to show the next-piece card only during play stops working
+   the moment some other rule for that element has equal-or-higher
+   specificity. */
 .card--hidden {
-    display: none;
+    display: none !important;
 }
 
 .progress-bar {
@@ -887,13 +925,13 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 
 .mobile-fabs__group {
     display: flex;
-    gap: 0.4rem;
+    gap: var(--fab-gap);
     pointer-events: auto;
 }
 
 .mobile-fab {
-    width: 2.5rem;
-    height: 2.5rem;
+    width: var(--fab-size);
+    height: var(--fab-size);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -915,14 +953,14 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 
 .drawer-close {
     position: absolute;
-    top: calc(var(--safe-t) + 0.6rem);
-    width: 1.75rem;
-    height: 1.75rem;
+    top: 50%;
+    width: 2rem;
+    height: 2rem;
     display: flex;
     align-items: center;
     justify-content: center;
     border: 1px solid var(--line);
-    border-radius: 999px;
+    border-radius: 1em;
     background: var(--panel);
     color: var(--muted);
     font-size: 1rem;
@@ -1080,11 +1118,15 @@ body.faux-fullscreen .mobile-fabs__group:first-child:focus-within {
         padding-top: 0;
     }
 
+    .board__canvas {
+        top: unset;
+    }
+
     .options__row:has([data-role="mouse-control-checkbox"]) {
         display: flex;
     }
 
-    [data-role="next-piece-card"] {
+    .card[data-role="next-piece-card"] {
         position: static;
         width: auto;
         height: auto;
@@ -1160,5 +1202,9 @@ body.faux-fullscreen .mobile-fabs__group:first-child:focus-within {
     .touch-controls,
     .drawer-close {
         display: none;
+    }
+
+    .screen__hint--tiny {
+        display: block;
     }
 }

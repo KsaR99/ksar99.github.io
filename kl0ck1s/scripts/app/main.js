@@ -29,8 +29,8 @@ import {Game} from "../core/game/game.js";
 import {I18n} from "../core/services/i18n.js";
 
 // Disable right click, for the mouse.
-document.querySelector(".app")
-    .addEventListener('contextmenu', event => event.preventDefault());
+const appEl = document.querySelector(".app");
+appEl.addEventListener('contextmenu', event => event.preventDefault());
 
 const i18n = new I18n();
 await i18n.init();
@@ -47,23 +47,60 @@ const nextCanvas = document.getElementById("next-piece-canvas");
 const nextCtx = nextCanvas.getContext("2d");
 nextCtx.imageSmoothingEnabled = false;
 
-function getVerticalChrome() {
+function getSidebarInlineFootprint() {
+    // Sidebars only eat into the board's available width when they're
+    // laid out in normal flow (desktop's 3-column row). On mobile
+    // they're position:fixed off-canvas drawers, so they take zero
+    // width away from the board — checking computed position (instead
+    // of hardcoding a breakpoint) keeps this correct even if the
+    // mobile/desktop cutoff in main.css ever changes.
+    const sidebars = document.querySelectorAll(".app__sidebar");
+    let width = 0;
+    let count = 0;
+    sidebars.forEach((el) => {
+        if (getComputedStyle(el).position !== "fixed") {
+            width += el.getBoundingClientRect().width;
+            count += 1;
+        }
+    });
+    return {width, count};
+}
 
+function getChrome() {
     const bodyStyle = getComputedStyle(document.body);
+    const boardWrapStyle = getComputedStyle(boardDiv.parentElement); // .app__board
     const boardStyle = getComputedStyle(boardDiv);
-    const bodyPadding = parseFloat(bodyStyle.paddingTop) + parseFloat(bodyStyle.paddingBottom);
-    const boardBorder = parseFloat(boardStyle.borderTopWidth) + parseFloat(boardStyle.borderBottomWidth);
+    const appStyle = getComputedStyle(appEl);
 
-    return bodyPadding + boardBorder;
+    const verticalChrome =
+        parseFloat(bodyStyle.paddingTop) + parseFloat(bodyStyle.paddingBottom) +
+        parseFloat(boardWrapStyle.paddingTop) + parseFloat(boardWrapStyle.paddingBottom) +
+        parseFloat(boardStyle.borderTopWidth) + parseFloat(boardStyle.borderBottomWidth);
+
+    const {width: sidebarsWidth, count: inFlowSidebars} = getSidebarInlineFootprint();
+    const rowGap = parseFloat(appStyle.columnGap) || 0;
+
+    const horizontalChrome =
+        parseFloat(bodyStyle.paddingLeft) + parseFloat(bodyStyle.paddingRight) +
+        parseFloat(boardWrapStyle.paddingLeft) + parseFloat(boardWrapStyle.paddingRight) +
+        parseFloat(boardStyle.borderLeftWidth) + parseFloat(boardStyle.borderRightWidth) +
+        sidebarsWidth + rowGap * inFlowSidebars;
+
+    return {verticalChrome, horizontalChrome};
 }
 
 function resizeBoardCanvas() {
     const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
-    const availableHeight = viewportHeight - getVerticalChrome();
+    const viewportWidth = window.visualViewport?.width ?? window.innerWidth;
+    const {verticalChrome, horizontalChrome} = getChrome();
+    const availableHeight = viewportHeight - verticalChrome;
+    const availableWidth = viewportWidth - horizontalChrome;
 
     BOARD_CONFIG.CELL_SIZE = calculateCellSize({
         availableHeight,
+        availableWidth,
         rows: BOARD_CONFIG.ROWS,
+        cols: BOARD_CONFIG.COLS,
         minCellSize: BOARD_CONFIG.MIN_CELL_SIZE,
         maxCellSize: BOARD_CONFIG.MAX_CELL_SIZE,
     });

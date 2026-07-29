@@ -101,7 +101,18 @@ export class TouchInput extends InputSource {
                     this._dragged = true;
                 }
             }
-            if (this._dragged && game.state === "running") this.steerTo(touch.clientX);
+            // Only steer when the motion so far is more horizontal than
+            // vertical. Without this, a straight-down swipe (meant purely
+            // as a hard-drop gesture) still counts as "dragged" the moment
+            // it crosses the movement threshold, and steerTo() would yank
+            // the piece over to the touch's starting X — even though X
+            // barely moved — before the drop happens. A dominant-direction
+            // check keeps vertical swipes from touching the column at all.
+            if (this._dragged && game.state === "running") {
+                const dx = touch.clientX - this._startX;
+                const dy = touch.clientY - this._startY;
+                if (Math.abs(dx) > Math.abs(dy)) this.steerTo(touch.clientX);
+            }
         };
 
         const endTouch = (event) => {
