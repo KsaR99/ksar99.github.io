@@ -65,3 +65,41 @@ export const COUNTDOWN_STEPS = [
     {number: 2, tint: "yellow"},
     {number: 1, tint: "green"},
 ];
+
+/**
+ * Falling-piece motion trail ("echo"). Purely a visual smoothing aid for
+ * fast drops, where the interval between rows gets short enough that the
+ * piece's whole-cell y-steps become visible as stutter. The trail only ever
+ * reflects vertical motion (see Game.updateFallTrail) - horizontal movement
+ * never lengthens or offsets it.
+ *
+ * Deliberately keyed off the *actual* drop interval (ms/row) rather than the
+ * level number: level only sets the gravity baseline, but soft-drop (holding
+ * "down") can make even level 1 fall just as fast as a high level normally
+ * would. Scaling off dropInterval means both cases - a high level, or a low
+ * level with soft-drop held - get the same trail once they reach the same
+ * real speed.
+ *
+ * - FALL_TRAIL_SLOW_INTERVAL_MS: dropInterval at/above this is already slow
+ *   enough to look smooth - trail is fully off.
+ * - FALL_TRAIL_FAST_INTERVAL_MS: dropInterval at/below this gets the full,
+ *   max-length trail. Between the two thresholds the length scales linearly.
+ * - FALL_TRAIL_MAX_LENGTH: hard cap on how many echo frames are kept/drawn.
+ * - FALL_TRAIL_MAX_ALPHA: opacity of the closest (freshest) echo frame; each
+ *   older frame fades linearly toward 0.
+ */
+export const FALL_TRAIL_SLOW_INTERVAL_MS = 500;
+export const FALL_TRAIL_FAST_INTERVAL_MS = 40;
+export const FALL_TRAIL_MAX_LENGTH = 7;
+export const FALL_TRAIL_MAX_ALPHA = 0.3;
+
+/** How many trail snapshots should be kept/drawn for a given current drop interval (ms/row). */
+export function fallTrailLengthForInterval(dropIntervalMs) {
+    if (!(dropIntervalMs < FALL_TRAIL_SLOW_INTERVAL_MS)) return 0;
+
+    const span = FALL_TRAIL_SLOW_INTERVAL_MS - FALL_TRAIL_FAST_INTERVAL_MS;
+    const t = (FALL_TRAIL_SLOW_INTERVAL_MS - dropIntervalMs) / span;
+    const clamped = Math.max(0, Math.min(1, t));
+
+    return Math.round(clamped * FALL_TRAIL_MAX_LENGTH);
+}

@@ -4,7 +4,7 @@ import {InputSource} from "./input-source.js";
 import {MOVEMENT_KEYS} from "./keyboard-input.js";
 
 // Codes that make sense to auto-repeat while a touch-controls button is
-// held down, mirroring KeyboardInput's REPEATABLE_KEYS behaviour.
+// held down, mirroring KeyboardInput's REPEATABLE_KEYS behavior.
 const REPEATABLE_CODES = new Set(["ArrowLeft", "ArrowRight", "ArrowDown"]);
 const REPEAT_INITIAL_DELAY_MS = 120;
 const REPEAT_INTERVAL_MS = 16;
@@ -17,7 +17,7 @@ const SWIPE_DOWN_THRESHOLD_RATIO = 0.22;
 // Fraction of the screen's width a drag needs to cover to steer the piece
 // all the way across the board - lets one-handed thumb reach control the
 // full board without needing to physically drag edge-to-edge.
-const DRAG_RANGE_RATIO = 2 / 3;
+const DRAG_DISTANCE_IN_SCREENS = 0.8;
 
 /**
  * Touch input source for mobile. Two independent pieces:
@@ -148,7 +148,7 @@ export class TouchInput extends InputSource {
 
             const boardRect = canvas.getBoundingClientRect();
             const screenWidth = window.visualViewport?.width ?? window.innerWidth;
-            this._dragSensitivity = boardRect.width / (screenWidth * DRAG_RANGE_RATIO);
+            this._dragSensitivity = boardRect.width / (screenWidth * DRAG_DISTANCE_IN_SCREENS);
         };
 
         const onTouchMove = (event) => {

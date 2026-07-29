@@ -1,6 +1,7 @@
 "use strict";
 
 import {forEachShapeCell, getTightBounds, lightenOklch, withAlpha} from "../shared/utils.js";
+import {FALL_TRAIL_MAX_ALPHA} from "../game/game-constants.js";
 
 export class Renderer {
     /**
@@ -216,6 +217,44 @@ export class Renderer {
             if (y < 0) return;
             this.drawCell(this.ctx, piece.x + c, y, piece.color, size, {glow: true});
         });
+    }
+
+    /**
+     * Draws the falling-piece motion trail ("echo"): a handful of faded
+     * copies of the piece's recent vertical positions, stacked behind it.
+     * Purely vertical - always uses the piece's *current* column (pieceX),
+     * so horizontal movement never smears the trail sideways.
+     *
+     * `trail` is the fixed-size ring buffer owned by Game (this.fallTrail),
+     * `headIndex`/`count` describe which slots currently hold valid data.
+     * Drawing reuses the same cached sprites as drawPiece/drawCell - the
+     * only extra cost here is a few extra drawImage calls with globalAlpha,
+     * no new sprite generation.
+     */
+    drawFallTrail(trail, headIndex, count, pieceX) {
+        if (count === 0) return;
+
+        const size = this.boardConfig.CELL_SIZE;
+        const {ctx} = this;
+        const capacity = trail.length;
+
+        ctx.save();
+        for (let i = 0; i < count; i++) {
+            const alpha = FALL_TRAIL_MAX_ALPHA * (1 - i / count);
+            if (alpha <= 0.02) continue;
+
+            const idx = (headIndex - 1 - i + capacity * 2) % capacity;
+            const snap = trail[idx];
+            if (!snap.mask) continue;
+
+            ctx.globalAlpha = alpha;
+            forEachShapeCell(snap.mask, snap.width, snap.height, (r, c) => {
+                const y = snap.y + r;
+                if (y < 0) return;
+                this.drawCell(ctx, pieceX + c, y, snap.color, size);
+            });
+        }
+        ctx.restore();
     }
 
     drawGhost(piece, board) {

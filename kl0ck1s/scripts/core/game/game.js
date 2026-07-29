@@ -1,7 +1,7 @@
 "use strict";
 
 import {dropIntervalForLevel, tierForLevel} from "../shared/utils.js";
-import {COUNTDOWN_STEPS} from "./game-constants.js";
+import {COUNTDOWN_STEPS, FALL_TRAIL_MAX_LENGTH, fallTrailLengthForInterval} from "./game-constants.js";
 import {InputController} from "../controllers/input-controller.js";
 import {PieceController} from "../controllers/piece-controller.js";
 import {StatsTracker} from "../controllers/stats-tracker.js";
@@ -86,6 +86,29 @@ export class Game {
         this.clearingLines = [];
         this.clearingTimer = 0;
 
+        // Fall-trail ("echo") state: a fixed-size ring buffer of preallocated
+        // snapshot slots, reused every frame - no per-frame allocations.
+        // Purely a vertical smoothing effect (see game-constants.js), so each
+        // slot only needs the piece's shape/color/y at that moment; x is
+        // always read from the current piece when drawing.
+        this.fallTrail = Array.from({length: FALL_TRAIL_MAX_LENGTH}, () => ({
+            y: 0, mask: null, width: 0, height: 0, color: null,
+        }));
+        this.fallTrailHead = 0;
+        this.fallTrailCount = 0;
+        this._trailPieceRef = null;
+
+        // Real-world measured time between successive one-row drops, used
+        // (instead of dropInterval) to size the fall trail. dropInterval only
+        // reflects gravity from the current level - softDrop() moves the
+        // piece down a row directly without touching dropInterval, so a
+        // held-down soft drop at level 1 would otherwise never trigger a
+        // trail even though the piece is visibly moving just as fast as a
+        // high-level gravity drop. Measuring actual elapsed time between row
+        // steps (see noteRowStep()) catches both cases the same way.
+        this.lastRowStepTime = 0;
+        this.effectiveDropIntervalMs = Infinity;
+
         // Level/stats state (owned/mutated by StatsTracker).
         this.startLevel = 0;
         this.level = 0;
@@ -152,6 +175,36 @@ export class Game {
         this.hud.update(this.stats);
     }
 
+    /** Clears the fall-trail ring buffer and speed measurement, e.g. on spawn/lock/round reset so old echoes/timing don't leak into the next piece. */
+    resetFallTrail() {
+        this.fallTrailCount = 0;
+        this.fallTrailHead = 0;
+        this._trailPieceRef = null;
+        this.lastRowStepTime = 0;
+        this.effectiveDropIntervalMs = Infinity;
+    }
+
+    /**
+     * Call whenever the current piece moves down exactly one row - from
+     * automatic gravity (update()) or from a manual soft drop
+     * (PieceController.softDrop()). Tracks the real elapsed time between
+     * successive calls (smoothed a little to avoid single-sample jitter) as
+     * `effectiveDropIntervalMs`, which is what actually drives the fall
+     * trail's length - see fallTrailLengthForInterval in game-constants.js.
+     */
+    noteRowStep() {
+        const now = typeof performance !== "undefined" ? performance.now() : Date.now();
+
+        if (this.lastRowStepTime > 0) {
+            const interval = now - this.lastRowStepTime;
+            this.effectiveDropIntervalMs = this.effectiveDropIntervalMs === Infinity
+                ? interval
+                : this.effectiveDropIntervalMs * 0.7 + interval * 0.3;
+        }
+
+        this.lastRowStepTime = now;
+    }
+
     update(delta) {
         if (this.rotationAnim) {
             this.rotationAnim.elapsed += delta;
@@ -210,22 +263,72 @@ export class Game {
         if (this.dropCounter > this.dropInterval) {
             ++this.current.y;
             this.dropCounter = 0;
+            this.noteRowStep();
         }
     }
 
+    /**
+     * Returns the piece as it should be drawn this frame. This is where the
+     * *visual* position can differ from the logical grid position in
+     * `this.current` - during a rotation animation (existing tween), and
+     * while falling (fractional y based on how far we are into the current
+     * drop step). The latter is what keeps falling pieces looking smooth at
+     * high levels, where dropInterval gets short enough that whole-cell
+     * steps would otherwise read as stutter.
+     */
     getRenderedPiece() {
-        if (!this.rotationAnim) return this.current;
+        const base = this.current;
+        if (!base) return base;
 
-        const t = Math.min(1, this.rotationAnim.elapsed / this.rotationAnim.duration);
-        const {fromX, fromY, toX, toY} = this.rotationAnim;
+        let x = base.x;
+        let y = base.y;
 
-        const rendered = Object.create(Object.getPrototypeOf(this.current));
-        Object.assign(rendered, this.current, {
-            x: fromX + (toX - fromX) * t,
-            y: fromY + (toY - fromY) * t,
-        });
+        if (this.rotationAnim) {
+            const t = Math.min(1, this.rotationAnim.elapsed / this.rotationAnim.duration);
+            const {fromX, fromY, toX, toY} = this.rotationAnim;
+            x = fromX + (toX - fromX) * t;
+            y = fromY + (toY - fromY) * t;
+        } else if (this.state === "running" && this.dropInterval > 0 && !this.board.collides(base, 0, 1)) {
+            y = base.y + Math.min(1, this.dropCounter / this.dropInterval);
+        }
 
+        if (x === base.x && y === base.y) return base;
+
+        const rendered = Object.create(Object.getPrototypeOf(base));
+        Object.assign(rendered, base, {x, y});
         return rendered;
+    }
+
+    /**
+     * Pushes the current frame's falling position into the fall-trail ring
+     * buffer, sized per the current *measured* fall speed (see
+     * effectiveDropIntervalMs / fallTrailLengthForInterval) - so soft-drop at
+     * level 1 gets the same trail as reaching that same speed naturally at a
+     * high level.
+     * Reuses preallocated slot objects - no allocation on the hot path.
+     */
+    updateFallTrail(renderedPiece) {
+        const trailLength = fallTrailLengthForInterval(this.effectiveDropIntervalMs);
+
+        if (trailLength === 0) {
+            this.fallTrailCount = 0;
+            return;
+        }
+
+        if (this._trailPieceRef !== this.current) {
+            this.fallTrailCount = 0;
+            this._trailPieceRef = this.current;
+        }
+
+        const slot = this.fallTrail[this.fallTrailHead];
+        slot.y = renderedPiece.y;
+        slot.mask = renderedPiece.mask;
+        slot.width = renderedPiece.width;
+        slot.height = renderedPiece.height;
+        slot.color = renderedPiece.color;
+
+        this.fallTrailHead = (this.fallTrailHead + 1) % FALL_TRAIL_MAX_LENGTH;
+        this.fallTrailCount = Math.min(trailLength, this.fallTrailCount + 1);
     }
 
     render() {
@@ -236,8 +339,17 @@ export class Game {
             && ["running", "paused"].includes(this.previousStateBeforeOptions);
 
         if (this.state === "running" || this.state === "paused" || showPieceBehindOptions) {
-            if (this.state === "running") this.renderer.drawGhost(this.current, this.board);
-            this.renderer.drawPiece(this.getRenderedPiece());
+            const renderedPiece = this.getRenderedPiece();
+
+            if (this.state === "running") {
+                this.renderer.drawGhost(this.current, this.board);
+                this.updateFallTrail(renderedPiece);
+                this.renderer.drawFallTrail(this.fallTrail, this.fallTrailHead, this.fallTrailCount, this.current.x);
+            } else {
+                this.fallTrailCount = 0;
+            }
+
+            this.renderer.drawPiece(renderedPiece);
         } else if (this.state === "clearing") {
             const progress = Math.min(1, this.clearingTimer / this.lineClearAnimationDuration);
             this.renderer.drawClearingLines(this.clearingLines, progress);

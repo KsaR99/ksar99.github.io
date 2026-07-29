@@ -28,6 +28,7 @@ export class PieceController {
         game.hardDropUsed = false;
         game.clearingLines = [];
         game.clearingTimer = 0;
+        game.resetFallTrail();
 
         game.current = new Piece(game.bag.next(), {cols: game.board.cols});
         game.statsTracker.registerPieceSpawn(game.current.type);
@@ -47,6 +48,7 @@ export class PieceController {
         game.groundedTime = 0;
         game.lastAction = null;
         game.rotationAnim = null;
+        game.resetFallTrail();
         game.renderer.drawNext(game.next);
         this.snapToPointer();
 
@@ -172,6 +174,7 @@ export class PieceController {
         game.lastAction = "move";
         game.statsTracker.addScore(pointsForSoftDrop(game.scoring));
         game.dropCounter = 0;
+        game.noteRowStep();
     }
 
     hardDrop() {
