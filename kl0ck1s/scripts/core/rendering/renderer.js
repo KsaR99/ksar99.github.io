@@ -220,18 +220,12 @@ export class Renderer {
     }
 
     /**
-     * Draws the falling-piece motion trail ("echo"): a handful of faded
-     * copies of the piece's recent vertical positions, stacked behind it.
-     * Purely vertical - always uses the piece's *current* column (pieceX),
-     * so horizontal movement never smears the trail sideways.
-     *
-     * `trail` is the fixed-size ring buffer owned by Game (this.fallTrail),
-     * `headIndex`/`count` describe which slots currently hold valid data.
-     * Drawing reuses the same cached sprites as drawPiece/drawCell - the
-     * only extra cost here is a few extra drawImage calls with globalAlpha,
-     * no new sprite generation.
+     * Draws the fading "echo" trail behind the falling/moving piece. Each
+     * ring-buffer slot carries its own x and y (see Game.updateFallTrail),
+     * so the trail follows both vertical falls and horizontal moves instead
+     * of being pinned to the current piece's x.
      */
-    drawFallTrail(trail, headIndex, count, pieceX) {
+    drawFallTrail(trail, headIndex, count) {
         if (count === 0) return;
 
         const size = this.boardConfig.CELL_SIZE;
@@ -249,9 +243,10 @@ export class Renderer {
 
             ctx.globalAlpha = alpha;
             forEachShapeCell(snap.mask, snap.width, snap.height, (r, c) => {
+                const x = snap.x + c;
                 const y = snap.y + r;
                 if (y < 0) return;
-                this.drawCell(ctx, pieceX + c, y, snap.color, size);
+                this.drawCell(ctx, x, y, snap.color, size);
             });
         }
         ctx.restore();

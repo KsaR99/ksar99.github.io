@@ -67,6 +67,7 @@
             "performanceTitle": "Производительность",
             "glow": "Свечение (размытие)",
             "transparency": "Прозрачность",
+            "fallTrail": "След падения",
             "effect": "Фильтр экрана",
             "effectNone": "Нет",
             "effectVhs": "Шум VHS",

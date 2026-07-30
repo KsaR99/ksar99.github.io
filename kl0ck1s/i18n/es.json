@@ -67,6 +67,7 @@
             "performanceTitle": "Rendimiento",
             "glow": "Brillo (desenfoque)",
             "transparency": "Transparencia",
+            "fallTrail": "Estela de caída",
             "effect": "Filtro de pantalla",
             "effectNone": "Ninguno",
             "effectVhs": "Ruido VHS",

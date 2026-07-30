@@ -15,7 +15,7 @@ export class SettingsController {
     defaultSettings() {
         return {
             volume: 1, muted: false, glow: true, transparency: true, effect: "vhs", hudRight: false,
-            ghost: true, gridLines: true, skipCountdown: false, mouseControl: false,
+            ghost: true, gridLines: true, skipCountdown: false, mouseControl: false, fallTrail: true,
         };
     }
 
@@ -59,11 +59,25 @@ export class SettingsController {
 
     applyPerformanceSettings() {
         const game = this.game;
-        const {glow, transparency, effect, ghost, gridLines} = game.settings;
+        const {glow, transparency, effect, ghost, gridLines, fallTrail} = game.settings;
         game.renderer.setGlowEnabled(glow);
         game.renderer.setTransparencyEnabled(transparency);
         game.renderer.setGhostEnabled(ghost);
         game.renderer.setGridEnabled(gridLines);
+
+        // Fall trail has no per-cell renderer setter like the others above -
+        // game.render()/updateFallTrail() check game.settings.fallTrail
+        // directly each frame. Clearing it here just means flipping the
+        // toggle off mid-run makes any already-visible echoes disappear
+        // immediately, instead of lingering until the piece next locks/spawns.
+        // shiftAnim only exists to feed the trail distinct in-between x
+        // values (see PieceController.moveHorizontal/moveToColumn), so it's
+        // cut short too - otherwise a move made just before toggling off
+        // would keep sliding for its last few frames instead of snapping.
+        if (!fallTrail) {
+            game.resetFallTrail();
+            game.shiftAnim = null;
+        }
 
         const body = game.dom?.body;
         if (body) {

@@ -75,6 +75,7 @@ export class Game {
         this.current = null;
         this.next = null;
         this.rotationAnim = null;
+        this.shiftAnim = null;
         this.dropCounter = 0;
         this.dropInterval = 0;
         this.lockDelayTimer = 0;
@@ -88,11 +89,12 @@ export class Game {
 
         // Fall-trail ("echo") state: a fixed-size ring buffer of preallocated
         // snapshot slots, reused every frame - no per-frame allocations.
-        // Purely a vertical smoothing effect (see game-constants.js), so each
-        // slot only needs the piece's shape/color/y at that moment; x is
-        // always read from the current piece when drawing.
+        // Stores the piece's shape/color/x/y at each moment, so the trail can
+        // smooth both vertical falls and horizontal moves (DAS, soft-drop
+        // while shifting, etc.) instead of only reading x from the current
+        // piece when drawing.
         this.fallTrail = Array.from({length: FALL_TRAIL_MAX_LENGTH}, () => ({
-            y: 0, mask: null, width: 0, height: 0, color: null,
+            x: 0, y: 0, mask: null, width: 0, height: 0, color: null,
         }));
         this.fallTrailHead = 0;
         this.fallTrailCount = 0;
@@ -108,6 +110,13 @@ export class Game {
         // steps (see noteRowStep()) catches both cases the same way.
         this.lastRowStepTime = 0;
         this.effectiveDropIntervalMs = Infinity;
+
+        // Same idea as lastRowStepTime/effectiveDropIntervalMs above, but for
+        // horizontal moves (tap-move or DAS auto-repeat), so the trail can
+        // also echo fast side-to-side movement even while the piece isn't
+        // currently falling quickly. See noteColStep().
+        this.lastColStepTime = 0;
+        this.effectiveShiftIntervalMs = Infinity;
 
         // Level/stats state (owned/mutated by StatsTracker).
         this.startLevel = 0;
@@ -182,6 +191,8 @@ export class Game {
         this._trailPieceRef = null;
         this.lastRowStepTime = 0;
         this.effectiveDropIntervalMs = Infinity;
+        this.lastColStepTime = 0;
+        this.effectiveShiftIntervalMs = Infinity;
     }
 
     /**
@@ -205,11 +216,52 @@ export class Game {
         this.lastRowStepTime = now;
     }
 
+    /**
+     * Call whenever the current piece moves left/right by one column - from
+     * a single tap-move or a DAS auto-repeat tick. Mirrors noteRowStep():
+     * tracks the real elapsed time between successive horizontal steps as
+     * `effectiveShiftIntervalMs`, so fast side-to-side movement can size the
+     * fall trail the same way fast falling does (see updateFallTrail()).
+     */
+    noteColStep() {
+        const now = typeof performance !== "undefined" ? performance.now() : Date.now();
+
+        if (this.lastColStepTime > 0) {
+            const interval = now - this.lastColStepTime;
+            this.effectiveShiftIntervalMs = this.effectiveShiftIntervalMs === Infinity
+                ? interval
+                : this.effectiveShiftIntervalMs * 0.7 + interval * 0.3;
+        }
+
+        this.lastColStepTime = now;
+    }
+
+    /**
+     * Returns the piece's current *visual* x - mid-tween if a shiftAnim is
+     * already in progress, otherwise its logical x. Used as the `fromX` when
+     * starting a new shift tween, so a horizontal move that lands mid-way
+     * through the previous tween (e.g. fast DAS auto-repeat) continues
+     * smoothly from where it visually is instead of snapping backward.
+     */
+    getShiftDisplayX() {
+        if (!this.shiftAnim) return this.current.x;
+        const t = Math.min(1, this.shiftAnim.elapsed / this.shiftAnim.duration);
+        const {fromX, toX} = this.shiftAnim;
+        return fromX + (toX - fromX) * t;
+    }
+
     update(delta) {
         if (this.rotationAnim) {
             this.rotationAnim.elapsed += delta;
             if (this.rotationAnim.elapsed >= this.rotationAnim.duration) {
                 this.rotationAnim = null;
+            }
+        }
+
+        if (this.shiftAnim) {
+            this.shiftAnim.elapsed += delta;
+            if (this.shiftAnim.elapsed >= this.shiftAnim.duration) {
+                this.shiftAnim = null;
             }
         }
 
@@ -270,11 +322,15 @@ export class Game {
     /**
      * Returns the piece as it should be drawn this frame. This is where the
      * *visual* position can differ from the logical grid position in
-     * `this.current` - during a rotation animation (existing tween), and
-     * while falling (fractional y based on how far we are into the current
-     * drop step). The latter is what keeps falling pieces looking smooth at
-     * high levels, where dropInterval gets short enough that whole-cell
-     * steps would otherwise read as stutter.
+     * `this.current` - during a rotation animation (existing tween), during
+     * a horizontal shift animation (shiftAnim, started by PieceController on
+     * every successful move so x eases over a few frames instead of jumping
+     * a whole column instantly - this is also what gives the fall trail
+     * enough distinct in-between x values to actually spread out visually),
+     * and while falling (fractional y based on how far we are into the
+     * current drop step). The latter is what keeps falling pieces looking
+     * smooth at high levels, where dropInterval gets short enough that whole-
+     * cell steps would otherwise read as stutter.
      */
     getRenderedPiece() {
         const base = this.current;
@@ -288,8 +344,15 @@ export class Game {
             const {fromX, fromY, toX, toY} = this.rotationAnim;
             x = fromX + (toX - fromX) * t;
             y = fromY + (toY - fromY) * t;
-        } else if (this.state === "running" && this.dropInterval > 0 && !this.board.collides(base, 0, 1)) {
-            y = base.y + Math.min(1, this.dropCounter / this.dropInterval);
+        } else {
+            if (this.shiftAnim) {
+                const t = Math.min(1, this.shiftAnim.elapsed / this.shiftAnim.duration);
+                const {fromX, toX} = this.shiftAnim;
+                x = fromX + (toX - fromX) * t;
+            }
+            if (this.state === "running" && this.dropInterval > 0 && !this.board.collides(base, 0, 1)) {
+                y = base.y + Math.min(1, this.dropCounter / this.dropInterval);
+            }
         }
 
         if (x === base.x && y === base.y) return base;
@@ -300,15 +363,20 @@ export class Game {
     }
 
     /**
-     * Pushes the current frame's falling position into the fall-trail ring
-     * buffer, sized per the current *measured* fall speed (see
-     * effectiveDropIntervalMs / fallTrailLengthForInterval) - so soft-drop at
-     * level 1 gets the same trail as reaching that same speed naturally at a
-     * high level.
+     * Pushes the current frame's position (both x and y) into the fall-trail
+     * ring buffer, sized per the current *measured* movement speed - whether
+     * that's falling (effectiveDropIntervalMs) or shifting left/right
+     * (effectiveShiftIntervalMs), see noteRowStep()/noteColStep(). Whichever
+     * axis is currently moving faster (smaller interval) wins, so a piece
+     * that's DAS-ing across the board without falling still gets a trail,
+     * same as one falling fast without moving sideways. Storing x per-snapshot
+     * (rather than reading it live from the current piece at draw time) lets
+     * the trail echo horizontal movement, not just falling.
      * Reuses preallocated slot objects - no allocation on the hot path.
      */
     updateFallTrail(renderedPiece) {
-        const trailLength = fallTrailLengthForInterval(this.effectiveDropIntervalMs);
+        const moveIntervalMs = Math.min(this.effectiveDropIntervalMs, this.effectiveShiftIntervalMs);
+        const trailLength = fallTrailLengthForInterval(moveIntervalMs);
 
         if (trailLength === 0) {
             this.fallTrailCount = 0;
@@ -321,6 +389,7 @@ export class Game {
         }
 
         const slot = this.fallTrail[this.fallTrailHead];
+        slot.x = renderedPiece.x;
         slot.y = renderedPiece.y;
         slot.mask = renderedPiece.mask;
         slot.width = renderedPiece.width;
@@ -343,8 +412,12 @@ export class Game {
 
             if (this.state === "running") {
                 this.renderer.drawGhost(this.current, this.board);
-                this.updateFallTrail(renderedPiece);
-                this.renderer.drawFallTrail(this.fallTrail, this.fallTrailHead, this.fallTrailCount, this.current.x);
+                if (this.settings.fallTrail) {
+                    this.updateFallTrail(renderedPiece);
+                    this.renderer.drawFallTrail(this.fallTrail, this.fallTrailHead, this.fallTrailCount);
+                } else {
+                    this.fallTrailCount = 0;
+                }
             } else {
                 this.fallTrailCount = 0;
             }

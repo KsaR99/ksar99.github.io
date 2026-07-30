@@ -67,6 +67,7 @@
             "performanceTitle": "Performance",
             "glow": "Glow (blur)",
             "transparency": "Transparency",
+            "fallTrail": "Fall trail",
             "effect": "Screen filter",
             "effectNone": "None",
             "effectVhs": "VHS noise",

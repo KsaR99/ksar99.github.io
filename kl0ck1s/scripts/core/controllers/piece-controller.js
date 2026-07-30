@@ -25,6 +25,7 @@ export class PieceController {
         game.lastAction = null;
         game.pendingSpin = null;
         game.rotationAnim = null;
+        game.shiftAnim = null;
         game.hardDropUsed = false;
         game.clearingLines = [];
         game.clearingTimer = 0;
@@ -48,6 +49,7 @@ export class PieceController {
         game.groundedTime = 0;
         game.lastAction = null;
         game.rotationAnim = null;
+        game.shiftAnim = null;
         game.resetFallTrail();
         game.renderer.drawNext(game.next);
         this.snapToPointer();
@@ -91,8 +93,17 @@ export class PieceController {
         const game = this.game;
         if (game.state !== "running") return;
         if (!game.board.collides(game.current, dir, 0)) {
+            const fromX = game.getShiftDisplayX();
             game.current.x += dir;
             game.lastAction = "move";
+            game.noteColStep();
+            // shiftAnim only exists to give the fall trail enough distinct
+            // in-between x values to spread out horizontally (see
+            // getRenderedPiece()) - with the trail off there's no reason to
+            // ease the move, so snap instantly like before that feature existed.
+            game.shiftAnim = game.settings.fallTrail
+                ? {fromX, toX: game.current.x, elapsed: 0, duration: 60}
+                : null;
             if (game.board.collides(game.current, 0, 1)) this.resetLockDelay();
         }
     }
@@ -144,6 +155,8 @@ export class PieceController {
 
         if (targetX === game.current.x) return;
 
+        const fromX = game.getShiftDisplayX();
+
         while (
             game.current.x < targetX &&
             !game.board.collides(game.current, 1, 0)
@@ -159,6 +172,10 @@ export class PieceController {
         }
 
         game.lastAction = "move";
+        game.noteColStep();
+        game.shiftAnim = game.settings.fallTrail
+            ? {fromX, toX: game.current.x, elapsed: 0, duration: 60}
+            : null;
 
         if (game.board.collides(game.current, 0, 1)) {
             this.resetLockDelay();

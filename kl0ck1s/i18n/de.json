@@ -67,6 +67,7 @@
             "performanceTitle": "Leistung",
             "glow": "Leuchten (Unschärfe)",
             "transparency": "Transparenz",
+            "fallTrail": "Fallspur",
             "effect": "Bildschirmfilter",
             "effectNone": "Kein",
             "effectVhs": "VHS-Rauschen",

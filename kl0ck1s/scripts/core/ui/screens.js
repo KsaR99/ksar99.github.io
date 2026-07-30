@@ -52,6 +52,8 @@ export const Screens = {
         screen.querySelector('[data-role="grid-checkbox"]').checked = settings.gridLines;
         screen.querySelector('[data-role="glow-checkbox"]').checked = settings.glow;
         screen.querySelector('[data-role="transparency-checkbox"]').checked = settings.transparency;
+        const fallTrailCheckbox = screen.querySelector('[data-role="fall-trail-checkbox"]');
+        if (fallTrailCheckbox) fallTrailCheckbox.checked = Boolean(settings.fallTrail);
         const skipCountdownCheckbox = screen.querySelector('[data-role="skip-countdown-checkbox"]');
         if (skipCountdownCheckbox) skipCountdownCheckbox.checked = Boolean(settings.skipCountdown);
 

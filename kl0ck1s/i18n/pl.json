@@ -67,6 +67,7 @@
             "performanceTitle": "Wydajność",
             "glow": "Poświata (blur)",
             "transparency": "Przezroczystość",
+            "fallTrail": "Smuga spadku",
             "effect": "Filtr ekranu",
             "effectNone": "Brak",
             "effectVhs": "Szum VHS",
