@@ -1,11 +1,11 @@
 "use strict";
 
 const CHARS = "Kl0ck1's";
-const FONT_SIZE = 15;
-const FALL_SPEED = 0.30; // rows per rendered frame (frame is throttled below)
-const HEAD_COLOR = "oklch(0.96 0.068 145)";
-const BODY_COLOR = "oklch(0.72 0.20 149)";
-const DIM_COLOR = "oklch(0.47 0.120 150)";
+const FONT_SIZE = 26;
+const FALL_SPEED = 0.12; // rows per rendered frame (frame is throttled below)
+const HEAD_COLOR = "oklch(0.85 0.1 144.74)";
+const BODY_COLOR = "oklch(0.763 0.214 148.729)";
+const DIM_COLOR = "oklch(0.451 0.121 149.242)";
 
 export class MatrixEffect {
     constructor(canvas, ctx = null) {
@@ -21,7 +21,7 @@ export class MatrixEffect {
     _spawnColumn(height, initial = false) {
         return {
             y: initial ? Math.random() * height : Math.random() * -height,
-            speed: 0.6 + Math.random() * 1.4,
+            speed: 0.6 + Math.random() * 1.1,
             charIndex: Math.floor(Math.random() * CHARS.length),
             switchEvery: 6 + Math.floor(Math.random() * 14),
             tick: Math.floor(Math.random() * 10),
@@ -50,8 +50,8 @@ export class MatrixEffect {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        ctx.font = `700 ${FONT_SIZE}px "Noto Sans Mono", monospace`;
-        ctx.textBaseline = "top";
+        ctx.font = `400 ${FONT_SIZE}px "Noto Sans Mono", monospace`;
+        ctx.textBaseline = "middle";
 
         columns.forEach((col, i) => {
             const x = i * FONT_SIZE;
