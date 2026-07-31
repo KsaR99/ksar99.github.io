@@ -64,7 +64,7 @@ function packState(rows) {
 // the packed KLOCKOMINOS export below — nothing at runtime touches this.
 const KLOCKOMINOS_SOURCE = {
     I: {
-        color: "oklch(0.905 0.154 194.7 / 0.9)",
+        color: "oklch(0.905 0.154 194.7)",
         states: [
             [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]],
             [[0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0], [0, 0, 1, 0]],
@@ -73,7 +73,7 @@ const KLOCKOMINOS_SOURCE = {
         ],
     },
     J: {
-        color: "oklch(0.563 0.240 260.8 / 0.9)",
+        color: "oklch(0.563 0.240 260.8)",
         states: [
             [[1, 0, 0], [1, 1, 1], [0, 0, 0]],
             [[0, 1, 1], [0, 1, 0], [0, 1, 0]],
@@ -82,7 +82,7 @@ const KLOCKOMINOS_SOURCE = {
         ],
     },
     L: {
-        color: "oklch(0.772 0.173 64.55 / 0.9)",
+        color: "oklch(0.772 0.173 64.55)",
         states: [
             [[0, 0, 1], [1, 1, 1], [0, 0, 0]],
             [[0, 1, 0], [0, 1, 0], [0, 1, 1]],
@@ -91,7 +91,7 @@ const KLOCKOMINOS_SOURCE = {
         ],
     },
     O: {
-        color: "oklch(0.968 0.211 109.7 / 0.9)",
+        color: "oklch(0.968 0.211 109.7)",
         states: [
             [[1, 1], [1, 1]],
             [[1, 1], [1, 1]],
@@ -109,7 +109,7 @@ const KLOCKOMINOS_SOURCE = {
         ],
     },
     T: {
-        color: "oklch(0.581 0.298 307 / 0.9)",
+        color: "oklch(0.581 0.298 307)",
         states: [
             [[0, 1, 0], [1, 1, 1], [0, 0, 0]],
             [[0, 1, 0], [0, 1, 1], [0, 1, 0]],
@@ -118,7 +118,7 @@ const KLOCKOMINOS_SOURCE = {
         ],
     },
     Z: {
-        color: "oklch(0.648 0.237 27 / 0.9)",
+        color: "oklch(0.648 0.237 27)",
         states: [
             [[1, 1, 0], [0, 1, 1], [0, 0, 0]],
             [[0, 0, 1], [0, 1, 1], [0, 1, 0]],
