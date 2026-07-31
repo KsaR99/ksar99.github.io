@@ -134,7 +134,7 @@
         "levelUpBanner": "POZIOM {level}"
     },
     "sounds": {
-        "lineClear1": "Pojedyncza linia",
+        "lineClear1": "Pojedyńcza linia",
         "lineClear2": "Podwójna linia",
         "lineClear3": "Potrójna linia",
         "lineClear4": "Tetris",
