@@ -82,6 +82,10 @@ export class Game {
         this.lockDelayResets = 0;
         this.groundedTime = 0;
         this.hardDropUsed = false;
+        this.isGrounded = false;
+        this.groundedSoundId = null;
+        this.groundedGraceTimer = 0;
+        this.groundedSoundRate = 1;
         this.lastAction = null;
         this.pendingSpin = null;
         this.clearingLines = [];
@@ -153,6 +157,18 @@ export class Game {
     /** Aggregated stats consumed by the HUD; see StatsTracker for the fields. */
     get stats() {
         return this.statsTracker.stats;
+    }
+
+    /**
+     * Max time (ms) the current difficulty tier allows a piece to sit resting
+     * before it's force-locked, regardless of further lock-delay resets from
+     * moves/rotations. Falls back to the scoring-wide default for tiers that
+     * don't override it (e.g. easy). Shared by update()'s lock check and the
+     * "grounded" sound's playback-rate scaling, so both always agree on the
+     * same window for the current tier.
+     */
+    getMaxGroundedTime() {
+        return this.difficulties[this.levelTier]?.groundedTime ?? this.scoring.MAX_GROUNDED_TIME;
     }
 
     async init() {
@@ -299,11 +315,21 @@ export class Game {
         if (this.state !== "running") return;
 
         const resting = this.board.collides(this.current, 0, 1);
+        this.pieceController.updateGrounded(resting, delta);
 
-        if (resting) {
+        // Deliberately reading this.isGrounded here rather than the raw
+        // `resting` we just computed: updateGrounded() debounces single-frame
+        // collision flicker (a rotation's new footprint/kick briefly not
+        // touching anything below) through GROUNDED_GRACE_MS, so isGrounded
+        // only flips once that's genuinely persisted. Using raw `resting`
+        // here would let repeated rotation flicker silently reset
+        // lockDelayTimer every such frame - bypassing LOCK_DELAY_MAX_RESETS
+        // entirely - and pause groundedTime's accumulation, letting a piece
+        // sit far longer than maxGroundedTime in real elapsed time.
+        if (this.isGrounded) {
             this.lockDelayTimer += delta;
             this.groundedTime += delta;
-            const maxGroundedTime = this.difficulties[this.levelTier]?.groundedTime ?? this.scoring.MAX_GROUNDED_TIME;
+            const maxGroundedTime = this.getMaxGroundedTime();
             if (this.lockDelayTimer >= this.scoring.LOCK_DELAY || this.groundedTime >= maxGroundedTime) {
                 this.pieceController.lockCurrentPiece();
             }

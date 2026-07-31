@@ -56,6 +56,10 @@
             "soundTitle": "Ton",
             "mute": "Stumm",
             "volume": "Lautstärke",
+            "sfxTitle": "Soundeffekte",
+            "musicTitle": "Musik",
+            "categoryVolume": "Kategorielautstärke",
+            "preview": "Anhören",
             "layoutTitle": "Layout",
             "hudRight": "HUD rechts",
             "gameplayTitle": "Gameplay",
@@ -128,5 +132,16 @@
     },
     "game": {
         "levelUpBanner": "LEVEL {level}"
+    },
+    "sounds": {
+        "lineClear1": "Einzeln",
+        "lineClear2": "Doppelt",
+        "lineClear3": "Dreifach",
+        "lineClear4": "Tetris",
+        "drop": "Stein fällt",
+        "gameOver": "Game Over",
+        "levelUp": "Levelaufstieg",
+        "rotate": "Drehen",
+        "grounded": "Stein aufgesetzt"
     }
 }

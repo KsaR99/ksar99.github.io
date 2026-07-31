@@ -17,6 +17,23 @@ function fillDifficultyButtons(dom, container, selectedDifficulty, difficulties,
     });
 }
 
+function fillSoundRows(dom, container, keys, soundVolumes, i18n) {
+    keys.forEach((key) => {
+        const row = clone(dom, "tpl-options-sound-row").querySelector('[data-role="sound-row"]');
+        row.querySelector('[data-field="name"]').textContent = i18n.t(`sounds.${key}`);
+
+        const slider = row.querySelector('[data-role="sound-volume-slider"]');
+        slider.dataset.soundKey = key;
+        slider.value = Math.round((soundVolumes[key] ?? 1) * 100);
+
+        const previewButton = row.querySelector('[data-role="sound-preview-button"]');
+        previewButton.dataset.soundKey = key;
+        previewButton.setAttribute("aria-label", i18n.t("screens.options.preview"));
+
+        container.appendChild(row);
+    });
+}
+
 export const Screens = {
     loading(title, text, dom = document) {
         const screen = clone(dom, "tpl-screen-loading");
@@ -40,8 +57,31 @@ export const Screens = {
         return screen;
     },
 
-    options(settings, dom = document, i18n) {
+    options(settings, dom = document, i18n, soundManager = null) {
         const screen = clone(dom, "tpl-screen-options");
+
+        if (soundManager) {
+            const categoryVolumes = settings.categoryVolumes ?? {};
+            const soundVolumes = settings.soundVolumes ?? {};
+
+            ["sfx", "music"].forEach((category) => {
+                const keys = soundManager.keysInCategory(category);
+                const group = screen.querySelector(`[data-role="sound-group-${category}"]`);
+                if (!group) return;
+
+                if (keys.length === 0) {
+                    group.remove();
+                    return;
+                }
+
+                const categorySlider = group.querySelector('[data-role="category-volume-slider"]');
+                if (categorySlider) categorySlider.value = Math.round((categoryVolumes[category] ?? 1) * 100);
+
+                const list = group.querySelector('[data-role="sound-list"]');
+                if (list) fillSoundRows(dom, list, keys, soundVolumes, i18n);
+            });
+        }
+
         const muteCheckbox = screen.querySelector('[data-role="mute-checkbox"]');
         const volumeSlider = screen.querySelector('[data-role="volume-slider"]');
         muteCheckbox.checked = settings.muted;

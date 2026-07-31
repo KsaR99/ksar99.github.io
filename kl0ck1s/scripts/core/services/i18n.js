@@ -22,7 +22,7 @@ export class I18n {
      * @param {Document|null} [options.documentRef]
      */
     constructor({
-                    basePath = "i18n/",
+                    basePath = "assets/i18n/",
                     storage = globalThis.localStorage ?? null,
                     navigatorRef = globalThis.navigator ?? null,
                     documentRef = globalThis.document ?? null,

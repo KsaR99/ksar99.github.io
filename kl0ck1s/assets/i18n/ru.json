@@ -56,6 +56,10 @@
             "soundTitle": "Звук",
             "mute": "Без звука",
             "volume": "Громкость",
+            "sfxTitle": "Звуковые эффекты",
+            "musicTitle": "Музыка",
+            "categoryVolume": "Громкость категории",
+            "preview": "Прослушать",
             "layoutTitle": "Макет",
             "hudRight": "HUD справа",
             "gameplayTitle": "Геймплей",
@@ -128,5 +132,16 @@
     },
     "game": {
         "levelUpBanner": "УРОВЕНЬ {level}"
+    },
+    "sounds": {
+        "lineClear1": "Одиночная",
+        "lineClear2": "Двойная",
+        "lineClear3": "Тройная",
+        "lineClear4": "Тетрис",
+        "drop": "Падение фигуры",
+        "gameOver": "Игра окончена",
+        "levelUp": "Повышение уровня",
+        "rotate": "Поворот",
+        "grounded": "Фигура на земле"
     }
 }

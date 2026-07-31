@@ -107,7 +107,7 @@ export class StatsTracker {
         game.clearCounts[cleared] = (game.clearCounts[cleared] ?? 0) + 1;
         game.burn = cleared === 4 ? 0 : game.burn + cleared;
 
-        if (playSound) game.soundManager.play("lineClear");
+        if (playSound) game.soundManager.play(`lineClear${Math.min(cleared, 4)}`);
 
         game.lines += cleared;
         this.addScore(pointsForLineClear(cleared, game.level, game.scoring));

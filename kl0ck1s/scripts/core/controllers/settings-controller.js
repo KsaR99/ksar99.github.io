@@ -16,6 +16,13 @@ export class SettingsController {
         return {
             volume: 1, muted: false, glow: true, transparency: true, effect: "vhs", hudRight: false,
             ghost: true, gridLines: true, skipCountdown: false, mouseControl: false, fallTrail: true,
+            // Bus volumes (0..1) for each sound category, applied on top of
+            // the master `volume` above.
+            categoryVolumes: {sfx: 1, music: 1},
+            // Per-sound volume overrides (0..1), keyed by SOUND_FILES key.
+            // A key missing here just means "full volume" - entries are only
+            // written once the player actually drags that sound's slider.
+            soundVolumes: {},
         };
     }
 
@@ -49,7 +56,20 @@ export class SettingsController {
         }
         game.soundManager.setVolume(settings.volume);
         game.soundManager.setMuted(settings.muted);
+        this.applyAudioSettings();
         this.applyPerformanceSettings();
+    }
+
+    /** Pushes the stored category/per-sound volumes into the SoundManager. Called on load; individual slider changes call soundManager.setCategoryVolume/setSoundVolume directly instead of round-tripping through here. */
+    applyAudioSettings() {
+        const game = this.game;
+        const {categoryVolumes, soundVolumes} = game.settings;
+        Object.entries(categoryVolumes ?? {}).forEach(([category, volume]) => {
+            game.soundManager.setCategoryVolume(category, volume);
+        });
+        Object.entries(soundVolumes ?? {}).forEach(([key, volume]) => {
+            game.soundManager.setSoundVolume(key, volume);
+        });
     }
 
     saveSettings() {

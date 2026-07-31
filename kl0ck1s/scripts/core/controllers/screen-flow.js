@@ -362,7 +362,7 @@ export class ScreenFlow {
 
     renderOptionsMenu() {
         const game = this.game;
-        game.hud.showScreen(game.screens.options(game.settings, game.dom, game.i18n));
+        game.hud.showScreen(game.screens.options(game.settings, game.dom, game.i18n, game.soundManager));
         this.bindOptionsMenu();
     }
 
@@ -471,6 +471,40 @@ export class ScreenFlow {
                 settingsController.saveSettings();
             });
         }
+
+        // Category (sfx/music) volume sliders - there's at most one per
+        // category so a plain querySelectorAll + forEach is enough, unlike
+        // the per-sound rows below which are built dynamically.
+        game.dom.querySelectorAll('[data-role="category-volume-slider"]').forEach((slider) => {
+            slider.addEventListener("input", () => {
+                const category = slider.dataset.category;
+                const volume = slider.value / 100;
+                game.settings.categoryVolumes = {...game.settings.categoryVolumes, [category]: volume};
+                game.soundManager.setCategoryVolume(category, volume);
+                settingsController.saveSettings();
+            });
+        });
+
+        // Per-sound rows are generated from SOUND_FILES, so their sliders/
+        // preview buttons are bound once via delegation on each sound-list
+        // container instead of one listener per row.
+        game.dom.querySelectorAll('[data-role="sound-list"]').forEach((list) => {
+            list.addEventListener("input", (event) => {
+                const slider = event.target.closest('[data-role="sound-volume-slider"]');
+                if (!slider) return;
+                const key = slider.dataset.soundKey;
+                const volume = slider.value / 100;
+                game.settings.soundVolumes = {...game.settings.soundVolumes, [key]: volume};
+                game.soundManager.setSoundVolume(key, volume);
+                settingsController.saveSettings();
+            });
+
+            list.addEventListener("click", (event) => {
+                const button = event.target.closest('[data-role="sound-preview-button"]');
+                if (!button) return;
+                game.soundManager.preview(button.dataset.soundKey);
+            });
+        });
 
         if (closeButton) {
             closeButton.addEventListener("click", () => this.toggleOptions());

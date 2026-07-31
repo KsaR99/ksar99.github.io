@@ -56,6 +56,10 @@
             "soundTitle": "Geluid",
             "mute": "Dempen",
             "volume": "Volume",
+            "sfxTitle": "Geluidseffecten",
+            "musicTitle": "Muziek",
+            "categoryVolume": "Categorievolume",
+            "preview": "Afspelen",
             "layoutTitle": "Lay-out",
             "hudRight": "HUD rechts",
             "gameplayTitle": "Gameplay",
@@ -128,5 +132,16 @@
     },
     "game": {
         "levelUpBanner": "NIVEAU {level}"
+    },
+    "sounds": {
+        "lineClear1": "Enkele lijn",
+        "lineClear2": "Dubbele lijn",
+        "lineClear3": "Drievoudige lijn",
+        "lineClear4": "Tetris",
+        "drop": "Blok valt",
+        "gameOver": "Game over",
+        "levelUp": "Niveau omhoog",
+        "rotate": "Draaien",
+        "grounded": "Blok geland"
     }
 }

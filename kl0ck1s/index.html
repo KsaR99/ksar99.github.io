@@ -245,6 +245,26 @@
                 <input class="options__input options__input--range" data-role="volume-slider"
                        max="100" min="0" type="range">
             </label>
+
+            <details class="options__group" data-role="sound-group-sfx">
+                <summary class="options__group-summary" data-i18n="screens.options.sfxTitle">SFX</summary>
+                <label class="options__row">
+                    <span data-i18n="screens.options.categoryVolume">Category volume</span>
+                    <input class="options__input options__input--range" data-category="sfx"
+                           data-role="category-volume-slider" max="100" min="0" type="range">
+                </label>
+                <div class="options__sound-list" data-role="sound-list"></div>
+            </details>
+
+            <details class="options__group" data-role="sound-group-music">
+                <summary class="options__group-summary" data-i18n="screens.options.musicTitle">Music</summary>
+                <label class="options__row">
+                    <span data-i18n="screens.options.categoryVolume">Category volume</span>
+                    <input class="options__input options__input--range" data-category="music"
+                           data-role="category-volume-slider" max="100" min="0" type="range">
+                </label>
+                <div class="options__sound-list" data-role="sound-list"></div>
+            </details>
         </div>
 
         <div class="options">
@@ -430,6 +450,15 @@
         <span data-field="label"></span>
         <span class="difficulty__level" data-field="level"></span>
     </button>
+</template>
+
+<template id="tpl-options-sound-row">
+    <label class="options__row options__row--sound" data-role="sound-row">
+        <span class="options__sound-name" data-field="name"></span>
+        <input class="options__input options__input--range" data-role="sound-volume-slider"
+               max="100" min="0" type="range">
+        <button class="options__preview-button" data-role="sound-preview-button" type="button">▶</button>
+    </label>
 </template>
 
 <template id="tpl-leaderboard-empty">

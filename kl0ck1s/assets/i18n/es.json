@@ -56,6 +56,10 @@
             "soundTitle": "Sonido",
             "mute": "Silenciar",
             "volume": "Volumen",
+            "sfxTitle": "Efectos de sonido",
+            "musicTitle": "Música",
+            "categoryVolume": "Volumen de categoría",
+            "preview": "Escuchar",
             "layoutTitle": "Diseño",
             "hudRight": "HUD a la derecha",
             "gameplayTitle": "Jugabilidad",
@@ -128,5 +132,16 @@
     },
     "game": {
         "levelUpBanner": "NIVEL {level}"
+    },
+    "sounds": {
+        "lineClear1": "Sencilla",
+        "lineClear2": "Doble",
+        "lineClear3": "Triple",
+        "lineClear4": "Tetris",
+        "drop": "Caída de pieza",
+        "gameOver": "Fin del juego",
+        "levelUp": "Subida de nivel",
+        "rotate": "Girar",
+        "grounded": "Pieza apoyada"
     }
 }

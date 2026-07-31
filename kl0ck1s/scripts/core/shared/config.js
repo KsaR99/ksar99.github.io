@@ -159,9 +159,32 @@ export const COLOR_PALETTE = [
 
 export const NEXT_PREVIEW_CELL_SIZE = 22;
 
+// Each sound is tagged with a "category" (sfx/music) - the SoundManager uses
+// it to route the sound through the matching volume bus, and the options
+// screen uses it to sort the per-sound volume sliders into their section.
+// `src` can also be an array of paths - a pool of interchangeable variants
+// that SoundManager.play() picks from at random each time a *plain* play()
+// call is made (no explicit variant requested).
 export const SOUND_FILES = Object.freeze({
-    lineClear: "sounds/line-clear.mp3",
-    drop: "sounds/drop.mp3",
-    gameOver: "sounds/game-over.ogg",
-    levelUp: "sounds/level-up.ogg",
+    // Deliberately 4 separate keys rather than one "lineClear" sound with 4
+    // random variants - which sound plays should depend on how many lines
+    // were cleared (single/double/triple/tetris), not be random. See
+    // PieceController.lockCurrentPiece(), which picks the key from the
+    // actual cleared-line count.
+    lineClear1: Object.freeze({src: "assets/audio/sounds/line-clear-1.ogg", category: "sfx"}),
+    lineClear2: Object.freeze({src: "assets/audio/sounds/line-clear-2.ogg", category: "sfx"}),
+    lineClear3: Object.freeze({src: "assets/audio/sounds/line-clear-3.ogg", category: "sfx"}),
+    lineClear4: Object.freeze({src: "assets/audio/sounds/line-clear-4.ogg", category: "sfx"}),
+    drop: Object.freeze({src: "assets/audio/sounds/drop.mp3", category: "sfx"}),
+    gameOver: Object.freeze({src: "assets/audio/sounds/game-over.ogg", category: "sfx"}),
+    levelUp: Object.freeze({src: "assets/audio/sounds/level-up.ogg", category: "sfx"}),
+    rotate: Object.freeze({src: "assets/audio/sounds/rotate.ogg", category: "sfx"}),
+    // Plays once, the moment the falling piece first touches down and lock
+    // delay starts counting - i.e. the ~1.5s window the player still has to
+    // slide/rotate it into place before it locks. Named to match the
+    // existing `groundedTime`/`MAX_GROUNDED_TIME` fields in SCORING/DIFFICULTIES.
+    grounded: Object.freeze({src: "assets/audio/sounds/grounded.ogg", category: "sfx"}),
+    // No music tracks ship yet (assets/audio/music/ is empty) - once one is
+    // added here with category: "music", it'll automatically get its own
+    // slider under the options screen's "Music" section.
 });
