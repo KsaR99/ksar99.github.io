@@ -117,8 +117,8 @@ export class Renderer {
         return Math.floor(x / this.boardConfig.CELL_SIZE);
     }
 
-    setTheme(backgroundColor) {
-        this.boardDiv.style.backgroundColor = backgroundColor;
+    setTheme(background) {
+        this.boardDiv.style.background = background;
     }
 
     drawCell(context, x, y, color, size, {glow = false, ghost = false} = {}) {
