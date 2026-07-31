@@ -149,7 +149,7 @@ export class Renderer {
     drawGrid(board, context = this.ctx) {
         const size = this.boardConfig.CELL_SIZE;
 
-        context.strokeStyle = "oklch(1 0 0 / 0.5)";
+        context.strokeStyle = "oklch(0.553 0.049 140.928 / 0.5)";
         context.lineWidth = 1;
 
         for (let x = 0; x <= board.cols; x++) {
