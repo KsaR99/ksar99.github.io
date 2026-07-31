@@ -5,22 +5,10 @@ import {pointsForHardDrop, pointsForSoftDrop} from "../game/scoring.js";
 import {getKickTable, T_FRONT_CORNERS} from "../game/game-constants.js";
 import {getTightBounds} from "../shared/utils.js";
 
-// How long (ms) the piece can be momentarily out of contact with the floor/
-// stack before the "grounded" cue actually stops. Rotating in place can flip
-// the raw floor-collision check for a single frame - the rotated shape's
-// footprint (or the kick that resolved it) may not touch anything directly
-// below even though the piece never really left the surface. Real detachment
-// (sliding off a ledge, a rotation that genuinely lifts the piece into open
-// air) lasts much longer than this, so it still stops/restarts the sound as
-// expected - only same-frame rotation flicker is absorbed.
+/** Grace window (ms) absorbing single-frame grounded/airborne flicker from in-place rotation before the "grounded" cue actually stops. */
 const GROUNDED_GRACE_MS = 100;
 
-// The "grounded" cue was authored at ~1.5s, matching Expert's groundedTime
-// (1500ms) 1:1 - i.e. at playbackRate 1 it exactly spans Expert's lock
-// window. Other tiers give a longer/shorter window before a forced lock, so
-// the cue's rate is scaled by this reference against the current tier's
-// window (see groundedSoundPlaybackRate()) so it always spans it too,
-// instead of only sounding right on Expert.
+/** Fallback duration (ms) for groundedSoundPlaybackRate() before the "grounded" clip has finished decoding - see SoundManager.getDuration(). */
 const GROUNDED_SOUND_REFERENCE_DURATION_MS = 1500;
 
 /**
@@ -37,21 +25,10 @@ export class PieceController {
     reset() {
         const game = this.game;
         game.dropCounter = 0;
-        game.lockDelayTimer = 0;
-        game.lockDelayResets = 0;
-        game.groundedTime = 0;
-        game.lastAction = null;
         game.pendingSpin = null;
-        game.rotationAnim = null;
-        game.shiftAnim = null;
-        game.hardDropUsed = false;
         game.clearingLines = [];
         game.clearingTimer = 0;
-        this.stopGroundedSound();
-        game.isGrounded = false;
-        game.groundedGraceTimer = 0;
-        game.groundedSoundRate = 1;
-        game.resetFallTrail();
+        this.resetPerPieceState();
 
         game.current = new Piece(game.bag.next(), {cols: game.board.cols});
         game.statsTracker.registerPieceSpawn(game.current.type);
@@ -65,6 +42,18 @@ export class PieceController {
         game.current = new Piece(game.next, {cols: game.board.cols});
         game.statsTracker.registerPieceSpawn(game.current.type);
         game.next = game.bag.next();
+        this.resetPerPieceState();
+        game.renderer.drawNext(game.next);
+        this.snapToPointer();
+
+        if (game.board.collides(game.current, 0, 0)) {
+            game.screenFlow.gameOver().then();
+        }
+    }
+
+    /** Clears lock-delay/grounded-cue/fall-trail state for the piece about to spawn - shared by reset() and spawnNext(). */
+    resetPerPieceState() {
+        const game = this.game;
         game.hardDropUsed = false;
         game.lockDelayTimer = 0;
         game.lockDelayResets = 0;
@@ -77,12 +66,6 @@ export class PieceController {
         game.rotationAnim = null;
         game.shiftAnim = null;
         game.resetFallTrail();
-        game.renderer.drawNext(game.next);
-        this.snapToPointer();
-
-        if (game.board.collides(game.current, 0, 0)) {
-            game.screenFlow.gameOver().then();
-        }
     }
 
     /**
@@ -113,9 +96,6 @@ export class PieceController {
         if (game.lockDelayResets >= game.scoring.LOCK_DELAY_MAX_RESETS) return;
         game.lockDelayTimer = 0;
         ++game.lockDelayResets;
-        if (game.lockDelayResets >= game.scoring.LOCK_DELAY_MAX_RESETS) {
-            this.snapGroundedSoundToLockTime();
-        }
     }
 
     /**
@@ -138,6 +118,12 @@ export class PieceController {
      * the surface) is treated as still grounded, so rotating in place never
      * stops-and-immediately-restarts the cue.
      *
+     * Once started/resumed here, the cue is never touched again by a move,
+     * rotation, or lock-delay reset - see groundedSoundPlaybackRate() for
+     * why that's correct rather than an oversight: it plays at a fixed rate
+     * tied to `groundedTime`, which already advances in perfect lockstep
+     * with real elapsed grounded time on its own.
+     *
      * @param {boolean} grounded
      * @param {number} delta - ms elapsed this frame, used to time the grace window
      */
@@ -147,35 +133,15 @@ export class PieceController {
         if (grounded) {
             game.groundedGraceTimer = 0;
             if (!game.isGrounded) {
-                const resetsExhausted = game.lockDelayResets >= game.scoring.LOCK_DELAY_MAX_RESETS;
-
-                if (game.groundedSoundId != null && !resetsExhausted) {
-                    // Same landing episode as before the brief loss of
-                    // contact (e.g. sliding across a gap that took longer
-                    // than GROUNDED_GRACE_MS to cross) - continue from
-                    // wherever it left off instead of restarting at 0%,
-                    // which would otherwise sound like a fresh touchdown.
-                    game.soundManager.resume(game.groundedSoundId);
-                } else if (game.groundedSoundId == null) {
+                const resumed = game.groundedSoundId != null && game.soundManager.resume(game.groundedSoundId);
+                if (!resumed) {
                     const rate = this.groundedSoundPlaybackRate();
                     game.groundedSoundId = game.soundManager.play("grounded", {playbackRate: rate});
                     game.groundedSoundRate = rate;
                 }
-                // else: resets were already exhausted by an earlier grounding
-                // episode of this same piece (e.g. spamming move/rotate,
-                // then sliding off the ledge and landing again elsewhere).
-                // lockDelayTimer just reset to 0 for this new episode (see
-                // Game.update()'s not-grounded branch), so this is really a
-                // brand new, independently-timed countdown to lock - resuming
-                // wherever the *previous* episode's cue happened to leave off
-                // (likely already near its own end, from that episode's own
-                // snapGroundedSoundToLockTime() call) would play only
-                // leftover scraps instead of a cue matching *this* episode's
-                // window. Realign below instead of resuming.
-
-                if (resetsExhausted) this.snapGroundedSoundToLockTime();
                 game.isGrounded = true;
             }
+
             return;
         }
 
@@ -190,55 +156,51 @@ export class PieceController {
     }
 
     /**
-     * Scales the "grounded" cue's playback so its duration always spans the
-     * current tier's actual lock window, whatever that window is - see
-     * GROUNDED_SOUND_REFERENCE_DURATION_MS above. E.g. Easy's 3000ms window
+     * The fixed rate the "grounded" cue plays at for the whole episode: the
+     * one rate at which playing the clip's actual decoded duration (see
+     * SoundManager.getDuration()) start-to-finish, uninterrupted, takes
+     * exactly the current tier's `maxGroundedTime` of real wall-clock time.
+     * Falls back to GROUNDED_SOUND_REFERENCE_DURATION_MS only if the buffer
+     * hasn't finished decoding yet (getDuration() returns null) - play()
+     * itself no-ops until it has, so this only affects the rate stashed for
+     * a resume() that ends up happening before decoding completes.
+     * E.g. Easy's 3000ms window
      * plays the cue at 0.5x (stretched to 3s); Pro's 1000ms window plays it
-     * at 1.5x (compressed to 1s).
+     * at 1.5x (compressed to 1s); Expert's 1500ms window plays it at 1x,
+     * matching how the clip was authored.
+     *
+     * This is the *only* place the cue's speed is decided, and it's set once
+     * per episode (touchdown/resume in updateGrounded()) and never adjusted
+     * afterwards - no resyncing on a move, rotation, or lock-delay reset is
+     * needed, because the cue's position is deliberately tied to
+     * `groundedTime`, not to the short, resettable LOCK_DELAY window (see
+     * the comment on GROUNDED_SOUND_REFERENCE_DURATION_MS above).
+     * `groundedTime` only ever counts forward in real time while the piece
+     * is grounded (Game.update()) and is never reset by input, so at this
+     * fixed rate the cue's own playback position - driven purely by the
+     * audio hardware clock, not by any per-frame recomputation - stays
+     * exactly in step with `groundedTime / maxGroundedTime` on its own.
+     * Whatever fraction of the clip has played when the piece actually
+     * locks (whether from a quiet LOCK_DELAY timeout or hitting the
+     * maxGroundedTime cap) is simply however far real time carried it -
+     * stopGroundedSound() then cuts it off there, same as before.
+     *
+     * An earlier version tried to actively realign the cue's *remaining*
+     * playback to `LOCK_DELAY - lockDelayTimer` every time a move/rotation
+     * reset that timer - but that timer jumps back up on every successful
+     * reset, so under repeated input (e.g. DAS-held movement, firing every
+     * ~16ms) it recomputed a new target rate faster than the previous
+     * ramp/reseek had settled, compounding into audibly wrong pitch/timing.
+     * Tying the cue to groundedTime instead removes the need for any of
+     * that: nothing about a move/rotation/reset changes groundedTime's pace,
+     * so there is nothing to resync.
      */
     groundedSoundPlaybackRate() {
-        return GROUNDED_SOUND_REFERENCE_DURATION_MS / this.game.getMaxGroundedTime();
-    }
-
-    /**
-     * Called the instant lockDelayResets hits LOCK_DELAY_MAX_RESETS - from
-     * here on no further reset can postpone the lock, so how long the piece
-     * has left is now fully fixed: lockDelayTimer (just reset to 0 by the
-     * caller) counts up unopposed to LOCK_DELAY, and groundedTime keeps
-     * counting up to maxGroundedTime at the same 1:1 pace - whichever cap is
-     * reached first decides the lock, and neither can be pushed back further.
-     *
-     * groundedSoundPlaybackRate() started the cue assuming the optimistic
-     * case - that resets might still be available to stretch it out to the
-     * full maxGroundedTime window. Now that the remaining time is fixed (and,
-     * for any tier whose LOCK_DELAY resets run out fast, much shorter than
-     * that), the cue needs to line up with the real remaining time instead
-     * of just getting cut off mid-playback.
-     *
-     * Rather than speeding up whatever's left of the clip to cram it into
-     * that window - which pitch-shifts it, badly so if most of the clip is
-     * still unplayed and the window is short (e.g. resets got exhausted by a
-     * burst of quick left/right taps, before much of groundedTime had
-     * elapsed) - this jumps the cue to whichever point in the buffer is
-     * exactly `timeUntilLock` from its end, and lets it play out at its
-     * natural pitch from there. `timeUntilLock` is derived from the exact
-     * same delta-driven clock (lockDelayTimer/groundedTime) that decides
-     * when Game.update() actually calls lockCurrentPiece(), so the cue's end
-     * point is tied to real game time, not a guess. See
-     * SoundManager.alignToRemaining().
-     */
-    snapGroundedSoundToLockTime() {
-        const game = this.game;
-        if (game.groundedSoundId == null) return;
-
-        const timeUntilLock = Math.min(
-            game.scoring.LOCK_DELAY - game.lockDelayTimer,
-            game.getMaxGroundedTime() - game.groundedTime,
-        );
-        if (timeUntilLock <= 0) return;
-
-        game.soundManager.alignToRemaining(game.groundedSoundId, timeUntilLock);
-        game.groundedSoundRate = 1;
+        const durationSeconds = this.game.soundManager.getDuration("grounded");
+        const durationMs = durationSeconds != null
+            ? durationSeconds * 1000
+            : GROUNDED_SOUND_REFERENCE_DURATION_MS;
+        return durationMs / this.game.getMaxGroundedTime();
     }
 
     /**
@@ -272,10 +234,6 @@ export class PieceController {
             game.current.x += dir;
             game.lastAction = "move";
             game.noteColStep();
-            // shiftAnim only exists to give the fall trail enough distinct
-            // in-between x values to spread out horizontally (see
-            // getRenderedPiece()) - with the trail off there's no reason to
-            // ease the move, so snap instantly like before that feature existed.
             game.shiftAnim = game.settings.fallTrail
                 ? {fromX, toX: game.current.x, elapsed: 0, duration: 60}
                 : null;
@@ -305,22 +263,7 @@ export class PieceController {
         if (game.state !== "running") return;
 
         const bounds = getTightBounds(game.current.mask, game.current.width, game.current.height);
-        // bounds.minX is the piece's visible shape offset *within* its mask
-        // grid (nonzero for shapes that aren't flush with the mask's left
-        // edge, e.g. some rotation states of J/L/S/Z). targetColumn below is
-        // in "visible column" space, but game.current.x is the mask's own
-        // origin, so it has to be shifted back by that offset - otherwise the
-        // piece can never be pushed far enough left to put its visible edge
-        // at column 0.
         const offsetX = bounds.minX || 0;
-        // Centers the piece under the cursor. For odd widths this is exact.
-        // For even widths there's no single center column, so a choice has
-        // to be made either way - floor(width/2) here would put the cursor
-        // over the piece's *right*-of-center column, making every even-width
-        // shape (O, horizontal I, ...) consistently land half a cell to the
-        // left of where the cursor actually was. floor((width-1)/2) instead
-        // puts the cursor over the *left*-of-center column, matching where
-        // players actually expect the piece to land.
         targetColumn -= Math.floor((bounds.width - 1) / 2);
         targetColumn = Math.max(
             0,
@@ -403,8 +346,6 @@ export class PieceController {
         const baseDx = fromBounds.minX - toBounds.minX;
         const baseDy = fromBounds.minY - toBounds.minY;
 
-        // Small extra nudges tried after the base correction, for leniency
-        // near walls/stacks - same spirit as a normal 5-offset kick table.
         return [[0, 0], [1, 0], [-1, 0], [0, -1], [0, 1]]
             .map(([nx, ny]) => [baseDx + nx, baseDy + ny]);
     }
@@ -436,24 +377,6 @@ export class PieceController {
                 game.soundManager.play("rotate");
                 if (game.board.collides(game.current, 0, 1)) this.resetLockDelay();
 
-                // Skip the position tween for 180s (see comment below) and
-                // for any rotation that didn't actually move the piece (e.g.
-                // O, whose kick table is always [0,0] - so this is every
-                // single O rotation). With no from->to distance there's
-                // nothing to animate, and letting the tween run anyway would
-                // needlessly suppress the falling-piece interpolation in
-                // getRenderedPiece() for its whole duration - visible as a
-                // brief stutter in the fall, most noticeable on O since it
-                // hits this on every rotate press.
-                //
-                // For 180s specifically: the tween interpolates x/y while the
-                // mask has already swapped to its new shape, which is
-                // invisible for 90° turns (the shape looks different anyway)
-                // but shows up as a visible "jump" for pieces with true 180°
-                // self-symmetry (I, S, Z) - mid-tween, the new mask's
-                // internal row/column offset combined with the not-yet-
-                // arrived position briefly misaligns the shape even though
-                // the start and end positions are both correct.
                 const noPositionChange = game.current.x === fromX && game.current.y === fromY;
                 game.rotationAnim = (Math.abs(dir) === 2 || noPositionChange)
                     ? null
@@ -502,8 +425,6 @@ export class PieceController {
         }
 
         game.pendingSpin = spin;
-        // 1/2/3/4 lines -> lineClear1..4. Clamped defensively in case a
-        // future piece shape could ever clear more than 4 at once.
         const clearedCount = Math.min(fullRows.length, 4);
         game.soundManager.play(`lineClear${clearedCount}`);
         game.state = "clearing";

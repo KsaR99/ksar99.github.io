@@ -161,10 +161,7 @@ export class SoundManager {
         if (!context || !bufferList || bufferList.length === 0) return null;
         this._resumeIfSuspended();
 
-        // Sounds with several source files (e.g. multiple line-clear takes)
-        // pick a random one each time - this is what actually gives the
-        // effect of "variety" instead of the same clip every time.
-        const buffer = bufferList[Math.floor(Math.random() * bufferList.length)];
+        const buffer = bufferList[0];
 
         const category = this.categoryFor(key);
         const source = context.createBufferSource();
@@ -233,7 +230,7 @@ export class SoundManager {
 
         const elapsed = (this.context.currentTime - instance.startedAt) * instance.playbackRate;
         const duration = instance.source.buffer.duration;
-        instance.offset = duration ? (instance.offset + elapsed) % duration : 0;
+        instance.offset = duration ? Math.min(instance.offset + elapsed, duration) : 0;
         instance.paused = true;
 
         try {
@@ -245,11 +242,10 @@ export class SoundManager {
     }
 
     /**
-     * Web Audio buffer sources are one-shot, so both resuming a paused
-     * instance and reseeking a playing one to an explicit position (see
-     * alignToRemaining() below) work the same way: tear down the old source
-     * and start a fresh one from the desired offset/rate on the same gain
-     * node, so per-instance/per-sound volume keeps applying transparently.
+     * Web Audio buffer sources are one-shot, so resuming a paused instance
+     * works by tearing down the old source and starting a fresh one from the
+     * desired offset/rate on the same gain node, so per-instance/per-sound
+     * volume keeps applying transparently.
      */
     _startSourceAt(instance, offset, rate) {
         const context = this.ensureContext();
@@ -277,53 +273,13 @@ export class SoundManager {
 
     resume(id) {
         const instance = this._instance(id);
-        if (!instance || !instance.paused) return;
-        if (!this.ensureContext()) return;
+        if (!instance || !instance.paused) return false;
+        const buffer = instance.source?.buffer;
+        if (buffer && instance.offset >= buffer.duration) return false;
+        if (!this.ensureContext()) return false;
         this._resumeIfSuspended();
         this._startSourceAt(instance, instance.offset, instance.playbackRate);
-    }
-
-    /**
-     * Reseeks a currently playing (or paused) instance so that, continuing
-     * at normal speed/pitch (rate 1) from right now, it finishes in exactly
-     * `remainingMs` - i.e. jumps straight to whichever point in the buffer
-     * is `remainingMs` from the end, rather than speeding up or slowing down
-     * the remaining audio to fit.
-     *
-     * Speeding up instead (adjusting playbackRate) pitch-shifts the cue -
-     * mildly if there's not much left to compress, but badly (audible
-     * "chipmunk" effect) if most of the clip is still unplayed and the
-     * deadline is short. Jumping keeps the cue's natural pitch throughout;
-     * the trade-off is that part of the clip's middle gets skipped instead
-     * of heard, in exchange for always sounding like the same clip.
-     *
-     * `remainingMs` should come from the same real-time game clock that
-     * actually decides when the underlying event happens (e.g. a piece
-     * lock) - once reseeked here, playback is driven by the audio hardware
-     * clock (context.currentTime), which runs in true wall-clock time
-     * regardless of any frame drops in the caller's own clock, so the two
-     * stay in sync instead of gradually drifting apart.
-     *
-     * No-ops if remainingMs isn't positive or the instance/buffer is gone.
-     */
-    alignToRemaining(id, remainingMs) {
-        const instance = this._instance(id);
-        if (!instance || remainingMs <= 0) return;
-
-        const buffer = instance.source?.buffer;
-        if (!buffer) return;
-
-        if (!instance.paused) {
-            try {
-                instance.source.onended = null;
-                instance.source.stop();
-            } catch {
-                // already stopped
-            }
-        }
-
-        const offset = Math.max(0, buffer.duration - remainingMs / 1000);
-        this._startSourceAt(instance, offset, 1);
+        return true;
     }
 
     /** Per-instance volume (0..1), independent of every other currently playing instance of the same sound. */
@@ -394,6 +350,20 @@ export class SoundManager {
 
     getSoundVolume(key) {
         return this.soundVolumes[key] ?? 1;
+    }
+
+    /**
+     * Actual duration (seconds) of a sound's decoded buffer, straight from
+     * the AudioBuffer itself rather than any assumption a caller might make
+     * about how the source file was authored. Uses the first variant when a
+     * sound has several (see srcListFor()) - callers that need a single
+     * fixed duration for e.g. a rate calculation should all be hearing the
+     * same variant anyway.
+     * @returns {number|null} null if the sound isn't loaded/decoded yet
+     */
+    getDuration(key) {
+        const buffer = this.buffers[key]?.[0];
+        return buffer ? buffer.duration : null;
     }
 
     /**

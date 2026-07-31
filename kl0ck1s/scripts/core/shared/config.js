@@ -183,7 +183,7 @@ export const SOUND_FILES = Object.freeze({
     // delay starts counting - i.e. the ~1.5s window the player still has to
     // slide/rotate it into place before it locks. Named to match the
     // existing `groundedTime`/`MAX_GROUNDED_TIME` fields in SCORING/DIFFICULTIES.
-    grounded: Object.freeze({src: "assets/audio/sounds/grounded.ogg", category: "sfx"}),
+    grounded: Object.freeze({src: "assets/audio/sounds/grounded.opus", category: "sfx"}),
     // No music tracks ship yet (assets/audio/music/ is empty) - once one is
     // added here with category: "music", it'll automatically get its own
     // slider under the options screen's "Music" section.

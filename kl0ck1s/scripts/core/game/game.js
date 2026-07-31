@@ -1,6 +1,6 @@
 "use strict";
 
-import {dropIntervalForLevel, tierForLevel} from "../shared/utils.js";
+import {dropIntervalForLevel, nowMs, smoothedInterval, tierForLevel} from "../shared/utils.js";
 import {COUNTDOWN_STEPS, FALL_TRAIL_MAX_LENGTH, fallTrailLengthForInterval} from "./game-constants.js";
 import {InputController} from "../controllers/input-controller.js";
 import {PieceController} from "../controllers/piece-controller.js";
@@ -61,7 +61,6 @@ export class Game {
         this.previousStateBeforeOptions = null;
         this.isPlayingSession = false;
 
-        // Screen/flow state (owned/mutated by ScreenFlow, read here in update()/render()).
         this.state = "idle";
         this.countdownIndex = 0;
         this.countdownTimer = 0;
@@ -71,7 +70,6 @@ export class Game {
         this.currentGameOverSaved = null;
         this.pointerClientX = null;
 
-        // Current piece / round state (owned/mutated by PieceController).
         this.current = null;
         this.next = null;
         this.rotationAnim = null;
@@ -91,12 +89,6 @@ export class Game {
         this.clearingLines = [];
         this.clearingTimer = 0;
 
-        // Fall-trail ("echo") state: a fixed-size ring buffer of preallocated
-        // snapshot slots, reused every frame - no per-frame allocations.
-        // Stores the piece's shape/color/x/y at each moment, so the trail can
-        // smooth both vertical falls and horizontal moves (DAS, soft-drop
-        // while shifting, etc.) instead of only reading x from the current
-        // piece when drawing.
         this.fallTrail = Array.from({length: FALL_TRAIL_MAX_LENGTH}, () => ({
             x: 0, y: 0, mask: null, width: 0, height: 0, color: null,
         }));
@@ -104,25 +96,12 @@ export class Game {
         this.fallTrailCount = 0;
         this._trailPieceRef = null;
 
-        // Real-world measured time between successive one-row drops, used
-        // (instead of dropInterval) to size the fall trail. dropInterval only
-        // reflects gravity from the current level - softDrop() moves the
-        // piece down a row directly without touching dropInterval, so a
-        // held-down soft drop at level 1 would otherwise never trigger a
-        // trail even though the piece is visibly moving just as fast as a
-        // high-level gravity drop. Measuring actual elapsed time between row
-        // steps (see noteRowStep()) catches both cases the same way.
         this.lastRowStepTime = 0;
         this.effectiveDropIntervalMs = Infinity;
 
-        // Same idea as lastRowStepTime/effectiveDropIntervalMs above, but for
-        // horizontal moves (tap-move or DAS auto-repeat), so the trail can
-        // also echo fast side-to-side movement even while the piece isn't
-        // currently falling quickly. See noteColStep().
         this.lastColStepTime = 0;
         this.effectiveShiftIntervalMs = Infinity;
 
-        // Level/stats state (owned/mutated by StatsTracker).
         this.startLevel = 0;
         this.level = 0;
         this.levelTier = null;
@@ -215,21 +194,13 @@ export class Game {
      * Call whenever the current piece moves down exactly one row - from
      * automatic gravity (update()) or from a manual soft drop
      * (PieceController.softDrop()). Tracks the real elapsed time between
-     * successive calls (smoothed a little to avoid single-sample jitter) as
-     * `effectiveDropIntervalMs`, which is what actually drives the fall
-     * trail's length - see fallTrailLengthForInterval in game-constants.js.
+     * successive calls as `effectiveDropIntervalMs`, which is what actually
+     * drives the fall trail's length - see fallTrailLengthForInterval in
+     * game-constants.js.
      */
     noteRowStep() {
-        const now = typeof performance !== "undefined" ? performance.now() : Date.now();
-
-        if (this.lastRowStepTime > 0) {
-            const interval = now - this.lastRowStepTime;
-            this.effectiveDropIntervalMs = this.effectiveDropIntervalMs === Infinity
-                ? interval
-                : this.effectiveDropIntervalMs * 0.7 + interval * 0.3;
-        }
-
-        this.lastRowStepTime = now;
+        ({lastTime: this.lastRowStepTime, effectiveMs: this.effectiveDropIntervalMs} =
+            smoothedInterval(this.lastRowStepTime, this.effectiveDropIntervalMs, nowMs()));
     }
 
     /**
@@ -240,16 +211,8 @@ export class Game {
      * fall trail the same way fast falling does (see updateFallTrail()).
      */
     noteColStep() {
-        const now = typeof performance !== "undefined" ? performance.now() : Date.now();
-
-        if (this.lastColStepTime > 0) {
-            const interval = now - this.lastColStepTime;
-            this.effectiveShiftIntervalMs = this.effectiveShiftIntervalMs === Infinity
-                ? interval
-                : this.effectiveShiftIntervalMs * 0.7 + interval * 0.3;
-        }
-
-        this.lastColStepTime = now;
+        ({lastTime: this.lastColStepTime, effectiveMs: this.effectiveShiftIntervalMs} =
+            smoothedInterval(this.lastColStepTime, this.effectiveShiftIntervalMs, nowMs()));
     }
 
     /**
@@ -317,20 +280,11 @@ export class Game {
         const resting = this.board.collides(this.current, 0, 1);
         this.pieceController.updateGrounded(resting, delta);
 
-        // Deliberately reading this.isGrounded here rather than the raw
-        // `resting` we just computed: updateGrounded() debounces single-frame
-        // collision flicker (a rotation's new footprint/kick briefly not
-        // touching anything below) through GROUNDED_GRACE_MS, so isGrounded
-        // only flips once that's genuinely persisted. Using raw `resting`
-        // here would let repeated rotation flicker silently reset
-        // lockDelayTimer every such frame - bypassing LOCK_DELAY_MAX_RESETS
-        // entirely - and pause groundedTime's accumulation, letting a piece
-        // sit far longer than maxGroundedTime in real elapsed time.
         if (this.isGrounded) {
             this.lockDelayTimer += delta;
             this.groundedTime += delta;
             const maxGroundedTime = this.getMaxGroundedTime();
-            if (this.lockDelayTimer >= this.scoring.LOCK_DELAY || this.groundedTime >= maxGroundedTime) {
+            if (resting && (this.lockDelayTimer >= this.scoring.LOCK_DELAY || this.groundedTime >= maxGroundedTime)) {
                 this.pieceController.lockCurrentPiece();
             }
             return;
@@ -376,7 +330,7 @@ export class Game {
                 const {fromX, toX} = this.shiftAnim;
                 x = fromX + (toX - fromX) * t;
             }
-            if (this.state === "running" && this.dropInterval > 0 && !this.board.collides(base, 0, 1)) {
+            if (this.state === "running" && this.dropInterval > 0 && !this.isGrounded) {
                 y = base.y + Math.min(1, this.dropCounter / this.dropInterval);
             }
         }

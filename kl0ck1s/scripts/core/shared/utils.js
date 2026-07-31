@@ -61,6 +61,26 @@ export function tierForLevel(level, difficulties) {
     return tier;
 }
 
+/** High-resolution timestamp (ms), falling back to Date.now() where performance isn't available. */
+export function nowMs() {
+    return typeof performance !== "undefined" ? performance.now() : Date.now();
+}
+
+/**
+ * Exponentially-smoothed elapsed time between successive calls to a
+ * once-per-step event (a row drop, a DAS column step). Returns the
+ * {lastTime, effectiveMs} pair the caller should store for next time;
+ * effectiveMs is Infinity until a second call establishes a real interval.
+ */
+export function smoothedInterval(lastTime, effectiveMs, now, smoothing = 0.7) {
+    if (lastTime <= 0) return {lastTime: now, effectiveMs};
+    const interval = now - lastTime;
+    const nextEffectiveMs = effectiveMs === Infinity
+        ? interval
+        : effectiveMs * smoothing + interval * (1 - smoothing);
+    return {lastTime: now, effectiveMs: nextEffectiveMs};
+}
+
 export function formatNumber(number, decimals = 1) {
     const units = [
         ["b", 1e9],
