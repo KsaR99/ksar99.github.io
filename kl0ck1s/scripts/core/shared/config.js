@@ -160,7 +160,7 @@ export const COLOR_PALETTE = [
 ];
 
 export const CREDITS = Object.freeze([
-    Object.freeze({name: "Sa_ymon", link: "https://www.twitch.tv/sa_ymon", roles: ["programmer", "sfx"]}),
+    Object.freeze({name: "Sa_ymon", link: "https://www.twitch.tv/sa_ymon", roles: ["developer", "sfx"]}),
     Object.freeze({name: "Danio Dragon", link: "https://www.twitch.tv/danio_dragon", roles: ["tester"]}),
     Object.freeze({name: "Aleksander Żak", link: "https://www.twitch.tv/grubyolson", roles: ["music", "sfx"]}),
 ]);

@@ -124,7 +124,7 @@
         "defaultName": "Jugador"
     },
     "credits": {
-        "roleProgrammer": "Programador",
+        "roleDeveloper": "Ingeniero de software",
         "roleTester": "Tester",
         "roleMusic": "Música",
         "roleSfx": "SFX"

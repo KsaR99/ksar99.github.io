@@ -124,7 +124,7 @@
         "defaultName": "Игрок"
     },
     "credits": {
-        "roleProgrammer": "Программист",
+        "roleDeveloper": "Инженер-программист",
         "roleTester": "Тестировщик",
         "roleMusic": "Музыка",
         "roleSfx": "SFX"
