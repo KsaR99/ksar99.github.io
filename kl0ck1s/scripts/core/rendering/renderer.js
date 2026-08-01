@@ -334,7 +334,7 @@ export class Renderer {
         const centerY = boardCanvas.height - bottomMargin - boxHeight / 2;
 
         ctx.shadowBlur = 6;
-        ctx.fillStyle = "oklch(0 0 0 / 0.75)";
+        ctx.fillStyle = "oklch(0 0 0 / 0.6)";
         ctx.beginPath();
         ctx.roundRect(centerX - boxWidth / 2, centerY - boxHeight / 2, boxWidth, boxHeight, fontSize * 0.2);
         ctx.fill();
@@ -345,7 +345,7 @@ export class Renderer {
         } else {
             ctx.shadowBlur = 0;
         }
-        ctx.fillStyle = "oklch(0.731 0.1861 52.7 / 0.8)";
+        ctx.fillStyle = "oklch(0.731 0.1861 52.7)";
         ctx.fillText(text, centerX, centerY);
         ctx.restore();
     }

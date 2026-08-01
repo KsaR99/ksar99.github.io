@@ -181,6 +181,7 @@ body.hud-right .sidebar--controls.app__sidebar--open {
     width: 3rem;
     height: 3rem;
     padding: 0;
+    justify-content: space-between;
     background: transparent;
     border-radius: var(--radius);
     backdrop-filter: blur(4px);
@@ -468,6 +469,7 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 0.4rem;
     height: 100%;
     width: 100%;
@@ -622,7 +624,6 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 
 .next-piece__canvas {
     display: block;
-    margin: 0 auto;
     background: var(--bg-2);
     border-radius: 0.25rem;
 }
@@ -1319,7 +1320,6 @@ body.faux-fullscreen .mobile-fabs__group:first-child:focus-within {
         display: block;
         width: 96px;
         height: 96px;
-        margin: 0 auto;
         background: var(--bg-2);
     }
 
