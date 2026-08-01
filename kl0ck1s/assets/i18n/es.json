@@ -28,7 +28,13 @@
         "options": "Opciones",
         "spaceKey": "Espacio",
         "restart": "Reiniciar",
-        "exitToMenu": "Salir al menú"
+        "exitToMenu": "Salir al menú",
+        "touchMove": "Mover",
+        "touchMoveGesture": "Arrastra en el tablero",
+        "touchRotateGesture": "Toca el tablero",
+        "touchHardDropGesture": "Desliza hacia abajo",
+        "touchSoftDropGesture": "Mantén ▼",
+        "touchPauseGesture": "Botón ❚❚"
     },
     "screens": {
         "common": {
@@ -79,7 +85,8 @@
             "effectMatrix": "Matrix",
             "effectRain": "Lluvia",
             "effectSnow": "Nieve",
-            "close": "Cerrar"
+            "close": "Cerrar",
+            "mouseSensitivity": "Sensibilidad del ratón"
         },
         "loading": {
             "leaderboardHint": "Cargando clasificación..."

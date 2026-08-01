@@ -4,6 +4,7 @@ import {Piece} from "../game/piece.js";
 import {pointsForHardDrop, pointsForSoftDrop} from "../game/scoring.js";
 import {getKickTable, T_FRONT_CORNERS} from "../game/game-constants.js";
 import {getTightBounds} from "../shared/utils.js";
+import {LINE_CLEAR_SOUND_PLAYBACK_RATE} from "../shared/config.js";
 
 /** Grace window (ms) absorbing single-frame grounded/airborne flicker from in-place rotation before the "grounded" cue actually stops. */
 const GROUNDED_GRACE_MS = 100;
@@ -17,9 +18,6 @@ const GROUNDED_SOUND_REFERENCE_DURATION_MS = 1500;
  * rather than anything derived from the piece's instantaneous fall speed -
  * see fallingSoundPlaybackRate() below.
  */
-
-/** Playback rate for all four "lineClear*" cues - -40% pitch vs. how the clips were authored (1 = unchanged). */
-const LINE_CLEAR_SOUND_PLAYBACK_RATE = 0.6;
 
 /**
  * Owns everything about the currently falling piece: movement, rotation (with

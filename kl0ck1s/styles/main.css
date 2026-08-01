@@ -731,8 +731,16 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     user-select: none;
 }
 
-.controls__list--collapsed {
+.controls__list--keys {
     display: none;
+}
+
+.controls__list--touch {
+    display: flex;
+}
+
+.controls__list--collapsed {
+    display: none !important;
 }
 
 .controls__item {
@@ -948,6 +956,16 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+
+    &::marker {
+        color: var(--accent-2);
+    }
+
+    &:hover {
+        color: var(--text);
+    }
 }
 
 .options__row {
@@ -1000,7 +1018,8 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     padding: 0.3em 0.5em;
 }
 
-.options__group[open] {
+.options__group[open],
+details.options[open] {
     padding-bottom: 0.5em;
 }
 
@@ -1073,7 +1092,8 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     align-self: center;
 }
 
-.options__row:has([data-role="mouse-control-checkbox"]) {
+.options__row:has([data-role="mouse-control-checkbox"]),
+.options__row:has([data-role="mouse-sensitivity-slider"]) {
     display: none;
 }
 

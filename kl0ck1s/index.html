@@ -98,7 +98,7 @@
                 <kbd class="kbd kbd--hint">H</kbd>
             </h3>
 
-            <ul class="controls__list controls__list--collapsed" data-role="controls-list">
+            <ul class="controls__list controls__list--keys controls__list--collapsed" data-role="controls-list">
                 <li class="controls__item">
                     <span data-i18n="controls.rotate">Rotate</span>
                     <span><kbd class="kbd kbd--clickable" data-key-action="ArrowUp">▲</kbd>&nbsp;<kbd
@@ -145,6 +145,29 @@
                 <li class="controls__item">
                     <span data-i18n="controls.options">Options</span> <kbd class="kbd kbd--clickable"
                                                                            data-key-action="KeyO">O</kbd>
+                </li>
+            </ul>
+
+            <ul class="controls__list controls__list--touch controls__list--collapsed" data-role="controls-list">
+                <li class="controls__item">
+                    <span data-i18n="controls.rotate">Rotate</span>
+                    <span data-i18n="controls.touchRotateGesture">Tap board</span>
+                </li>
+                <li class="controls__item">
+                    <span data-i18n="controls.touchMove">Move</span>
+                    <span data-i18n="controls.touchMoveGesture">Drag on board</span>
+                </li>
+                <li class="controls__item">
+                    <span data-i18n="controls.softDrop">Soft drop</span>
+                    <span data-i18n="controls.touchSoftDropGesture">Hold ▼</span>
+                </li>
+                <li class="controls__item">
+                    <span data-i18n="controls.hardDrop">Hard drop</span>
+                    <span data-i18n="controls.touchHardDropGesture">Swipe down</span>
+                </li>
+                <li class="controls__item">
+                    <span data-i18n="controls.pause">Pause</span>
+                    <span data-i18n="controls.touchPauseGesture">❚❚ button</span>
                 </li>
             </ul>
         </div>
@@ -231,16 +254,16 @@
                 data-i18n="screens.options.closeHintAfter">to close</span>
         </p>
 
-        <div class="options">
-            <h3 class="options__title" data-i18n="screens.options.languageTitle">Language</h3>
+        <details class="options" data-role="options-group-language">
+            <summary class="options__title" data-i18n="screens.options.languageTitle">Language</summary>
             <label class="options__row">
                 <span data-i18n="screens.options.language">Language</span>
                 <select class="options__input options__input--select" data-role="lang-select"></select>
             </label>
-        </div>
+        </details>
 
-        <div class="options">
-            <h3 class="options__title" data-i18n="screens.options.soundTitle">Sound</h3>
+        <details class="options" data-role="options-group-sound">
+            <summary class="options__title" data-i18n="screens.options.soundTitle">Sound</summary>
             <label class="options__row">
                 <span data-i18n="screens.options.mute">Mute</span>
                 <input class="options__input options__input--checkbox" data-role="mute-checkbox" type="checkbox">
@@ -270,18 +293,18 @@
                 </label>
                 <div class="options__sound-list" data-role="sound-list"></div>
             </details>
-        </div>
+        </details>
 
-        <div class="options">
-            <h3 class="options__title" data-i18n="screens.options.layoutTitle">Layout</h3>
+        <details class="options" data-role="options-group-layout">
+            <summary class="options__title" data-i18n="screens.options.layoutTitle">Layout</summary>
             <label class="options__row">
                 <span data-i18n="screens.options.hudRight">HUD on the right</span>
                 <input class="options__input options__input--checkbox" data-role="hud-right-checkbox" type="checkbox">
             </label>
-        </div>
+        </details>
 
-        <div class="options">
-            <h3 class="options__title" data-i18n="screens.options.graphicsTitle">Graphics</h3>
+        <details class="options" data-role="options-group-graphics">
+            <summary class="options__title" data-i18n="screens.options.graphicsTitle">Graphics</summary>
             <label class="options__row">
                 <span data-i18n="screens.options.ghost">Ghost piece</span>
                 <input class="options__input options__input--checkbox" data-role="ghost-checkbox" type="checkbox">
@@ -290,10 +313,10 @@
                 <span data-i18n="screens.options.gridLines">Grid lines</span>
                 <input class="options__input options__input--checkbox" data-role="grid-checkbox" type="checkbox">
             </label>
-        </div>
+        </details>
 
-        <div class="options">
-            <h3 class="options__title" data-i18n="screens.options.gameplayTitle">Gameplay</h3>
+        <details class="options" data-role="options-group-gameplay">
+            <summary class="options__title" data-i18n="screens.options.gameplayTitle">Gameplay</summary>
             <label class="options__row">
                 <span data-i18n="screens.options.skipCountdown">Skip countdown</span>
                 <input class="options__input options__input--checkbox" data-role="skip-countdown-checkbox"
@@ -304,10 +327,15 @@
                 <input class="options__input options__input--checkbox" data-role="mouse-control-checkbox"
                        type="checkbox">
             </label>
-        </div>
+            <label class="options__row">
+                <span data-i18n="screens.options.mouseSensitivity">Mouse sensitivity</span>
+                <input class="options__input options__input--range" data-role="mouse-sensitivity-slider"
+                       max="200" min="50" step="5" type="range">
+            </label>
+        </details>
 
-        <div class="options">
-            <h3 class="options__title" data-i18n="screens.options.performanceTitle">Performance</h3>
+        <details class="options" data-role="options-group-performance">
+            <summary class="options__title" data-i18n="screens.options.performanceTitle">Performance</summary>
             <label class="options__row">
                 <span data-i18n="screens.options.glow">Glow (blur)</span>
                 <input class="options__input options__input--checkbox" data-role="glow-checkbox" type="checkbox">
@@ -332,7 +360,7 @@
                     <option data-i18n="screens.options.effectSnow" value="snow">Snow</option>
                 </select>
             </label>
-        </div>
+        </details>
 
         <button class="options__resume button button--accent" data-i18n="screens.options.close"
                 data-role="options-close-button" type="button">Close

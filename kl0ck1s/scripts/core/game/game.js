@@ -1,6 +1,7 @@
 "use strict";
 
 import {dropIntervalForLevel, nowMs, smoothedInterval, tierForLevel} from "../shared/utils.js";
+import {LINE_CLEAR_SOUND_PLAYBACK_RATE} from "../shared/config.js";
 import {COUNTDOWN_STEPS, FALL_TRAIL_MAX_LENGTH, fallTrailLengthForInterval} from "./game-constants.js";
 import {InputController} from "../controllers/input-controller.js";
 import {PieceController} from "../controllers/piece-controller.js";
@@ -162,6 +163,24 @@ export class Game {
      */
     getFallingSoundRate() {
         return this.difficulties[this.levelTier]?.fallingSoundRate ?? this.scoring.DEFAULT_FALLING_SOUND_RATE;
+    }
+
+    /**
+     * The playback rate the options screen's sound preview should use for
+     * `key`, so previewing a sound sounds exactly like it does in a real
+     * game - "falling" and "grounded" are pitched per the current
+     * difficulty/level tier (see getFallingSoundRate()/groundedSoundPlaybackRate()),
+     * "lineClear*" is always pitched down a flat amount, and everything else
+     * plays at its authored speed. Reads live off `levelTier`/`difficulty`
+     * (same fields the real gameplay cues read), so switching difficulty on
+     * the idle screen and then opening options previews the newly selected
+     * tier immediately - no round has to actually be running.
+     */
+    previewPlaybackRateFor(key) {
+        if (key === "falling") return this.getFallingSoundRate();
+        if (key === "grounded") return this.pieceController.groundedSoundPlaybackRate();
+        if (key.startsWith("lineClear")) return LINE_CLEAR_SOUND_PLAYBACK_RATE;
+        return 1;
     }
 
     async init() {

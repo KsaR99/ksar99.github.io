@@ -102,6 +102,12 @@ export const Screens = {
         const mouseControlCheckbox = screen.querySelector('[data-role="mouse-control-checkbox"]');
         if (mouseControlCheckbox) mouseControlCheckbox.checked = Boolean(settings.mouseControl);
 
+        const mouseSensitivitySlider = screen.querySelector('[data-role="mouse-sensitivity-slider"]');
+        if (mouseSensitivitySlider) {
+            mouseSensitivitySlider.value = Math.round((settings.mouseSensitivity ?? 1) * 100);
+            mouseSensitivitySlider.disabled = !settings.mouseControl;
+        }
+
         const effectSelect = screen.querySelector('[data-role="effect-select"]');
         if (effectSelect) effectSelect.value = settings.effect ?? "none";
 

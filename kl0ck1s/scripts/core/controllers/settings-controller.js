@@ -14,8 +14,18 @@ export class SettingsController {
 
     defaultSettings() {
         return {
-            volume: 1, muted: false, glow: true, transparency: true, effect: "none", hudRight: false,
-            ghost: true, gridLines: true, skipCountdown: false, mouseControl: false, fallTrail: true,
+            volume: 1,
+            muted: false,
+            glow: true,
+            transparency: true,
+            effect: "none",
+            hudRight: false,
+            ghost: true,
+            gridLines: true,
+            skipCountdown: false,
+            mouseControl: false,
+            mouseSensitivity: 1,
+            fallTrail: true,
             // Bus volumes (0..1) for each sound category, applied on top of
             // the master `volume` above.
             categoryVolumes: {sfx: 1, music: 0.1},

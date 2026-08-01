@@ -28,7 +28,13 @@
         "options": "Настройки",
         "spaceKey": "Пробел",
         "restart": "Рестарт",
-        "exitToMenu": "Выйти в меню"
+        "exitToMenu": "Выйти в меню",
+        "touchMove": "Движение",
+        "touchMoveGesture": "Проведите пальцем по полю",
+        "touchRotateGesture": "Коснитесь поля",
+        "touchHardDropGesture": "Смахните вниз",
+        "touchSoftDropGesture": "Удерживайте ▼",
+        "touchPauseGesture": "Кнопка ❚❚"
     },
     "screens": {
         "common": {
@@ -79,7 +85,8 @@
             "effectMatrix": "Матрица",
             "effectRain": "Дождь",
             "effectSnow": "Снег",
-            "close": "Закрыть"
+            "close": "Закрыть",
+            "mouseSensitivity": "Чувствительность мыши"
         },
         "loading": {
             "leaderboardHint": "Загрузка таблицы лидеров..."

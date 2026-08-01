@@ -28,7 +28,13 @@
         "options": "Options",
         "spaceKey": "Space",
         "restart": "Restart",
-        "exitToMenu": "Exit to menu"
+        "exitToMenu": "Exit to menu",
+        "touchMove": "Move",
+        "touchMoveGesture": "Drag on board",
+        "touchRotateGesture": "Tap board",
+        "touchHardDropGesture": "Swipe down",
+        "touchSoftDropGesture": "Hold ▼",
+        "touchPauseGesture": "❚❚ button"
     },
     "screens": {
         "common": {
@@ -79,7 +85,8 @@
             "effectMatrix": "Matrix",
             "effectRain": "Rain",
             "effectSnow": "Snow",
-            "close": "Close"
+            "close": "Close",
+            "mouseSensitivity": "Mouse sensitivity"
         },
         "loading": {
             "leaderboardHint": "Loading leaderboard..."

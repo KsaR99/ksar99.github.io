@@ -26,12 +26,19 @@ export class InputController {
         });
     }
 
-    /** Toggles the collapsed/expanded state of the sidebar controls list. UI concern, not tied to any input source. */
+    /**
+     * Toggles the collapsed/expanded state of the sidebar controls list. UI
+     * concern, not tied to any input source. Two lists share this data-role
+     * (a keyboard-shortcut one and a touch-gesture one - see index.html);
+     * only one is ever visible per breakpoint, but both are kept in sync so
+     * whichever one the CSS shows is already in the right state.
+     */
     toggleControlsList() {
         const game = this.game;
         if (!game.dom) return;
-        const list = game.dom.querySelector('[data-role="controls-list"]');
-        if (list) list.classList.toggle("controls__list--collapsed");
+        game.dom.querySelectorAll('[data-role="controls-list"]').forEach((list) => {
+            list.classList.toggle("controls__list--collapsed");
+        });
     }
 
     bindControlsToggle() {

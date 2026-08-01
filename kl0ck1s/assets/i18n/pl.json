@@ -28,7 +28,13 @@
         "options": "Opcje",
         "spaceKey": "Spacja",
         "restart": "Restart",
-        "exitToMenu": "Wyjdź do menu"
+        "exitToMenu": "Wyjdź do menu",
+        "touchMove": "Ruch",
+        "touchMoveGesture": "Przeciągnij po planszy",
+        "touchRotateGesture": "Stuknij planszę",
+        "touchHardDropGesture": "Przesuń w dół",
+        "touchSoftDropGesture": "Przytrzymaj ▼",
+        "touchPauseGesture": "Przycisk ❚❚"
     },
     "screens": {
         "common": {
@@ -79,7 +85,8 @@
             "effectMatrix": "Matrix",
             "effectRain": "Deszcz",
             "effectSnow": "Śnieg",
-            "close": "Zamknij"
+            "close": "Zamknij",
+            "mouseSensitivity": "Czułość myszy"
         },
         "loading": {
             "leaderboardHint": "Wczytywanie tabeli wyników..."

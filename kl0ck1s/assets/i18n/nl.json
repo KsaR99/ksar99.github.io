@@ -28,7 +28,13 @@
         "options": "Opties",
         "spaceKey": "Spatie",
         "restart": "Herstart",
-        "exitToMenu": "Terug naar menu"
+        "exitToMenu": "Terug naar menu",
+        "touchMove": "Bewegen",
+        "touchMoveGesture": "Sleep over het bord",
+        "touchRotateGesture": "Tik op het bord",
+        "touchHardDropGesture": "Veeg omlaag",
+        "touchSoftDropGesture": "Houd ▼ ingedrukt",
+        "touchPauseGesture": "❚❚-knop"
     },
     "screens": {
         "common": {
@@ -79,7 +85,8 @@
             "effectMatrix": "Matrix",
             "effectRain": "Regen",
             "effectSnow": "Sneeuw",
-            "close": "Sluiten"
+            "close": "Sluiten",
+            "mouseSensitivity": "Muisgevoeligheid"
         },
         "loading": {
             "leaderboardHint": "Scorebord laden..."

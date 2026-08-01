@@ -28,7 +28,13 @@
         "options": "Optionen",
         "spaceKey": "Leertaste",
         "restart": "Neustart",
-        "exitToMenu": "Zum Menü zurückkehren"
+        "exitToMenu": "Zum Menü zurückkehren",
+        "touchMove": "Bewegen",
+        "touchMoveGesture": "Auf dem Spielfeld ziehen",
+        "touchRotateGesture": "Spielfeld antippen",
+        "touchHardDropGesture": "Nach unten wischen",
+        "touchSoftDropGesture": "▼ gedrückt halten",
+        "touchPauseGesture": "❚❚-Taste"
     },
     "screens": {
         "common": {
@@ -79,7 +85,8 @@
             "effectMatrix": "Matrix",
             "effectRain": "Regen",
             "effectSnow": "Schnee",
-            "close": "Schließen"
+            "close": "Schließen",
+            "mouseSensitivity": "Mausempfindlichkeit"
         },
         "loading": {
             "leaderboardHint": "Bestenliste wird geladen..."

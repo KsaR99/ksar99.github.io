@@ -25,10 +25,32 @@ export class MouseInput extends InputSource {
         this.softDropIntervalId = undefined;
     }
 
-    /** Steers the piece to the column under clientX and marks the pointer as the active steering source. */
+    /**
+     * Steers the piece to the column under clientX and marks the pointer as
+     * the active steering source. Mouse control maps cursor position to
+     * board column directly (1:1, not relative deltas), so "sensitivity"
+     * here means how much that mapping is stretched around the board's
+     * horizontal center: at the default 1x it's an exact passthrough
+     * (unchanged from before this setting existed); above 1x, a smaller
+     * physical cursor movement swings the piece further (edges of the board
+     * become reachable without leaving the board's own width); below 1x, the
+     * cursor has to travel further than the board's width to reach either
+     * edge.
+     */
     steerTo(clientX) {
         const game = this.game;
-        const column = game.renderer.columnFromClientX(clientX);
+        const sensitivity = game.settings?.mouseSensitivity ?? 1;
+
+        let effectiveX = clientX;
+        if (sensitivity !== 1) {
+            const rect = game.renderer.boardCanvasRect ?? this.canvas?.getBoundingClientRect();
+            if (rect) {
+                const centerX = rect.left + rect.width / 2;
+                effectiveX = centerX + (clientX - centerX) * sensitivity;
+            }
+        }
+
+        const column = game.renderer.columnFromClientX(effectiveX);
         if (column === null || column === undefined) return;
         this.steeringArbiter.markPointerSteer();
         game.pieceController.moveToColumn(column);

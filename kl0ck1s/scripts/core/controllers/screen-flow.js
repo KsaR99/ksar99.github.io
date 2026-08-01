@@ -396,7 +396,10 @@ export class ScreenFlow {
             if (otherButton !== button) this.setPreviewButtonState(otherButton, "play");
         });
 
-        const state = game.soundManager.previewToggle(key, () => this.setPreviewButtonState(button, "play"));
+        const rate = game.previewPlaybackRateFor(key);
+        const state = game.soundManager.previewToggle(
+            key, () => this.setPreviewButtonState(button, "play"), {playbackRate: rate}
+        );
         this.setPreviewButtonState(button, state === "playing" ? "pause" : "play");
     }
 
@@ -426,6 +429,7 @@ export class ScreenFlow {
         const effectSelect = game.dom.querySelector('[data-role="effect-select"]');
         const skipCountdownCheckbox = game.dom.querySelector('[data-role="skip-countdown-checkbox"]');
         const mouseControlCheckbox = game.dom.querySelector('[data-role="mouse-control-checkbox"]');
+        const mouseSensitivitySlider = game.dom.querySelector('[data-role="mouse-sensitivity-slider"]');
         const closeButton = game.dom.querySelector('[data-role="options-close-button"]');
         const closeKey = game.dom.querySelector('[data-role="options-close-key"]');
 
@@ -512,6 +516,14 @@ export class ScreenFlow {
         if (mouseControlCheckbox) {
             mouseControlCheckbox.addEventListener("change", () => {
                 game.settings.mouseControl = mouseControlCheckbox.checked;
+                if (mouseSensitivitySlider) mouseSensitivitySlider.disabled = !mouseControlCheckbox.checked;
+                settingsController.saveSettings();
+            });
+        }
+
+        if (mouseSensitivitySlider) {
+            mouseSensitivitySlider.addEventListener("input", () => {
+                game.settings.mouseSensitivity = mouseSensitivitySlider.value / 100;
                 settingsController.saveSettings();
             });
         }

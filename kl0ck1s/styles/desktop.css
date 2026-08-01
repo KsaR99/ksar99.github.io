@@ -51,8 +51,17 @@ body {
     top: unset;
 }
 
-.options__row:has([data-role="mouse-control-checkbox"]) {
+.options__row:has([data-role="mouse-control-checkbox"]),
+.options__row:has([data-role="mouse-sensitivity-slider"]) {
     display: flex;
+}
+
+.controls__list--keys {
+    display: flex;
+}
+
+.controls__list--touch {
+    display: none;
 }
 
 .card[data-role="next-piece-card"] {

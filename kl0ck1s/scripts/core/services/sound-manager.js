@@ -452,9 +452,13 @@ export class SoundManager {
      *   reaches the end of the clip on its own (not on pause/stop/switch) -
      *   lets the caller flip its button back to the "play" icon without
      *   having to poll.
+     * @param {object} [opts] - extra play() options, e.g. {playbackRate} so a
+     *   preview can be pitched to match how the sound actually plays in-game
+     *   (see Game.previewPlaybackRateFor()). Only used when starting a fresh
+     *   preview - resuming a paused one keeps whatever rate it started at.
      * @returns {"playing"|"paused"} the state the preview is in after this call
      */
-    previewToggle(key, onEnded) {
+    previewToggle(key, onEnded, opts = {}) {
         if (this._previewKey === key && this._previewInstance != null) {
             const instance = this._instance(this._previewInstance);
             if (instance) {
@@ -471,7 +475,7 @@ export class SoundManager {
 
         const wasMuted = this.muted;
         this.muted = false;
-        const id = this.play(key, {onEnded});
+        const id = this.play(key, {...opts, onEnded});
         this.muted = wasMuted;
 
         this._previewInstance = id;
