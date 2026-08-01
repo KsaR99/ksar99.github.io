@@ -159,6 +159,11 @@ body.hud-right .sidebar--controls.app__sidebar--open {
     left: 0;
 }
 
+body.hud-right .card[data-role="next-piece-card"] {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
 /* Next piece + level/progress mini-readout: pulled out of the (hidden)
    stats drawer and pinned as a transparent strip above the board, so
    they stay visible during play without spending sidebar space. Same
@@ -177,7 +182,6 @@ body.hud-right .sidebar--controls.app__sidebar--open {
     z-index: var(--z-fab);
     display: flex;
     align-items: center;
-    justify-content: center;
     width: 3rem;
     height: 3rem;
     padding: 0;
