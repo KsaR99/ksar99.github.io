@@ -173,17 +173,17 @@ export const SOUND_FILES = Object.freeze({
     // were cleared (single/double/triple/tetris), not be random. See
     // PieceController.lockCurrentPiece(), which picks the key from the
     // actual cleared-line count.
-    lineClear1: Object.freeze({src: "assets/audio/sounds/line-clear-1.ogg", category: "sfx"}),
-    lineClear2: Object.freeze({src: "assets/audio/sounds/line-clear-2.ogg", category: "sfx"}),
-    lineClear3: Object.freeze({src: "assets/audio/sounds/line-clear-3.ogg", category: "sfx"}),
-    lineClear4: Object.freeze({src: "assets/audio/sounds/line-clear-4.ogg", category: "sfx"}),
+    lineClear1: Object.freeze({src: "assets/audio/sounds/line-clear-1.opus", category: "sfx"}),
+    lineClear2: Object.freeze({src: "assets/audio/sounds/line-clear-2.opus", category: "sfx"}),
+    lineClear3: Object.freeze({src: "assets/audio/sounds/line-clear-3.opus", category: "sfx"}),
+    lineClear4: Object.freeze({src: "assets/audio/sounds/line-clear-4.opus", category: "sfx"}),
     // Hard drop's instant slam - see PieceController.hardDrop()/
     // lockCurrentPiece(). A piece that locks naturally instead (grounded/
     // lock-delay timing out) plays "pieceLock" below, never both together.
-    drop: Object.freeze({src: "assets/audio/sounds/drop.mp3", category: "sfx"}),
-    gameOver: Object.freeze({src: "assets/audio/sounds/game-over.ogg", category: "sfx"}),
-    levelUp: Object.freeze({src: "assets/audio/sounds/level-up.ogg", category: "sfx"}),
-    rotate: Object.freeze({src: "assets/audio/sounds/rotate.ogg", category: "sfx"}),
+    drop: Object.freeze({src: "assets/audio/sounds/drop.opus", category: "sfx"}),
+    gameOver: Object.freeze({src: "assets/audio/sounds/game-over.opus", category: "sfx"}),
+    levelUp: Object.freeze({src: "assets/audio/sounds/level-up.opus", category: "sfx"}),
+    rotate: Object.freeze({src: "assets/audio/sounds/rotate.opus", category: "sfx"}),
     // Plays once, the moment the falling piece first touches down and lock
     // delay starts counting - i.e. the ~1.5s window the player still has to
     // slide/rotate it into place before it locks. Named to match the
