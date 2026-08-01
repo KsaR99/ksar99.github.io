@@ -22,8 +22,8 @@
     --safe-l: env(safe-area-inset-left, 0px);
     --safe-r: env(safe-area-inset-right, 0px);
     --z-fab: 3;
-    --z-credits: 100;
-    --z-drawer: 30;
+    --z-credits: 29;
+    --z-drawer: 28;
     --z-scrim: 25;
     --fab-size: 2.5rem;
     --fab-gap: 0.4rem;
@@ -332,7 +332,6 @@ body.perf-no-transparency .board__overlay--transparent {
     pointer-events: none;
     overflow: hidden;
     border-radius: var(--radius);
-    align-content: center;
     background: oklch(from var(--bg-2) l c h / 0.85);
     backdrop-filter: blur(6px);
     opacity: 0;
@@ -353,7 +352,6 @@ body.perf-no-transparency .board__overlay--transparent {
     align-items: center;
     gap: 1.5rem;
     padding: 1rem;
-    transform: translateY(-100%);
 }
 
 .board__credits__entry {
@@ -381,23 +379,6 @@ body.perf-no-transparency .board__overlay--transparent {
     font-family: var(--font-body);
     color: var(--muted);
     font-size: 0.85rem;
-}
-
-@keyframes credits-scroll-down {
-    from {
-        transform: translateY(-100%);
-    }
-    to {
-        transform: translateY(100%);
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .board__credits__scroll {
-        animation: none !important;
-        position: static;
-        transform: none;
-    }
 }
 
 .board__filter {

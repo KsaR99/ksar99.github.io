@@ -166,9 +166,9 @@ export const CREDITS = Object.freeze([
 ]);
 
 export const CREDITS_TIMING = Object.freeze({
-    IDLE_DELAY_MS: 30000,
-    REPEAT_INTERVAL_MS: 30000,
-    SCROLL_DURATION_MS: 5000,
+    IDLE_DELAY_MS: 20000,
+    SCROLL_DURATION_MS: 14000,
+    HOLD_DURATION_MS: 10000,
 });
 
 export const NEXT_PREVIEW_CELL_SIZE = 22;
