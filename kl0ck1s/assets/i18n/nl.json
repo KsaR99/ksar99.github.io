@@ -123,6 +123,12 @@
         },
         "defaultName": "Speler"
     },
+    "credits": {
+        "roleProgrammer": "Programmeur",
+        "roleTester": "Tester",
+        "roleMusic": "Muziek",
+        "roleSfx": "SFX"
+    },
     "difficulty": {
         "easy": "Beginner",
         "medium": "Gemiddeld",

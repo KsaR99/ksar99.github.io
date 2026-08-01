@@ -130,6 +130,7 @@ export class ScreenFlow {
         game.isPlayingSession = true;
         game.hud.setPlaying(true);
         game.hud.hideOverlay();
+        game.musicDirector.start(game.board);
     }
 
     async gameOver() {
@@ -137,6 +138,7 @@ export class ScreenFlow {
         game.state = "gameOver-entry";
         game.isPlayingSession = false;
         game.hud.setPlaying(false);
+        game.musicDirector.stop();
         game.soundManager.play("gameOver");
         game.hud.showScreen(game.screens.loading(
             game.i18n.t("screens.gameOverEntry.title"), game.i18n.t("screens.loading.leaderboardHint"), game.dom
@@ -168,6 +170,7 @@ export class ScreenFlow {
         const game = this.game;
         if (!["running", "paused", "countdown", "clearing"].includes(game.state)) return;
         game.pieceController.stopGameplaySounds();
+        game.musicDirector.stop();
         this.showIdleScreen().then();
     }
 
@@ -221,10 +224,12 @@ export class ScreenFlow {
         if (game.state === "running") {
             game.state = "paused";
             game.pieceController.stopGameplaySounds();
+            game.musicDirector.pause();
             this.renderPauseMenu();
         } else if (game.state === "paused") {
             game.state = "running";
             game.hud.hideOverlay();
+            game.musicDirector.resume();
         }
     }
 
@@ -341,6 +346,7 @@ export class ScreenFlow {
 
             if (previousState === "running") {
                 game.hud.hideOverlay();
+                game.musicDirector.resume();
             } else if (previousState === "paused") {
                 this.renderPauseMenu();
             } else if (previousState === "idle") {
@@ -359,7 +365,10 @@ export class ScreenFlow {
         if (!["idle", "running", "paused", "gameOver-saved", "gameOver-entry"].includes(game.state)) return;
 
         game.previousStateBeforeOptions = game.state;
-        if (game.state === "running") game.pieceController.stopGameplaySounds();
+        if (game.state === "running") {
+            game.pieceController.stopGameplaySounds();
+            game.musicDirector.pause();
+        }
         game.state = "options";
         this.renderOptionsMenu();
     }

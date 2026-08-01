@@ -301,6 +301,27 @@ export class SoundManager {
         instance.gainNode.gain.value = volume * (this.soundVolumes[instance.key] ?? 1);
     }
 
+    /** Ramps an instance's volume to `volume` (0..1) over `durationMs`, instead of snapping to it like setInstanceVolume(). */
+    fadeInstanceVolume(id, volume, durationMs = 0) {
+        const instance = this._instance(id);
+        if (!instance) return;
+        const context = this.ensureContext();
+        if (!context) return;
+
+        const target = Math.min(1, Math.max(0, volume)) * (this.soundVolumes[instance.key] ?? 1);
+        instance.baseVolume = volume;
+
+        const param = instance.gainNode.gain;
+        const now = context.currentTime;
+        param.cancelScheduledValues(now);
+        param.setValueAtTime(param.value, now);
+        if (durationMs <= 0) {
+            param.setValueAtTime(target, now);
+        } else {
+            param.linearRampToValueAtTime(target, now + durationMs / 1000);
+        }
+    }
+
     /** Takes effect immediately, even mid-playback - playbackRate is a live AudioParam, not a one-time setting. */
     setPlaybackRate(id, rate) {
         const instance = this._instance(id);

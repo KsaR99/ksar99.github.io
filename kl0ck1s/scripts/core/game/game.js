@@ -9,6 +9,7 @@ import {SettingsController} from "../controllers/settings-controller.js";
 import {EffectOverlay} from "../controllers/effect-overlay.js";
 import {DifficultyController} from "../controllers/difficulty-controller.js";
 import {ScreenFlow} from "../controllers/screen-flow.js";
+import {CreditsController} from "../controllers/credits-controller.js";
 
 /**
  * Central game state + the update/render loop. Gameplay, controls, screens,
@@ -128,6 +129,7 @@ export class Game {
         this.difficultyController = new DifficultyController(this);
         this.screenFlow = new ScreenFlow(this);
         this.inputController = new InputController(this);
+        this.creditsController = new CreditsController(this);
 
         this.settings = this.settingsController.defaultSettings();
     }
@@ -169,6 +171,7 @@ export class Game {
         this.inputController.bindTouchControls();
         this.inputController.bindControlsToggle();
         this.inputController.bindMouseControls();
+        this.creditsController.bind();
         requestAnimationFrame(this.loop.bind(this));
     }
 

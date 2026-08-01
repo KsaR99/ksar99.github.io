@@ -123,6 +123,12 @@
         },
         "defaultName": "Игрок"
     },
+    "credits": {
+        "roleProgrammer": "Программист",
+        "roleTester": "Тестировщик",
+        "roleMusic": "Музыка",
+        "roleSfx": "SFX"
+    },
     "difficulty": {
         "easy": "Новичок",
         "medium": "Любитель",

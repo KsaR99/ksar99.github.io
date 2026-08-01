@@ -159,6 +159,18 @@ export const COLOR_PALETTE = [
     ...KLOCKOMINO_TYPES.map((type) => KLOCKOMINOS[type].color),
 ];
 
+export const CREDITS = Object.freeze([
+    Object.freeze({name: "Sa_ymon", link: "https://www.twitch.tv/sa_ymon", roles: ["programmer", "sfx"]}),
+    Object.freeze({name: "Danio Dragon", link: "https://www.twitch.tv/danio_dragon", roles: ["tester"]}),
+    Object.freeze({name: "Aleksander Żak", link: "https://www.twitch.tv/grubyolson", roles: ["music"]}),
+]);
+
+export const CREDITS_TIMING = Object.freeze({
+    IDLE_DELAY_MS: 30000,
+    REPEAT_INTERVAL_MS: 30000,
+    SCROLL_DURATION_MS: 15000,
+});
+
 export const NEXT_PREVIEW_CELL_SIZE = 22;
 
 // Each sound is tagged with a "category" (sfx/music) - the SoundManager uses
@@ -194,7 +206,8 @@ export const SOUND_FILES = Object.freeze({
     // "grounded" cue's window ran out rather than the player hard-dropping
     // it. See PieceController.lockCurrentPiece().
     pieceLock: Object.freeze({src: "assets/audio/sounds/piece-lock.opus", category: "sfx"}),
-    // No music tracks ship yet (assets/audio/music/ is empty) - once one is
-    // added here with category: "music", it'll automatically get its own
-    // slider under the options screen's "Music" section.
+    // music
+    tetrisowyShvt: Object.freeze({src: "assets/audio/music/tetrisowy-shvt-1.opus", category: "music"}),
+    tetrisowyShvt2: Object.freeze({src: "assets/audio/music/tetrisowy-shvt-2.opus", category: "music"}),
+    tetrisowyShvt3: Object.freeze({src: "assets/audio/music/tetrisowy-shvt-3.opus", category: "music"}),
 });

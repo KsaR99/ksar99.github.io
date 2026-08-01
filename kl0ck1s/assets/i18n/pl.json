@@ -123,6 +123,12 @@
         },
         "defaultName": "Gracz"
     },
+    "credits": {
+        "roleProgrammer": "Programista",
+        "roleTester": "Tester",
+        "roleMusic": "Muzyka",
+        "roleSfx": "SFX"
+    },
     "difficulty": {
         "easy": "Początkujący",
         "medium": "Średni",

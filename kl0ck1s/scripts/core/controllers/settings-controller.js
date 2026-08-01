@@ -18,7 +18,7 @@ export class SettingsController {
             ghost: true, gridLines: true, skipCountdown: false, mouseControl: false, fallTrail: true,
             // Bus volumes (0..1) for each sound category, applied on top of
             // the master `volume` above.
-            categoryVolumes: {sfx: 1, music: 1},
+            categoryVolumes: {sfx: 1, music: 0.1},
             // Per-sound volume overrides (0..1), keyed by SOUND_FILES key.
             // A key missing here just means "full volume" - entries are only
             // written once the player actually drags that sound's slider.

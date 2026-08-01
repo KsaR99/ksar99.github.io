@@ -83,6 +83,9 @@
             <canvas class="board__filter-canvas" id="filter-canvas"></canvas>
         </div>
         <div class="board__overlay" id="overlay"></div>
+        <div aria-hidden="true" class="board__credits" data-role="credits">
+            <div class="board__credits__scroll" data-role="credits-scroll"></div>
+        </div>
     </div>
 
     <div class="app__sidebar sidebar sidebar--controls">
@@ -459,6 +462,13 @@
                max="100" min="0" type="range">
         <button class="options__preview-button" data-role="sound-preview-button" type="button">▶</button>
     </label>
+</template>
+
+<template id="tpl-credits-entry">
+    <div class="board__credits__entry">
+        <a class="board__credits__link" data-field="link" data-role="credits-link" rel="noopener" target="_blank"></a>
+        <span class="board__credits__roles" data-field="roles"></span>
+    </div>
 </template>
 
 <template id="tpl-leaderboard-empty">
