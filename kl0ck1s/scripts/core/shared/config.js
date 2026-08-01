@@ -18,9 +18,7 @@ export const SCORING = Object.freeze({
     LOCK_DELAY: 500,
     LOCK_DELAY_MAX_RESETS: 15,
     MAX_GROUNDED_TIME: 3000,
-    // Fallback for Game.getFallingSoundRate() if a tier is ever missing its
-    // own fallingSoundRate override below - shouldn't happen since every
-    // DIFFICULTIES entry defines one, but keeps that lookup safe regardless.
+    // Fallback for Game.getFallingSoundRate() if a tier is ever missing.
     DEFAULT_FALLING_SOUND_RATE: 0.5,
 });
 

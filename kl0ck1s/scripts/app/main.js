@@ -179,3 +179,16 @@ function handleViewportResize() {
 }
 
 (window?.visualViewport || window).addEventListener("resize", handleViewportResize);
+
+// Auto-pause on minimize/tab-switch/app-background. Without this the rAF
+// loop and the WebAudio-backed music/sfx keep running (or get silently
+// suspended by the browser in an inconsistent way) whenever the page is
+// hidden, since neither the game loop nor SoundManager listen for
+// visibility on their own - screenFlow.togglePause() already knows how to
+// cleanly stop gameplay sounds and pause the music at its exact position
+// (same code path as pressing Escape), so we just need to trigger it here.
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden && game.state === "running") {
+        game.screenFlow.togglePause();
+    }
+});
