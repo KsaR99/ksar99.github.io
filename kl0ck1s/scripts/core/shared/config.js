@@ -18,6 +18,10 @@ export const SCORING = Object.freeze({
     LOCK_DELAY: 500,
     LOCK_DELAY_MAX_RESETS: 15,
     MAX_GROUNDED_TIME: 3000,
+    // Fallback for Game.getFallingSoundRate() if a tier is ever missing its
+    // own fallingSoundRate override below - shouldn't happen since every
+    // DIFFICULTIES entry defines one, but keeps that lookup safe regardless.
+    DEFAULT_FALLING_SOUND_RATE: 0.5,
 });
 
 export const SPIN_POINTS = Object.freeze({
@@ -30,11 +34,11 @@ export const LEVEL_UP_BANNER_DURATION_MS = 470;
 export const LINE_CLEAR_ANIMATION_DURATION_MS = 220;
 
 export const DIFFICULTIES = Object.freeze({
-    easy: {startLevel: 1},
-    medium: {startLevel: 10, groundedTime: 2500},
-    hard: {startLevel: 15, groundedTime: 2000},
-    expert: {startLevel: 20, groundedTime: 1500},
-    pro: {startLevel: 30, groundedTime: 1000},
+    easy: {startLevel: 1, fallingSoundRate: 0.10},
+    medium: {startLevel: 10, groundedTime: 2500, fallingSoundRate: 0.20},
+    hard: {startLevel: 15, groundedTime: 2000, fallingSoundRate: 0.30},
+    expert: {startLevel: 20, groundedTime: 1500, fallingSoundRate: 0.40},
+    pro: {startLevel: 30, groundedTime: 1000, fallingSoundRate: 0.50},
 });
 
 export const BOARD_BACKGROUNDS = Object.freeze({
@@ -184,6 +188,7 @@ export const SOUND_FILES = Object.freeze({
     // slide/rotate it into place before it locks. Named to match the
     // existing `groundedTime`/`MAX_GROUNDED_TIME` fields in SCORING/DIFFICULTIES.
     grounded: Object.freeze({src: "assets/audio/sounds/grounded.opus", category: "sfx"}),
+    falling: Object.freeze({src: "assets/audio/sounds/falling.opus", category: "sfx"}),
     // No music tracks ship yet (assets/audio/music/ is empty) - once one is
     // added here with category: "music", it'll automatically get its own
     // slider under the options screen's "Music" section.

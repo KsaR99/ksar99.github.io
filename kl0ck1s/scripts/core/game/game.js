@@ -84,6 +84,7 @@ export class Game {
         this.groundedSoundId = null;
         this.groundedGraceTimer = 0;
         this.groundedSoundRate = 1;
+        this.fallingSoundId = null;
         this.lastAction = null;
         this.pendingSpin = null;
         this.clearingLines = [];
@@ -148,6 +149,17 @@ export class Game {
      */
     getMaxGroundedTime() {
         return this.difficulties[this.levelTier]?.groundedTime ?? this.scoring.MAX_GROUNDED_TIME;
+    }
+
+    /**
+     * Base playback rate (0..1) for the "falling" cue at the current
+     * difficulty tier - see PieceController.fallingSoundPlaybackRate(). Read
+     * live off `levelTier` (not the originally selected `difficulty`), same
+     * as getMaxGroundedTime() above, so it keeps climbing as the player's
+     * level pushes into a faster tier mid-round.
+     */
+    getFallingSoundRate() {
+        return this.difficulties[this.levelTier]?.fallingSoundRate ?? this.scoring.DEFAULT_FALLING_SOUND_RATE;
     }
 
     async init() {
@@ -279,6 +291,7 @@ export class Game {
 
         const resting = this.board.collides(this.current, 0, 1);
         this.pieceController.updateGrounded(resting, delta);
+        this.pieceController.updateFalling();
 
         if (this.isGrounded) {
             this.lockDelayTimer += delta;

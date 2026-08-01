@@ -142,6 +142,7 @@
         "gameOver": "Game Over",
         "levelUp": "Levelaufstieg",
         "rotate": "Drehen",
-        "grounded": "Stein aufgesetzt"
+        "grounded": "Stein aufgesetzt",
+        "falling": "Stein sinkt"
     }
 }

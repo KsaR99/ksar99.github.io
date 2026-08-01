@@ -142,6 +142,7 @@
         "gameOver": "Koniec gry",
         "levelUp": "Awans poziomu",
         "rotate": "Obrót",
-        "grounded": "Klocek na dole"
+        "grounded": "Klocek na dole",
+        "falling": "Spadanie klocka"
     }
 }

@@ -142,6 +142,7 @@
         "gameOver": "Game over",
         "levelUp": "Niveau omhoog",
         "rotate": "Draaien",
-        "grounded": "Blok geland"
+        "grounded": "Blok geland",
+        "falling": "Blok zakt"
     }
 }

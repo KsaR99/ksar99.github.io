@@ -167,6 +167,7 @@ export class ScreenFlow {
     exitToMenu() {
         const game = this.game;
         if (!["running", "paused", "countdown", "clearing"].includes(game.state)) return;
+        game.pieceController.stopGameplaySounds();
         this.showIdleScreen().then();
     }
 
@@ -219,6 +220,7 @@ export class ScreenFlow {
         const game = this.game;
         if (game.state === "running") {
             game.state = "paused";
+            game.pieceController.stopGameplaySounds();
             this.renderPauseMenu();
         } else if (game.state === "paused") {
             game.state = "running";
@@ -356,6 +358,7 @@ export class ScreenFlow {
         if (!["idle", "running", "paused", "gameOver-saved", "gameOver-entry"].includes(game.state)) return;
 
         game.previousStateBeforeOptions = game.state;
+        if (game.state === "running") game.pieceController.stopGameplaySounds();
         game.state = "options";
         this.renderOptionsMenu();
     }

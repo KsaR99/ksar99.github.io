@@ -586,7 +586,7 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 .progress-bar__fill {
     height: 100%;
     width: 0;
-    background: oklch(0.44 0.18 148.1);
+    background: oklch(0.54 0.17 150.8);
     border-radius: inherit;
     transition: width 0.1s ease;
 }

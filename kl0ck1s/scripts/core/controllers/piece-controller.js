@@ -12,6 +12,16 @@ const GROUNDED_GRACE_MS = 100;
 const GROUNDED_SOUND_REFERENCE_DURATION_MS = 1500;
 
 /**
+ * The "falling" cue's playback rate is a flat per-difficulty-tier value (see
+ * DIFFICULTIES.*.fallingSoundRate in config.js and Game.getFallingSoundRate())
+ * rather than anything derived from the piece's instantaneous fall speed -
+ * see fallingSoundPlaybackRate() below.
+ */
+
+/** Playback rate for all four "lineClear*" cues - -40% pitch vs. how the clips were authored (1 = unchanged). */
+const LINE_CLEAR_SOUND_PLAYBACK_RATE = 0.6;
+
+/**
  * Owns everything about the currently falling piece: movement, rotation (with
  * kicks), soft/hard drop, lock delay, spin detection and locking/line-clear
  * hand-off. Reads/writes the shared piece-related fields on the Game instance.
@@ -58,7 +68,7 @@ export class PieceController {
         game.lockDelayTimer = 0;
         game.lockDelayResets = 0;
         game.groundedTime = 0;
-        this.stopGroundedSound();
+        this.stopGameplaySounds();
         game.isGrounded = false;
         game.groundedGraceTimer = 0;
         game.groundedSoundRate = 1;
@@ -224,6 +234,76 @@ export class PieceController {
         if (game.groundedSoundId == null) return;
         game.soundManager.stop(game.groundedSoundId);
         game.groundedSoundId = null;
+    }
+
+    /**
+     * The "falling" cue's playback rate: a flat value for the current
+     * difficulty tier (see DIFFICULTIES.*.fallingSoundRate in config.js) -
+     * Easy plays it low and slow (10%), Pro plays it at half speed (50%),
+     * with the tiers in between climbing evenly. Read live off the current
+     * tier via Game.getFallingSoundRate(), so - same as the "grounded" cue's
+     * window - it keeps climbing if the player's level pushes into a faster
+     * tier mid-round, even if they started on a slower difficulty.
+     */
+    fallingSoundPlaybackRate() {
+        return this.game.getFallingSoundRate();
+    }
+
+    /**
+     * Starts/keeps/stops the "falling" cue in lockstep with `game.isGrounded`
+     * (already debounced by updateGrounded() above, so this never fights it
+     * over the same single-frame flicker). Deliberately simpler than the
+     * "grounded" cue's pause/resume dance: falling never seeks back into a
+     * previous instance - every fresh falling episode (spawn, or coming back
+     * off a ledge after having been grounded) starts a brand new looping
+     * instance from position 0 via play(), and stopFallingSound() always
+     * discards it outright rather than pausing it. While an instance is
+     * already playing, only its rate is touched (a live AudioParam - see
+     * SoundManager.setPlaybackRate()), so the pitch can keep tracking speed
+     * for as long as the piece keeps falling without ever restarting the
+     * clip mid-fall.
+     */
+    updateFalling() {
+        const game = this.game;
+
+        if (game.isGrounded) {
+            this.stopFallingSound();
+            return;
+        }
+
+        const rate = this.fallingSoundPlaybackRate();
+
+        if (game.fallingSoundId == null) {
+            // Retries every frame until this succeeds - harmless no-op if
+            // the buffer hasn't finished decoding yet (play() just returns
+            // null, see SoundManager.play()).
+            game.fallingSoundId = game.soundManager.play("falling", {loop: true, playbackRate: rate});
+            return;
+        }
+
+        game.soundManager.setPlaybackRate(game.fallingSoundId, rate);
+    }
+
+    /** Stops the currently playing "falling" cue for good, if any - see updateFalling(). */
+    stopFallingSound() {
+        const game = this.game;
+        if (game.fallingSoundId == null) return;
+        game.soundManager.stop(game.fallingSoundId);
+        game.fallingSoundId = null;
+    }
+
+    /**
+     * Stops both the "grounded" and "falling" cues outright. Used whenever
+     * gameplay is interrupted from the outside - pausing, opening options,
+     * or exiting to the menu - rather than through the piece's own
+     * grounded/falling state machine, so neither cue is left playing behind
+     * a non-gameplay screen. Piece-lifecycle stops (spawn, lock) already go
+     * through resetPerPieceState()/lockCurrentPiece() instead, which call
+     * this too - see there.
+     */
+    stopGameplaySounds() {
+        this.stopGroundedSound();
+        this.stopFallingSound();
     }
 
     moveHorizontal(dir) {
@@ -411,7 +491,7 @@ export class PieceController {
         const game = this.game;
         const spin = this.detectSpin();
 
-        this.stopGroundedSound();
+        this.stopGameplaySounds();
         game.soundManager.play("drop");
         game.board.lockPiece(game.current);
 
@@ -426,7 +506,7 @@ export class PieceController {
 
         game.pendingSpin = spin;
         const clearedCount = Math.min(fullRows.length, 4);
-        game.soundManager.play(`lineClear${clearedCount}`);
+        game.soundManager.play(`lineClear${clearedCount}`, {playbackRate: LINE_CLEAR_SOUND_PLAYBACK_RATE});
         game.state = "clearing";
         game.clearingLines = fullRows;
         game.clearingTimer = 0;
