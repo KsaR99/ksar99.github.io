@@ -30,7 +30,7 @@ export const SPIN_POINTS = Object.freeze({
     OTHER: [100, 200, 400, 600],
 });
 
-export const LEVEL_UP_BANNER_DURATION_MS = 470;
+export const LEVEL_UP_BANNER_DURATION_MS = 420;
 export const LINE_CLEAR_ANIMATION_DURATION_MS = 220;
 
 export const DIFFICULTIES = Object.freeze({
@@ -183,7 +183,7 @@ export const MUSIC_TENSION = Object.freeze({
     TRACK_KEYS: ["tetrisowyShvt", "tetrisowyShvt2", "tetrisowyShvt3"],
     THRESHOLDS: [0, 0.33, 0.66],
     HYSTERESIS: 0.05,
-    FADE_DURATION_MS: 1500,
+    FADE_DURATION_MS: 10000,
     STOP_FADE_DURATION_MS: 800,
 });
 

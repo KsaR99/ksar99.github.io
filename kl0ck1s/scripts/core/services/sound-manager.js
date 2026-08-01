@@ -238,7 +238,18 @@ export class SoundManager {
 
         const elapsed = (this.context.currentTime - instance.startedAt) * instance.playbackRate;
         const duration = instance.source.buffer.duration;
-        instance.offset = duration ? Math.min(instance.offset + elapsed, duration) : 0;
+        let offset = instance.offset + elapsed;
+        if (duration) {
+            // A looping instance can have looped around many times while
+            // playing, so elapsed can be several multiples of duration -
+            // wrap it back into [0, duration) instead of clamping to
+            // duration, which made offset >= buffer.duration below and
+            // silently blocked resume() ever restarting it.
+            offset = instance.source.loop ? offset % duration : Math.min(offset, duration);
+        } else {
+            offset = 0;
+        }
+        instance.offset = offset;
         instance.paused = true;
 
         try {
