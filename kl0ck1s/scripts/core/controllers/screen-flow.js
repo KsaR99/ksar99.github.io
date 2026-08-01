@@ -334,6 +334,7 @@ export class ScreenFlow {
     toggleOptions() {
         const game = this.game;
         if (game.state === "options") {
+            game.soundManager.stopPreview();
             const previousState = game.previousStateBeforeOptions ?? "idle";
             game.previousStateBeforeOptions = null;
             game.state = previousState;
@@ -367,6 +368,37 @@ export class ScreenFlow {
         const game = this.game;
         game.hud.showScreen(game.screens.options(game.settings, game.dom, game.i18n, game.soundManager));
         this.bindOptionsMenu();
+    }
+
+    /**
+     * Handles a click on a sound's preview button: delegates the actual
+     * play/pause/switch decision to SoundManager.previewToggle(), then syncs
+     * every preview button's icon to match. Only one preview is ever alive
+     * (see previewToggle()), so every *other* button is reset to "play"
+     * first - if this click ends up switching to a different sound, that
+     * reset already matches reality; if it's the same button, the reset
+     * pass simply skips it.
+     */
+    togglePreviewButton(button, list) {
+        const game = this.game;
+        const key = button.dataset.soundKey;
+
+        list.querySelectorAll('[data-role="sound-preview-button"]').forEach((otherButton) => {
+            if (otherButton !== button) this.setPreviewButtonState(otherButton, "play");
+        });
+
+        const state = game.soundManager.previewToggle(key, () => this.setPreviewButtonState(button, "play"));
+        this.setPreviewButtonState(button, state === "playing" ? "pause" : "play");
+    }
+
+    /** Paints a single preview button's icon/aria-label for "play" or "pause" state. */
+    setPreviewButtonState(button, state) {
+        const game = this.game;
+        button.textContent = state === "pause" ? "⏸" : "▶";
+        button.setAttribute(
+            "aria-label",
+            game.i18n.t(state === "pause" ? "screens.options.pause" : "screens.options.preview")
+        );
     }
 
     bindOptionsMenu() {
@@ -505,7 +537,7 @@ export class ScreenFlow {
             list.addEventListener("click", (event) => {
                 const button = event.target.closest('[data-role="sound-preview-button"]');
                 if (!button) return;
-                game.soundManager.preview(button.dataset.soundKey);
+                this.togglePreviewButton(button, list);
             });
         });
 

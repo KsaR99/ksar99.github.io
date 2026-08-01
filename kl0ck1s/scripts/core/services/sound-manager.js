@@ -43,6 +43,7 @@ export class SoundManager {
         this.soundVolumes = {};
 
         this._previewInstance = null;
+        this._previewKey = null;
         this._ready = null;
     }
 
@@ -151,9 +152,12 @@ export class SoundManager {
      * @param {number} [opts.volume] extra one-off multiplier, on top of the sound's/category's/master volume (default 1)
      * @param {number} [opts.playbackRate] 1 = normal speed
      * @param {number} [opts.detune] cents (100 = one semitone), 0 = no pitch shift
+     * @param {() => void} [opts.onEnded] called once the instance reaches the end of the clip on its own -
+     *   i.e. NOT when it's paused or explicitly stopped, only on a genuine natural finish. Used by the
+     *   options screen's preview buttons to flip back to the "play" icon without polling.
      * @returns {number|null} an instance id usable with stop/pause/resume/setInstanceVolume/setPlaybackRate/setDetune, or null if it couldn't play
      */
-    play(key, {loop = false, volume = 1, playbackRate = 1, detune = 0} = {}) {
+    play(key, {loop = false, volume = 1, playbackRate = 1, detune = 0, onEnded = null} = {}) {
         if (this.muted) return null;
 
         const context = this.ensureContext();
@@ -180,6 +184,7 @@ export class SoundManager {
             id, key, category, source, gainNode, loop,
             baseVolume: volume, playbackRate, detune,
             startedAt: context.currentTime, offset: 0, paused: false,
+            onEnded,
         };
         this.instances.set(id, instance);
 
@@ -187,7 +192,10 @@ export class SoundManager {
             // A paused instance's source is also technically "ended" (we call
             // .stop() on it) - that's not a real end-of-playback, resume()
             // will swap in a new source, so don't drop the instance's state.
-            if (!instance.paused) this.instances.delete(id);
+            if (!instance.paused) {
+                this.instances.delete(id);
+                instance.onEnded?.();
+            }
         };
 
         source.start(0);
@@ -260,7 +268,10 @@ export class SoundManager {
 
         const id = instance.id;
         source.onended = () => {
-            if (!instance.paused) this.instances.delete(id);
+            if (!instance.paused) {
+                this.instances.delete(id);
+                instance.onEnded?.();
+            }
         };
 
         instance.source = source;
@@ -382,5 +393,57 @@ export class SoundManager {
 
         this._previewInstance = id;
         return id;
+    }
+
+    /** Stops whatever sound preview is currently playing or paused, if any - used when the options screen is closed so a preview never keeps sounding (or sits silently paused) once it's not visible. */
+    stopPreview() {
+        if (this._previewInstance == null) return;
+        this.stop(this._previewInstance);
+        this._previewInstance = null;
+        this._previewKey = null;
+    }
+
+    /**
+     * Same idea as preview() above, but toggles instead of always
+     * restarting - lets the options screen's preview button double as a
+     * play/pause control so a sound can be paused mid-clip while testing it.
+     *
+     * Clicking the *same* key's button again while its preview is still
+     * alive pauses it (or resumes it, if it was already paused) rather than
+     * cutting it off and starting over. Clicking a *different* key's button
+     * always stops whatever was previewing before and starts the new one
+     * fresh from the beginning - only one preview is ever alive at a time.
+     * Bypasses mute, same as preview().
+     *
+     * @param {string} key
+     * @param {() => void} [onEnded] - called once this preview instance
+     *   reaches the end of the clip on its own (not on pause/stop/switch) -
+     *   lets the caller flip its button back to the "play" icon without
+     *   having to poll.
+     * @returns {"playing"|"paused"} the state the preview is in after this call
+     */
+    previewToggle(key, onEnded) {
+        if (this._previewKey === key && this._previewInstance != null) {
+            const instance = this._instance(this._previewInstance);
+            if (instance) {
+                if (instance.paused) {
+                    this.resume(this._previewInstance);
+                    return "playing";
+                }
+                this.pause(this._previewInstance);
+                return "paused";
+            }
+        }
+
+        if (this._previewInstance !== null) this.stop(this._previewInstance);
+
+        const wasMuted = this.muted;
+        this.muted = false;
+        const id = this.play(key, {onEnded});
+        this.muted = wasMuted;
+
+        this._previewInstance = id;
+        this._previewKey = key;
+        return "playing";
     }
 }

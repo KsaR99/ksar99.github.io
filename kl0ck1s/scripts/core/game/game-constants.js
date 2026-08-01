@@ -90,8 +90,8 @@ export const COUNTDOWN_STEPS = [
  */
 export const FALL_TRAIL_SLOW_INTERVAL_MS = 500;
 export const FALL_TRAIL_FAST_INTERVAL_MS = 40;
-export const FALL_TRAIL_MAX_LENGTH = 7;
-export const FALL_TRAIL_MAX_ALPHA = 0.3;
+export const FALL_TRAIL_MAX_LENGTH = 8;
+export const FALL_TRAIL_MAX_ALPHA = 0.25;
 
 /** How many trail snapshots should be kept/drawn for a given current drop interval (ms/row). */
 export function fallTrailLengthForInterval(dropIntervalMs) {
