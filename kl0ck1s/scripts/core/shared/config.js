@@ -166,7 +166,7 @@ export const CREDITS = Object.freeze([
 ]);
 
 export const CREDITS_TIMING = Object.freeze({
-    IDLE_DELAY_MS: 20000,
+    IDLE_DELAY_MS: 45000,
     SCROLL_DURATION_MS: 11500,
     HOLD_DURATION_MS: 15000,
 });
