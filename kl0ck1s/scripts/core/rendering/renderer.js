@@ -313,7 +313,6 @@ export class Renderer {
     drawLevelUpBanner(level) {
         const {ctx, boardCanvas, boardConfig} = this;
         const centerX = boardCanvas.width / 2;
-        const centerY = boardCanvas.height / 2;
         const fontSize = Math.max(18, Math.round(boardConfig.CELL_SIZE * 1.2));
         const text = this.i18n ? this.i18n.t("game.levelUpBanner", {level}) : `LEVEL ${level}`;
         const fontBody = getComputedStyle(document.documentElement)
@@ -331,19 +330,22 @@ export class Renderer {
         const boxWidth = textWidth + paddingX * 2;
         const boxHeight = fontSize + paddingY * 2;
 
+        const bottomMargin = fontSize * 0.8;
+        const centerY = boardCanvas.height - bottomMargin - boxHeight / 2;
+
         ctx.shadowBlur = 6;
-        ctx.fillStyle = "oklch(0 0 0 / 0.3)";
+        ctx.fillStyle = "oklch(0 0 0 / 0.75)";
         ctx.beginPath();
         ctx.roundRect(centerX - boxWidth / 2, centerY - boxHeight / 2, boxWidth, boxHeight, fontSize * 0.2);
         ctx.fill();
 
         if (this.glowEnabled) {
             ctx.shadowBlur = fontSize * 0.2;
-            ctx.shadowColor = "oklch(0.765 0.175 63 / 0.75)";
+            ctx.shadowColor = "oklch(0.464 0.043 75.925 / 0.85)";
         } else {
             ctx.shadowBlur = 0;
         }
-        ctx.fillStyle = "oklch(0.731143 0.186114 52.7757 / 0.8)";
+        ctx.fillStyle = "oklch(0.731 0.1861 52.7 / 0.8)";
         ctx.fillText(text, centerX, centerY);
         ctx.restore();
     }

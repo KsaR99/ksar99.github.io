@@ -30,7 +30,7 @@ export const SPIN_POINTS = Object.freeze({
     OTHER: [100, 200, 400, 600],
 });
 
-export const LEVEL_UP_BANNER_DURATION_MS = 420;
+export const LEVEL_UP_BANNER_DURATION_MS = 750;
 export const LINE_CLEAR_ANIMATION_DURATION_MS = 220;
 
 export const DIFFICULTIES = Object.freeze({
