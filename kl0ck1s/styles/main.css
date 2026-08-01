@@ -332,7 +332,9 @@ body.perf-no-transparency .board__overlay--transparent {
     pointer-events: none;
     overflow: hidden;
     border-radius: var(--radius);
+    align-content: center;
     background: oklch(from var(--bg-2) l c h / 0.85);
+    backdrop-filter: blur(6px);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
