@@ -1,0 +1,13 @@
+/* Mobile-only additions on top of main.css's mobile-first base rules.
+   Hides the floating HUD bits (next-piece mini icon + difficulty bar)
+   and the on-screen touch D-pad whenever a screen overlay is showing
+   (paused/options/idle/game over) — none of them make sense floating
+   over a menu screen. Desktop doesn't need this: the next-piece/
+   difficulty widgets live statically in the sidebar there (stay
+   visible regardless of overlay state) and there's no touch D-pad
+   at all. */
+.app:has(.board__overlay--visible) [data-role="next-piece-card"],
+.app:has(.board__overlay--visible) [data-role="difficulty-stat"],
+.app:has(.board__overlay--visible) [data-role="touch-controls"] {
+    display: none;
+}

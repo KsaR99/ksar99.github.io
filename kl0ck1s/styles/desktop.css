@@ -1,0 +1,162 @@
+/* ============================================================
+   Desktop overrides on top of main.css's mobile-first base rules.
+   Restores the original 3-column row layout and hides every
+   mobile-only control. Loaded instead of mobile.css above `48rem`
+   (see index.html) — relies on main.css being loaded first, so
+   these rules only need to state what actually changes, not
+   reset every mobile-only property back to a neutral value.
+   ============================================================ */
+
+body {
+    overflow: visible;
+    padding: 0.25rem;
+}
+
+.app {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    width: auto;
+    height: auto;
+    gap: 0.75rem;
+}
+
+.app__board {
+    order: 2;
+    flex: 0 0 auto;
+    display: block;
+    width: auto;
+    padding: 0;
+}
+
+.board__overlay {
+    /* No justify-content override here (stays flex-start, from main.css):
+       centering is done below via .screen's own auto margins instead of
+       justify-content:center, so it never traps overflow above scroll
+       reach — see the .screen rule below for why. */
+    padding-top: 0;
+}
+
+.screen {
+    /* Auto margins center .screen within .board__overlay while it's
+       shorter than the board (they absorb the free space equally
+       top/bottom) but collapse to 0 the instant content overflows —
+       unlike justify-content:center, they can't go negative, so an
+       expanded SFX/Music group just grows downward from the top
+       instead of pushing content above the scrollable area. */
+    margin-block: auto;
+}
+
+.board__canvas {
+    top: unset;
+}
+
+.options__row:has([data-role="mouse-control-checkbox"]) {
+    display: flex;
+}
+
+.card[data-role="next-piece-card"] {
+    position: static;
+    inset: auto;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    transform: none;
+
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0.64rem 1rem;
+
+    z-index: auto;
+
+    background: var(--panel);
+    border-radius: var(--radius);
+    backdrop-filter: none;
+}
+
+[data-role="next-piece-card"] .card__title {
+    display: block;
+}
+
+[data-role="next-piece-card"] .next-piece__canvas {
+    display: block;
+    width: 96px;
+    height: 96px;
+    background: var(--bg-2);
+}
+
+[data-role="difficulty-stat"] {
+    position: static;
+    inset: auto;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+
+    width: 100%;
+    height: auto;
+    margin-top: .5rem;
+    z-index: auto;
+}
+
+[data-role="difficulty-stat"] .progress-bar--difficulty {
+    width: 100%;
+    height: 1.5rem;
+    background: oklch(25.03% 0.027 271);
+    backdrop-filter: none;
+}
+
+.app__sidebar {
+    width: clamp(11.5rem, 22vw, 13.75rem);
+    max-width: 90vw;
+    flex: 0 1 13.75rem;
+}
+
+.sidebar--stats,
+.sidebar--controls {
+    position: static;
+    z-index: auto;
+    padding: 0;
+    overflow-y: visible;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    transform: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+}
+
+.sidebar--stats {
+    order: 1;
+}
+
+.sidebar--controls {
+    order: 3;
+}
+
+body.hud-right .sidebar--stats,
+body.hud-right .sidebar--controls {
+    transform: none;
+}
+
+body.hud-right .sidebar--stats {
+    order: 3;
+}
+
+body.hud-right .sidebar--controls {
+    order: 1;
+}
+
+.mobile-fabs,
+.drawer-scrim,
+.touch-controls,
+.drawer-close {
+    display: none;
+}
+
+.screen__hint--tiny {
+    display: block;
+}

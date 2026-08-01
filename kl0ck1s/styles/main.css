@@ -55,11 +55,13 @@ body {
 
 /* ============================================================
    Layout — mobile-first.
-   Base rules below target small/touch screens: the board is the
-   dominant element and both sidebars become off-canvas drawers
-   that slide in on demand instead of competing for width. The
-   desktop override near the bottom of this file restores the
-   original three-column row layout.
+   Rules below target small/touch screens by default: the board is
+   the dominant element and both sidebars become off-canvas drawers
+   that slide in on demand instead of competing for width. desktop.css
+   (loaded instead of mobile.css above `48rem`, see index.html)
+   overrides these same selectors to restore the original
+   three-column row layout — it relies on this file's cascade order
+   (loaded first) rather than repeating these declarations.
    ============================================================ */
 
 .app {
@@ -218,21 +220,6 @@ body.hud-right .card[data-role="next-piece-card"] {
     height: 100%;
     background: oklch(from var(--bg-2) l c h / 0.6);
     backdrop-filter: blur(4px);
-}
-
-/* Hide the floating HUD bits (next-piece mini icon + difficulty bar)
-   and the on-screen touch D-pad whenever a screen overlay is showing
-   (paused/options/idle/game over) — none of them make sense floating
-   over a menu screen. Mobile-only: on desktop the next-piece/difficulty
-   widgets live statically in the sidebar (stay visible regardless of
-   overlay state) and there's no touch D-pad at all — see the desktop
-   override below, which doesn't repeat this rule. */
-@media (width < 48rem) {
-    .app:has(.board__overlay--visible) [data-role="next-piece-card"],
-    .app:has(.board__overlay--visible) [data-role="difficulty-stat"],
-    .app:has(.board__overlay--visible) [data-role="touch-controls"] {
-        display: none;
-    }
 }
 
 .board {
@@ -475,7 +462,19 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     align-items: center;
     justify-content: center;
     gap: 0.4rem;
-    height: 100%;
+    /* min-height, not height: at a fixed height, "justify-content: center"
+       centers overflowing content around the box's midpoint, pushing the
+       top half out above the box where .board__overlay's scroll can't
+       reach it (scrollTop can't go negative). With min-height, .screen
+       can grow to fit tall content instead — centering only kicks in
+       while there's actually slack to center within.
+       flex-shrink: 0 is required alongside it: a flex item's default
+       flex-shrink:1 would otherwise still compress .screen back down to
+       exactly 100% whenever content is taller (that's the container's
+       only available space), silently reintroducing the same clipped/
+       trapped-overflow problem min-height was meant to prevent. */
+    min-height: 100%;
+    flex-shrink: 0;
     width: 100%;
     background: oklch(0 0 0 / 15%);
     backdrop-filter: grayscale(1) blur(2px);
@@ -1257,149 +1256,3 @@ body.faux-fullscreen .mobile-fabs__group:first-child:focus-within {
     opacity: 1;
 }
 
-/* ============================================================
-   Desktop override — restores the original 3-column row layout
-   and hides every mobile-only control.
-   ============================================================ */
-@media (width >= 48rem) {
-    body {
-        overflow: visible;
-        padding: 0.25rem;
-    }
-
-    .app {
-        flex-direction: row;
-        align-items: flex-start;
-        justify-content: center;
-        width: auto;
-        height: auto;
-        gap: 0.75rem;
-    }
-
-    .app__board {
-        order: 2;
-        flex: 0 0 auto;
-        display: block;
-        width: auto;
-        padding: 0;
-    }
-
-    .board__overlay {
-        justify-content: center;
-        padding-top: 0;
-    }
-
-    .board__canvas {
-        top: unset;
-    }
-
-    .options__row:has([data-role="mouse-control-checkbox"]) {
-        display: flex;
-    }
-
-    .card[data-role="next-piece-card"] {
-        position: static;
-        inset: auto;
-        top: auto;
-        right: auto;
-        bottom: auto;
-        left: auto;
-        transform: none;
-
-        width: auto;
-        height: auto;
-        margin: 0;
-        padding: 0.64rem 1rem;
-
-        z-index: auto;
-
-        background: var(--panel);
-        border-radius: var(--radius);
-        backdrop-filter: none;
-    }
-
-    [data-role="next-piece-card"] .card__title {
-        display: block;
-    }
-
-    [data-role="next-piece-card"] .next-piece__canvas {
-        display: block;
-        width: 96px;
-        height: 96px;
-        background: var(--bg-2);
-    }
-
-    [data-role="difficulty-stat"] {
-        position: static;
-        inset: auto;
-        top: auto;
-        right: auto;
-        bottom: auto;
-        left: auto;
-
-        width: 100%;
-        height: auto;
-        margin-top: .5rem;
-        z-index: auto;
-    }
-
-    [data-role="difficulty-stat"] .progress-bar--difficulty {
-        width: 100%;
-        height: 1.5rem;
-        background: oklch(25.03% 0.027 271);
-        backdrop-filter: none;
-    }
-
-    .app__sidebar {
-        width: clamp(11.5rem, 22vw, 13.75rem);
-        max-width: 90vw;
-        flex: 0 1 13.75rem;
-    }
-
-    .sidebar--stats,
-    .sidebar--controls {
-        position: static;
-        z-index: auto;
-        padding: 0;
-        overflow-y: visible;
-        background: transparent;
-        border: none;
-        border-radius: 0;
-        transform: none;
-        display: flex;
-        flex-direction: column;
-        gap: var(--gap);
-    }
-
-    .sidebar--stats {
-        order: 1;
-    }
-
-    .sidebar--controls {
-        order: 3;
-    }
-
-    body.hud-right .sidebar--stats,
-    body.hud-right .sidebar--controls {
-        transform: none;
-    }
-
-    body.hud-right .sidebar--stats {
-        order: 3;
-    }
-
-    body.hud-right .sidebar--controls {
-        order: 1;
-    }
-
-    .mobile-fabs,
-    .drawer-scrim,
-    .touch-controls,
-    .drawer-close {
-        display: none;
-    }
-
-    .screen__hint--tiny {
-        display: block;
-    }
-}
