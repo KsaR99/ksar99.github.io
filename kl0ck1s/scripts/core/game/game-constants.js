@@ -58,7 +58,7 @@ export function getKickTable(type) {
 
 export const SETTINGS_KEY = "klockis-settings";
 export const APP_NAME = "Kl0ck1's";
-export const NICKNAME_PATTERN = /^[a-zA-Z0-9_-]{3,16}$/;
+export const NICKNAME_PATTERN = /^[a-zA-Z\d_-]{3,16}$/u;
 
 export const COUNTDOWN_STEPS = [
     {number: 3, tint: "red"},
