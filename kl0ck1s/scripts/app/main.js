@@ -1,7 +1,6 @@
 "use strict";
 
 import {
-    BOARD_BACKGROUNDS,
     BOARD_CONFIG,
     COLOR_PALETTE,
     DEFAULT_DIFFICULTY,
@@ -162,7 +161,6 @@ const game = new Game({
     screens: Screens,
     difficulties: DIFFICULTIES,
     defaultDifficulty: DEFAULT_DIFFICULTY,
-    boardBackgrounds: BOARD_BACKGROUNDS,
     scoring: SCORING,
     levelUpBannerDuration: LEVEL_UP_BANNER_DURATION_MS,
     lineClearAnimationDuration: LINE_CLEAR_ANIMATION_DURATION_MS,

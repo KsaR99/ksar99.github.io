@@ -28,7 +28,6 @@ export class Game {
                     screens,
                     difficulties,
                     defaultDifficulty,
-                    boardBackgrounds,
                     scoring,
                     levelUpBannerDuration,
                     lineClearAnimationDuration,
@@ -48,7 +47,6 @@ export class Game {
         this.screens = screens;
         this.difficulties = difficulties;
         this.difficulty = defaultDifficulty;
-        this.boardBackgrounds = boardBackgrounds;
         this.scoring = scoring;
         this.levelUpBannerDuration = levelUpBannerDuration;
         this.lineClearAnimationDuration = lineClearAnimationDuration;
@@ -165,7 +163,6 @@ export class Game {
     async init() {
         this.soundManager.init();
         await this.settingsController.loadSettings();
-        this.difficultyController.applyDifficultyTheme();
         this.prepareNewRound();
         this.screenFlow.showIdleScreen().then();
         this.inputController.bindControls();
@@ -187,7 +184,6 @@ export class Game {
         this.statsTracker.reset();
         this.pieceController.reset();
 
-        this.difficultyController.applyLevelTheme();
         this.hud.update(this.stats);
     }
 

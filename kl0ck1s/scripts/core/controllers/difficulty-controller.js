@@ -1,6 +1,6 @@
 "use strict";
 
-/** Owns difficulty selection and the board theme that follows difficulty/level. */
+/** Owns difficulty selection (start level, lines/level pacing). Board theming no longer follows difficulty - see EffectOverlay. */
 export class DifficultyController {
     constructor(game) {
         this.game = game;
@@ -16,7 +16,6 @@ export class DifficultyController {
             game.lines = 0;
         }
 
-        this.applyDifficultyTheme();
         game.settings.difficulty = difficulty;
         game.settingsController.saveSettings();
         game.hud.update(game.stats);
@@ -48,17 +47,5 @@ export class DifficultyController {
             const {list, entry} = game.currentGameOverSaved;
             game.screenFlow.renderGameOverSaved(list, entry);
         }
-    }
-
-    applyDifficultyTheme() {
-        const game = this.game;
-        const color = game.boardBackgrounds?.[game.difficulty];
-        if (color) game.renderer.setTheme(color);
-    }
-
-    applyLevelTheme() {
-        const game = this.game;
-        const color = game.boardBackgrounds?.[game.levelTier];
-        if (color) game.renderer.setTheme(color);
     }
 }

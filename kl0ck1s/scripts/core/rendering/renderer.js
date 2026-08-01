@@ -117,8 +117,16 @@ export class Renderer {
         return Math.floor(x / this.boardConfig.CELL_SIZE);
     }
 
-    setTheme(background) {
-        this.boardDiv.style.background = background;
+    /**
+     * Switches the board's visual theme by setting data-theme on the board
+     * div - the actual background/accent colors live in main.css under
+     * .board[data-theme="..."], keyed by the same effect names as
+     * EffectOverlay (none/matrix/rain/snow/vhs). Keeping the colors in CSS
+     * (rather than passed in here) means this stays a one-line attribute
+     * flip and new themes only ever need a new CSS block, no JS changes.
+     */
+    setTheme(theme) {
+        this.boardDiv.dataset.theme = theme || "none";
     }
 
     drawCell(context, x, y, color, size, {glow = false, ghost = false} = {}) {

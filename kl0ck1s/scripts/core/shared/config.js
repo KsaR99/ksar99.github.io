@@ -41,13 +41,11 @@ export const DIFFICULTIES = Object.freeze({
     pro: {startLevel: 30, groundedTime: 1000, fallingSoundRate: 0.50},
 });
 
-export const BOARD_BACKGROUNDS = Object.freeze({
-    easy: "oklch(0.159 0.038 141.487)",
-    medium: "oklch(0.159 0.038 141.487)",
-    hard: "oklch(0.159 0.038 141.487)",
-    expert: "oklch(0.159 0.038 141.487)",
-    pro: "conic-gradient(oklch(0.2329 0.038 141.49), oklch(0.1884 0.038 141.49), oklch(0.2329 0.038 141.49), oklch(0 0 0), oklch(0.159 0.038 141.487), oklch(0.1884 0.038 141.49), oklch(0.159 0.038 141.487))",
-});
+// Board theme (background + accent border) now lives in main.css, under
+// .board[data-theme="..."] - keyed by the same effect names as
+// EffectOverlay/options.effect (none/matrix/rain/snow/vhs). Renderer.setTheme()
+// just flips the data-theme attribute; see effect-overlay.js for where that's
+// called from.
 
 export const DEFAULT_DIFFICULTY = "hard";
 
