@@ -124,9 +124,9 @@
         "defaultName": "Speler"
     },
     "difficulty": {
-        "easy": "Makkelijk",
+        "easy": "Beginner",
         "medium": "Gemiddeld",
-        "hard": "Moeilijk",
+        "hard": "Gevorderd",
         "expert": "Expert",
         "pro": "PRO",
         "levelPrefix": "niveau {level}"
@@ -135,10 +135,10 @@
         "levelUpBanner": "NIVEAU {level}"
     },
     "sounds": {
-        "lineClear1": "Enkele lijn",
-        "lineClear2": "Dubbele lijn",
-        "lineClear3": "Drievoudige lijn",
-        "lineClear4": "Tetris",
+        "lineClear1": "lijn",
+        "lineClear2": "II: lijn",
+        "lineClear3": "III: lijn",
+        "lineClear4": "IV: lijn",
         "drop": "Blok valt",
         "gameOver": "Game over",
         "levelUp": "Niveau omhoog",

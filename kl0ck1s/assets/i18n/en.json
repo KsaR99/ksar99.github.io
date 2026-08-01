@@ -124,9 +124,9 @@
         "defaultName": "Player"
     },
     "difficulty": {
-        "easy": "Easy",
-        "medium": "Medium",
-        "hard": "Hard",
+        "easy": "Rookie",
+        "medium": "Amateur",
+        "hard": "Veteran",
         "expert": "Expert",
         "pro": "PRO",
         "levelPrefix": "level {level}"
@@ -135,10 +135,10 @@
         "levelUpBanner": "LEVEL {level}"
     },
     "sounds": {
-        "lineClear1": "Single",
-        "lineClear2": "Double",
-        "lineClear3": "Triple",
-        "lineClear4": "Tetris",
+        "lineClear1": "line",
+        "lineClear2": "II: line",
+        "lineClear3": "III: line",
+        "lineClear4": "IV: line",
         "drop": "Piece drop",
         "gameOver": "Game over",
         "levelUp": "Level up",

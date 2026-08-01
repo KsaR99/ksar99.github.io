@@ -124,9 +124,9 @@
         "defaultName": "Gracz"
     },
     "difficulty": {
-        "easy": "Łatwy",
-        "medium": "Średni",
-        "hard": "Trudny",
+        "easy": "Początkujący",
+        "medium": "Średniak",
+        "hard": "Zaawansowany",
         "expert": "Ekspert",
         "pro": "PRO",
         "levelPrefix": "poziom {level}"
@@ -135,10 +135,10 @@
         "levelUpBanner": "POZIOM {level}"
     },
     "sounds": {
-        "lineClear1": "Pojedyńcza linia",
-        "lineClear2": "Podwójna linia",
-        "lineClear3": "Potrójna linia",
-        "lineClear4": "Tetris",
+        "lineClear1": "linia",
+        "lineClear2": "II: linia",
+        "lineClear3": "III: linia",
+        "lineClear4": "IV: linia",
         "drop": "Upadek klocka",
         "gameOver": "Koniec gry",
         "levelUp": "Awans poziomu",

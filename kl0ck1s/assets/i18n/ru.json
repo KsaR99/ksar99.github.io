@@ -124,9 +124,9 @@
         "defaultName": "Игрок"
     },
     "difficulty": {
-        "easy": "Лёгкий",
-        "medium": "Средний",
-        "hard": "Сложный",
+        "easy": "Новичок",
+        "medium": "Любитель",
+        "hard": "Опытный",
         "expert": "Эксперт",
         "pro": "PRO",
         "levelPrefix": "уровень {level}"
@@ -135,10 +135,10 @@
         "levelUpBanner": "УРОВЕНЬ {level}"
     },
     "sounds": {
-        "lineClear1": "Одиночная",
-        "lineClear2": "Двойная",
-        "lineClear3": "Тройная",
-        "lineClear4": "Тетрис",
+        "lineClear1": "линия",
+        "lineClear2": "II: линия",
+        "lineClear3": "III: линия",
+        "lineClear4": "IV: линия",
         "drop": "Падение фигуры",
         "gameOver": "Игра окончена",
         "levelUp": "Повышение уровня",
