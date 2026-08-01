@@ -51,6 +51,12 @@ export class CreditsController {
         if (!root || !scroll) return;
 
         scroll.replaceChildren();
+
+        const title = game.dom.createElement("p");
+        title.className = "brand__title";
+        title.textContent = "Kl0ck1's";
+        scroll.appendChild(title);
+
         CREDITS.forEach((person) => {
             const entry = game.dom.getElementById("tpl-credits-entry").content.cloneNode(true);
             const link = entry.querySelector('[data-role="credits-link"]');
