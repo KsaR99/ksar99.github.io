@@ -177,6 +177,9 @@ export const SOUND_FILES = Object.freeze({
     lineClear2: Object.freeze({src: "assets/audio/sounds/line-clear-2.ogg", category: "sfx"}),
     lineClear3: Object.freeze({src: "assets/audio/sounds/line-clear-3.ogg", category: "sfx"}),
     lineClear4: Object.freeze({src: "assets/audio/sounds/line-clear-4.ogg", category: "sfx"}),
+    // Hard drop's instant slam - see PieceController.hardDrop()/
+    // lockCurrentPiece(). A piece that locks naturally instead (grounded/
+    // lock-delay timing out) plays "pieceLock" below, never both together.
     drop: Object.freeze({src: "assets/audio/sounds/drop.mp3", category: "sfx"}),
     gameOver: Object.freeze({src: "assets/audio/sounds/game-over.ogg", category: "sfx"}),
     levelUp: Object.freeze({src: "assets/audio/sounds/level-up.ogg", category: "sfx"}),
@@ -187,6 +190,10 @@ export const SOUND_FILES = Object.freeze({
     // existing `groundedTime`/`MAX_GROUNDED_TIME` fields in SCORING/DIFFICULTIES.
     grounded: Object.freeze({src: "assets/audio/sounds/grounded.opus", category: "sfx"}),
     falling: Object.freeze({src: "assets/audio/sounds/falling.opus", category: "sfx"}),
+    // Plays instead of "drop" whenever a piece locks naturally - i.e. the
+    // "grounded" cue's window ran out rather than the player hard-dropping
+    // it. See PieceController.lockCurrentPiece().
+    pieceLock: Object.freeze({src: "assets/audio/sounds/piece-lock.opus", category: "sfx"}),
     // No music tracks ship yet (assets/audio/music/ is empty) - once one is
     // added here with category: "music", it'll automatically get its own
     // slider under the options screen's "Music" section.

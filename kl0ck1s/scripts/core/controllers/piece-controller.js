@@ -487,12 +487,22 @@ export class PieceController {
         return {type: "T", mini: !frontBlocked};
     }
 
+    /**
+     * Locks the current piece, called either from a natural lock (the
+     * "grounded"/lock-delay window running out in Game.update()) or from
+     * hardDrop() (which sets `hardDropUsed` right before calling this - see
+     * there). The two get different lock cues so they stay recognizably
+     * different at the table: hardDrop() already has its own instant "drop"
+     * slam, so a natural lock plays "pieceLock" instead - never both, and
+     * never "drop" for a piece that was just sitting on the "grounded" cue.
+     */
     lockCurrentPiece() {
         const game = this.game;
         const spin = this.detectSpin();
+        const isHardDrop = game.hardDropUsed;
 
         this.stopGameplaySounds();
-        game.soundManager.play("drop");
+        game.soundManager.play(isHardDrop ? "drop" : "pieceLock");
         game.board.lockPiece(game.current);
 
         const fullRows = game.board.getFullLineIndices();

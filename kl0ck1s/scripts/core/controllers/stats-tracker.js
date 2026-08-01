@@ -117,7 +117,6 @@ export class StatsTracker {
             game.level = newLevel;
             game.dropInterval = dropIntervalForLevel(game.level, game.scoring);
             game.levelTier = tierForLevel(game.level, game.difficulties);
-            game.difficultyController.applyLevelTheme();
 
             if (game.transitionScore === null) {
                 game.transitionScore = game.score;

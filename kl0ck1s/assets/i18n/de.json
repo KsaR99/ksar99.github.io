@@ -144,6 +144,7 @@
         "levelUp": "Levelaufstieg",
         "rotate": "Drehen",
         "grounded": "Stein aufgesetzt",
-        "falling": "Stein sinkt"
+        "falling": "Stein sinkt",
+        "pieceLock": "Stein verriegelt"
     }
 }

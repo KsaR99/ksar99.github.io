@@ -144,6 +144,7 @@
         "levelUp": "Awans poziomu",
         "rotate": "Obrót",
         "grounded": "Klocek na dole",
-        "falling": "Spadanie klocka"
+        "falling": "Spadanie klocka",
+        "pieceLock": "Osadzenie klocka"
     }
 }

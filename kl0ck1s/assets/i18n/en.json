@@ -144,6 +144,7 @@
         "levelUp": "Level up",
         "rotate": "Rotate",
         "grounded": "Piece grounded",
-        "falling": "Piece falling"
+        "falling": "Piece falling",
+        "pieceLock": "Piece lock"
     }
 }

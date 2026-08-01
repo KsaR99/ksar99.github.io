@@ -101,7 +101,7 @@ export const Screens = {
         if (mouseControlCheckbox) mouseControlCheckbox.checked = Boolean(settings.mouseControl);
 
         const effectSelect = screen.querySelector('[data-role="effect-select"]');
-        if (effectSelect) effectSelect.value = settings.effect ?? "vhs";
+        if (effectSelect) effectSelect.value = settings.effect ?? "none";
 
         const langSelect = screen.querySelector('[data-role="lang-select"]');
         if (langSelect) {
