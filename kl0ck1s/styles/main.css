@@ -22,7 +22,7 @@
     --safe-l: env(safe-area-inset-left, 0px);
     --safe-r: env(safe-area-inset-right, 0px);
     --z-fab: 3;
-    --z-credits: 4;
+    --z-credits: 100;
     --z-drawer: 30;
     --z-scrim: 25;
     --fab-size: 2.5rem;

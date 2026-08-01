@@ -173,6 +173,20 @@ export const CREDITS_TIMING = Object.freeze({
 
 export const NEXT_PREVIEW_CELL_SIZE = 22;
 
+// Drives MusicDirector's tension-based track switching (see
+// services/music-director.js). tensionFor(board) returns 0..1 based on how
+// high the stack is; _tierForTension walks TRACK_KEYS' index up/down as
+// tension crosses THRESHOLDS, with HYSTERESIS as a buffer so it doesn't
+// flip-flop right at a boundary. TRACK_KEYS[tier] must be a key that exists
+// in SOUND_FILES (category "music") below.
+export const MUSIC_TENSION = Object.freeze({
+    TRACK_KEYS: ["tetrisowyShvt", "tetrisowyShvt2", "tetrisowyShvt3"],
+    THRESHOLDS: [0, 0.33, 0.66],
+    HYSTERESIS: 0.05,
+    FADE_DURATION_MS: 1500,
+    STOP_FADE_DURATION_MS: 800,
+});
+
 // Each sound is tagged with a "category" (sfx/music) - the SoundManager uses
 // it to route the sound through the matching volume bus, and the options
 // screen uses it to sort the per-sound volume sliders into their section.

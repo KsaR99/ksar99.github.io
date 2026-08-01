@@ -10,6 +10,7 @@ import {EffectOverlay} from "../controllers/effect-overlay.js";
 import {DifficultyController} from "../controllers/difficulty-controller.js";
 import {ScreenFlow} from "../controllers/screen-flow.js";
 import {CreditsController} from "../controllers/credits-controller.js";
+import {MusicDirector} from "../services/music-director.js";
 
 /**
  * Central game state + the update/render loop. Gameplay, controls, screens,
@@ -130,6 +131,7 @@ export class Game {
         this.screenFlow = new ScreenFlow(this);
         this.inputController = new InputController(this);
         this.creditsController = new CreditsController(this);
+        this.musicDirector = new MusicDirector(this.soundManager);
 
         this.settings = this.settingsController.defaultSettings();
     }
