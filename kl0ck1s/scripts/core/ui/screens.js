@@ -1,6 +1,7 @@
 "use strict";
 
 import {formatNumber} from "../shared/utils.js";
+import {SOUND_FILES} from "../shared/config.js";
 
 function clone(dom, templateId) {
     return dom.getElementById(templateId).content.cloneNode(true);
@@ -20,7 +21,8 @@ function fillDifficultyButtons(dom, container, selectedDifficulty, difficulties,
 function fillSoundRows(dom, container, keys, soundVolumes, i18n) {
     keys.forEach((key) => {
         const row = clone(dom, "tpl-options-sound-row").querySelector('[data-role="sound-row"]');
-        row.querySelector('[data-field="name"]').textContent = i18n.t(`sounds.${key}`);
+        const label = SOUND_FILES[key]?.label ?? i18n.t(`sounds.${key}`);
+        row.querySelector('[data-field="name"]').textContent = label;
 
         const slider = row.querySelector('[data-role="sound-volume-slider"]');
         slider.dataset.soundKey = key;

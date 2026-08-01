@@ -207,7 +207,25 @@ export const SOUND_FILES = Object.freeze({
     // it. See PieceController.lockCurrentPiece().
     pieceLock: Object.freeze({src: "assets/audio/sounds/piece-lock.opus", category: "sfx"}),
     // music
-    tetrisowyShvt: Object.freeze({src: "assets/audio/music/tetrisowy-shvt-1.opus", category: "music"}),
-    tetrisowyShvt2: Object.freeze({src: "assets/audio/music/tetrisowy-shvt-2.opus", category: "music"}),
-    tetrisowyShvt3: Object.freeze({src: "assets/audio/music/tetrisowy-shvt-3.opus", category: "music"}),
+    // `label` is what shows up in the options screen's music list (Screens.options ->
+    // fillSoundRows in ui/screens.js). Music tracks are proper names, not meant to be
+    // translated per-language, so the label is set once right here - unlike the SFX
+    // above, which get their (actually-translated) name from sounds.<key> in each
+    // assets/i18n/<lang>.json instead. Add a new track by just adding an entry with a
+    // label below; no i18n or index.html changes needed.
+    tetrisowyShvt: Object.freeze({
+        src: "assets/audio/music/tetrisowy-shvt-1.opus",
+        category: "music",
+        label: "Tetrisowy Shvt I"
+    }),
+    tetrisowyShvt2: Object.freeze({
+        src: "assets/audio/music/tetrisowy-shvt-2.opus",
+        category: "music",
+        label: "Tetrisowy Shvt II"
+    }),
+    tetrisowyShvt3: Object.freeze({
+        src: "assets/audio/music/tetrisowy-shvt-3.opus",
+        category: "music",
+        label: "Tetrisowy Shvt III"
+    }),
 });
