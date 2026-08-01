@@ -247,8 +247,8 @@ body.hud-right .sidebar--controls.app__sidebar--open {
  * Add a new filter in effect-overlay.js? Add its block here too.
  */
 .board[data-theme="none"] {
-    --board-bg: oklch(0.159 0.038 141.487);
-    --board-accent: oklch(0.43 0.1 137.67 / 0.85);
+    --board-bg: oklch(0.31 0.04 210.57);
+    --board-accent: oklch(0.54 0.12 185.61 / 0.85);
 }
 
 .board[data-theme="matrix"] {
@@ -258,17 +258,17 @@ body.hud-right .sidebar--controls.app__sidebar--open {
 
 .board[data-theme="rain"] {
     --board-bg: linear-gradient(180deg, oklch(0.185 0.045 250), oklch(0.13 0.04 254), oklch(0.185 0.045 250));
-    --board-accent: oklch(0.58 0.12 250 / 0.85);
+    --board-accent: oklch(0.4 0.09 250.08 / 0.85);
 }
 
 .board[data-theme="snow"] {
     --board-bg: linear-gradient(180deg, oklch(0.24 0.018 238), oklch(0.185 0.014 235), oklch(0.24 0.018 238));
-    --board-accent: oklch(0.88 0.02 240 / 0.85);
+    --board-accent: oklch(0.54 0.04 240.12 / 0.85);
 }
 
 .board[data-theme="vhs"] {
     --board-bg: linear-gradient(160deg, oklch(0.19 0.06 330), oklch(0.135 0.05 300), oklch(0.19 0.06 330));
-    --board-accent: oklch(0.62 0.2 330 / 0.85);
+    --board-accent: oklch(0.35 0.14 324.84 / 0.85);
 }
 
 body.perf-no-glow .board {
