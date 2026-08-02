@@ -534,7 +534,7 @@ export class PieceController {
         const {board, renderer} = game;
         const size = renderer.boardConfig.CELL_SIZE;
         const cols = board.cols;
-        const fragmentsPerAxis = 5;
+        const fragmentsPerAxis = 9;
         const fragSize = size / fragmentsPerAxis;
         const fragments = [];
 
@@ -550,7 +550,7 @@ export class PieceController {
                         const startY = y * size + (fy + 0.5) * fragSize;
 
                         const angle = Math.random() * Math.PI * 2;
-                        const distance = size * (0.3 + Math.random() * 1.1);
+                        const distance = size * (0.05 + Math.random() * 0.1);
 
                         fragments.push({
                             startX,
@@ -561,7 +561,7 @@ export class PieceController {
                             dRotation: (Math.random() - 0.5) * Math.PI * 6,
                             size: fragSize,
                             halfSize: fragSize / 2,
-                            color: `oklch(from ${color} l c h / 0.3)`
+                            color: `oklch(from ${color} l c h / 0.55)`
                         });
                     }
                 }

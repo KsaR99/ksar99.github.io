@@ -29,7 +29,7 @@ export const SPIN_POINTS = Object.freeze({
 });
 
 export const LEVEL_UP_BANNER_DURATION_MS = 500;
-export const LINE_CLEAR_ANIMATION_DURATION_MS = 210;
+export const LINE_CLEAR_ANIMATION_DURATION_MS = 230;
 export const LINE_CLEAR_SOUND_PLAYBACK_RATE = 0.6;
 
 export const DIFFICULTIES = Object.freeze({

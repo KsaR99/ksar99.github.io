@@ -317,7 +317,7 @@ export class Renderer {
             ctx.shadowBlur = size * progress;
         }
 
-        ctx.fillStyle = `oklch(0.5 0 0 / ${alpha})`;
+        ctx.fillStyle = `oklch(1 0 0 / 0.5)`;
 
         lineIndices.forEach((y) => {
             ctx.fillRect(0, y * size, this.boardConfig.COLS * size, size);

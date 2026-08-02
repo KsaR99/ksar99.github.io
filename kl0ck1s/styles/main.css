@@ -5,8 +5,8 @@
     --line: oklch(28.15% 0.0276 273.6);
     --text: oklch(93.08% 0.0139 264.5);
     --muted: oklch(64.84% 0.0321 264.3);
-    --accent: oklch(0.84 0.33 146.1);
-    --accent-2: oklch(0.73 0.23 159.98);
+    --accent: oklch(0.62 0.13 164.88 / 0.39);
+    --accent-2: oklch(0.55 0.14 165.12);
     --good: oklch(0.93 0.21 101.98);
 
     --font-display: "Noto Sans Mono", monospace;
@@ -465,6 +465,8 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     align-items: center;
     justify-content: center;
     gap: 0.4rem;
+    line-height: 1.5;
+    letter-spacing: 1px;
     /* min-height, not height: at a fixed height, "justify-content: center"
        centers overflowing content around the box's midpoint, pushing the
        top half out above the box where .board__overlay's scroll can't
@@ -486,8 +488,8 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 .screen__title {
     font-family: var(--font-display);
     font-size: clamp(1.25rem, 4vw, 1.75rem);
-    color: var(--accent-2);
-    text-shadow: 0 0 0.6rem oklch(0.85 0.35 147.32);
+    color: oklch(0.86 0.36 144.2);
+    text-shadow: 0 0 0.6rem oklch(0.85 0.37 145.75);
     user-select: none;
 }
 
@@ -576,7 +578,9 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    padding: 0.64rem 1rem;
+    padding: 0.2rem 0.5rem;
+    letter-spacing: 2px;
+    line-height: 1.5;
 
     &:has(.controls__list--collapsed) .card__title {
         margin: 0;
@@ -598,9 +602,7 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 
 .stats__row {
     display: flex;
-    align-items: baseline;
     justify-content: space-between;
-    gap: 0.5rem;
 }
 
 .stats__row .card__title {
@@ -796,18 +798,18 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     user-select: none;
 
     &:hover {
-        filter: brightness(1.1);
+        filter: brightness(1.5);
     }
 }
 
 .button--primary {
-    background: var(--accent);
-    color: oklch(0 0 0);
+    background: oklch(0.50 0 0 / 0.5);
+    color: oklch(0.95 0 0);
 }
 
 .button--accent {
-    background: var(--accent-2);
-    color: var(--bg-2);
+    background: oklch(0.3 0 0 / 0.5);
+    color: oklch(0.95 0 0);
     padding: 0.5em 1.25em;
 }
 
@@ -910,6 +912,8 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     display: flex;
     width: 100%;
     border-radius: 0.375rem;
+    padding: 0.19rem;
+    margin: 0.2em auto;
     outline: 2px solid transparent;
     transition: outline-color 0.15s ease;
 }
@@ -941,7 +945,7 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 }
 
 .difficulty__button--active {
-    color: oklch(0 0 0);
+    color: oklch(0.88 0 0);
     background: var(--accent);
     border-color: var(--accent-2);
 }
@@ -963,6 +967,9 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 .difficulty--modes .difficulty__button {
     flex: 1 1 40%;
     padding: 0.35em 0.4em;
+    display: flex;
+    gap: 1em;
+    font-size: 0.9em;
 }
 
 .difficulty__description {

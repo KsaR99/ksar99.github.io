@@ -1,11 +1,11 @@
 "use strict";
 
 const CHARS = "Kl0ck1's";
-const FONT_SIZE = 24;
-const FALL_SPEED = 0.085; // rows per rendered frame (frame is throttled below)
-const HEAD_COLOR = "oklch(0.85 0.1 144.74)";
-const BODY_COLOR = "oklch(0.763 0.214 148.729)";
-const DIM_COLOR = "oklch(0.451 0.121 149.242)";
+const FONT_SIZE = 22;
+const FALL_SPEED = 0.09; // rows per rendered frame (frame is throttled below)
+const HEAD_COLOR = "oklch(0.751 0.133 144.116)";
+const BODY_COLOR = "oklch(0.543 0.123 151.327)";
+const DIM_COLOR = "oklch(0.3 0.075 152.239)";
 
 export class MatrixEffect {
     constructor(canvas, ctx = null) {
