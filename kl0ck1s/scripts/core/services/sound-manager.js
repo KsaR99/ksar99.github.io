@@ -333,6 +333,30 @@ export class SoundManager {
         }
     }
 
+    /**
+     * Ramps an instance's detune (cents) to `cents` over `durationMs`, instead
+     * of snapping to it like setDetune() does. Mirrors fadeInstanceVolume()
+     * above, just on the detune AudioParam instead of the gain one.
+     */
+    rampInstanceDetune(id, cents, durationMs = 0) {
+        const instance = this._instance(id);
+        if (!instance) return;
+        const context = this.ensureContext();
+        if (!context) return;
+
+        instance.detune = cents;
+
+        const param = instance.source.detune;
+        const now = context.currentTime;
+        param.cancelScheduledValues(now);
+        param.setValueAtTime(param.value, now);
+        if (durationMs <= 0) {
+            param.setValueAtTime(cents, now);
+        } else {
+            param.linearRampToValueAtTime(cents, now + durationMs / 1000);
+        }
+    }
+
     /** Takes effect immediately, even mid-playback - playbackRate is a live AudioParam, not a one-time setting. */
     setPlaybackRate(id, rate) {
         const instance = this._instance(id);

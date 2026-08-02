@@ -199,6 +199,20 @@ export const MUSIC_TENSION = Object.freeze({
     HYSTERESIS: 0.05,
     FADE_DURATION_MS: 10000,
     STOP_FADE_DURATION_MS: 800,
+    // On top of the tier crossfade above, MusicDirector also nudges the
+    // playing track's pitch based on which way tension is trending - see
+    // MusicDirector._updatePitch(). Every PITCH_STEP_INTERVAL_MS, pitch moves
+    // by PITCH_STEP_SEMITONES toward +/-PITCH_MAX_SEMITONES while tension is
+    // rising/falling; once tension holds steady, it glides back down to 0
+    // instead - over PITCH_RETURN_MS, deliberately the same span as
+    // FADE_DURATION_MS so the pitch settles on the same timescale as a tier
+    // crossfade. Step size is set so PITCH_MAX_SEMITONES is reached in
+    // exactly PITCH_RETURN_MS / PITCH_STEP_INTERVAL_MS steps (10s / 1s = 10
+    // steps of 0.25), keeping the ramp-up and the glide-back-down symmetric.
+    PITCH_STEP_SEMITONES: 0.25,
+    PITCH_MAX_SEMITONES: 2.5,
+    PITCH_STEP_INTERVAL_MS: 1000,
+    PITCH_RETURN_MS: 10000,
 });
 
 // Each sound is tagged with a "category" (sfx/music) - the SoundManager uses

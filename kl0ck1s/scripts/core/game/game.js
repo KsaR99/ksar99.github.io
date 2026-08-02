@@ -292,7 +292,7 @@ export class Game {
         if (this.state === "running" || this.state === "clearing") {
             this.elapsedMs += delta;
             this.hud.update(this.stats);
-            this.musicDirector.update(this.board);
+            this.musicDirector.update(this.board, delta);
         }
 
         if (this.state === "countdown") {
