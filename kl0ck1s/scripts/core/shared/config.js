@@ -180,9 +180,9 @@ export const CREDITS = Object.freeze([
 ]);
 
 export const CREDITS_TIMING = Object.freeze({
-    IDLE_DELAY_MS: 45000,
-    SCROLL_DURATION_MS: 11500,
-    HOLD_DURATION_MS: 15000,
+    IDLE_DELAY_MS: 60000,
+    SCROLL_DURATION_MS: 11000,
+    HOLD_DURATION_MS: 30000,
 });
 
 export const NEXT_PREVIEW_CELL_SIZE = 22;

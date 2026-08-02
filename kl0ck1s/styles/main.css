@@ -827,7 +827,6 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 
     &:focus {
         outline: 2px solid var(--accent-2);
-        outline-offset: 1px;
     }
 }
 
@@ -909,7 +908,6 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     width: 100%;
     border-radius: 0.375rem;
     outline: 2px solid transparent;
-    outline-offset: 3px;
     transition: outline-color 0.15s ease;
 }
 
@@ -1054,7 +1052,6 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 
     &:focus {
         outline: 2px solid var(--accent-2);
-        outline-offset: 1px;
     }
 }
 
