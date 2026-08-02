@@ -35,6 +35,7 @@ export class PieceController {
         game.dropCounter = 0;
         game.pendingSpin = null;
         game.clearingLines = [];
+        game.clearingFragments = [];
         game.clearingTimer = 0;
         this.resetPerPieceState();
 
@@ -524,7 +525,50 @@ export class PieceController {
         game.soundManager.play(`lineClear${clearedCount}`, {playbackRate: LINE_CLEAR_SOUND_PLAYBACK_RATE});
         game.state = "clearing";
         game.clearingLines = fullRows;
+        game.clearingFragments = this.buildClearFragments(fullRows);
         game.clearingTimer = 0;
+    }
+
+    buildClearFragments(rows) {
+        const game = this.game;
+        const {board, renderer} = game;
+        const size = renderer.boardConfig.CELL_SIZE;
+        const cols = board.cols;
+        const fragmentsPerAxis = 5;
+        const fragSize = size / fragmentsPerAxis;
+        const fragments = [];
+
+        rows.forEach((y) => {
+            for (let x = 0; x < cols; x++) {
+                const colorIndex = board.colors[y * cols + x];
+                if (!colorIndex) continue;
+                const color = renderer.colorPalette[colorIndex];
+
+                for (let fy = 0; fy < fragmentsPerAxis; fy++) {
+                    for (let fx = 0; fx < fragmentsPerAxis; fx++) {
+                        const startX = x * size + (fx + 0.5) * fragSize;
+                        const startY = y * size + (fy + 0.5) * fragSize;
+
+                        const angle = Math.random() * Math.PI * 2;
+                        const distance = size * (0.3 + Math.random() * 1.1);
+
+                        fragments.push({
+                            startX,
+                            startY,
+                            dx: Math.cos(angle) * distance,
+                            dy: Math.sin(angle) * distance,
+                            rotation0: Math.random() * Math.PI * 2,
+                            dRotation: (Math.random() - 0.5) * Math.PI * 6,
+                            size: fragSize,
+                            halfSize: fragSize / 2,
+                            color: `oklch(from ${color} l c h / 0.3)`
+                        });
+                    }
+                }
+            }
+        });
+
+        return fragments;
     }
 
     finishLineClear() {
@@ -538,6 +582,7 @@ export class PieceController {
 
         game.pendingSpin = null;
         game.clearingLines = [];
+        game.clearingFragments = [];
         game.dropCounter = 0;
 
         if (game.modeController.checkSprintComplete()) return;

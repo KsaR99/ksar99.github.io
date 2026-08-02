@@ -1,6 +1,6 @@
 "use strict";
 
-const GLOW_BLUR_RATIO = 0.8;
+const GLOW_BLUR_RATIO = 0.1;
 const GHOST_ALPHA = 0.3;
 
 export function createBlockSprite(color, size, canvasFactory = () => document.createElement("canvas")) {

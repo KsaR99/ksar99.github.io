@@ -96,6 +96,7 @@ export class Game {
         this.lastAction = null;
         this.pendingSpin = null;
         this.clearingLines = [];
+        this.clearingFragments = [];
         this.clearingTimer = 0;
 
         this.fallTrail = Array.from({length: FALL_TRAIL_MAX_LENGTH}, () => ({
@@ -458,7 +459,7 @@ export class Game {
             this.renderer.drawPiece(renderedPiece);
         } else if (this.state === "clearing") {
             const progress = Math.min(1, this.clearingTimer / this.lineClearAnimationDuration);
-            this.renderer.drawClearingLines(this.clearingLines, progress);
+            this.renderer.drawClearingLines(this.clearingLines, this.clearingFragments, progress);
         }
 
         if (this.levelUpTimer > 0) {

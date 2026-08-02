@@ -280,22 +280,86 @@ export class Renderer {
         });
     }
 
-    drawClearingLines(lineIndices, progress) {
+    /**
+     * Masks the still-full rows (they're only actually removed from the
+     * board once the clear animation finishes - see PieceController.
+     * finishLineClear()) with the same "empty socket" tile used for the
+     * rest of the empty grid, so the shattered fragments drawn on top
+     * aren't flying off of visibly-still-solid blocks underneath.
+     */
+    maskClearingRows(lineIndices) {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx} = this;
-        const flashBoost = Math.sin(Math.min(1, progress) * Math.PI);
-        const alpha = Math.min(1, 0.8 + flashBoost * 0.2);
+        const sprite = this.gridEnabled
+            ? this.spriteCache.getGridCell(size)
+            : null;
+
+        lineIndices.forEach((y) => {
+            if (sprite) {
+                for (let x = 0; x < this.boardConfig.COLS; x++) {
+                    ctx.drawImage(sprite, x * size, y * size, size, size);
+                }
+            } else {
+                ctx.clearRect(0, y * size, this.boardConfig.COLS * size, size);
+            }
+        });
+    }
+
+    drawClearingFlash(lineIndices, progress) {
+        const size = this.boardConfig.CELL_SIZE;
+        const {ctx} = this;
+
+        const alpha = 1 - progress;
 
         ctx.save();
         if (this.glowEnabled) {
-            ctx.shadowColor = "oklch(1 0 0 / 95%)";
-            ctx.shadowBlur = size * (0.3 + flashBoost * 0.35);
+            ctx.shadowColor = `oklch(1 0 0 / ${alpha})`;
+            ctx.shadowBlur = size * progress;
         }
-        ctx.fillStyle = `oklch(1 0 0 / ${alpha})`;
+
+        ctx.fillStyle = `oklch(0.5 0 0 / ${alpha})`;
 
         lineIndices.forEach((y) => {
             ctx.fillRect(0, y * size, this.boardConfig.COLS * size, size);
         });
+
+        ctx.restore();
+    }
+
+    /**
+     * Draws the shattered-block line-clear effect: each cell in the
+     * clearing rows was pre-split into a grid of fragments (see
+     * PieceController.buildClearFragments()), each carrying its own random
+     * flight vector and spin. Fragments are positioned/rotated purely as a
+     * function of `progress` (0..1, same clock the flash above uses - see
+     * Game.render()) rather than accumulated per-frame, so the effect is
+     * frame-rate independent and trivially resettable.
+     */
+    drawClearingLines(lineIndices, fragments, progress) {
+        if (!fragments || fragments.length === 0) return;
+
+        const {ctx} = this;
+        const p = Math.min(1, progress);
+        const fragmentAlpha = 0.75;
+
+        this.maskClearingRows(lineIndices);
+        this.drawClearingFlash(lineIndices, p);
+
+        ctx.save();
+        ctx.globalAlpha = fragmentAlpha;
+
+        for (const frag of fragments) {
+            const x = frag.startX + frag.dx * p;
+            const y = frag.startY + frag.dy * p;
+            const rotation = frag.rotation0 + frag.dRotation * p;
+
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rotation);
+            ctx.fillStyle = frag.color;
+            ctx.fillRect(-frag.halfSize, -frag.halfSize, frag.size, frag.size);
+            ctx.restore();
+        }
 
         ctx.restore();
     }
