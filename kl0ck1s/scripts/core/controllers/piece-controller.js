@@ -448,9 +448,6 @@ export class PieceController {
 
         for (const [dx, dy] of kicks) {
             if (!game.board.collides(game.current, dx, dy, rotatedMask)) {
-                const fromX = game.current.x;
-                const fromY = game.current.y;
-
                 game.current.mask = rotatedMask;
                 game.current.x += dx;
                 game.current.y += dy;
@@ -459,10 +456,16 @@ export class PieceController {
                 game.soundManager.play("rotate");
                 if (game.board.collides(game.current, 0, 1)) this.resetLockDelay();
 
-                const noPositionChange = game.current.x === fromX && game.current.y === fromY;
-                game.rotationAnim = (Math.abs(dir) === 2 || noPositionChange)
-                    ? null
-                    : {fromX, fromY, toX: game.current.x, toY: game.current.y, elapsed: 0, duration: 60};
+                // Wall-kicked rotations used to tween from (fromX, fromY) to
+                // the kicked position, but that starting point is exactly
+                // where collides() just rejected the new shape - the whole
+                // reason a kick was needed - so the tween's early frames
+                // rendered the piece overlapping whatever it got kicked away
+                // from (e.g. a piece rotated to point left, kicked off a
+                // neighboring stack, briefly looked like it "sank into" that
+                // stack). Every rotation - kicked or not, any piece, 90° or
+                // 180° - now snaps to its new position instantly instead.
+                game.rotationAnim = null;
                 return;
             }
         }
