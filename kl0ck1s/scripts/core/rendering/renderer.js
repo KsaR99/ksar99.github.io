@@ -244,7 +244,7 @@ export class Renderer {
                 const x = snap.x + c;
                 const y = snap.y + r;
                 if (y < 0) return;
-                this.drawCell(ctx, x, y, snap.color, size);
+                this.drawCell(ctx, x, y, `oklch(from ${snap.color} calc(l + 0.75) c h / 0.3)`, size);
             });
         }
         ctx.restore();

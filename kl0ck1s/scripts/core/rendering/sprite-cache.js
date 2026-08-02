@@ -1,6 +1,6 @@
 "use strict";
 
-const GLOW_BLUR_RATIO = 0.4;
+const GLOW_BLUR_RATIO = 0.8;
 const GHOST_ALPHA = 0.3;
 
 export function createBlockSprite(color, size, canvasFactory = () => document.createElement("canvas")) {
@@ -63,10 +63,7 @@ export function createGridCellSprite(size, canvasFactory = () => document.create
 
     const bevel = Math.max(1, Math.round(size * 0.12));
 
-    spriteCtx.fillStyle = "oklch(0.4 0.015 260 / 0.1)";
-    spriteCtx.fillRect(0, 0, size, size);
-
-    spriteCtx.fillStyle = "oklch(0 0 0 / 0.4)";
+    spriteCtx.fillStyle = "oklch(0 0 0 / 0.18)"; // top + left
     spriteCtx.beginPath();
     spriteCtx.moveTo(0, 0);
     spriteCtx.lineTo(size, 0);
@@ -77,7 +74,7 @@ export function createGridCellSprite(size, canvasFactory = () => document.create
     spriteCtx.closePath();
     spriteCtx.fill();
 
-    spriteCtx.fillStyle = "oklch(1 0 0 / 0.16)";
+    spriteCtx.fillStyle = "oklch(1 0 0 / 0.08)"; // bottom + right
     spriteCtx.beginPath();
     spriteCtx.moveTo(size, 0);
     spriteCtx.lineTo(size, size);
@@ -88,7 +85,7 @@ export function createGridCellSprite(size, canvasFactory = () => document.create
     spriteCtx.closePath();
     spriteCtx.fill();
 
-    spriteCtx.strokeStyle = "oklch(0 0 0 / 0.35)";
+    spriteCtx.strokeStyle = "oklch(0 0 0 / 0.15)"; // border
     spriteCtx.lineWidth = 1;
     spriteCtx.strokeRect(0.5, 0.5, size - 1, size - 1);
 

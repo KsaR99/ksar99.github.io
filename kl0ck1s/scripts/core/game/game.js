@@ -391,6 +391,7 @@ export class Game {
 
         const rendered = Object.create(Object.getPrototypeOf(base));
         Object.assign(rendered, base, {x, y});
+
         return rendered;
     }
 
