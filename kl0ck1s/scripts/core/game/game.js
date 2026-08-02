@@ -329,7 +329,13 @@ export class Game {
             this.lockDelayTimer += delta;
             this.groundedTime += delta;
             const maxGroundedTime = this.getMaxGroundedTime();
-            if (resting && (this.lockDelayTimer >= this.scoring.LOCK_DELAY || this.groundedTime >= maxGroundedTime)) {
+            // Re-check collision here rather than reusing `resting`: modeController.update()
+            // above (Survival's garbage rows) can reshape the board without moving the
+            // falling piece, so the value computed before it can be stale by the time we
+            // decide whether to lock - a piece could get locked (and its landing spot
+            // checked for full lines) against a board state it never actually rested on.
+            const stillResting = this.board.collides(this.current, 0, 1);
+            if (stillResting && (this.lockDelayTimer >= this.scoring.LOCK_DELAY || this.groundedTime >= maxGroundedTime)) {
                 this.pieceController.lockCurrentPiece();
             }
             return;

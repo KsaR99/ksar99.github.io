@@ -123,6 +123,13 @@ export class ModeController {
                 const span = def.garbageLinesMax - def.garbageLinesMin + 1;
                 const count = def.garbageLinesMin + Math.floor(Math.random() * span);
                 const {toppedOut} = game.board.addGarbageLines(count);
+                // addGarbageLines() shifts every existing row up by `count` but has no
+                // notion of the currently-falling piece, so without this the piece would
+                // stay at its old y while the stack rises underneath it - silently
+                // changing (or removing) the gap it was about to drop into. Rising the
+                // piece by the same amount keeps its position relative to the stack
+                // exactly as it was the instant before the garbage landed.
+                if (game.current) game.current.y -= count;
                 if (toppedOut) {
                     game.screenFlow.endRound("topOut");
                 }
