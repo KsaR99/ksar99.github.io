@@ -9,9 +9,9 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+Mono:wght@100..900&display=swap"
         rel="stylesheet">
-    <link href="styles/main.css?v=19" rel="stylesheet">
-    <link href="styles/mobile.css?v=19" media="(width < 48rem)" rel="stylesheet">
-    <link href="styles/desktop.css?v=19" media="(width >= 48rem)" rel="stylesheet">
+    <link href="styles/main.css?v=20" rel="stylesheet">
+    <link href="styles/mobile.css?v=20" media="(width < 48rem)" rel="stylesheet">
+    <link href="styles/desktop.css?v=20" media="(width >= 48rem)" rel="stylesheet">
 </head>
 <body>
 <div class="app" id="app-root">
@@ -48,6 +48,10 @@
             <div class="stats__row" data-role="lines-stat">
                 <h3 class="card__title" data-i18n="sidebar.lines">Lines</h3>
                 <div class="stats__value" id="lines-value">0</div>
+            </div>
+            <div class="stats__row" data-role="objective-stat">
+                <h3 class="card__title" data-i18n="sidebar.objective">Objective</h3>
+                <div class="stats__value" id="objective-value">-</div>
             </div>
             <div class="stats__row" data-role="time-stat">
                 <h3 class="card__title" data-i18n="sidebar.time">Time</h3>
@@ -206,8 +210,17 @@
             <span data-i18n="screens.common.switchHint">Switch with arrows</span> <kbd
             class="kbd kbd--clickable" data-key-action="ArrowLeft">◄</kbd> <kbd class="kbd kbd--clickable"
                                                                                 data-key-action="ArrowRight">►</kbd>
+            <kbd class="kbd kbd--clickable" data-key-action="ArrowDown">▼</kbd>
         </p>
         <div class="difficulty" data-field="difficulty" data-role="difficulty-select"></div>
+        <p class="screen__hint" data-i18n="screens.idle.modeHint">Choose mode</p>
+        <p class="screen__hint screen__hint--tiny">
+            <span data-i18n="screens.common.switchHint">Switch with arrows</span> <kbd
+            class="kbd kbd--clickable" data-key-action="ArrowUp">▲</kbd> <kbd class="kbd kbd--clickable"
+                                                                              data-key-action="ArrowLeft">◄</kbd> <kbd
+            class="kbd kbd--clickable" data-key-action="ArrowRight">►</kbd>
+        </p>
+        <div class="difficulty difficulty--modes" data-field="mode" data-role="mode-select"></div>
         <div class="nickname-form">
             <input class="nickname-form__input" data-i18n-placeholder="screens.idle.namePlaceholder"
                    data-role="name-input" maxlength="16" pattern="[a-zA-Z\d_\-]{3,16}" placeholder="Your nickname"
@@ -254,13 +267,13 @@
                 data-i18n="screens.options.closeHintAfter">to close</span>
         </p>
 
-        <details class="options" data-role="options-group-language">
-            <summary class="options__title" data-i18n="screens.options.languageTitle">Language</summary>
+        <div class="options" data-role="options-group-language">
+            <h3 class="options__title options__title--static" data-i18n="screens.options.languageTitle">Language</h3>
             <label class="options__row">
                 <span data-i18n="screens.options.language">Language</span>
                 <select class="options__input options__input--select" data-role="lang-select"></select>
             </label>
-        </details>
+        </div>
 
         <details class="options" data-role="options-group-sound">
             <summary class="options__title" data-i18n="screens.options.soundTitle">Sound</summary>
@@ -313,6 +326,35 @@
                 <span data-i18n="screens.options.gridLines">Grid lines</span>
                 <input class="options__input options__input--checkbox" data-role="grid-checkbox" type="checkbox">
             </label>
+
+            <details class="options__group" data-role="options-group-performance">
+                <summary class="options__group-summary" data-i18n="screens.options.performanceTitle">Performance
+                </summary>
+                <label class="options__row">
+                    <span data-i18n="screens.options.glow">Glow (blur)</span>
+                    <input class="options__input options__input--checkbox" data-role="glow-checkbox" type="checkbox">
+                </label>
+                <label class="options__row">
+                    <span data-i18n="screens.options.transparency">Transparency</span>
+                    <input class="options__input options__input--checkbox" data-role="transparency-checkbox"
+                           type="checkbox">
+                </label>
+                <label class="options__row">
+                    <span data-i18n="screens.options.fallTrail">Fall trail</span>
+                    <input class="options__input options__input--checkbox" data-role="fall-trail-checkbox"
+                           type="checkbox">
+                </label>
+                <label class="options__row">
+                    <span data-i18n="screens.options.effect">Screen filter</span>
+                    <select class="options__input options__input--select" data-role="effect-select">
+                        <option data-i18n="screens.options.effectNone" value="none">None</option>
+                        <option data-i18n="screens.options.effectVhs" value="vhs">VHS noise</option>
+                        <option data-i18n="screens.options.effectMatrix" value="matrix">Matrix</option>
+                        <option data-i18n="screens.options.effectRain" value="rain">Rain</option>
+                        <option data-i18n="screens.options.effectSnow" value="snow">Snow</option>
+                    </select>
+                </label>
+            </details>
         </details>
 
         <details class="options" data-role="options-group-gameplay">
@@ -334,34 +376,6 @@
             </label>
         </details>
 
-        <details class="options" data-role="options-group-performance">
-            <summary class="options__title" data-i18n="screens.options.performanceTitle">Performance</summary>
-            <label class="options__row">
-                <span data-i18n="screens.options.glow">Glow (blur)</span>
-                <input class="options__input options__input--checkbox" data-role="glow-checkbox" type="checkbox">
-            </label>
-            <label class="options__row">
-                <span data-i18n="screens.options.transparency">Transparency</span>
-                <input class="options__input options__input--checkbox" data-role="transparency-checkbox"
-                       type="checkbox">
-            </label>
-            <label class="options__row">
-                <span data-i18n="screens.options.fallTrail">Fall trail</span>
-                <input class="options__input options__input--checkbox" data-role="fall-trail-checkbox"
-                       type="checkbox">
-            </label>
-            <label class="options__row">
-                <span data-i18n="screens.options.effect">Screen filter</span>
-                <select class="options__input options__input--select" data-role="effect-select">
-                    <option data-i18n="screens.options.effectNone" value="none">None</option>
-                    <option data-i18n="screens.options.effectVhs" value="vhs">VHS noise</option>
-                    <option data-i18n="screens.options.effectMatrix" value="matrix">Matrix</option>
-                    <option data-i18n="screens.options.effectRain" value="rain">Rain</option>
-                    <option data-i18n="screens.options.effectSnow" value="snow">Snow</option>
-                </select>
-            </label>
-        </details>
-
         <button class="options__resume button button--accent" data-i18n="screens.options.close"
                 data-role="options-close-button" type="button">Close
         </button>
@@ -370,7 +384,7 @@
 
 <template id="tpl-screen-gameover-entry">
     <div class="screen">
-        <h2 class="screen__title" data-i18n="screens.gameOverEntry.title">GAME OVER</h2>
+        <h2 class="screen__title" data-field="title" data-i18n="screens.gameOverEntry.title">GAME OVER</h2>
         <p class="screen__hint">
             <strong class="screen__hint-highlight" data-field="playerName"></strong>
             &middot; <span data-i18n="screens.gameOverEntry.scoreLabel">Score:</span>
@@ -454,8 +468,18 @@
                                                                                        data-key-action="ArrowLeft">◄</kbd>
             <kbd
                 class="kbd kbd--clickable" data-key-action="ArrowRight">►</kbd>
+            <kbd class="kbd kbd--clickable" data-key-action="ArrowDown">▼</kbd>
         </p>
         <div class="difficulty" data-field="difficulty" data-role="difficulty-select"></div>
+        <p class="screen__hint" data-i18n="screens.idle.modeHint">Choose mode</p>
+        <p class="screen__hint screen__hint--tiny">
+            <span data-i18n="screens.common.switchHint">Switch with arrows</span> <kbd class="kbd kbd--clickable"
+                                                                                       data-key-action="ArrowUp">▲</kbd>
+            <kbd
+                class="kbd kbd--clickable" data-key-action="ArrowLeft">◄</kbd>
+            <kbd class="kbd kbd--clickable" data-key-action="ArrowRight">►</kbd>
+        </p>
+        <div class="difficulty difficulty--modes" data-field="mode" data-role="mode-select"></div>
         <div class="nickname-form">
             <input class="nickname-form__input" data-i18n-placeholder="screens.idle.namePlaceholder"
                    data-role="name-input" maxlength="16" pattern="[a-zA-Z\d_\-]{3,16}" placeholder="Your nickname"
@@ -482,6 +506,13 @@
     <button class="difficulty__button" data-role="difficulty-button" type="button">
         <span data-field="label"></span>
         <span class="difficulty__level" data-field="level"></span>
+    </button>
+</template>
+
+<template id="tpl-mode-button">
+    <button class="difficulty__button" data-role="mode-button" type="button">
+        <span data-field="label"></span>
+        <span class="difficulty__description" data-field="description"></span>
     </button>
 </template>
 
@@ -626,6 +657,6 @@
         window.addEventListener("orientationchange", notifyResize);
     })();
 </script>
-<script src="scripts/app/main.js?v=19" type="module"></script>
+<script src="scripts/app/main.js?v=20" type="module"></script>
 </body>
 </html>

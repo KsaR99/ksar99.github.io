@@ -323,7 +323,11 @@ export class PieceController {
     handleHorizontalArrow(dir) {
         const game = this.game;
         if (game.state === "idle" || game.state === "gameOver-saved") {
-            game.difficultyController.changeDifficulty(dir);
+            if (game.menuSelector === "mode") {
+                game.modeController.changeMode(dir);
+            } else {
+                game.difficultyController.changeDifficulty(dir);
+            }
         } else {
             this.moveHorizontal(dir);
         }
@@ -532,6 +536,9 @@ export class PieceController {
         game.pendingSpin = null;
         game.clearingLines = [];
         game.dropCounter = 0;
+
+        if (game.modeController.checkSprintComplete()) return;
+
         game.state = "running";
         this.spawnNext();
     }

@@ -17,12 +17,15 @@ export class HUD {
      * @param {HTMLElement} [elements.droughtEl]
      * @param {HTMLElement} [elements.tetrisRateEl]
      * @param {HTMLElement} [elements.ppsEl]
+     * @param {HTMLElement} [elements.objectiveEl]
+     * @param {HTMLElement} [elements.objectiveRowEl]
      */
     constructor({
                     scoreEl, linesEl, bestEl, overlayEl,
                     nextPieceCardEl = null, statsStatusEl = null, difficultyEl = null,
                     difficultyBarEl = null, statsCardEl = null, i18n = null,
                     timeEl = null, droughtEl = null, tetrisRateEl = null, ppsEl = null,
+                    objectiveEl = null, objectiveRowEl = null,
                 }) {
         this.scoreEl = scoreEl;
         this.linesEl = linesEl;
@@ -38,6 +41,8 @@ export class HUD {
         this.droughtEl = droughtEl;
         this.tetrisRateEl = tetrisRateEl;
         this.ppsEl = ppsEl;
+        this.objectiveEl = objectiveEl;
+        this.objectiveRowEl = objectiveRowEl;
 
         this._cache = {
             score: undefined,
@@ -49,6 +54,8 @@ export class HUD {
             drought: undefined,
             tetrisRate: undefined,
             pps: undefined,
+            objective: undefined,
+            hasObjective: undefined,
             hasPlayedBefore: undefined,
             isPlaying: undefined,
             statsStatusText: undefined,
@@ -90,7 +97,7 @@ export class HUD {
         }
     }
 
-    update({score, lines, best, difficulty, difficultyPercent, gameTime, drought, tetrisRate, pps}) {
+    update({score, lines, best, difficulty, difficultyPercent, gameTime, drought, tetrisRate, pps, objective}) {
         this._setText(this.scoreEl, "score", score);
         this._setText(this.linesEl, "lines", lines);
         this._setText(this.bestEl, "best", best);
@@ -120,6 +127,19 @@ export class HUD {
 
         if (this.ppsEl && pps !== undefined) {
             this._setText(this.ppsEl, "pps", pps);
+        }
+
+        if (objective !== undefined) {
+            const hasObjective = objective !== null;
+
+            if (this.objectiveRowEl && this._cache.hasObjective !== hasObjective) {
+                this._cache.hasObjective = hasObjective;
+                this.objectiveRowEl.classList.toggle("stats__row--hidden", !hasObjective);
+            }
+
+            if (this.objectiveEl && hasObjective) {
+                this._setText(this.objectiveEl, "objective", objective);
+            }
         }
     }
 

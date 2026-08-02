@@ -4,7 +4,9 @@ import {
     BOARD_CONFIG,
     COLOR_PALETTE,
     DEFAULT_DIFFICULTY,
+    DEFAULT_MODE,
     DIFFICULTIES,
+    GAME_MODES,
     KLOCKOMINO_TYPES,
     KLOCKOMINOS,
     LEVEL_UP_BANNER_DURATION_MS,
@@ -143,6 +145,8 @@ const hud = new HUD({
     droughtEl: document.getElementById("drought-value"),
     tetrisRateEl: document.getElementById("trt-value"),
     ppsEl: document.getElementById("pps-value"),
+    objectiveEl: document.getElementById("objective-value"),
+    objectiveRowEl: document.querySelector('[data-role="objective-stat"]'),
 });
 
 const soundManager = new SoundManager(SOUND_FILES);
@@ -161,6 +165,8 @@ const game = new Game({
     screens: Screens,
     difficulties: DIFFICULTIES,
     defaultDifficulty: DEFAULT_DIFFICULTY,
+    gameModes: GAME_MODES,
+    defaultMode: DEFAULT_MODE,
     scoring: SCORING,
     levelUpBannerDuration: LEVEL_UP_BANNER_DURATION_MS,
     lineClearAnimationDuration: LINE_CLEAR_ANIMATION_DURATION_MS,

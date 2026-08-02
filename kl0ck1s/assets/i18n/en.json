@@ -12,6 +12,7 @@
         "drought": "Drought",
         "tetrisRate": "TRT",
         "pps": "PPS",
+        "objective": "Objective",
         "statusLive": "Current game",
         "statusLast": "Last game"
     },
@@ -41,7 +42,8 @@
             "switchHint": "Switch with arrows"
         },
         "idle": {
-            "hint": "Choose difficulty",
+            "hint": "Difficulty",
+            "modeHint": "Mode",
             "startButton": "Start",
             "namePlaceholder": "Your nickname"
         },
@@ -93,6 +95,8 @@
         },
         "gameOverEntry": {
             "title": "GAME OVER",
+            "titleSprintComplete": "SPRINT COMPLETE",
+            "titleTimeUp": "TIME'S UP",
             "scoreLabel": "Score:",
             "levelLabel": "level",
             "linesLabel": "lines",
@@ -143,6 +147,24 @@
         "expert": "Expert",
         "pro": "PRO",
         "levelPrefix": "level {level}"
+    },
+    "modes": {
+        "marathon": {
+            "name": "Marathon",
+            "description": "Classic endless play"
+        },
+        "sprint": {
+            "name": "Sprint",
+            "description": "Clear 40 lines as fast as you can"
+        },
+        "ultra": {
+            "name": "Ultra",
+            "description": "Highest score in 3 minutes"
+        },
+        "survival": {
+            "name": "Survival",
+            "description": "Watch out for rising lines"
+        }
     },
     "game": {
         "levelUpBanner": "LEVEL {level}"

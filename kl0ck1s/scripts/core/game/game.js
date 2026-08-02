@@ -9,6 +9,7 @@ import {StatsTracker} from "../controllers/stats-tracker.js";
 import {SettingsController} from "../controllers/settings-controller.js";
 import {EffectOverlay} from "../controllers/effect-overlay.js";
 import {DifficultyController} from "../controllers/difficulty-controller.js";
+import {ModeController} from "../controllers/mode-controller.js";
 import {ScreenFlow} from "../controllers/screen-flow.js";
 import {CreditsController} from "../controllers/credits-controller.js";
 import {MusicDirector} from "../services/music-director.js";
@@ -31,6 +32,8 @@ export class Game {
                     screens,
                     difficulties,
                     defaultDifficulty,
+                    gameModes,
+                    defaultMode,
                     scoring,
                     levelUpBannerDuration,
                     lineClearAnimationDuration,
@@ -50,6 +53,9 @@ export class Game {
         this.screens = screens;
         this.difficulties = difficulties;
         this.difficulty = defaultDifficulty;
+        this.gameModes = gameModes;
+        this.mode = defaultMode;
+        this.modeState = {garbageTimer: 0};
         this.scoring = scoring;
         this.levelUpBannerDuration = levelUpBannerDuration;
         this.lineClearAnimationDuration = lineClearAnimationDuration;
@@ -63,6 +69,7 @@ export class Game {
         this.isPlayingSession = false;
 
         this.state = "idle";
+        this.menuSelector = "difficulty";
         this.countdownIndex = 0;
         this.countdownTimer = 0;
         this.playerName = "";
@@ -129,6 +136,7 @@ export class Game {
         this.settingsController = new SettingsController(this);
         this.effectOverlay = new EffectOverlay(this, {canvas: effectCanvas, ctx: effectCtx});
         this.difficultyController = new DifficultyController(this);
+        this.modeController = new ModeController(this);
         this.screenFlow = new ScreenFlow(this);
         this.inputController = new InputController(this);
         this.creditsController = new CreditsController(this);
@@ -207,6 +215,7 @@ export class Game {
 
         this.statsTracker.reset();
         this.pieceController.reset();
+        this.modeController.reset();
 
         this.hud.update(this.stats);
     }
@@ -312,6 +321,9 @@ export class Game {
         const resting = this.board.collides(this.current, 0, 1);
         this.pieceController.updateGrounded(resting, delta);
         this.pieceController.updateFalling();
+
+        this.modeController.update(delta);
+        if (this.state !== "running") return;
 
         if (this.isGrounded) {
             this.lockDelayTimer += delta;

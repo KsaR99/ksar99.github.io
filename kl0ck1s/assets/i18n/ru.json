@@ -12,6 +12,7 @@
         "drought": "Засуха",
         "tetrisRate": "TRT",
         "pps": "PPS",
+        "objective": "Цель",
         "statusLive": "Текущая игра",
         "statusLast": "Последняя игра"
     },
@@ -41,7 +42,8 @@
             "switchHint": "Переключайте стрелками"
         },
         "idle": {
-            "hint": "Выберите сложность",
+            "hint": "Сложность",
+            "modeHint": "Режим",
             "startButton": "Старт",
             "namePlaceholder": "Ваш ник"
         },
@@ -93,6 +95,8 @@
         },
         "gameOverEntry": {
             "title": "ИГРА ОКОНЧЕНА",
+            "titleSprintComplete": "СПРИНТ ЗАВЕРШЁН",
+            "titleTimeUp": "ВРЕМЯ ВЫШЛО",
             "scoreLabel": "Очки:",
             "levelLabel": "уровень",
             "linesLabel": "линий",
@@ -143,6 +147,24 @@
         "expert": "Эксперт",
         "pro": "PRO",
         "levelPrefix": "уровень {level}"
+    },
+    "modes": {
+        "marathon": {
+            "name": "Марафон",
+            "description": "Классическая бесконечная игра"
+        },
+        "sprint": {
+            "name": "Спринт",
+            "description": "Очистите 40 линий как можно быстрее"
+        },
+        "ultra": {
+            "name": "Ультра",
+            "description": "Максимальный счёт за 3 минуты"
+        },
+        "survival": {
+            "name": "Выживание",
+            "description": "Остерегайтесь поднимающихся линий"
+        }
     },
     "game": {
         "levelUpBanner": "УРОВЕНЬ {level}"

@@ -48,6 +48,18 @@ export const DIFFICULTIES = Object.freeze({
 
 export const DEFAULT_DIFFICULTY = "hard";
 
+export const GAME_MODES = Object.freeze({
+    marathon: Object.freeze({sprintTarget: null, timeLimitMs: null, garbage: false}),
+    sprint: Object.freeze({sprintTarget: 40, timeLimitMs: null, garbage: false}),
+    ultra: Object.freeze({sprintTarget: null, timeLimitMs: 180000, garbage: false}),
+    survival: Object.freeze({
+        sprintTarget: null, timeLimitMs: null, garbage: true,
+        garbageIntervalMs: 20000, garbageLinesMin: 1, garbageLinesMax: 2,
+    }),
+});
+
+export const DEFAULT_MODE = "marathon";
+
 /** Packs a 2D 0/1 grid into a single integer bitmask, bit index = r*width + c. */
 function packState(rows) {
     const height = rows.length;
@@ -157,6 +169,9 @@ export const COLOR_PALETTE = [
     null,
     ...KLOCKOMINO_TYPES.map((type) => KLOCKOMINOS[type].color),
 ];
+
+export const GARBAGE_COLOR_INDEX = COLOR_PALETTE.length;
+COLOR_PALETTE.push("oklch(0.42 0.015 271)");
 
 export const CREDITS = Object.freeze([
     Object.freeze({name: "Sa_ymon", link: "https://www.twitch.tv/sa_ymon", roles: ["developer", "sfx"]}),

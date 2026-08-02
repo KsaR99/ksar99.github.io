@@ -27,11 +27,18 @@ export class StatsTracker {
         const efficiencyValue = game.lines > 0 ? game.score / game.lines : 0;
         const droughtAvgValue = game.droughtCount > 0 ? game.droughtTotal / game.droughtCount : 0;
 
+        const bestEntry = game.leaderboard.bestEntry(game.mode);
+        const bestDisplay = game.mode === "sprint"
+            ? (bestEntry ? formatDuration(bestEntry.timeMs) : "—")
+            : formatNumber(bestEntry ? bestEntry.score : 0);
+
         return {
             score: formatNumber(game.score),
             level: game.level,
             lines: game.lines,
-            best: formatNumber(game.leaderboard.bestScore()),
+            best: bestDisplay,
+            mode: game.mode,
+            objective: game.modeController.objectiveText(),
             difficulty: `${game.i18n.t(`difficulty.${game.levelTier}`)} ${game.level}`,
             difficultyPercent: progressPercent,
             gameTime: formatDuration(game.elapsedMs),

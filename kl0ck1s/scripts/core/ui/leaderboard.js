@@ -21,6 +21,26 @@ export class Leaderboard {
         return new Date(iso).toDateString() === new Date().toDateString();
     }
 
+    entryMode(entry) {
+        return entry.mode || "marathon";
+    }
+
+    compareEntries(a, b, mode) {
+        if (mode === "sprint") return (a.timeMs ?? Infinity) - (b.timeMs ?? Infinity);
+        return b.score - a.score;
+    }
+
+    /** Entries for one mode, sorted best-first by that mode's own ranking criteria (score, or time for Sprint). */
+    forMode(mode) {
+        return this.cache
+            .filter((entry) => this.entryMode(entry) === mode)
+            .sort((a, b) => this.compareEntries(a, b, mode));
+    }
+
+    bestEntry(mode = "marathon") {
+        return this.forMode(mode)[0] ?? null;
+    }
+
     async loadTodayBest() {
         let stored = null;
         try {
@@ -57,12 +77,24 @@ export class Leaderboard {
     async add(entry) {
         const list = this.cache.slice();
         list.push(entry);
-        list.sort((a, b) => b.score - a.score);
-        this.cache = list.slice(0, Leaderboard.MAX_ENTRIES);
 
+        const byMode = new Map();
+        list.forEach((e) => {
+            const mode = this.entryMode(e);
+            if (!byMode.has(mode)) byMode.set(mode, []);
+            byMode.get(mode).push(e);
+        });
+
+        const trimmed = [];
+        byMode.forEach((entries, mode) => {
+            entries.sort((a, b) => this.compareEntries(a, b, mode));
+            trimmed.push(...entries.slice(0, Leaderboard.MAX_ENTRIES));
+        });
+
+        this.cache = trimmed;
         await this.store.set(Leaderboard.SCORES_KEY, JSON.stringify(this.cache));
 
-        return this.cache;
+        return this.forMode(this.entryMode(entry));
     }
 
     async loadLastName() {
@@ -75,8 +107,8 @@ export class Leaderboard {
         await this.store.set(Leaderboard.NAME_KEY, name);
     }
 
-    bestScore() {
-        return this.cache.length ? this.cache[0].score : 0;
+    bestScore(mode = "marathon") {
+        return this.bestEntry(mode)?.score ?? 0;
     }
 
     todayBestEntry() {

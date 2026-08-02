@@ -64,6 +64,9 @@ export class SettingsController {
         if (settings.difficulty && game.difficulties[settings.difficulty]) {
             game.difficulty = settings.difficulty;
         }
+        if (settings.mode && game.gameModes[settings.mode]) {
+            game.mode = settings.mode;
+        }
         game.soundManager.setVolume(settings.volume);
         game.soundManager.setMuted(settings.muted);
         this.applyAudioSettings();

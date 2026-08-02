@@ -18,6 +18,17 @@ function fillDifficultyButtons(dom, container, selectedDifficulty, difficulties,
     });
 }
 
+function fillModeButtons(dom, container, selectedMode, gameModes, i18n) {
+    Object.keys(gameModes).forEach((key) => {
+        const button = clone(dom, "tpl-mode-button").querySelector('[data-role="mode-button"]');
+        button.dataset.mode = key;
+        button.classList.toggle("difficulty__button--active", key === selectedMode);
+        button.querySelector('[data-field="label"]').textContent = i18n.t(`modes.${key}.name`);
+        button.querySelector('[data-field="description"]').textContent = i18n.t(`modes.${key}.description`);
+        container.appendChild(button);
+    });
+}
+
 function fillSoundRows(dom, container, keys, soundVolumes, i18n) {
     keys.forEach((key) => {
         const row = clone(dom, "tpl-options-sound-row").querySelector('[data-role="sound-row"]');
@@ -44,9 +55,10 @@ export const Screens = {
         return screen;
     },
 
-    idle(list, selectedDifficulty, difficulties, renderLeaderboard, dom = document, i18n, playerName = "") {
+    idle(list, selectedDifficulty, difficulties, selectedMode, gameModes, renderLeaderboard, dom = document, i18n, playerName = "") {
         const screen = clone(dom, "tpl-screen-idle");
         fillDifficultyButtons(dom, screen.querySelector('[data-field="difficulty"]'), selectedDifficulty, difficulties, i18n);
+        fillModeButtons(dom, screen.querySelector('[data-field="mode"]'), selectedMode, gameModes, i18n);
         screen.querySelector('[data-role="name-input"]').value = playerName;
         screen.querySelector('[data-field="leaderboard"]').appendChild(renderLeaderboard(list));
         i18n.applyStatic(screen);
@@ -133,7 +145,7 @@ export const Screens = {
         return screen;
     },
 
-    gameOverEntry(stats, list, highlightEntry, todayBestEntry, renderLeaderboard, dom = document, i18n) {
+    gameOverEntry(stats, list, highlightEntry, todayBestEntry, renderLeaderboard, dom = document, i18n, reason = "topOut") {
         const screen = clone(dom, "tpl-screen-gameover-entry");
         screen.querySelector('[data-field="playerName"]').textContent = highlightEntry?.name ?? "";
         screen.querySelector('[data-field="score"]').textContent = stats.score;
@@ -174,12 +186,27 @@ export const Screens = {
 
         screen.querySelector('[data-field="leaderboard"]').appendChild(renderLeaderboard(list, highlightEntry));
         i18n.applyStatic(screen);
+
+        // Sprint/Ultra finishing on their own terms aren't a "GAME OVER" -
+        // swap in a mode-specific title. topOut (and any other/unknown
+        // reason) keeps whatever applyStatic() already set above.
+        const titleKeyByReason = {
+            sprintComplete: "screens.gameOverEntry.titleSprintComplete",
+            timeUp: "screens.gameOverEntry.titleTimeUp",
+        };
+        const titleKey = titleKeyByReason[reason];
+        if (titleKey) {
+            const titleEl = screen.querySelector('[data-field="title"]');
+            if (titleEl) titleEl.textContent = i18n.t(titleKey);
+        }
+
         return screen;
     },
 
-    gameOverSaved(list, highlightEntry, renderLeaderboard, selectedDifficulty, difficulties, dom = document, i18n, playerName = "") {
+    gameOverSaved(list, highlightEntry, renderLeaderboard, selectedDifficulty, difficulties, selectedMode, gameModes, dom = document, i18n, playerName = "") {
         const screen = clone(dom, "tpl-screen-gameover-saved");
         fillDifficultyButtons(dom, screen.querySelector('[data-field="difficulty"]'), selectedDifficulty, difficulties, i18n);
+        fillModeButtons(dom, screen.querySelector('[data-field="mode"]'), selectedMode, gameModes, i18n);
         screen.querySelector('[data-role="name-input"]').value = playerName;
         screen.querySelector('[data-field="leaderboard"]').appendChild(renderLeaderboard(list, highlightEntry));
         i18n.applyStatic(screen);

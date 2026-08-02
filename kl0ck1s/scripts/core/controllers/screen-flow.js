@@ -20,6 +20,7 @@ export class ScreenFlow {
     async showIdleScreen() {
         const game = this.game;
         game.state = "idle";
+        game.menuSelector = "difficulty";
         game.isPlayingSession = false;
         game.hud.setPlaying(false);
         game.hud.setHasPlayedBefore(false);
@@ -27,14 +28,14 @@ export class ScreenFlow {
             APP_NAME, game.i18n.t("screens.loading.leaderboardHint"), game.dom
         ));
 
-        const [list, lastName] = await Promise.all([
+        const [, lastName] = await Promise.all([
             game.leaderboard.load(),
             game.leaderboard.loadLastName(),
         ]);
         if (game.state !== "idle") return;
 
         game.playerName = lastName;
-        this.renderIdleScreen(list);
+        this.renderIdleScreen(game.leaderboard.forMode(game.mode));
         game.hud.update(game.stats);
     }
 
@@ -43,13 +44,53 @@ export class ScreenFlow {
         game.currentIdleList = list;
         game.hud.showScreen(
             game.screens.idle(
-                list, game.difficulty, game.difficulties, (l, h) => this.renderLeaderboard(l, h), game.dom, game.i18n, game.playerName
+                list, game.difficulty, game.difficulties, game.mode, game.gameModes,
+                (l, h) => this.renderLeaderboard(l, h), game.dom, game.i18n, game.playerName
             )
         );
         game.difficultyController.bindDifficultyButtons(() => this.renderIdleScreen(list));
+        game.modeController.bindModeButtons(() => this.renderIdleScreen(game.leaderboard.forMode(game.mode)));
         this.bindNameInput();
         this.bindStartButton();
         this.bindOverlayShortcuts();
+        this.updateMenuSelectorFocus();
+    }
+
+    /**
+     * Moves keyboard focus between the difficulty picker, mode picker and
+     * nickname field on the idle/gameOver-saved screens (ArrowDown/ArrowUp)
+     * - a no-op everywhere else, same as PieceController.handleHorizontalArrow()'s
+     * left/right, which reads game.menuSelector to decide which group
+     * ArrowLeft/ArrowRight should actually cycle. Reaching "nickname" moves
+     * actual DOM focus into the text field - see bindNameInput()'s own
+     * ArrowUp listener for the way back, since a focused <input> swallows
+     * arrow keys before they reach the global handler below.
+     */
+    moveMenuFocus(dir) {
+        const game = this.game;
+        if (game.state !== "idle" && game.state !== "gameOver-saved") return;
+
+        const groups = ["difficulty", "mode", "nickname"];
+        const currentIndex = groups.indexOf(game.menuSelector);
+        const nextIndex = Math.max(0, Math.min(groups.length - 1, currentIndex + dir));
+        if (nextIndex === currentIndex) return;
+
+        game.menuSelector = groups[nextIndex];
+        this.updateMenuSelectorFocus();
+    }
+
+    /** Paints the difficulty--focused outline on whichever picker group matches game.menuSelector, or moves DOM focus into the nickname field. */
+    updateMenuSelectorFocus() {
+        const game = this.game;
+        if (!game.dom) return;
+        const difficultyEl = game.dom.querySelector('[data-role="difficulty-select"]');
+        const modeEl = game.dom.querySelector('[data-role="mode-select"]');
+        const nameInput = game.dom.querySelector('[data-role="name-input"]');
+        if (difficultyEl) difficultyEl.classList.toggle("difficulty--focused", game.menuSelector === "difficulty");
+        if (modeEl) modeEl.classList.toggle("difficulty--focused", game.menuSelector === "mode");
+        if (nameInput && game.menuSelector === "nickname" && game.dom.activeElement !== nameInput) {
+            nameInput.focus();
+        }
     }
 
     bindOverlayShortcuts() {
@@ -72,6 +113,14 @@ export class ScreenFlow {
         if (!game.dom) return;
         const input = game.dom.querySelector('[data-role="name-input"]');
         if (!input) return;
+
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowUp") {
+                e.preventDefault();
+                input.blur();
+                this.moveMenuFocus(-1);
+            }
+        });
 
         input.value = game.playerName || "";
         input.addEventListener("input", (e) => {
@@ -133,13 +182,25 @@ export class ScreenFlow {
         game.musicDirector.start(game.board);
     }
 
+    /** Topping out - kept as a thin alias since PieceController.spawnNext() calls this by name. */
     async gameOver() {
+        return this.endRound("topOut");
+    }
+
+    /**
+     * Ends the current round for any reason: topping out (Marathon/Survival,
+     * or any mode), Sprint hitting its line target, or Ultra's clock running
+     * out. Feeds the same game-over-entry/leaderboard flow for all three -
+     * only the sound, title and whether the run gets saved differ.
+     */
+    async endRound(reason = "topOut") {
         const game = this.game;
         game.state = "gameOver-entry";
         game.isPlayingSession = false;
         game.hud.setPlaying(false);
         game.musicDirector.stop();
-        game.soundManager.play("gameOver");
+        game.pieceController.stopGameplaySounds();
+        game.soundManager.play(reason === "topOut" ? "gameOver" : "levelUp");
         game.hud.showScreen(game.screens.loading(
             game.i18n.t("screens.gameOverEntry.title"), game.i18n.t("screens.loading.leaderboardHint"), game.dom
         ));
@@ -155,15 +216,25 @@ export class ScreenFlow {
             level: game.level,
             lines: game.lines,
             date: new Date().toISOString(),
+            mode: game.mode,
+            timeMs: game.elapsedMs,
         };
 
-        const todayBestBeforeThisGame = game.leaderboard.todayBestEntry();
+        // Sprint only makes it onto the leaderboard if it was actually
+        // finished - an unfinished run has no meaningful time to rank by.
+        const sprintUnfinished = game.mode === "sprint" && reason !== "sprintComplete";
+        const savedEntry = sprintUnfinished ? null : entry;
 
-        const list = await game.leaderboard.add(entry);
-        await game.leaderboard.recordIfTodayBest(entry);
+        const todayBestBeforeThisGame = game.mode === "marathon" ? game.leaderboard.todayBestEntry() : null;
+
+        let list = game.leaderboard.forMode(game.mode);
+        if (savedEntry) {
+            list = await game.leaderboard.add(savedEntry);
+            if (game.mode === "marathon") await game.leaderboard.recordIfTodayBest(savedEntry);
+        }
         if (game.state !== "gameOver-entry") return;
 
-        this.renderGameOverEntry(list, entry, todayBestBeforeThisGame);
+        this.renderGameOverEntry(list, savedEntry, todayBestBeforeThisGame, reason);
     }
 
     exitToMenu() {
@@ -174,12 +245,13 @@ export class ScreenFlow {
         this.showIdleScreen().then();
     }
 
-    renderGameOverEntry(list, entry, todayBestBeforeThisGame) {
+    renderGameOverEntry(list, entry, todayBestBeforeThisGame, reason = "topOut") {
         const game = this.game;
-        game.currentGameOverEntry = {list, entry, todayBestBeforeThisGame};
+        game.currentGameOverEntry = {list, entry, todayBestBeforeThisGame, reason};
         game.hud.showScreen(
             game.screens.gameOverEntry(
-                game.stats, list, entry, todayBestBeforeThisGame, (l, h) => this.renderLeaderboard(l, h), game.dom, game.i18n
+                game.stats, list, entry, todayBestBeforeThisGame,
+                (l, h) => this.renderLeaderboard(l, h), game.dom, game.i18n, reason
             )
         );
         this.bindGameOverContinue();
@@ -198,6 +270,7 @@ export class ScreenFlow {
         if (game.state !== "gameOver-entry" || !game.currentGameOverEntry) return;
         const {list, entry} = game.currentGameOverEntry;
         game.state = "gameOver-saved";
+        game.menuSelector = "difficulty";
         game.level = game.difficulties[game.difficulty].startLevel;
         game.lines = 0;
         game.hud.update(game.stats);
@@ -210,13 +283,15 @@ export class ScreenFlow {
         game.hud.showScreen(
             game.screens.gameOverSaved(
                 list, entry, (l, h) => this.renderLeaderboard(l, h),
-                game.difficulty, game.difficulties, game.dom, game.i18n, game.playerName
+                game.difficulty, game.difficulties, game.mode, game.gameModes, game.dom, game.i18n, game.playerName
             )
         );
         game.difficultyController.bindDifficultyButtons(() => this.renderGameOverSaved(list, entry));
+        game.modeController.bindModeButtons(() => this.renderGameOverSaved(game.leaderboard.forMode(game.mode), entry));
         this.bindNameInput();
         this.bindStartButton();
         this.bindOverlayShortcuts();
+        this.updateMenuSelectorFocus();
     }
 
     togglePause() {
@@ -355,8 +430,8 @@ export class ScreenFlow {
                 const {list, entry} = game.currentGameOverSaved;
                 this.renderGameOverSaved(list, entry);
             } else if (previousState === "gameOver-entry" && game.currentGameOverEntry) {
-                const {list, entry, todayBestBeforeThisGame} = game.currentGameOverEntry;
-                this.renderGameOverEntry(list, entry, todayBestBeforeThisGame);
+                const {list, entry, todayBestBeforeThisGame, reason} = game.currentGameOverEntry;
+                this.renderGameOverEntry(list, entry, todayBestBeforeThisGame, reason);
             }
 
             return;

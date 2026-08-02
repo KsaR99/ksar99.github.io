@@ -1,5 +1,7 @@
 "use strict";
 
+import {GARBAGE_COLOR_INDEX} from "../shared/config.js";
+
 export class Board {
     constructor(cols, rows) {
         this.cols = cols;
@@ -129,5 +131,48 @@ export class Board {
         this.colors = newColors;
         this.version++;
         return cleared;
+    }
+
+    /**
+     * Shifts the whole board up by `count` rows and fills that many new
+     * rows at the bottom, each solid except for one random gap column.
+     * Returns {toppedOut: true} if any of the rows pushed off the top were
+     * occupied - the caller should treat that as an instant game over.
+     */
+    addGarbageLines(count) {
+        if (count <= 0) return {toppedOut: false};
+
+        let toppedOut = false;
+        for (let y = 0; y < Math.min(count, this.rows); y++) {
+            if (this.occupancy[y] !== 0) toppedOut = true;
+        }
+
+        const newOccupancy = new Uint32Array(this.rows);
+        const newColors = new Uint8Array(this.rows * this.cols);
+
+        for (let y = count; y < this.rows; y++) {
+            newOccupancy[y - count] = this.occupancy[y];
+            newColors.set(
+                this.colors.subarray(y * this.cols, (y + 1) * this.cols),
+                (y - count) * this.cols
+            );
+        }
+
+        for (let i = 0; i < Math.min(count, this.rows); i++) {
+            const y = this.rows - count + i;
+            const gapCol = Math.floor(Math.random() * this.cols);
+            let rowMask = 0;
+            for (let x = 0; x < this.cols; x++) {
+                if (x === gapCol) continue;
+                rowMask |= (1 << x);
+                newColors[y * this.cols + x] = GARBAGE_COLOR_INDEX;
+            }
+            newOccupancy[y] = rowMask;
+        }
+
+        this.occupancy = newOccupancy;
+        this.colors = newColors;
+        this.version++;
+        return {toppedOut};
     }
 }

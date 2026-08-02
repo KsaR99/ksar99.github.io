@@ -12,6 +12,7 @@
         "drought": "Dürre",
         "tetrisRate": "TRT",
         "pps": "PPS",
+        "objective": "Ziel",
         "statusLive": "Aktuelles Spiel",
         "statusLast": "Letztes Spiel"
     },
@@ -41,7 +42,8 @@
             "switchHint": "Mit Pfeiltasten wechseln"
         },
         "idle": {
-            "hint": "Schwierigkeit wählen",
+            "hint": "Schwierigkeitsgrad",
+            "modeHint": "Modus",
             "startButton": "Start",
             "namePlaceholder": "Dein Spitzname"
         },
@@ -93,6 +95,8 @@
         },
         "gameOverEntry": {
             "title": "GAME OVER",
+            "titleSprintComplete": "SPRINT ABGESCHLOSSEN",
+            "titleTimeUp": "ZEIT ABGELAUFEN",
             "scoreLabel": "Punkte:",
             "levelLabel": "Level",
             "linesLabel": "Reihen",
@@ -143,6 +147,24 @@
         "expert": "Experte",
         "pro": "PRO",
         "levelPrefix": "Level {level}"
+    },
+    "modes": {
+        "marathon": {
+            "name": "Marathon",
+            "description": "Klassisches endloses Spiel"
+        },
+        "sprint": {
+            "name": "Sprint",
+            "description": "Räume 40 Reihen so schnell wie möglich"
+        },
+        "ultra": {
+            "name": "Ultra",
+            "description": "Höchste Punktzahl in 3 Minuten"
+        },
+        "survival": {
+            "name": "Überleben",
+            "description": "Achte auf aufsteigende Linien"
+        }
     },
     "game": {
         "levelUpBanner": "LEVEL {level}"

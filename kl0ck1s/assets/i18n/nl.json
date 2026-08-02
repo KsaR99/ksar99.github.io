@@ -12,6 +12,7 @@
         "drought": "Droogte",
         "tetrisRate": "TRT",
         "pps": "PPS",
+        "objective": "Doel",
         "statusLive": "Huidige spel",
         "statusLast": "Laatste spel"
     },
@@ -41,7 +42,8 @@
             "switchHint": "Wissel met pijltjes"
         },
         "idle": {
-            "hint": "Kies moeilijkheidsgraad",
+            "hint": "Moeilijkheidsgraad",
+            "modeHint": "Modus",
             "startButton": "Start",
             "namePlaceholder": "Jouw bijnaam"
         },
@@ -93,6 +95,8 @@
         },
         "gameOverEntry": {
             "title": "GAME OVER",
+            "titleSprintComplete": "SPRINT VOLTOOID",
+            "titleTimeUp": "TIJD OM",
             "scoreLabel": "Score:",
             "levelLabel": "niveau",
             "linesLabel": "lijnen",
@@ -143,6 +147,24 @@
         "expert": "Expert",
         "pro": "PRO",
         "levelPrefix": "niveau {level}"
+    },
+    "modes": {
+        "marathon": {
+            "name": "Marathon",
+            "description": "Klassiek eindeloos spel"
+        },
+        "sprint": {
+            "name": "Sprint",
+            "description": "Ruim 40 lijnen zo snel mogelijk"
+        },
+        "ultra": {
+            "name": "Ultra",
+            "description": "Hoogste score in 3 minuten"
+        },
+        "survival": {
+            "name": "Overleven",
+            "description": "Pas op voor stijgende lijnen"
+        }
     },
     "game": {
         "levelUpBanner": "NIVEAU {level}"

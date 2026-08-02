@@ -46,11 +46,12 @@ export class KeyboardInput extends InputSource {
 
     get keyActions() {
         const game = this.game;
+        const isMenuScreen = () => game.state === "idle" || game.state === "gameOver-saved";
         return {
             ArrowLeft: () => game.pieceController.handleHorizontalArrow(-1),
             ArrowRight: () => game.pieceController.handleHorizontalArrow(1),
-            ArrowDown: () => game.pieceController.softDrop(),
-            ArrowUp: () => game.pieceController.rotate(),
+            ArrowDown: () => isMenuScreen() ? game.screenFlow.moveMenuFocus(1) : game.pieceController.softDrop(),
+            ArrowUp: () => isMenuScreen() ? game.screenFlow.moveMenuFocus(-1) : game.pieceController.rotate(),
             Space: () => game.pieceController.hardDrop(),
             Enter: () => game.screenFlow.handleEnter(),
             Escape: () => game.screenFlow.handleEscape(),

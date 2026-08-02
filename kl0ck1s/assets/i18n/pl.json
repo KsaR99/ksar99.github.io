@@ -12,6 +12,7 @@
         "drought": "Posucha",
         "tetrisRate": "TRT",
         "pps": "PPS",
+        "objective": "Cel",
         "statusLive": "Aktualna gra",
         "statusLast": "Ostatnia gra"
     },
@@ -41,7 +42,8 @@
             "switchHint": "Przełącz strzałkami"
         },
         "idle": {
-            "hint": "Wybierz poziom trudności",
+            "hint": "Poziom trudności",
+            "modeHint": "Tryb",
             "startButton": "Start",
             "namePlaceholder": "Twój nick"
         },
@@ -50,7 +52,7 @@
             "resumeHintBefore": "Naciśnij",
             "resumeHintAfter": " aby wznowić",
             "optionsHintBefore": "Naciśnij",
-            "optionsHintAfter": ", aby otworzyć opcje",
+            "optionsHintAfter": " aby otworzyć opcje",
             "resumeButton": "Wznów"
         },
         "options": {
@@ -93,6 +95,8 @@
         },
         "gameOverEntry": {
             "title": "KONIEC GRY",
+            "titleSprintComplete": "SPRINT UKOŃCZONY",
+            "titleTimeUp": "CZAS MINĄŁ",
             "scoreLabel": "Wynik:",
             "levelLabel": "poziom",
             "linesLabel": "linii",
@@ -143,6 +147,24 @@
         "expert": "Ekspert",
         "pro": "PRO",
         "levelPrefix": "poziom {level}"
+    },
+    "modes": {
+        "marathon": {
+            "name": "Maraton",
+            "description": "Klasyczna, nieskończona gra"
+        },
+        "sprint": {
+            "name": "Sprint",
+            "description": "Ułóż 40 linii najszybciej jak potrafisz"
+        },
+        "ultra": {
+            "name": "Ultra",
+            "description": "Najwyższy wynik w 3 minuty"
+        },
+        "survival": {
+            "name": "Przetrwanie",
+            "description": "Uważaj na rosnące linie"
+        }
     },
     "game": {
         "levelUpBanner": "POZIOM {level}"

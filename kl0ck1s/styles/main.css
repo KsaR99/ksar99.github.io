@@ -672,6 +672,13 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     display: none !important;
 }
 
+/* Same rationale as .card--hidden above - JS toggles this on the
+   Objective row, which only exists for modes with a real objective
+   (Sprint/Ultra/Survival); Marathon has none. */
+.stats__row--hidden {
+    display: none !important;
+}
+
 .progress-bar {
     width: 100%;
     background: oklch(25.03% 0.027 271);
@@ -900,6 +907,17 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 .difficulty {
     display: flex;
     width: 100%;
+    border-radius: 0.375rem;
+    outline: 2px solid transparent;
+    outline-offset: 3px;
+    transition: outline-color 0.15s ease;
+}
+
+/* Set by ScreenFlow.updateMenuSelectorFocus() - shows which group
+   ArrowLeft/ArrowRight will act on after ArrowDown/ArrowUp moved focus
+   between the difficulty and mode pickers. */
+.difficulty--focused {
+    outline-color: var(--accent-2);
 }
 
 .difficulty__button {
@@ -934,6 +952,28 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     opacity: 0.75;
 }
 
+/* Mode picker reuses .difficulty/.difficulty__button, but with 4 longer
+   labels + descriptions it wraps into a 2x2 grid instead of the
+   difficulty picker's single row. */
+.difficulty--modes {
+    flex-wrap: wrap;
+}
+
+.difficulty--modes .difficulty__button {
+    flex: 1 1 40%;
+    padding: 0.35em 0.4em;
+}
+
+.difficulty__description {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.625rem;
+    font-weight: 400;
+    line-height: 1.2;
+    opacity: 0.75;
+    margin-top: 0.2em;
+}
+
 [data-field="label"] {
     font-weight: 600;
     font-family: var(--font-body);
@@ -965,6 +1005,18 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 
     &:hover {
         color: var(--text);
+    }
+}
+
+/* Language only has one row, so unlike the other <details> groups it's
+   rendered as a plain, always-visible div/h3 (see index.html) - this
+   just undoes the <summary>-flavored pointer cursor + hover tint above,
+   since there's nothing here to expand/collapse. */
+.options__title--static {
+    cursor: default;
+
+    &:hover {
+        color: var(--muted);
     }
 }
 
