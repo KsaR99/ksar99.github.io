@@ -6,6 +6,7 @@
     "sidebar": {
         "nextPiece": "Volgend blok",
         "score": "Score",
+        "time": "Tijd",
         "lines": "Lijnen",
         "best": "Beste",
         "time": "Tijd",
@@ -128,6 +129,7 @@
         "headers": {
             "name": "Naam",
             "score": "Score",
+            "time": "Tijd",
             "level": "Niv.",
             "lines": "Lijnen",
             "date": "Datum"

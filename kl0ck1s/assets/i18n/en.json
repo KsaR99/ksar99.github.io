@@ -6,6 +6,7 @@
     "sidebar": {
         "nextPiece": "Next piece",
         "score": "Score",
+        "time": "Time",
         "lines": "Lines",
         "best": "Best",
         "time": "Time",
@@ -128,6 +129,7 @@
         "headers": {
             "name": "Name",
             "score": "Score",
+            "time": "Time",
             "level": "Lvl",
             "lines": "Lines",
             "date": "Date"

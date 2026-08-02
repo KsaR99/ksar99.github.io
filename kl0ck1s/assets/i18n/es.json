@@ -129,6 +129,7 @@
             "headers": {
                 "name": "Nombre",
                 "score": "Puntos",
+                "time": "Tiempo",
                 "level": "Niv.",
                 "lines": "Líneas",
                 "date": "Fecha"
@@ -184,3 +185,4 @@
             "pieceLock": "Bloqueo de pieza"
         }
     }
+}

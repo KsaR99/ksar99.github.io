@@ -6,6 +6,7 @@
     "sidebar": {
         "nextPiece": "Nächster Stein",
         "score": "Punkte",
+        "time": "Zeit",
         "lines": "Reihen",
         "best": "Bestwert",
         "time": "Zeit",
@@ -128,6 +129,7 @@
         "headers": {
             "name": "Name",
             "score": "Punkte",
+            "time": "Zeit",
             "level": "Lvl",
             "lines": "Reihen",
             "date": "Datum"

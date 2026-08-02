@@ -70,6 +70,12 @@ export class ScreenFlow {
         const game = this.game;
         if (game.state !== "idle" && game.state !== "gameOver-saved") return;
 
+        // The mode picker is a 2x2 grid (see .difficulty--modes), so
+        // ArrowUp/ArrowDown there first try to move a row within the grid
+        // itself - only falling through to switching the focused group once
+        // you're already on the top/bottom row and there's nowhere left to go.
+        if (game.menuSelector === "mode" && game.modeController.changeModeRow(dir)) return;
+
         const groups = ["difficulty", "mode", "nickname"];
         const currentIndex = groups.indexOf(game.menuSelector);
         const nextIndex = Math.max(0, Math.min(groups.length - 1, currentIndex + dir));

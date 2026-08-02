@@ -6,6 +6,7 @@
     "sidebar": {
         "nextPiece": "Następny klocek",
         "score": "Wynik",
+        "time": "Czas",
         "lines": "Linie",
         "best": "Rekord",
         "time": "Czas",
@@ -128,6 +129,7 @@
         "headers": {
             "name": "Nick",
             "score": "Wynik",
+            "time": "Czas",
             "level": "Poz.",
             "lines": "Linie",
             "date": "Data"

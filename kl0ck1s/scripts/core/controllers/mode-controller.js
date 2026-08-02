@@ -46,7 +46,31 @@ export class ModeController {
         const keys = Object.keys(game.gameModes);
         const currentIndex = keys.indexOf(game.mode);
         const nextMode = keys[(currentIndex + dir + keys.length) % keys.length];
-        this.setMode(nextMode);
+        this.applyModeAndRerender(nextMode);
+    }
+
+    /**
+     * Moves the selection by a row (dir = ±1) within the mode picker's 2x2
+     * grid (see .difficulty--modes in main.css - 2 buttons per row) - the
+     * ArrowUp/ArrowDown counterpart to changeMode()'s ArrowLeft/ArrowRight.
+     * Unlike changeMode() this doesn't wrap: returns false when there's no
+     * button a row away (top row + up, bottom row + down) so ScreenFlow can
+     * fall back to moving focus to the difficulty/nickname group instead.
+     */
+    changeModeRow(dir) {
+        const game = this.game;
+        const keys = Object.keys(game.gameModes);
+        const currentIndex = keys.indexOf(game.mode);
+        const nextIndex = currentIndex + dir * 2;
+        if (nextIndex < 0 || nextIndex >= keys.length) return false;
+
+        this.applyModeAndRerender(keys[nextIndex]);
+        return true;
+    }
+
+    applyModeAndRerender(mode) {
+        const game = this.game;
+        this.setMode(mode);
 
         if (game.state === "idle") {
             game.screenFlow.renderIdleScreen(game.leaderboard.forMode(game.mode));

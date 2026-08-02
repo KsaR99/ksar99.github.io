@@ -156,22 +156,12 @@ export class Renderer {
 
     drawGrid(board, context = this.ctx) {
         const size = this.boardConfig.CELL_SIZE;
+        const sprite = this.spriteCache.getGridCell(size);
 
-        context.strokeStyle = "oklch(0.553 0.049 140.928 / 0.5)";
-        context.lineWidth = 1;
-
-        for (let x = 0; x <= board.cols; x++) {
-            context.beginPath();
-            context.moveTo(x * size + 0.5, 0);
-            context.lineTo(x * size + 0.5, board.rows * size);
-            context.stroke();
-        }
-
-        for (let y = 0; y <= board.rows; y++) {
-            context.beginPath();
-            context.moveTo(0, y * size + 0.5);
-            context.lineTo(board.cols * size, y * size + 0.5);
-            context.stroke();
+        for (let y = 0; y < board.rows; y++) {
+            for (let x = 0; x < board.cols; x++) {
+                context.drawImage(sprite, x * size, y * size, size, size);
+            }
         }
     }
 

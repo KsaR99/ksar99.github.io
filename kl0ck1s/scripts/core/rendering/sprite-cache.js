@@ -45,6 +45,56 @@ export function createBlockSprite(color, size, canvasFactory = () => document.cr
     return sprite;
 }
 
+/**
+ * Empty-cell "socket" sprite: a gray inset bevel, the mirror image of
+ * createBlockSprite()'s outset one. Filled pieces get light-top-left/
+ * dark-bottom-right (reads as raised); this flips it - dark top-left,
+ * light bottom-right - the classic CSS `border-style: inset` look, so the
+ * empty grid reads as a recessed socket the (raised) klocki blocks drop
+ * into, instead of plain grid lines.
+ */
+export function createGridCellSprite(size, canvasFactory = () => document.createElement("canvas")) {
+    const sprite = canvasFactory();
+    sprite.width = size;
+    sprite.height = size;
+
+    const spriteCtx = sprite.getContext("2d", {colorSpace: "display-p3"});
+    spriteCtx.imageSmoothingEnabled = false;
+
+    const bevel = Math.max(1, Math.round(size * 0.12));
+
+    spriteCtx.fillStyle = "oklch(0.4 0.015 260 / 0.1)";
+    spriteCtx.fillRect(0, 0, size, size);
+
+    spriteCtx.fillStyle = "oklch(0 0 0 / 0.4)";
+    spriteCtx.beginPath();
+    spriteCtx.moveTo(0, 0);
+    spriteCtx.lineTo(size, 0);
+    spriteCtx.lineTo(size - bevel, bevel);
+    spriteCtx.lineTo(bevel, bevel);
+    spriteCtx.lineTo(bevel, size - bevel);
+    spriteCtx.lineTo(0, size);
+    spriteCtx.closePath();
+    spriteCtx.fill();
+
+    spriteCtx.fillStyle = "oklch(1 0 0 / 0.16)";
+    spriteCtx.beginPath();
+    spriteCtx.moveTo(size, 0);
+    spriteCtx.lineTo(size, size);
+    spriteCtx.lineTo(0, size);
+    spriteCtx.lineTo(bevel, size - bevel);
+    spriteCtx.lineTo(size - bevel, size - bevel);
+    spriteCtx.lineTo(size - bevel, bevel);
+    spriteCtx.closePath();
+    spriteCtx.fill();
+
+    spriteCtx.strokeStyle = "oklch(0 0 0 / 0.35)";
+    spriteCtx.lineWidth = 1;
+    spriteCtx.strokeRect(0.5, 0.5, size - 1, size - 1);
+
+    return sprite;
+}
+
 export function createGlowSprite(color, size, canvasFactory = () => document.createElement("canvas")) {
     const blur = size * GLOW_BLUR_RATIO;
     const pad = Math.ceil(blur);
@@ -92,6 +142,7 @@ export class SpriteCache {
         this.sprites = new Map();
         this.glowSprites = new Map();
         this.ghostSprites = new Map();
+        this.gridCellSprite = null;
     }
 
     rebuild(size) {
@@ -100,6 +151,7 @@ export class SpriteCache {
         this.sprites.clear();
         this.glowSprites.clear();
         this.ghostSprites.clear();
+        this.gridCellSprite = createGridCellSprite(this.size, this.canvasFactory);
 
         const colors = new Set(Object.values(this.klockominos).map(({color}) => color));
         colors.forEach((color) => {
@@ -107,6 +159,11 @@ export class SpriteCache {
             this.glowSprites.set(color, createGlowSprite(color, this.size, this.canvasFactory));
             this.ghostSprites.set(color, createGhostSprite(color, this.size, this.canvasFactory));
         });
+    }
+
+    getGridCell(currentSize) {
+        if (this.size !== currentSize) this.rebuild(currentSize);
+        return this.gridCellSprite;
     }
 
     get(color, currentSize) {
