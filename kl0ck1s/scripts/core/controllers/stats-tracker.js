@@ -45,7 +45,9 @@ export class StatsTracker {
             lines: game.lines,
             best: bestDisplay,
             mode: game.mode,
-            objective: game.modeController.objectiveText(),
+            objective: game.modeController.objectiveText() !== null
+                ? `${game.i18n.t("sidebar.objective")}: ${game.modeController.objectiveText()}`
+                : null,
             objectivePercent: game.modeController.objectivePercent(),
             objectiveUrgency: game.modeController.objectiveUrgency(),
             objectiveColorMode: game.modeController.objectiveColorMode(),
