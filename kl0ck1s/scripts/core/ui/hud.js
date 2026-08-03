@@ -5,6 +5,7 @@ export class HUD {
      * @param {object} elements
      * @param {HTMLElement} elements.scoreEl
      * @param {HTMLElement} elements.linesEl
+     * @param {HTMLElement} [elements.linesRowEl]
      * @param {HTMLElement} elements.bestEl
      * @param {HTMLElement} elements.overlayEl
      * @param {HTMLElement} [elements.nextPieceCardEl]
@@ -28,10 +29,11 @@ export class HUD {
                     difficultyBarEl = null, statsCardEl = null, i18n = null,
                     timeEl = null, droughtEl = null, tetrisRateEl = null, ppsEl = null,
                     objectiveEl = null, objectiveRowEl = null,
-                    objectiveBarEl = null, objectiveBarTrackEl = null,
+                    objectiveBarEl = null, objectiveBarTrackEl = null, linesRowEl = null,
                 }) {
         this.scoreEl = scoreEl;
         this.linesEl = linesEl;
+        this.linesRowEl = linesRowEl;
         this.bestEl = bestEl;
         this.overlayEl = overlayEl;
         this.nextPieceCardEl = nextPieceCardEl;
@@ -61,8 +63,10 @@ export class HUD {
             pps: undefined,
             objective: undefined,
             objectivePercent: undefined,
+            objectiveColorMode: undefined,
             objectiveUrgency: undefined,
             hasObjective: undefined,
+            hasLinesRow: undefined,
             hasPlayedBefore: undefined,
             isPlaying: undefined,
             statsStatusText: undefined,
@@ -112,6 +116,20 @@ export class HUD {
         this._setText(this.linesEl, "lines", lines);
         this._setText(this.bestEl, "best", best);
 
+        // Sprint/Cheese Race/Dig Survival ("ramp" objective color mode - see
+        // ModeController.objectiveColorMode()) already show this exact same
+        // number as "X / target" in the objective row right below, so the
+        // plain lines count here would just be a duplicate. Hidden only for
+        // those three; every other mode (including Marathon, which has no
+        // objective at all) keeps showing it as before.
+        if (this.linesRowEl) {
+            const hideLinesRow = objectiveColorMode === "ramp";
+            if (this._cache.hasLinesRow !== !hideLinesRow) {
+                this._cache.hasLinesRow = !hideLinesRow;
+                this.linesRowEl.classList.toggle("stats__row--hidden", hideLinesRow);
+            }
+        }
+
         if (this.difficultyEl && difficulty !== undefined) {
             this._setText(this.difficultyEl, "difficulty", difficulty);
         }
@@ -152,8 +170,9 @@ export class HUD {
             }
 
             if (this.objectiveBarEl && hasObjective && objectivePercent !== undefined && objectivePercent !== null) {
-                if (this._cache.objectivePercent !== objectivePercent) {
+                if (this._cache.objectivePercent !== objectivePercent || this._cache.objectiveColorMode !== objectiveColorMode) {
                     this._cache.objectivePercent = objectivePercent;
+                    this._cache.objectiveColorMode = objectiveColorMode;
                     this.objectiveBarEl.style.width = `${objectivePercent}%`;
 
                     // "ramp" mode (Sprint): ease the fill color from neutral toward

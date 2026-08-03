@@ -133,6 +133,7 @@ const renderer = new Renderer({
 const hud = new HUD({
     scoreEl: document.getElementById("score-value"),
     linesEl: document.getElementById("lines-value"),
+    linesRowEl: document.querySelector('[data-role="lines-stat"]'),
     bestEl: document.getElementById("best-value"),
     overlayEl: document.getElementById("overlay"),
     nextPieceCardEl: document.querySelector('[data-role="next-piece-card"]'),
