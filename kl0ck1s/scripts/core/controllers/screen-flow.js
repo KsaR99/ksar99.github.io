@@ -24,6 +24,7 @@ export class ScreenFlow {
         game.isPlayingSession = false;
         game.hud.setPlaying(false);
         game.hud.setHasPlayedBefore(false);
+        game.modeController.restoreSelectedMode();
         game.hud.showScreen(game.screens.loading(
             APP_NAME, game.i18n.t("screens.loading.leaderboardHint"), game.dom
         ));
@@ -306,6 +307,7 @@ export class ScreenFlow {
         game.menuSelector = "mode";
         game.level = game.difficulties[game.difficulty].startLevel;
         game.lines = 0;
+        game.modeController.restoreSelectedMode();
         game.hud.update(game.stats);
         this.renderGameOverSaved(list, entry);
     }
@@ -346,6 +348,12 @@ export class ScreenFlow {
         if (!["running", "paused", "clearing", "countdown", "gameOver-entry", "gameOver-saved"].includes(game.state)) {
             return;
         }
+        // Mid-round (running/paused/clearing/countdown) game.mode is already
+        // whatever resolveRandomMode() resolved "random" to earlier, so this
+        // is a no-op then - but from gameOver-saved, restoreSelectedMode()
+        // (see continueFromGameOverEntry()) may have just put game.mode back
+        // to "random" itself, which prepareNewRound() can't actually play.
+        game.modeController.resolveRandomMode();
         this.startCountdown();
     }
 

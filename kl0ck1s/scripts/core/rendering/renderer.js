@@ -384,22 +384,33 @@ export class Renderer {
         const boxWidth = textWidth + paddingX * 2;
         const boxHeight = fontSize + paddingY * 2;
 
-        const bottomMargin = fontSize * 0.8;
-        const centerY = boardCanvas.height - bottomMargin - boxHeight / 2;
+        // Centered vertically on the board rather than pinned near the
+        // bottom - the bottom is exactly where the stack piles up in a
+        // normal game, so the banner used to land right on top of the
+        // blocks it was supposed to be announcing a level-up over.
+        const centerY = boardCanvas.height / 2;
 
-        ctx.shadowBlur = 6;
-        ctx.fillStyle = "oklch(0 0 0 / 0.6)";
+        ctx.shadowBlur = 8;
+        ctx.fillStyle = "oklch(0 0 0 / 0.82)";
         ctx.beginPath();
         ctx.roundRect(centerX - boxWidth / 2, centerY - boxHeight / 2, boxWidth, boxHeight, fontSize * 0.2);
         ctx.fill();
 
         if (this.glowEnabled) {
-            ctx.shadowBlur = fontSize * 0.2;
+            ctx.shadowBlur = fontSize * 0.25;
             ctx.shadowColor = "oklch(0.464 0.043 75.925 / 0.85)";
         } else {
             ctx.shadowBlur = 0;
         }
-        ctx.fillStyle = "oklch(0.731 0.1861 52.7)";
+
+        // A dark outline behind the fill keeps the text legible over the
+        // board's own busy colors even where the box's semi-transparent
+        // background lets some of them bleed through.
+        ctx.lineWidth = Math.max(2, fontSize * 0.12);
+        ctx.strokeStyle = "oklch(0 0 0 / 0.9)";
+        ctx.strokeText(text, centerX, centerY);
+
+        ctx.fillStyle = "oklch(0.94 0.05 90)";
         ctx.fillText(text, centerX, centerY);
         ctx.restore();
     }

@@ -56,20 +56,41 @@ export class ModeController {
 
     /**
      * If "Random" is the currently selected mode, swaps it out for one
-     * randomly-picked real mode via setMode() - same effect as if the player
-     * had picked that mode themselves, persisted the same way. Called from
-     * ScreenFlow.handleEnter() right before the Start flow (mode-info screen,
-     * countdown, round) begins, so everything downstream - mode-info's rules
-     * text, the HUD, the leaderboard entry - already sees the resolved mode
-     * and needs no "random" special-casing of its own. A no-op for any other
-     * mode.
+     * randomly-picked real mode for the *duration of this round only* - same
+     * effect as if the player had picked that mode themselves, but without
+     * persisting the pick: game.settings.mode (and localStorage) keep
+     * remembering "random" as the actual selection, since setMode() (which
+     * saves) is deliberately NOT used here. Called from ScreenFlow.handleEnter()
+     * right before the Start flow (mode-info screen, countdown, round) begins,
+     * so everything downstream - mode-info's rules text, the HUD, the
+     * leaderboard entry - already sees the resolved mode and needs no "random"
+     * special-casing of its own. A no-op for any other mode. See
+     * restoreSelectedMode() for the other half of this - putting game.mode
+     * back once the round is over.
      */
     resolveRandomMode() {
         const game = this.game;
         if (!game.gameModes[game.mode]?.isRandom) return;
         const keys = this.randomizableModeKeys;
         const picked = keys[Math.floor(Math.random() * keys.length)];
-        this.setMode(picked);
+        game.mode = picked;
+        game.hud.update(game.stats);
+    }
+
+    /**
+     * Puts game.mode back in sync with the player's persisted selection
+     * (game.settings.mode) - the counterpart to resolveRandomMode() above.
+     * Needed because resolveRandomMode() only overwrites game.mode for the
+     * round itself, on purpose, so once we're back on a mode-picker screen
+     * (idle / gameOver-saved) it has to be switched back to "random" (or
+     * whatever's actually selected) rather than staying on whichever mode
+     * got resolved last round. A no-op if nothing was ever swapped.
+     */
+    restoreSelectedMode() {
+        const game = this.game;
+        if (game.settings.mode && game.gameModes[game.settings.mode] && game.mode !== game.settings.mode) {
+            game.mode = game.settings.mode;
+        }
     }
 
     applyModeAndRerender(mode) {
@@ -110,9 +131,20 @@ export class ModeController {
         game.board.addGarbageLines(def.cheeseRows);
     }
 
-    /** True once every row on the board is empty - Cheese Race's actual finish condition (see checkObjectiveComplete()). */
-    isBoardClear() {
-        return this.game.board.occupancy.every((row) => row === 0);
+    /**
+     * True once the player has cleared as many lines this round as the
+     * board started with (def.cheeseRows) - Cheese Race's actual finish
+     * condition. Deliberately just a line count, exactly like Sprint's
+     * sprintTarget check, NOT "every cell on the board is empty": requiring
+     * a literal perfect-clear board state would mean the round almost never
+     * actually ends, since any leftover overhang from a piece that didn't
+     * complete a row would block it forever, even after all cheeseRows
+     * garbage rows are long gone.
+     */
+    cheeseRaceComplete() {
+        const game = this.game;
+        const def = this.def;
+        return game.lines >= def.cheeseRows;
     }
 
     /** Short status string for the sidebar (e.g. "24 / 40", "02:14", "8s") - null for Marathon, which has no extra objective. */
@@ -324,7 +356,7 @@ export class ModeController {
             return true;
         }
 
-        if (game.mode === "cheeseRace" && this.isBoardClear()) {
+        if (game.mode === "cheeseRace" && this.cheeseRaceComplete()) {
             game.screenFlow.endRound("cheeseClear");
             return true;
         }
