@@ -391,7 +391,7 @@ export class Renderer {
         const centerY = boardCanvas.height / 2;
 
         ctx.shadowBlur = 8;
-        ctx.fillStyle = "oklch(0 0 0 / 0.82)";
+        ctx.fillStyle = "oklch(0 0 0 / 0.1)";
         ctx.beginPath();
         ctx.roundRect(centerX - boxWidth / 2, centerY - boxHeight / 2, boxWidth, boxHeight, fontSize * 0.2);
         ctx.fill();
@@ -407,7 +407,7 @@ export class Renderer {
         // board's own busy colors even where the box's semi-transparent
         // background lets some of them bleed through.
         ctx.lineWidth = Math.max(2, fontSize * 0.12);
-        ctx.strokeStyle = "oklch(0 0 0 / 0.9)";
+        ctx.strokeStyle = "oklch(0 0 0 / 0.2)";
         ctx.strokeText(text, centerX, centerY);
 
         ctx.fillStyle = "oklch(0.94 0.05 90)";
