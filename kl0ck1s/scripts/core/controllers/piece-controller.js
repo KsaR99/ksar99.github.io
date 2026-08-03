@@ -585,7 +585,16 @@ export class PieceController {
         game.clearingFragments = [];
         game.dropCounter = 0;
 
-        if (game.modeController.onLinesCleared(cleared)) return;
+        // registerLineClears() above already pushed a HUD update, but at that point
+        // modeController.onLinesCleared() hasn't run yet - so Dig Survival's digCleared
+        // and Countdown's time-bonus were still showing this clear's *old* values (the
+        // sidebar objective one clear behind, and stuck stale forever if this clear was
+        // the one that actually finished/ended the round). Update again now that
+        // onLinesCleared() has applied its mode-specific state, before either
+        // early-return path below.
+        const toppedOutFromResupply = game.modeController.onLinesCleared(cleared);
+        game.hud.update(game.stats);
+        if (toppedOutFromResupply) return;
         if (game.modeController.checkObjectiveComplete()) return;
 
         game.state = "running";
