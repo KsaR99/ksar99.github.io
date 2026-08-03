@@ -9,9 +9,8 @@
         "time": "Czas",
         "lines": "Linie",
         "best": "Rekord",
-        "time": "Czas",
         "drought": "Posucha",
-        "tetrisRate": "TRT",
+        "tetrisRate": "W4L",
         "pps": "PPS",
         "objective": "Cel",
         "statusLive": "Aktualna gra",
@@ -39,14 +38,15 @@
         "touchPauseGesture": "Przycisk ❚❚"
     },
     "screens": {
-        "common": {
-            "switchHint": "Przełącz strzałkami"
-        },
         "idle": {
             "hint": "Poziom trudności",
             "modeHint": "Tryb",
             "startButton": "Start",
             "namePlaceholder": "Twój nick"
+        },
+        "modeInfo": {
+            "subtitle": "Tryb: {mode}",
+            "continueButton": "Kontynuuj"
         },
         "paused": {
             "title": "PAUZA",
@@ -74,6 +74,7 @@
             "hudRight": "HUD po prawej",
             "gameplayTitle": "Rozgrywka",
             "skipCountdown": "Pomiń odliczanie",
+            "skipModeInfo": "Pomiń ekran informacyjny trybu",
             "mouseControl": "Sterowanie myszką",
             "graphicsTitle": "Grafika",
             "ghost": "Duszek",
@@ -98,6 +99,8 @@
             "title": "KONIEC GRY",
             "titleSprintComplete": "SPRINT UKOŃCZONY",
             "titleTimeUp": "CZAS MINĄŁ",
+            "titleCheeseClear": "SER WYCZYSZCZONY",
+            "titleDigComplete": "WYKOPANO",
             "scoreLabel": "Wynik:",
             "levelLabel": "poziom",
             "linesLabel": "linii",
@@ -111,7 +114,7 @@
             "droughtAvgLabel": "D.AVG",
             "burnLabel": "BRN",
             "transitionLabel": "TRNS",
-            "tetrisRateLabel": "Wskaźnik Tetris (TRT)",
+            "tetrisRateLabel": "Wskaźnik 4 linii (W4L)",
             "clearsLabel": "Czyszczenia (1/2/3/4 linie)",
             "ppsLabel": "PPS",
             "spinsLabel": "Spiny (T / T-mini / inne)",
@@ -153,19 +156,76 @@
     "modes": {
         "marathon": {
             "name": "Maraton",
-            "description": "Klasyczna, nieskończona gra"
+            "description": "Klasyczna, nieskończona gra",
+            "rules": [
+                "♾️ Gra bez końca — układaj linie i rośnij w poziomach",
+                "📈 Tempo opadania rośnie z każdym poziomem",
+                "🏆 Liczy się wynik i najwyższy osiągnięty poziom"
+            ]
         },
         "sprint": {
             "name": "Sprint",
-            "description": "Ułóż 40 linii najszybciej jak potrafisz"
+            "description": "Ułóż 40 linii najszybciej jak potrafisz",
+            "rules": [
+                "🎯 Cel: ułóż 40 linii",
+                "⏱️ Liczy się czas ukończenia — bądź jak najszybszy",
+                "🚫 Nieukończony bieg nie trafia na tablicę wyników"
+            ]
         },
         "ultra": {
             "name": "Ultra",
-            "description": "Najwyższy wynik w 3 minuty"
+            "description": "Najwyższy wynik w 3 minuty",
+            "rules": [
+                "⏱️ Masz dokładnie 3 minuty",
+                "💯 Zdobądź jak najwyższy wynik, zanim czas się skończy",
+                "📊 Liczy się tylko wynik na koniec czasu"
+            ]
         },
         "survival": {
             "name": "Przetrwanie",
-            "description": "Uważaj na rosnące linie"
+            "description": "Uważaj na rosnące linie",
+            "rules": [
+                "🧱 Linie śmieci rosną od dołu przez cały czas",
+                "🕳️ Znajdź i wykorzystaj przerwy w śmieciach",
+                "☠️ Gra kończy się, gdy plansza się przepełni"
+            ]
+        },
+        "cheeseRace": {
+            "name": "Wyścig z serem",
+            "description": "Wykop wcześniej ułożony stos jak najszybciej",
+            "rules": [
+                "🧀 Plansza startuje z 10 rzędami sera (śmieci) z dziurą",
+                "⏱️ Wykop wszystko najszybciej jak się da",
+                "🚫 Nieukończony bieg nie trafia na tablicę wyników"
+            ]
+        },
+        "digSurvival": {
+            "name": "Kopanie na przetrwanie",
+            "description": "Kop bez końca — śmieci odrastają za każdym razem, gdy je wykopiesz. Przetrwaj i wykop ich 100.",
+            "rules": [
+                "🧀 Start z niewielkim stosem śmieci u dołu planszy",
+                "♻️ Każda wykopana linia natychmiast odrasta od dołu — stos nigdy się nie kończy",
+                "🎯 Wykop w sumie 100 linii, by wygrać",
+                "☠️ Gra kończy się, gdy plansza się przepełni"
+            ]
+        },
+        "countdown": {
+            "name": "Odliczanie",
+            "description": "Czyść linie, by zegar nie doszedł do zera",
+            "rules": [
+                "⏱️ Start z 60 sekundami na zegarze",
+                "➕ Każde czyszczenie linii dodaje czasu (więcej za 4 linie)",
+                "⏳ Gra kończy się, gdy zegar dojdzie do zera"
+            ]
+        },
+        "random": {
+            "name": "Losowy",
+            "description": "Losuje jeden z pozostałych trybów po naciśnięciu Start",
+            "rules": [
+                "🎲 Losuje jeden z pozostałych trybów",
+                "▶️ Runda toczy się dokładnie tak, jak w wylosowanym trybie",
+                "🔁 Wybierz Losowy ponownie po kolejną niespodziankę"
+            ]
         }
     },
     "game": {

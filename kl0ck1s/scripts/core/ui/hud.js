@@ -19,6 +19,8 @@ export class HUD {
      * @param {HTMLElement} [elements.ppsEl]
      * @param {HTMLElement} [elements.objectiveEl]
      * @param {HTMLElement} [elements.objectiveRowEl]
+     * @param {HTMLElement} [elements.objectiveBarEl]
+     * @param {HTMLElement} [elements.objectiveBarTrackEl]
      */
     constructor({
                     scoreEl, linesEl, bestEl, overlayEl,
@@ -26,6 +28,7 @@ export class HUD {
                     difficultyBarEl = null, statsCardEl = null, i18n = null,
                     timeEl = null, droughtEl = null, tetrisRateEl = null, ppsEl = null,
                     objectiveEl = null, objectiveRowEl = null,
+                    objectiveBarEl = null, objectiveBarTrackEl = null,
                 }) {
         this.scoreEl = scoreEl;
         this.linesEl = linesEl;
@@ -43,6 +46,8 @@ export class HUD {
         this.ppsEl = ppsEl;
         this.objectiveEl = objectiveEl;
         this.objectiveRowEl = objectiveRowEl;
+        this.objectiveBarEl = objectiveBarEl;
+        this.objectiveBarTrackEl = objectiveBarTrackEl;
 
         this._cache = {
             score: undefined,
@@ -55,6 +60,8 @@ export class HUD {
             tetrisRate: undefined,
             pps: undefined,
             objective: undefined,
+            objectivePercent: undefined,
+            objectiveUrgency: undefined,
             hasObjective: undefined,
             hasPlayedBefore: undefined,
             isPlaying: undefined,
@@ -97,7 +104,10 @@ export class HUD {
         }
     }
 
-    update({score, lines, best, difficulty, difficultyPercent, gameTime, drought, tetrisRate, pps, objective}) {
+    update({
+               score, lines, best, difficulty, difficultyPercent, gameTime, drought, tetrisRate, pps,
+               objective, objectivePercent, objectiveUrgency, objectiveColorMode,
+           }) {
         this._setText(this.scoreEl, "score", score);
         this._setText(this.linesEl, "lines", lines);
         this._setText(this.bestEl, "best", best);
@@ -139,6 +149,30 @@ export class HUD {
 
             if (this.objectiveEl && hasObjective) {
                 this._setText(this.objectiveEl, "objective", objective);
+            }
+
+            if (this.objectiveBarEl && hasObjective && objectivePercent !== undefined && objectivePercent !== null) {
+                if (this._cache.objectivePercent !== objectivePercent) {
+                    this._cache.objectivePercent = objectivePercent;
+                    this.objectiveBarEl.style.width = `${objectivePercent}%`;
+
+                    // "ramp" mode (Sprint): ease the fill color from neutral toward
+                    // "good" as lines closed in on the target - set directly here
+                    // rather than via a CSS class, since it needs the continuous
+                    // percent rather than a handful of discrete steps.
+                    this.objectiveBarEl.style.backgroundColor = objectiveColorMode === "ramp"
+                        ? `color-mix(in oklch, var(--accent-2) ${100 - objectivePercent}%, var(--good) ${objectivePercent}%)`
+                        : "";
+                }
+            }
+
+            if (this.objectiveBarTrackEl && this._cache.objectiveUrgency !== objectiveUrgency) {
+                this._cache.objectiveUrgency = objectiveUrgency;
+                if (objectiveUrgency) {
+                    this.objectiveBarTrackEl.dataset.urgency = objectiveUrgency;
+                } else {
+                    delete this.objectiveBarTrackEl.dataset.urgency;
+                }
             }
         }
     }

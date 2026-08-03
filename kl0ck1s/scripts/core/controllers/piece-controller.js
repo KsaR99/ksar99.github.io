@@ -585,7 +585,8 @@ export class PieceController {
         game.clearingFragments = [];
         game.dropCounter = 0;
 
-        if (game.modeController.checkSprintComplete()) return;
+        if (game.modeController.onLinesCleared(cleared)) return;
+        if (game.modeController.checkObjectiveComplete()) return;
 
         game.state = "running";
         this.spawnNext();

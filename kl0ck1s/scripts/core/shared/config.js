@@ -56,6 +56,37 @@ export const GAME_MODES = Object.freeze({
         sprintTarget: null, timeLimitMs: null, garbage: true,
         garbageIntervalMs: 20000, garbageLinesMin: 1, garbageLinesMax: 2,
     }),
+    // Board starts pre-filled with a `cheeseRows`-tall stack of one-gap-per-row
+    // garbage (ModeController.setupBoard()) - dig it all out (board fully
+    // clear) as fast as you can. Ranked on the leaderboard by time, same as
+    // Sprint (see Leaderboard.compareEntries()).
+    cheeseRace: Object.freeze({
+        sprintTarget: null, timeLimitMs: null, garbage: false, cheeseRows: 10,
+    }),
+    // Same pre-filled starting stack as Cheese Race, but instead of racing to
+    // clear it, every line you clear is immediately resupplied at the bottom
+    // (ModeController.onLinesCleared()) - the stack never shrinks, so the
+    // only way to lose is topping out. Survive long enough to dig `digTarget`
+    // total lines to win.
+    digSurvival: Object.freeze({
+        sprintTarget: null, timeLimitMs: null, garbage: false, cheeseRows: 4, digTarget: 100,
+    }),
+    // Starts with `countdownStartMs` on the clock, ticking down every frame;
+    // hits zero and the round ends. Every line clear adds time back
+    // (ModeController.onLinesCleared()) - `countdownBonusMs[n]` is the bonus
+    // for an n-line clear (index clamped to the array's last entry, so a
+    // tetris and a triple can share the top bonus without a 5th entry).
+    countdown: Object.freeze({
+        sprintTarget: null, timeLimitMs: null, garbage: false,
+        countdownStartMs: 60000, countdownBonusMs: [3000, 3000, 5000, 8000],
+    }),
+    // Not an actual playable mode - a picker entry. ModeController.resolveRandomMode()
+    // swaps it out for a randomly-picked real mode the moment Start is pressed
+    // (see ScreenFlow.handleEnter()), so nothing ever actually runs a round as
+    // "random" itself; `isRandom` just tells that resolver (and the mode
+    // carousel's cycling logic) to leave this entry out of the pool it picks
+    // from.
+    random: Object.freeze({sprintTarget: null, timeLimitMs: null, garbage: false, isRandom: true}),
 });
 
 export const DEFAULT_MODE = "marathon";

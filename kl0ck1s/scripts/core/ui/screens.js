@@ -7,26 +7,28 @@ function clone(dom, templateId) {
     return dom.getElementById(templateId).content.cloneNode(true);
 }
 
-function fillDifficultyButtons(dom, container, selectedDifficulty, difficulties, i18n) {
-    Object.entries(difficulties).forEach(([key, def]) => {
-        const button = clone(dom, "tpl-difficulty-button").querySelector('[data-role="difficulty-button"]');
-        button.dataset.difficulty = key;
-        button.classList.toggle("difficulty__button--active", key === selectedDifficulty);
-        button.querySelector('[data-field="label"]').textContent = i18n.t(`difficulty.${key}`);
-        button.querySelector('[data-field="level"]').textContent = i18n.t("difficulty.levelPrefix", {level: def.startLevel});
-        container.appendChild(button);
-    });
+function fillDifficultyCarousel(container, selectedDifficulty, difficulties, i18n) {
+    if (!container) return;
+    const def = difficulties[selectedDifficulty];
+    container.querySelector('[data-field="difficultyLabel"]').textContent = i18n.t(`difficulty.${selectedDifficulty}`);
+    container.querySelector('[data-field="difficultyLevel"]').textContent = i18n.t("difficulty.levelPrefix", {level: def.startLevel});
 }
 
-function fillModeButtons(dom, container, selectedMode, gameModes, i18n) {
-    Object.keys(gameModes).forEach((key) => {
-        const button = clone(dom, "tpl-mode-button").querySelector('[data-role="mode-button"]');
-        button.dataset.mode = key;
-        button.classList.toggle("difficulty__button--active", key === selectedMode);
-        button.querySelector('[data-field="label"]').textContent = i18n.t(`modes.${key}.name`);
-        button.querySelector('[data-field="description"]').textContent = i18n.t(`modes.${key}.description`);
-        container.appendChild(button);
-    });
+function fillModeCarousel(container, selectedMode, i18n) {
+    if (!container) return;
+    container.querySelector('[data-field="modeLabel"]').textContent = i18n.t(`modes.${selectedMode}.name`);
+}
+
+/**
+ * Fills the single shared panel below the mode picker with the currently
+ * selected mode's rules text, prefixed with 💡. Called once per screen
+ * render (idle/gameOverSaved); ModeController re-renders the whole screen
+ * on every mode change (click or arrow key), so this always reflects the
+ * current selection without needing its own change listener.
+ */
+function fillModeDescription(container, selectedMode, i18n) {
+    if (!container) return;
+    container.textContent = `💡 ${i18n.t(`modes.${selectedMode}.description`)}`;
 }
 
 function fillSoundRows(dom, container, keys, soundVolumes, i18n) {
@@ -47,6 +49,15 @@ function fillSoundRows(dom, container, keys, soundVolumes, i18n) {
     });
 }
 
+function fillModeInfoRules(dom, container, mode, i18n) {
+    const rules = i18n.raw(`modes.${mode}.rules`) ?? [];
+    rules.forEach((rule) => {
+        const item = clone(dom, "tpl-mode-info-rule").querySelector('[data-field="rule"]');
+        item.textContent = rule;
+        container.appendChild(item);
+    });
+}
+
 export const Screens = {
     loading(title, text, dom = document) {
         const screen = clone(dom, "tpl-screen-loading");
@@ -57,8 +68,9 @@ export const Screens = {
 
     idle(list, selectedDifficulty, difficulties, selectedMode, gameModes, renderLeaderboard, dom = document, i18n, playerName = "") {
         const screen = clone(dom, "tpl-screen-idle");
-        fillDifficultyButtons(dom, screen.querySelector('[data-field="difficulty"]'), selectedDifficulty, difficulties, i18n);
-        fillModeButtons(dom, screen.querySelector('[data-field="mode"]'), selectedMode, gameModes, i18n);
+        fillDifficultyCarousel(screen.querySelector('[data-role="difficulty-select"]'), selectedDifficulty, difficulties, i18n);
+        fillModeCarousel(screen.querySelector('[data-role="mode-select"]'), selectedMode, i18n);
+        fillModeDescription(screen.querySelector('[data-field="modeDescription"]'), selectedMode, i18n);
         screen.querySelector('[data-role="name-input"]').value = playerName;
         screen.querySelector('[data-field="leaderboard"]').appendChild(renderLeaderboard(list));
         i18n.applyStatic(screen);
@@ -110,6 +122,8 @@ export const Screens = {
         if (fallTrailCheckbox) fallTrailCheckbox.checked = Boolean(settings.fallTrail);
         const skipCountdownCheckbox = screen.querySelector('[data-role="skip-countdown-checkbox"]');
         if (skipCountdownCheckbox) skipCountdownCheckbox.checked = Boolean(settings.skipCountdown);
+        const skipModeInfoCheckbox = screen.querySelector('[data-role="skip-mode-info-checkbox"]');
+        if (skipModeInfoCheckbox) skipModeInfoCheckbox.checked = Boolean(settings.skipModeInfo);
 
         const mouseControlCheckbox = screen.querySelector('[data-role="mouse-control-checkbox"]');
         if (mouseControlCheckbox) mouseControlCheckbox.checked = Boolean(settings.mouseControl);
@@ -138,6 +152,14 @@ export const Screens = {
         return screen;
     },
 
+    modeInfo(mode, dom = document, i18n) {
+        const screen = clone(dom, "tpl-screen-mode-info");
+        screen.querySelector('[data-field="modeName"]').textContent = i18n.t(`modes.${mode}.name`);
+        fillModeInfoRules(dom, screen.querySelector('[data-field="rules"]'), mode, i18n);
+        i18n.applyStatic(screen);
+        return screen;
+    },
+
     countdown(number, tint, dom = document) {
         const screen = clone(dom, "tpl-screen-countdown");
         screen.querySelector('[data-role="countdown-screen"]').dataset.tint = tint;
@@ -151,6 +173,16 @@ export const Screens = {
         screen.querySelector('[data-field="score"]').textContent = stats.score;
         screen.querySelector('[data-field="level"]').textContent = stats.level;
         screen.querySelector('[data-field="lines"]').textContent = stats.lines;
+
+        const headerTimeEl = screen.querySelector('[data-role="gameover-header-time"]');
+        const isTimedRaceMode = stats.mode === "sprint" || stats.mode === "cheeseRace";
+        if (headerTimeEl) {
+            if (isTimedRaceMode) {
+                headerTimeEl.querySelector('[data-field="headerTime"]').textContent = stats.gameTime;
+            } else {
+                headerTimeEl.remove();
+            }
+        }
 
         screen.querySelector('[data-field="gameTime"]').textContent = stats.gameTime;
         screen.querySelector('[data-field="maxDrought"]').textContent = stats.maxDrought;
@@ -193,6 +225,8 @@ export const Screens = {
         const titleKeyByReason = {
             sprintComplete: "screens.gameOverEntry.titleSprintComplete",
             timeUp: "screens.gameOverEntry.titleTimeUp",
+            cheeseClear: "screens.gameOverEntry.titleCheeseClear",
+            digComplete: "screens.gameOverEntry.titleDigComplete",
         };
         const titleKey = titleKeyByReason[reason];
         if (titleKey) {
@@ -205,8 +239,9 @@ export const Screens = {
 
     gameOverSaved(list, highlightEntry, renderLeaderboard, selectedDifficulty, difficulties, selectedMode, gameModes, dom = document, i18n, playerName = "") {
         const screen = clone(dom, "tpl-screen-gameover-saved");
-        fillDifficultyButtons(dom, screen.querySelector('[data-field="difficulty"]'), selectedDifficulty, difficulties, i18n);
-        fillModeButtons(dom, screen.querySelector('[data-field="mode"]'), selectedMode, gameModes, i18n);
+        fillDifficultyCarousel(screen.querySelector('[data-role="difficulty-select"]'), selectedDifficulty, difficulties, i18n);
+        fillModeCarousel(screen.querySelector('[data-role="mode-select"]'), selectedMode, i18n);
+        fillModeDescription(screen.querySelector('[data-field="modeDescription"]'), selectedMode, i18n);
         screen.querySelector('[data-role="name-input"]').value = playerName;
         screen.querySelector('[data-field="leaderboard"]').appendChild(renderLeaderboard(list, highlightEntry));
         i18n.applyStatic(screen);

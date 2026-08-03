@@ -21,17 +21,13 @@ export class DifficultyController {
         game.hud.update(game.stats);
     }
 
-    bindDifficultyButtons(onChange) {
+    bindDifficultyButtons() {
         const game = this.game;
         if (!game.dom) return;
-        game.dom
-            .querySelectorAll('[data-role="difficulty-button"]')
-            .forEach((btn) =>
-                btn.addEventListener("click", ({currentTarget}) => {
-                    this.setDifficulty(currentTarget.dataset.difficulty);
-                    onChange();
-                })
-            );
+        const prevButton = game.dom.querySelector('[data-role="difficulty-prev"]');
+        const nextButton = game.dom.querySelector('[data-role="difficulty-next"]');
+        if (prevButton) prevButton.addEventListener("click", () => this.changeDifficulty(-1));
+        if (nextButton) nextButton.addEventListener("click", () => this.changeDifficulty(1));
     }
 
     changeDifficulty(dir) {

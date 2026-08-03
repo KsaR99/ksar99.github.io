@@ -20,7 +20,7 @@ export class ScreenFlow {
     async showIdleScreen() {
         const game = this.game;
         game.state = "idle";
-        game.menuSelector = "difficulty";
+        game.menuSelector = "mode";
         game.isPlayingSession = false;
         game.hud.setPlaying(false);
         game.hud.setHasPlayedBefore(false);
@@ -48,8 +48,8 @@ export class ScreenFlow {
                 (l, h) => this.renderLeaderboard(l, h), game.dom, game.i18n, game.playerName
             )
         );
-        game.difficultyController.bindDifficultyButtons(() => this.renderIdleScreen(list));
-        game.modeController.bindModeButtons(() => this.renderIdleScreen(game.leaderboard.forMode(game.mode)));
+        game.difficultyController.bindDifficultyButtons();
+        game.modeController.bindModeButtons();
         this.bindNameInput();
         this.bindStartButton();
         this.bindOverlayShortcuts();
@@ -57,7 +57,7 @@ export class ScreenFlow {
     }
 
     /**
-     * Moves keyboard focus between the difficulty picker, mode picker and
+     * Moves keyboard focus between the mode picker, difficulty picker and
      * nickname field on the idle/gameOver-saved screens (ArrowDown/ArrowUp)
      * - a no-op everywhere else, same as PieceController.handleHorizontalArrow()'s
      * left/right, which reads game.menuSelector to decide which group
@@ -70,13 +70,7 @@ export class ScreenFlow {
         const game = this.game;
         if (game.state !== "idle" && game.state !== "gameOver-saved") return;
 
-        // The mode picker is a 2x2 grid (see .difficulty--modes), so
-        // ArrowUp/ArrowDown there first try to move a row within the grid
-        // itself - only falling through to switching the focused group once
-        // you're already on the top/bottom row and there's nowhere left to go.
-        if (game.menuSelector === "mode" && game.modeController.changeModeRow(dir)) return;
-
-        const groups = ["difficulty", "mode", "nickname"];
+        const groups = ["mode", "difficulty", "nickname"];
         const currentIndex = groups.indexOf(game.menuSelector);
         const nextIndex = Math.max(0, Math.min(groups.length - 1, currentIndex + dir));
         if (nextIndex === currentIndex) return;
@@ -137,6 +131,34 @@ export class ScreenFlow {
         input.addEventListener("change", () => {
             game.leaderboard.setLastName(game.playerName);
         });
+    }
+
+    /**
+     * Shown right after Start is pressed, before the countdown - explains
+     * what the chosen mode is about (rules pulled from modes.<mode>.rules)
+     * behind a Continue button. Skippable via its own settings toggle
+     * (independent of skipCountdown), same as the countdown itself.
+     */
+    showModeInfo() {
+        const game = this.game;
+        if (game.settings.skipModeInfo) {
+            this.startCountdown();
+            return;
+        }
+
+        game.state = "modeInfo";
+        game.isPlayingSession = false;
+        game.hud.setPlaying(false);
+        game.hud.showScreen(game.screens.modeInfo(game.mode, game.dom, game.i18n));
+        this.bindModeInfoContinue();
+    }
+
+    bindModeInfoContinue() {
+        const game = this.game;
+        if (!game.dom) return;
+        const button = game.dom.querySelector('[data-role="mode-info-continue-button"]');
+        if (!button) return;
+        button.addEventListener("click", () => this.startCountdown(), {once: true});
     }
 
     startCountdown() {
@@ -226,10 +248,15 @@ export class ScreenFlow {
             timeMs: game.elapsedMs,
         };
 
-        // Sprint only makes it onto the leaderboard if it was actually
-        // finished - an unfinished run has no meaningful time to rank by.
-        const sprintUnfinished = game.mode === "sprint" && reason !== "sprintComplete";
-        const savedEntry = sprintUnfinished ? null : entry;
+        // Sprint/Cheese Race only make it onto the leaderboard if they were
+        // actually finished - an unfinished run has no meaningful time to
+        // rank by (Dig Survival and Countdown are ranked by score instead,
+        // so a run cut short by topping out still counts, same as Marathon/
+        // Ultra/Survival).
+        const raceUnfinished =
+            (game.mode === "sprint" && reason !== "sprintComplete") ||
+            (game.mode === "cheeseRace" && reason !== "cheeseClear");
+        const savedEntry = raceUnfinished ? null : entry;
 
         const todayBestBeforeThisGame = game.mode === "marathon" ? game.leaderboard.todayBestEntry() : null;
 
@@ -276,7 +303,7 @@ export class ScreenFlow {
         if (game.state !== "gameOver-entry" || !game.currentGameOverEntry) return;
         const {list, entry} = game.currentGameOverEntry;
         game.state = "gameOver-saved";
-        game.menuSelector = "difficulty";
+        game.menuSelector = "mode";
         game.level = game.difficulties[game.difficulty].startLevel;
         game.lines = 0;
         game.hud.update(game.stats);
@@ -292,8 +319,8 @@ export class ScreenFlow {
                 game.difficulty, game.difficulties, game.mode, game.gameModes, game.dom, game.i18n, game.playerName
             )
         );
-        game.difficultyController.bindDifficultyButtons(() => this.renderGameOverSaved(list, entry));
-        game.modeController.bindModeButtons(() => this.renderGameOverSaved(game.leaderboard.forMode(game.mode), entry));
+        game.difficultyController.bindDifficultyButtons();
+        game.modeController.bindModeButtons();
         this.bindNameInput();
         this.bindStartButton();
         this.bindOverlayShortcuts();
@@ -359,9 +386,12 @@ export class ScreenFlow {
         if (game.state === "idle" || game.state === "gameOver-saved") {
             if (!this.isNicknameValid()) return;
             if (game.playerName) game.leaderboard.setLastName(game.playerName);
-            this.startCountdown();
+            game.modeController.resolveRandomMode();
+            this.showModeInfo();
         } else if (game.state === "gameOver-entry") {
             this.continueFromGameOverEntry();
+        } else if (game.state === "modeInfo") {
+            this.startCountdown();
         }
     }
 
@@ -590,6 +620,14 @@ export class ScreenFlow {
         if (skipCountdownCheckbox) {
             skipCountdownCheckbox.addEventListener("change", () => {
                 game.settings.skipCountdown = skipCountdownCheckbox.checked;
+                settingsController.saveSettings();
+            });
+        }
+
+        const skipModeInfoCheckbox = game.dom.querySelector('[data-role="skip-mode-info-checkbox"]');
+        if (skipModeInfoCheckbox) {
+            skipModeInfoCheckbox.addEventListener("change", () => {
+                game.settings.skipModeInfo = skipModeInfoCheckbox.checked;
                 settingsController.saveSettings();
             });
         }

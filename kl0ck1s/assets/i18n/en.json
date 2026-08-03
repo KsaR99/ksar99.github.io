@@ -9,9 +9,8 @@
         "time": "Time",
         "lines": "Lines",
         "best": "Best",
-        "time": "Time",
         "drought": "Drought",
-        "tetrisRate": "TRT",
+        "tetrisRate": "4LR",
         "pps": "PPS",
         "objective": "Objective",
         "statusLive": "Current game",
@@ -39,14 +38,15 @@
         "touchPauseGesture": "❚❚ button"
     },
     "screens": {
-        "common": {
-            "switchHint": "Switch with arrows"
-        },
         "idle": {
             "hint": "Difficulty",
             "modeHint": "Mode",
             "startButton": "Start",
             "namePlaceholder": "Your nickname"
+        },
+        "modeInfo": {
+            "subtitle": "Mode: {mode}",
+            "continueButton": "Continue"
         },
         "paused": {
             "title": "PAUSED",
@@ -74,6 +74,7 @@
             "hudRight": "HUD on the right",
             "gameplayTitle": "Gameplay",
             "skipCountdown": "Skip countdown",
+            "skipModeInfo": "Skip mode info screen",
             "mouseControl": "Mouse control",
             "graphicsTitle": "Graphics",
             "ghost": "Ghost piece",
@@ -98,6 +99,8 @@
             "title": "GAME OVER",
             "titleSprintComplete": "SPRINT COMPLETE",
             "titleTimeUp": "TIME'S UP",
+            "titleCheeseClear": "CHEESE CLEARED",
+            "titleDigComplete": "DIG COMPLETE",
             "scoreLabel": "Score:",
             "levelLabel": "level",
             "linesLabel": "lines",
@@ -111,7 +114,7 @@
             "droughtAvgLabel": "D.AVG",
             "burnLabel": "BRN",
             "transitionLabel": "TRNS",
-            "tetrisRateLabel": "Tetris rate (TRT)",
+            "tetrisRateLabel": "4-line rate (4LR)",
             "clearsLabel": "Clears (1/2/3/4 lines)",
             "ppsLabel": "PPS",
             "spinsLabel": "Spins (T / T-mini / other)",
@@ -153,19 +156,76 @@
     "modes": {
         "marathon": {
             "name": "Marathon",
-            "description": "Classic endless play"
+            "description": "Classic endless play",
+            "rules": [
+                "♾️ Endless game — clear lines and climb levels",
+                "📈 Drop speed increases with every level",
+                "🏆 Score and highest level reached both count"
+            ]
         },
         "sprint": {
             "name": "Sprint",
-            "description": "Clear 40 lines as fast as you can"
+            "description": "Clear 40 lines as fast as you can",
+            "rules": [
+                "🎯 Goal: clear 40 lines",
+                "⏱️ Your finish time is what counts — go fast",
+                "🚫 An unfinished run won't be saved to the leaderboard"
+            ]
         },
         "ultra": {
             "name": "Ultra",
-            "description": "Highest score in 3 minutes"
+            "description": "Highest score in 3 minutes",
+            "rules": [
+                "⏱️ You get exactly 3 minutes",
+                "💯 Score as high as you can before time runs out",
+                "📊 Only your final score counts"
+            ]
         },
         "survival": {
             "name": "Survival",
-            "description": "Watch out for rising lines"
+            "description": "Watch out for rising lines",
+            "rules": [
+                "🧱 Garbage lines keep rising from the bottom",
+                "🕳️ Find and use the gaps in the garbage",
+                "☠️ The game ends when the board fills up"
+            ]
+        },
+        "cheeseRace": {
+            "name": "Cheese Race",
+            "description": "Dig out a pre-built stack as fast as you can",
+            "rules": [
+                "🧀 The board starts with 10 rows of garbage with a gap",
+                "⏱️ Dig it all out as fast as you can",
+                "🚫 An unfinished run won't be saved to the leaderboard"
+            ]
+        },
+        "digSurvival": {
+            "name": "Dig Survival",
+            "description": "Dig forever - the garbage grows right back every time you clear it. Survive and dig 100 lines total.",
+            "rules": [
+                "🧀 Starts with a small garbage stack at the bottom",
+                "♻️ Every line you dig out instantly regrows from below - the stack never runs out",
+                "🎯 Dig a total of 100 lines to win",
+                "☠️ The game ends when the board fills up"
+            ]
+        },
+        "countdown": {
+            "name": "Countdown",
+            "description": "Clear lines to keep the clock from hitting zero",
+            "rules": [
+                "⏱️ Starts with 60 seconds on the clock",
+                "➕ Every line clear adds time back (more for 4 lines)",
+                "⏳ The game ends when the clock hits zero"
+            ]
+        },
+        "random": {
+            "name": "Random",
+            "description": "Picks one of the other modes for you when you press Start",
+            "rules": [
+                "🎲 Picks one of the other modes at random",
+                "▶️ The round then plays exactly like that mode",
+                "🔁 Pick Random again for another surprise"
+            ]
         }
     },
     "game": {

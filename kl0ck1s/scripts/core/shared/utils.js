@@ -112,3 +112,26 @@ export function formatDuration(ms) {
 
     return hours > 0 ? `${hours}:${mm}:${ss}` : `${mm}:${ss}`;
 }
+
+/**
+ * Same as formatDuration() but keeps two extra digits of sub-second
+ * precision ("MM:SS.CC", or "H:MM:SS.CC" past an hour) - used wherever a
+ * result is actually timed against the clock (Sprint/Cheese Race finishes,
+ * their leaderboard entries and best-time display), where whole seconds
+ * alone aren't enough to tell two close runs apart.
+ */
+export function formatDurationPrecise(ms) {
+    const clamped = Math.max(0, ms);
+    const totalCentiseconds = Math.floor(clamped / 10);
+    const totalSeconds = Math.floor(totalCentiseconds / 100);
+    const centiseconds = totalCentiseconds % 100;
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    const mm = String(minutes).padStart(2, "0");
+    const ss = String(seconds).padStart(2, "0");
+    const cc = String(centiseconds).padStart(2, "0");
+
+    return hours > 0 ? `${hours}:${mm}:${ss}.${cc}` : `${mm}:${ss}.${cc}`;
+}

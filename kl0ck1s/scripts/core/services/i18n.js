@@ -132,6 +132,18 @@ export class I18n {
     }
 
     /**
+     * Looks up a dot-path key like t(), but returns whatever's actually stored
+     * there (array, object, ...) instead of coercing to a string - for values
+     * like `modes.<mode>.rules` that t() can't return since it only accepts
+     * string leaves. Returns undefined if nothing is found.
+     */
+    raw(key) {
+        return key
+            .split(".")
+            .reduce((node, part) => node?.[part], this.dict);
+    }
+
+    /**
      * Translates every [data-i18n] / [data-i18n-placeholder] element under root.
      * Safe to call repeatedly (e.g. after cloning a <template> or switching language).
      */

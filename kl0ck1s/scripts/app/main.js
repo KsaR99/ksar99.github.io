@@ -147,6 +147,8 @@ const hud = new HUD({
     ppsEl: document.getElementById("pps-value"),
     objectiveEl: document.getElementById("objective-value"),
     objectiveRowEl: document.querySelector('[data-role="objective-stat"]'),
+    objectiveBarEl: document.getElementById("objective-bar"),
+    objectiveBarTrackEl: document.getElementById("objective-bar-track"),
 });
 
 const soundManager = new SoundManager(SOUND_FILES);

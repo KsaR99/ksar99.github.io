@@ -9,9 +9,8 @@
         "time": "Zeit",
         "lines": "Reihen",
         "best": "Bestwert",
-        "time": "Zeit",
         "drought": "Dürre",
-        "tetrisRate": "TRT",
+        "tetrisRate": "4LR",
         "pps": "PPS",
         "objective": "Ziel",
         "statusLive": "Aktuelles Spiel",
@@ -39,14 +38,15 @@
         "touchPauseGesture": "❚❚-Taste"
     },
     "screens": {
-        "common": {
-            "switchHint": "Mit Pfeiltasten wechseln"
-        },
         "idle": {
             "hint": "Schwierigkeitsgrad",
             "modeHint": "Modus",
             "startButton": "Start",
             "namePlaceholder": "Dein Spitzname"
+        },
+        "modeInfo": {
+            "subtitle": "Modus: {mode}",
+            "continueButton": "Weiter"
         },
         "paused": {
             "title": "PAUSE",
@@ -74,6 +74,7 @@
             "hudRight": "HUD rechts",
             "gameplayTitle": "Gameplay",
             "skipCountdown": "Countdown überspringen",
+            "skipModeInfo": "Modus-Infobildschirm überspringen",
             "mouseControl": "Maussteuerung",
             "graphicsTitle": "Grafik",
             "ghost": "Geisterstein",
@@ -98,6 +99,8 @@
             "title": "GAME OVER",
             "titleSprintComplete": "SPRINT ABGESCHLOSSEN",
             "titleTimeUp": "ZEIT ABGELAUFEN",
+            "titleCheeseClear": "KÄSE GERÄUMT",
+            "titleDigComplete": "GRABEN ABGESCHLOSSEN",
             "scoreLabel": "Punkte:",
             "levelLabel": "Level",
             "linesLabel": "Reihen",
@@ -111,7 +114,7 @@
             "droughtAvgLabel": "D.AVG",
             "burnLabel": "BRN",
             "transitionLabel": "TRNS",
-            "tetrisRateLabel": "Tetris-Rate (TRT)",
+            "tetrisRateLabel": "4-Linien-Rate (4LR)",
             "clearsLabel": "Reihen (1/2/3/4 gleichzeitig)",
             "ppsLabel": "PPS",
             "spinsLabel": "Spins (T / T-Mini / sonstige)",
@@ -153,19 +156,76 @@
     "modes": {
         "marathon": {
             "name": "Marathon",
-            "description": "Klassisches endloses Spiel"
+            "description": "Klassisches endloses Spiel",
+            "rules": [
+                "♾️ Endloses Spiel — räume Linien und steige im Level auf",
+                "📈 Die Fallgeschwindigkeit steigt mit jedem Level",
+                "🏆 Punktzahl und höchstes erreichtes Level zählen beide"
+            ]
         },
         "sprint": {
             "name": "Sprint",
-            "description": "Räume 40 Reihen so schnell wie möglich"
+            "description": "Räume 40 Reihen so schnell wie möglich",
+            "rules": [
+                "🎯 Ziel: 40 Linien räumen",
+                "⏱️ Deine Zeit zählt — sei so schnell wie möglich",
+                "🚫 Ein unvollendeter Lauf wird nicht in der Bestenliste gespeichert"
+            ]
         },
         "ultra": {
             "name": "Ultra",
-            "description": "Höchste Punktzahl in 3 Minuten"
+            "description": "Höchste Punktzahl in 3 Minuten",
+            "rules": [
+                "⏱️ Du hast genau 3 Minuten",
+                "💯 Erziele so viele Punkte wie möglich, bevor die Zeit abläuft",
+                "📊 Nur dein Endstand zählt"
+            ]
         },
         "survival": {
             "name": "Überleben",
-            "description": "Achte auf aufsteigende Linien"
+            "description": "Achte auf aufsteigende Linien",
+            "rules": [
+                "🧱 Müllzeilen steigen ständig von unten",
+                "🕳️ Finde und nutze die Lücken im Müll",
+                "☠️ Das Spiel endet, wenn das Feld voll ist"
+            ]
+        },
+        "cheeseRace": {
+            "name": "Käse-Rennen",
+            "description": "Grabe einen vorgefertigten Stapel so schnell wie möglich frei",
+            "rules": [
+                "🧀 Das Feld startet mit 10 Müllreihen mit einer Lücke",
+                "⏱️ Grabe alles so schnell wie möglich aus",
+                "🚫 Ein unvollendeter Lauf wird nicht in der Bestenliste gespeichert"
+            ]
+        },
+        "digSurvival": {
+            "name": "Grab-Überleben",
+            "description": "Grabe endlos - der Müll wächst sofort nach, sobald du eine Linie räumst. Überlebe und grabe insgesamt 100 Linien.",
+            "rules": [
+                "🧀 Start mit einem kleinen Müllstapel am Boden",
+                "♻️ Jede gegrabene Linie wächst sofort von unten nach - der Stapel wird nie leer",
+                "🎯 Grabe insgesamt 100 Linien, um zu gewinnen",
+                "☠️ Das Spiel endet, wenn das Feld voll ist"
+            ]
+        },
+        "countdown": {
+            "name": "Countdown",
+            "description": "Räume Linien, damit die Uhr nicht abläuft",
+            "rules": [
+                "⏱️ Start mit 60 Sekunden auf der Uhr",
+                "➕ Jede Linie bringt Zeit zurück (mehr für 4 Linien)",
+                "⏳ Das Spiel endet, wenn die Uhr null erreicht"
+            ]
+        },
+        "random": {
+            "name": "Zufällig",
+            "description": "Wählt beim Drücken von Start einen der anderen Modi für dich aus",
+            "rules": [
+                "🎲 Wählt zufällig einen der anderen Modi",
+                "▶️ Die Runde läuft dann genau wie in diesem Modus ab",
+                "🔁 Wähle erneut Zufällig für eine weitere Überraschung"
+            ]
         }
     },
     "game": {

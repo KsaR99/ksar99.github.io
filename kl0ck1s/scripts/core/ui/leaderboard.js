@@ -1,6 +1,6 @@
 "use strict";
 
-import {formatDuration, formatNumber} from "../shared/utils.js";
+import {formatDurationPrecise, formatNumber} from "../shared/utils.js";
 
 export class Leaderboard {
     static SCORES_KEY = "klockis-scores";
@@ -25,8 +25,16 @@ export class Leaderboard {
         return entry.mode || "marathon";
     }
 
+    // Sprint and Cheese Race are both races against the clock - fastest
+    // finish wins, so they're ranked by time rather than score. Every other
+    // mode (including the score-attack finishes of Dig Survival/Countdown)
+    // ranks by score, same as Marathon/Ultra/Survival always have.
+    isTimedRaceMode(mode) {
+        return mode === "sprint" || mode === "cheeseRace";
+    }
+
     compareEntries(a, b, mode) {
-        if (mode === "sprint") return (a.timeMs ?? Infinity) - (b.timeMs ?? Infinity);
+        if (this.isTimedRaceMode(mode)) return (a.timeMs ?? Infinity) - (b.timeMs ?? Infinity);
         return b.score - a.score;
     }
 
@@ -115,12 +123,52 @@ export class Leaderboard {
         return this.todayBestCache;
     }
 
+    /**
+     * Leaderboard dates are formatted relative to "now":
+     * - Different year: day/month/year + time
+     * - Same year, different month: day/month + time
+     * - Same month, different day: day + time
+     * - Same day: time only
+     */
     formatDate(iso) {
         const date = new Date(iso);
+        const now = new Date();
         const locale = this.i18n?.locale || "en-US";
+
+        const sameYear = date.getFullYear() === now.getFullYear();
+        const sameMonth = sameYear && date.getMonth() === now.getMonth();
+        const sameDay = sameMonth && date.getDate() === now.getDate();
+
+        if (sameDay) {
+            return date.toLocaleString(locale, {
+                hour: "2-digit",
+                minute: "2-digit",
+            });
+        }
+
+        if (sameMonth) {
+            return date.toLocaleString(locale, {
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+            });
+        }
+
+        if (sameYear) {
+            return date.toLocaleString(locale, {
+                day: "2-digit",
+                month: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+            });
+        }
+
         return date.toLocaleString(locale, {
-            day: "2-digit", month: "2-digit", year: "numeric",
-            hour: "2-digit", minute: "2-digit",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
         });
     }
 
@@ -139,8 +187,8 @@ export class Leaderboard {
             row.querySelector('[data-field="rank"]').innerHTML = (i < 3 ? podiumBadges[i] : `&nbsp;${i + 1}`);
             row.querySelector('[data-field="name"]').textContent = entry.name;
             row.querySelector('[data-field="score"]').textContent = formatNumber(entry.score);
-            row.querySelector('[data-field="time"]').textContent = this.entryMode(entry) === "sprint"
-                ? formatDuration(entry.timeMs)
+            row.querySelector('[data-field="time"]').textContent = this.isTimedRaceMode(this.entryMode(entry))
+                ? formatDurationPrecise(entry.timeMs)
                 : "—";
             row.querySelector('[data-field="level"]').textContent = entry.level;
             row.querySelector('[data-field="lines"]').textContent = entry.lines;

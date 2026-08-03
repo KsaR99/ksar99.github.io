@@ -69,7 +69,7 @@ export class Game {
         this.isPlayingSession = false;
 
         this.state = "idle";
-        this.menuSelector = "difficulty";
+        this.menuSelector = "mode";
         this.countdownIndex = 0;
         this.countdownTimer = 0;
         this.playerName = "";
@@ -209,6 +209,7 @@ export class Game {
         const startLevel = this.difficulties[this.difficulty].startLevel;
 
         this.board.reset();
+        this.modeController.setupBoard();
         this.startLevel = startLevel;
         this.level = startLevel;
         this.levelTier = tierForLevel(this.level, this.difficulties);

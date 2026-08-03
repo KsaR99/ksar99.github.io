@@ -23,6 +23,7 @@ export class SettingsController {
             ghost: true,
             gridLines: true,
             skipCountdown: false,
+            skipModeInfo: false,
             mouseControl: false,
             mouseSensitivity: 1,
             fallTrail: true,

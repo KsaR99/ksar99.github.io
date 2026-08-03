@@ -3,11 +3,14 @@
 import {formatDuration} from "../shared/utils.js";
 
 /**
- * Owns game-mode selection (Marathon/Sprint/Ultra/Survival) and the
- * per-frame objective checks that are specific to a mode: Sprint's 40-line
- * finish line, Ultra's 3-minute clock, Survival's periodic garbage. Marathon
- * has no extra objective - it's just the existing unlimited/topping-out
- * behavior with every mode-specific check below skipped.
+ * Owns game-mode selection (Marathon/Sprint/Ultra/Survival/Cheese Race/Dig
+ * Survival/Countdown) and the per-frame objective checks that are specific
+ * to a mode: Sprint's 40-line finish line, Ultra's 3-minute clock,
+ * Survival's periodic garbage, Cheese Race's dig-out-the-stack finish, Dig
+ * Survival's endlessly-resupplied stack, Countdown's clear-to-survive
+ * clock. Marathon has no extra objective - it's just the existing
+ * unlimited/topping-out behavior with every mode-specific check below
+ * skipped.
  */
 export class ModeController {
     constructor(game) {
@@ -16,6 +19,12 @@ export class ModeController {
 
     get def() {
         return this.game.gameModes[this.game.mode];
+    }
+
+    /** Every real, playable mode - i.e. every GAME_MODES key except the "random" picker entry itself. What resolveRandomMode() below picks from. */
+    get randomizableModeKeys() {
+        const game = this.game;
+        return Object.keys(game.gameModes).filter((key) => !game.gameModes[key].isRandom);
     }
 
     setMode(mode) {
@@ -27,17 +36,13 @@ export class ModeController {
         game.hud.update(game.stats);
     }
 
-    bindModeButtons(onChange) {
+    bindModeButtons() {
         const game = this.game;
         if (!game.dom) return;
-        game.dom
-            .querySelectorAll('[data-role="mode-button"]')
-            .forEach((btn) =>
-                btn.addEventListener("click", ({currentTarget}) => {
-                    this.setMode(currentTarget.dataset.mode);
-                    onChange();
-                })
-            );
+        const prevButton = game.dom.querySelector('[data-role="mode-prev"]');
+        const nextButton = game.dom.querySelector('[data-role="mode-next"]');
+        if (prevButton) prevButton.addEventListener("click", () => this.changeMode(-1));
+        if (nextButton) nextButton.addEventListener("click", () => this.changeMode(1));
     }
 
     /** Cycles to the next/previous mode (dir = ±1) - the arrow-key counterpart to bindModeButtons()'s clicks. */
@@ -50,22 +55,21 @@ export class ModeController {
     }
 
     /**
-     * Moves the selection by a row (dir = ±1) within the mode picker's 2x2
-     * grid (see .difficulty--modes in main.css - 2 buttons per row) - the
-     * ArrowUp/ArrowDown counterpart to changeMode()'s ArrowLeft/ArrowRight.
-     * Unlike changeMode() this doesn't wrap: returns false when there's no
-     * button a row away (top row + up, bottom row + down) so ScreenFlow can
-     * fall back to moving focus to the difficulty/nickname group instead.
+     * If "Random" is the currently selected mode, swaps it out for one
+     * randomly-picked real mode via setMode() - same effect as if the player
+     * had picked that mode themselves, persisted the same way. Called from
+     * ScreenFlow.handleEnter() right before the Start flow (mode-info screen,
+     * countdown, round) begins, so everything downstream - mode-info's rules
+     * text, the HUD, the leaderboard entry - already sees the resolved mode
+     * and needs no "random" special-casing of its own. A no-op for any other
+     * mode.
      */
-    changeModeRow(dir) {
+    resolveRandomMode() {
         const game = this.game;
-        const keys = Object.keys(game.gameModes);
-        const currentIndex = keys.indexOf(game.mode);
-        const nextIndex = currentIndex + dir * 2;
-        if (nextIndex < 0 || nextIndex >= keys.length) return false;
-
-        this.applyModeAndRerender(keys[nextIndex]);
-        return true;
+        if (!game.gameModes[game.mode]?.isRandom) return;
+        const keys = this.randomizableModeKeys;
+        const picked = keys[Math.floor(Math.random() * keys.length)];
+        this.setMode(picked);
     }
 
     applyModeAndRerender(mode) {
@@ -82,7 +86,33 @@ export class ModeController {
 
     /** Resets per-round mode state - called from Game.prepareNewRound(). */
     reset() {
-        this.game.modeState = {garbageTimer: 0};
+        const def = this.def;
+        this.game.modeState = {
+            garbageTimer: 0,
+            digCleared: 0,
+            countdownRemainingMs: def.countdownStartMs ?? 0,
+        };
+    }
+
+    /**
+     * Lays down a mode's starting board layout - called from
+     * Game.prepareNewRound() right after the board itself has been reset.
+     * Only Cheese Race and Dig Survival start with anything already on the
+     * board (a `cheeseRows`-tall stack of one-gap-per-row garbage, built via
+     * the same Board.addGarbageLines() Survival's periodic rise already
+     * uses); every other mode starts on a completely empty board, same as
+     * before this method existed.
+     */
+    setupBoard() {
+        const game = this.game;
+        const def = this.def;
+        if (!def.cheeseRows) return;
+        game.board.addGarbageLines(def.cheeseRows);
+    }
+
+    /** True once every row on the board is empty - Cheese Race's actual finish condition (see checkObjectiveComplete()). */
+    isBoardClear() {
+        return this.game.board.occupancy.every((row) => row === 0);
     }
 
     /** Short status string for the sidebar (e.g. "24 / 40", "02:14", "8s") - null for Marathon, which has no extra objective. */
@@ -103,10 +133,105 @@ export class ModeController {
             return `${Math.ceil(remainingMs / 1000)}s`;
         }
 
+        if (game.mode === "cheeseRace") {
+            return `${game.lines} / ${def.cheeseRows}`;
+        }
+
+        if (game.mode === "digSurvival") {
+            return `${game.modeState.digCleared} / ${def.digTarget}`;
+        }
+
+        if (game.mode === "countdown") {
+            return formatDuration(Math.max(0, game.modeState.countdownRemainingMs));
+        }
+
         return null;
     }
 
-    /** Called every frame the round is actually running - Ultra's clock and Survival's garbage timer both live here. */
+    /**
+     * Progress toward the objective as 0-100, or null for Marathon (no
+     * objective bar at all). Sprint/Cheese Race/Dig Survival count up
+     * toward a line target; Ultra/Survival/Countdown count up toward
+     * their respective clocks running out. This is the single number that
+     * drives the sidebar's objective progress bar - objectiveText() above
+     * still supplies the label printed on top of it.
+     */
+    objectivePercent() {
+        const game = this.game;
+        const def = this.def;
+
+        if (game.mode === "sprint") {
+            return Math.min(100, (game.lines / def.sprintTarget) * 100);
+        }
+
+        if (game.mode === "ultra") {
+            return Math.min(100, (game.elapsedMs / def.timeLimitMs) * 100);
+        }
+
+        if (game.mode === "survival") {
+            return Math.min(100, (game.modeState.garbageTimer / def.garbageIntervalMs) * 100);
+        }
+
+        if (game.mode === "cheeseRace") {
+            return Math.min(100, (game.lines / def.cheeseRows) * 100);
+        }
+
+        if (game.mode === "digSurvival") {
+            return Math.min(100, (game.modeState.digCleared / def.digTarget) * 100);
+        }
+
+        if (game.mode === "countdown") {
+            return Math.min(100, (game.modeState.countdownRemainingMs / def.countdownStartMs) * 100);
+        }
+
+        return null;
+    }
+
+    /**
+     * How urgently the objective bar should read as "running out of time",
+     * for the clock-driven objectives (Ultra's round clock, Survival's
+     * next-garbage timer, Countdown's clear-or-die clock) - "danger" inside
+     * the last 5s, "warning" inside the last 10s, otherwise null. Sprint/
+     * Cheese Race/Dig Survival have no clock to run out, so they always
+     * return null here; their progress reads via the neutral-to-"good"
+     * color ramp applied directly from objectivePercent() instead.
+     */
+    objectiveUrgency() {
+        const game = this.game;
+        const def = this.def;
+        let remainingMs;
+
+        if (game.mode === "ultra") {
+            remainingMs = def.timeLimitMs - game.elapsedMs;
+        } else if (game.mode === "survival") {
+            remainingMs = def.garbageIntervalMs - game.modeState.garbageTimer;
+        } else if (game.mode === "countdown") {
+            remainingMs = game.modeState.countdownRemainingMs;
+        } else {
+            return null;
+        }
+
+        if (remainingMs <= 5000) return "danger";
+        if (remainingMs <= 10000) return "warning";
+        return null;
+    }
+
+    /**
+     * Which color scheme the sidebar's objective bar should use for this
+     * mode: "ramp" for Sprint/Cheese Race/Dig Survival (fill color eases
+     * from neutral toward "good" as the line count closes in on the
+     * target), "urgency" for Ultra/Survival/Countdown (fill turns
+     * yellow/red as their clock runs low, per objectiveUrgency() above),
+     * or null for Marathon (no bar at all).
+     */
+    objectiveColorMode() {
+        const game = this.game;
+        if (game.mode === "sprint" || game.mode === "cheeseRace" || game.mode === "digSurvival") return "ramp";
+        if (game.mode === "ultra" || game.mode === "survival" || game.mode === "countdown") return "urgency";
+        return null;
+    }
+
+    /** Called every frame the round is actually running - Ultra's/Countdown's clocks and Survival's garbage timer all live here. */
     update(delta) {
         const game = this.game;
         const def = this.def;
@@ -114,6 +239,14 @@ export class ModeController {
         if (game.mode === "ultra" && game.elapsedMs >= def.timeLimitMs) {
             game.screenFlow.endRound("timeUp");
             return;
+        }
+
+        if (game.mode === "countdown") {
+            game.modeState.countdownRemainingMs -= delta;
+            if (game.modeState.countdownRemainingMs <= 0) {
+                game.screenFlow.endRound("timeUp");
+                return;
+            }
         }
 
         if (game.mode === "survival" && def.garbage) {
@@ -137,12 +270,70 @@ export class ModeController {
         }
     }
 
-    /** Called after a line clear finishes - true if that clear just hit Sprint's target (and endRound() has already been kicked off). */
-    checkSprintComplete() {
+    /**
+     * Called from PieceController.finishLineClear() right after a clear has
+     * been tallied into game.lines/score, for the two mode-specific per-clear
+     * side effects that aren't a finish condition on their own: Dig
+     * Survival's endless garbage resupply (returns true if that resupply
+     * just topped the player out - finishLineClear() must not spawn a new
+     * piece in that case) and Countdown's per-clear time bonus.
+     */
+    onLinesCleared(cleared) {
         const game = this.game;
-        if (game.mode !== "sprint") return false;
-        if (game.lines < this.def.sprintTarget) return false;
-        game.screenFlow.endRound("sprintComplete");
-        return true;
+        const def = this.def;
+
+        if (game.mode === "digSurvival") {
+            game.modeState.digCleared += cleared;
+
+            // Board.clearFullLines() (called just before this, in
+            // finishLineClear()) already shifted everything down to fill the
+            // gap - adding the same number of rows straight back at the
+            // bottom is what keeps the stack "endless" instead of shrinking
+            // like Cheese Race's. No falling piece to adjust for here (unlike
+            // Survival's timer-driven rise above): this runs between a lock
+            // and the next spawn, so there's nothing currently in the air.
+            const {toppedOut} = game.board.addGarbageLines(cleared);
+            if (toppedOut) {
+                game.screenFlow.endRound("topOut");
+                return true;
+            }
+        }
+
+        if (game.mode === "countdown") {
+            const bonusMs = def.countdownBonusMs[Math.min(cleared, def.countdownBonusMs.length - 1)];
+            game.modeState.countdownRemainingMs += bonusMs;
+        }
+
+        return false;
+    }
+
+    /**
+     * Called after a line clear finishes - true if that clear just hit this
+     * mode's finish condition (and endRound() has already been kicked off).
+     * Sprint (line target), Cheese Race (the whole board finally empty) and
+     * Dig Survival (dug the target line count) are the three modes with a
+     * "win" reachable this way; Marathon/Ultra/Survival/Countdown all end
+     * some other way instead (topping out, or their own clock).
+     */
+    checkObjectiveComplete() {
+        const game = this.game;
+        const def = this.def;
+
+        if (game.mode === "sprint" && game.lines >= def.sprintTarget) {
+            game.screenFlow.endRound("sprintComplete");
+            return true;
+        }
+
+        if (game.mode === "cheeseRace" && this.isBoardClear()) {
+            game.screenFlow.endRound("cheeseClear");
+            return true;
+        }
+
+        if (game.mode === "digSurvival" && game.modeState.digCleared >= def.digTarget) {
+            game.screenFlow.endRound("digComplete");
+            return true;
+        }
+
+        return false;
     }
 }

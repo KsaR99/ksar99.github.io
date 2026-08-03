@@ -9,9 +9,8 @@
         "time": "Tijd",
         "lines": "Lijnen",
         "best": "Beste",
-        "time": "Tijd",
         "drought": "Droogte",
-        "tetrisRate": "TRT",
+        "tetrisRate": "4LP",
         "pps": "PPS",
         "objective": "Doel",
         "statusLive": "Huidige spel",
@@ -39,14 +38,15 @@
         "touchPauseGesture": "❚❚-knop"
     },
     "screens": {
-        "common": {
-            "switchHint": "Wissel met pijltjes"
-        },
         "idle": {
             "hint": "Moeilijkheidsgraad",
             "modeHint": "Modus",
             "startButton": "Start",
             "namePlaceholder": "Jouw bijnaam"
+        },
+        "modeInfo": {
+            "subtitle": "Modus: {mode}",
+            "continueButton": "Doorgaan"
         },
         "paused": {
             "title": "GEPAUZEERD",
@@ -74,6 +74,7 @@
             "hudRight": "HUD rechts",
             "gameplayTitle": "Gameplay",
             "skipCountdown": "Aftellen overslaan",
+            "skipModeInfo": "Modusinfoscherm overslaan",
             "mouseControl": "Muisbediening",
             "graphicsTitle": "Grafica",
             "ghost": "Spookblok",
@@ -98,6 +99,8 @@
             "title": "GAME OVER",
             "titleSprintComplete": "SPRINT VOLTOOID",
             "titleTimeUp": "TIJD OM",
+            "titleCheeseClear": "KAAS GERUIMD",
+            "titleDigComplete": "GRAVEN VOLTOOID",
             "scoreLabel": "Score:",
             "levelLabel": "niveau",
             "linesLabel": "lijnen",
@@ -111,7 +114,7 @@
             "droughtAvgLabel": "D.AVG",
             "burnLabel": "BRN",
             "transitionLabel": "TRNS",
-            "tetrisRateLabel": "Tetris-percentage (TRT)",
+            "tetrisRateLabel": "4-lijnenpercentage (4LP)",
             "clearsLabel": "Lijnen (1/2/3/4 tegelijk)",
             "ppsLabel": "PPS",
             "spinsLabel": "Spins (T / T-mini / overig)",
@@ -153,19 +156,76 @@
     "modes": {
         "marathon": {
             "name": "Marathon",
-            "description": "Klassiek eindeloos spel"
+            "description": "Klassiek eindeloos spel",
+            "rules": [
+                "♾️ Eindeloos spel — ruim lijnen op en stijg in level",
+                "📈 De valsnelheid neemt toe met elk level",
+                "🏆 Zowel score als hoogst bereikte level tellen mee"
+            ]
         },
         "sprint": {
             "name": "Sprint",
-            "description": "Ruim 40 lijnen zo snel mogelijk"
+            "description": "Ruim 40 lijnen zo snel mogelijk",
+            "rules": [
+                "🎯 Doel: ruim 40 lijnen op",
+                "⏱️ Je tijd telt — wees zo snel mogelijk",
+                "🚫 Een onvoltooide run wordt niet op het scorebord opgeslagen"
+            ]
         },
         "ultra": {
             "name": "Ultra",
-            "description": "Hoogste score in 3 minuten"
+            "description": "Hoogste score in 3 minuten",
+            "rules": [
+                "⏱️ Je hebt precies 3 minuten",
+                "💯 Scoor zo hoog mogelijk voordat de tijd om is",
+                "📊 Alleen je eindscore telt"
+            ]
         },
         "survival": {
             "name": "Overleven",
-            "description": "Pas op voor stijgende lijnen"
+            "description": "Pas op voor stijgende lijnen",
+            "rules": [
+                "🧱 Rommellijnen stijgen voortdurend vanaf de onderkant",
+                "🕳️ Vind en gebruik de gaten in de rommel",
+                "☠️ Het spel eindigt wanneer het veld vol raakt"
+            ]
+        },
+        "cheeseRace": {
+            "name": "Kaasrace",
+            "description": "Graaf een vooraf opgebouwde stapel zo snel mogelijk weg",
+            "rules": [
+                "🧀 Het veld begint met 10 rijen rommel met een gat",
+                "⏱️ Graaf alles zo snel mogelijk weg",
+                "🚫 Een onvoltooide run wordt niet op het scorebord opgeslagen"
+            ]
+        },
+        "digSurvival": {
+            "name": "Graafoverleving",
+            "description": "Graaf eindeloos - de rommel groeit meteen weer aan zodra je een lijn opruimt. Overleef en graaf in totaal 100 lijnen.",
+            "rules": [
+                "🧀 Begint met een kleine stapel rommel onderaan",
+                "♻️ Elke opgegraven lijn groeit meteen weer aan vanaf de onderkant - de stapel raakt nooit op",
+                "🎯 Graaf in totaal 100 lijnen om te winnen",
+                "☠️ Het spel eindigt wanneer het veld vol raakt"
+            ]
+        },
+        "countdown": {
+            "name": "Aftellen",
+            "description": "Ruim lijnen om de klok niet op nul te laten komen",
+            "rules": [
+                "⏱️ Begint met 60 seconden op de klok",
+                "➕ Elke opgeruimde lijn geeft tijd terug (meer voor 4 lijnen)",
+                "⏳ Het spel eindigt wanneer de klok nul bereikt"
+            ]
+        },
+        "random": {
+            "name": "Willekeurig",
+            "description": "Kiest een van de andere modi voor je zodra je op Start drukt",
+            "rules": [
+                "🎲 Kiest willekeurig een van de andere modi",
+                "▶️ De ronde speelt vervolgens precies zoals die modus",
+                "🔁 Kies opnieuw Willekeurig voor nog een verrassing"
+            ]
         }
     },
     "game": {

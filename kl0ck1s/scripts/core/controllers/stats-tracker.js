@@ -1,6 +1,12 @@
 "use strict";
 
-import {dropIntervalForLevel, formatDuration, formatNumber, tierForLevel} from "../shared/utils.js";
+import {
+    dropIntervalForLevel,
+    formatDuration,
+    formatDurationPrecise,
+    formatNumber,
+    tierForLevel
+} from "../shared/utils.js";
 import {levelForLines, pointsForLineClear, pointsForSpin} from "../game/scoring.js";
 
 /**
@@ -27,9 +33,10 @@ export class StatsTracker {
         const efficiencyValue = game.lines > 0 ? game.score / game.lines : 0;
         const droughtAvgValue = game.droughtCount > 0 ? game.droughtTotal / game.droughtCount : 0;
 
+        const isTimedRaceMode = game.mode === "sprint" || game.mode === "cheeseRace";
         const bestEntry = game.leaderboard.bestEntry(game.mode);
-        const bestDisplay = game.mode === "sprint"
-            ? (bestEntry ? formatDuration(bestEntry.timeMs) : "—")
+        const bestDisplay = isTimedRaceMode
+            ? (bestEntry ? formatDurationPrecise(bestEntry.timeMs) : "—")
             : formatNumber(bestEntry ? bestEntry.score : 0);
 
         return {
@@ -39,9 +46,12 @@ export class StatsTracker {
             best: bestDisplay,
             mode: game.mode,
             objective: game.modeController.objectiveText(),
+            objectivePercent: game.modeController.objectivePercent(),
+            objectiveUrgency: game.modeController.objectiveUrgency(),
+            objectiveColorMode: game.modeController.objectiveColorMode(),
             difficulty: `${game.i18n.t(`difficulty.${game.levelTier}`)} ${game.level}`,
             difficultyPercent: progressPercent,
-            gameTime: formatDuration(game.elapsedMs),
+            gameTime: isTimedRaceMode ? formatDurationPrecise(game.elapsedMs) : formatDuration(game.elapsedMs),
             drought: game.drought,
             maxDrought: game.maxDrought,
             droughtTotal: game.droughtTotal,
