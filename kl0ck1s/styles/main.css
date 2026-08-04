@@ -51,7 +51,7 @@ body {
         --line: oklch(0.28 0.06 154.66);
         --nickname-form__input--bg: oklch(0.3 0.12 146.58);
         --kbd-border-color: oklch(0.63 0.15 133.63);
-        --board-bg: conic-gradient(oklch(0.2329 0.038 141.49), oklch(0.1884 0.038 141.49), oklch(0.2329 0.038 141.49), oklch(0 0 0), oklch(0.159 0.038 141.487), oklch(0.1884 0.038 141.49), oklch(0.159 0.038 141.487));
+        --board-bg: conic-gradient(oklch(0.33 0.1 150.53), oklch(0.33 0.14 143.75), oklch(0.16 0.06 138.47), oklch(0.35 0.09 146.31), oklch(0.17 0.07 140.91), oklch(0.33 0.13 142.45), oklch(0.12 0.04 143.05));
         --board-accent: oklch(0.43 0.1 137.67 / 0.85);
         --panel: oklch(0.17 0.02 154.44);
         --accent-2: oklch(0.5 0.14 147.92);
