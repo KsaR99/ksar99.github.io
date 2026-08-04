@@ -301,7 +301,7 @@ body.hud-right .card[data-role="next-piece-card"] {
     background: var(--board-bg, var(--panel));
     border-radius: var(--radius);
     border: 1px solid var(--board-accent, var(--line));
-    box-shadow: var(--board-accent, oklch(0.39 0 0)) 0 0 1.25rem 0.2rem;
+    box-shadow: var(--board-accent, oklch(0.39 0 0)) 0 0 1.15rem 0.25rem;
 }
 
 body.perf-no-glow .board {
@@ -332,15 +332,13 @@ body.perf-no-glow .screen__title {
     align-items: center;
     justify-content: flex-start;
     gap: 0.625rem;
-    padding-top: 0.75rem;
     background: oklch(from var(--bg-2) l c h / 0.8);
     border-radius: var(--radius);
     overflow-y: auto;
     overflow-x: hidden;
     width: 100%;
     height: 100%;
-    padding-inline: 0.75rem;
-    padding-bottom: 0.75rem;
+    padding: 0.25rem;
     scrollbar-color: var(--accent) transparent;
 }
 
