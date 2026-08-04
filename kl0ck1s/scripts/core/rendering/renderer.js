@@ -6,7 +6,7 @@ import {FALL_TRAIL_MAX_ALPHA} from "../game/game-constants.js";
 export class Renderer {
     /**
      * @param {object} deps
-     * @param {HTMLDivElement} boardDiv
+     * @param {HTMLBodyElement} bodyEl
      * @param {CanvasRenderingContext2D} deps.ctx
      * @param {HTMLCanvasElement} deps.boardCanvas
      * @param {CanvasRenderingContext2D} deps.nextCtx
@@ -19,7 +19,7 @@ export class Renderer {
      * @param {import("../services/i18n.js").I18n} [deps.i18n]
      */
     constructor({
-                    boardDiv,
+                    bodyEl,
                     ctx,
                     boardCanvas,
                     nextCtx,
@@ -31,7 +31,7 @@ export class Renderer {
                     nextPreviewCellSize,
                     i18n = null
                 }) {
-        this.boardDiv = boardDiv;
+        this.bodyEl = bodyEl;
         this.ctx = ctx;
         this.boardCanvas = boardCanvas;
         this.nextCtx = nextCtx;
@@ -95,7 +95,7 @@ export class Renderer {
     }
 
     setTheme(theme) {
-        this.boardDiv.dataset.theme = theme || "none";
+        this.bodyEl.dataset.theme = theme || "none";
     }
 
     drawCell(context, x, y, color, size, {glow = false, ghost = false} = {}) {

@@ -37,6 +37,7 @@ const i18n = new I18n();
 await i18n.init();
 i18n.applyStatic(document);
 
+const bodyEl = document.querySelector('body');
 const boardDiv = document.querySelector(".board");
 
 /** @type {HTMLCanvasElement} */
@@ -111,7 +112,7 @@ const effectCtx = effectCanvas.getContext("2d", {colorSpace: "display-p3", willR
 const spriteCache = new SpriteCache(KLOCKOMINOS, () => document.createElement("canvas"));
 
 const renderer = new Renderer({
-    boardDiv,
+    bodyEl,
     ctx,
     boardCanvas,
     nextCtx,

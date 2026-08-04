@@ -19,6 +19,7 @@ body {
     width: auto;
     height: auto;
     gap: 0.75rem;
+    background: var(--app-bg, transparent);
 }
 
 .app__board {

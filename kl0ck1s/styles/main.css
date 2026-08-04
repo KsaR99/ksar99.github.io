@@ -10,6 +10,10 @@
     --good: oklch(0.63 0.27 145.76);
     --warn: oklch(0.8 0.19 95);
     --danger: oklch(0.6 0.22 25);
+    --nickname-form__input--bg: oklch(22.054% 0.02402 273.436);
+    --screen__title-color: oklch(0.86 0.36 144.2);
+    --screen__title-shadow: oklch(0.85 0.37 145.75);
+    --kbd-border-color: oklch(0.15 0 0 / 1);
 
     --font-display: "Noto Sans Mono", monospace;
     --font-body: "Inter", system-ui, -apple-system, sans-serif;
@@ -33,6 +37,73 @@
     --mobile-chrome-h: 5.6rem;
 }
 
+body {
+    &[data-theme="none"] {
+        --body-bg: radial-gradient(circle at 50% 100%, oklch(0.89 0 0) 0, oklch(0.26 0.04 283.84) 60%);
+        --app-bg: oklch(0.18 0.02 254.93 / 0.9);
+        --board-bg: oklch(0.33 0 0);
+        --board-accent: oklch(0.72 0 0 / 0.85);
+    }
+
+    &[data-theme="matrix"] {
+        --app-bg: oklch(0.12 0.04 161.13 / 0.9);
+        --body-bg: radial-gradient(circle at 50% 100%, oklch(0.87 0.3 146.23) 0, oklch(0.12 0.05 146.9) 50%);
+        --line: oklch(0.28 0.06 154.66);
+        --nickname-form__input--bg: oklch(0.3 0.12 146.58);
+        --kbd-border-color: oklch(0.63 0.15 133.63);
+        --board-bg: conic-gradient(oklch(0.2329 0.038 141.49), oklch(0.1884 0.038 141.49), oklch(0.2329 0.038 141.49), oklch(0 0 0), oklch(0.159 0.038 141.487), oklch(0.1884 0.038 141.49), oklch(0.159 0.038 141.487));
+        --board-accent: oklch(0.43 0.1 137.67 / 0.85);
+        --panel: oklch(0.17 0.02 154.44);
+        --accent-2: oklch(0.5 0.14 147.92);
+    }
+
+
+    &[data-theme="rain"] {
+        --app-bg: oklch(0.13 0.04 233.93 / 0.9);
+        --body-bg: radial-gradient(circle at 50% 100%, oklch(0.78 0.15 233.86) 0, var(--bg) 60%);
+        --line: oklch(0.4 0.08 212.68);
+        --nickname-form__input--bg: oklch(0.27 0.09 248.21);
+        --kbd-border-color: oklch(0.56 0.09 225.83);
+        --board-bg: linear-gradient(180deg, oklch(0.185 0.045 250), oklch(0.13 0.04 254), oklch(0.185 0.045 250));
+        --board-accent: oklch(0.4 0.09 250.08 / 0.85);
+        --panel: oklch(0.17 0.03 253.5);
+        --accent: oklch(0.48 0.31 263.31 / 0.39);
+        --accent-2: oklch(0.58 0.13 214);
+        --screen__title-color: oklch(1 0 0);
+        --screen__title-shadow: oklch(1 0 0);
+    }
+
+    &[data-theme="snow"] {
+        --app-bg: oklch(0.18 0.03 265.27 / 0.9);;
+        --body-bg: radial-gradient(circle at 50% 100%, oklch(0.81 0.11 282.14) 0, oklch(0.11 0.03 261.36) 50%);
+        --line: oklch(0.4 0.08 212.68);
+        --nickname-form__input--bg: oklch(0.27 0.09 248.21);
+        --kbd-border-color: oklch(0.56 0.09 225.83);
+        --board-bg: linear-gradient(180deg, oklch(0.24 0.018 238), oklch(0.185 0.014 235), oklch(0.24 0.018 238));
+        --board-accent: oklch(0.54 0.04 240.12 / 0.85);
+        --panel: oklch(0.17 0.03 253.5);
+        --accent: oklch(0.48 0.31 263.31 / 0.39);
+        --accent-2: oklch(0.58 0.13 214);
+        --screen__title-color: oklch(1 0 0);
+        --screen__title-shadow: oklch(1 0 0);
+    }
+
+    &[data-theme="vhs"] {
+        --app-bg: oklch(0.15 0.07 331.23 / 0.9);
+        --body-bg: radial-gradient(circle at 50% 100%, oklch(0.76 0.29 332.59) 0, oklch(0.12 0.04 327.72) 50%);
+        --line: oklch(0.25 0.07 326.88);
+        --nickname-form__input--bg: oklch(0.3 0.14 337.96);
+        --kbd-border-color: oklch(0.54 0.18 330.58);
+        --board-bg: linear-gradient(160deg, oklch(0.19 0.06 330), oklch(0.135 0.05 300), oklch(0.19 0.06 330));
+        --board-accent: oklch(0.35 0.14 324.84 / 0.85);
+        --panel: oklch(0.18 0.06 332.36);
+        --accent: oklch(0.69 0.33 344.43 / 0.39);
+        --accent-2: oklch(0.53 0.25 331.04);
+        --screen__title-color: oklch(0.7 0.34 338.65);
+        --screen__title-shadow: oklch(0.7 0.35 328.6);
+    }
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -40,7 +111,7 @@
 }
 
 html {
-    font-size: clamp(10px, 0.1vw + 1rem, 2rem);
+    font-size: clamp(10px, 0.1vw + 1rem, 1.8rem);
 }
 
 body {
@@ -48,11 +119,12 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: radial-gradient(circle at 50% 0, oklch(21.93% 0.0285 270.9) 0, var(--bg) 60%);
+    background: var(--body-bg, oklch(0.1291 0 0));
     font-family: var(--font-body);
     color: var(--text);
     padding: 0;
     overflow: hidden;
+    color-scheme: dark;
 }
 
 /* ============================================================
@@ -230,40 +302,6 @@ body.hud-right .card[data-role="next-piece-card"] {
     border-radius: var(--radius);
     border: 1px solid var(--board-accent, var(--line));
     box-shadow: var(--board-accent, oklch(0.39 0 0)) 0 0 1.25rem 0.2rem;
-}
-
-/*
- * Board theme - switched by toggling .board[data-theme="..."] (see
- * Renderer.setTheme(), driven by EffectOverlay to match whichever screen
- * filter is active: options.effect / game.activeEffect). Each block only
- * needs to set --board-bg/--board-accent; .board and .board__canvas above
- * pick them up automatically. Falls back to --panel/--line if data-theme
- * is missing or unrecognized (e.g. before JS has run once on first paint).
- * Add a new filter in effect-overlay.js? Add its block here too.
- */
-.board[data-theme="none"] {
-    --board-bg: oklch(0.31 0.04 210.57);
-    --board-accent: oklch(0.54 0.12 185.61 / 0.85);
-}
-
-.board[data-theme="matrix"] {
-    --board-bg: conic-gradient(oklch(0.2329 0.038 141.49), oklch(0.1884 0.038 141.49), oklch(0.2329 0.038 141.49), oklch(0 0 0), oklch(0.159 0.038 141.487), oklch(0.1884 0.038 141.49), oklch(0.159 0.038 141.487));
-    --board-accent: oklch(0.43 0.1 137.67 / 0.85);
-}
-
-.board[data-theme="rain"] {
-    --board-bg: linear-gradient(180deg, oklch(0.185 0.045 250), oklch(0.13 0.04 254), oklch(0.185 0.045 250));
-    --board-accent: oklch(0.4 0.09 250.08 / 0.85);
-}
-
-.board[data-theme="snow"] {
-    --board-bg: linear-gradient(180deg, oklch(0.24 0.018 238), oklch(0.185 0.014 235), oklch(0.24 0.018 238));
-    --board-accent: oklch(0.54 0.04 240.12 / 0.85);
-}
-
-.board[data-theme="vhs"] {
-    --board-bg: linear-gradient(160deg, oklch(0.19 0.06 330), oklch(0.135 0.05 300), oklch(0.19 0.06 330));
-    --board-accent: oklch(0.35 0.14 324.84 / 0.85);
 }
 
 body.perf-no-glow .board {
@@ -479,8 +517,8 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 .screen__title {
     font-family: var(--font-display);
     font-size: clamp(1.25rem, 4vw, 1.75rem);
-    color: oklch(0.86 0.36 144.2);
-    text-shadow: 0 0 0.6rem oklch(0.85 0.37 145.75);
+    color: var(--screen__title-color);
+    text-shadow: 0 0 0.6rem var(--screen__title-shadow);
     user-select: none;
 }
 
@@ -793,8 +831,8 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 }
 
 .kbd {
-    background: oklch(25.039% 0.02732 271.986);
-    border: 2px outset var(--line);
+    background: oklch(0.15 0 0 / 1);
+    border: 1px inset var(--kbd-border-color);
     border-radius: 0.25rem;
     font-family: var(--font-display);
     font-size: clamp(.72rem, .2vw + .68rem, .9rem);
@@ -852,7 +890,7 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 .nickname-form__input {
     flex: 1;
     min-width: 0;
-    background: oklch(22.054% 0.02402 273.436);
+    background: var(--nickname-form__input--bg);
     border: 1px solid var(--line);
     border-radius: 0.375rem;
     padding: 0.5em 0.75em;
@@ -1090,7 +1128,7 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     display: flex;
     flex-direction: column;
     gap: 0.3rem;
-    background: oklch(20.196% 0.02064 271.521);
+    background: var(--panel);
     border: 1px solid var(--line);
     border-radius: var(--radius);
     padding: .4em .7em;
