@@ -89,10 +89,10 @@ body {
     }
 
     &[data-theme="vhs"] {
-        --app-bg: oklch(0.15 0.07 331.23 / 0.9);
-        --body-bg: radial-gradient(circle at 50% 100%, oklch(0.76 0.29 332.59) 0, oklch(0.12 0.04 327.72) 50%);
-        --line: oklch(0.25 0.07 326.88);
-        --nickname-form__input--bg: oklch(0.3 0.14 337.96);
+        --app-bg: linear-gradient(oklch(0.37 0.17 331.19 / 0.9), oklch(0.14 0.07 331.35 / 0.9) 40%);
+        --body-bg: radial-gradient(circle at 50% 100%, oklch(0.52 0.25 333.31) 0, oklch(0.22 0.06 326.54) 50%);
+        --line: oklch(0.42 0.17 326.9);
+        --nickname-form__input--bg: oklch(0.34 0.16 338.2);
         --kbd-border-color: oklch(0.54 0.18 330.58);
         --board-bg: linear-gradient(160deg, oklch(0.19 0.06 330), oklch(0.135 0.05 300), oklch(0.19 0.06 330));
         --board-accent: oklch(0.35 0.14 324.84 / 0.85);
