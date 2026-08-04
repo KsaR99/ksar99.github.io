@@ -46,7 +46,7 @@ body {
     }
 
     &[data-theme="matrix"] {
-        --app-bg: oklch(0.12 0.04 161.13 / 0.9);
+        --app-bg: linear-gradient(oklch(0.58 0.17 135.05 / 0.81), oklch(0.12 0.04 159.56 / 0.95) 40%);
         --body-bg: radial-gradient(circle at 50% 100%, oklch(0.87 0.3 146.23) 0, oklch(0.12 0.05 146.9) 50%);
         --line: oklch(0.28 0.06 154.66);
         --nickname-form__input--bg: oklch(0.3 0.12 146.58);
