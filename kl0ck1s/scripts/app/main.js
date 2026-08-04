@@ -49,19 +49,13 @@ const nextCtx = nextCanvas.getContext("2d");
 nextCtx.imageSmoothingEnabled = false;
 
 function getSidebarInlineFootprint() {
-    // Sidebars only eat into the board's available width when they're
-    // laid out in normal flow (desktop's 3-column row). On mobile
-    // they're position:fixed off-canvas drawers, so they take zero
-    // width away from the board — checking computed position (instead
-    // of hardcoding a breakpoint) keeps this correct even if the
-    // mobile/desktop cutoff in main.css ever changes.
     const sidebars = document.querySelectorAll(".app__sidebar");
     let width = 0;
     let count = 0;
     sidebars.forEach((el) => {
         if (getComputedStyle(el).position !== "fixed") {
             width += el.getBoundingClientRect().width;
-            count += 1;
+            ++count;
         }
     });
     return {width, count};
@@ -189,13 +183,6 @@ function handleViewportResize() {
 
 (window?.visualViewport || window).addEventListener("resize", handleViewportResize);
 
-// Auto-pause on minimize/tab-switch/app-background. Without this the rAF
-// loop and the WebAudio-backed music/sfx keep running (or get silently
-// suspended by the browser in an inconsistent way) whenever the page is
-// hidden, since neither the game loop nor SoundManager listen for
-// visibility on their own - screenFlow.togglePause() already knows how to
-// cleanly stop gameplay sounds and pause the music at its exact position
-// (same code path as pressing Escape), so we just need to trigger it here.
 document.addEventListener("visibilitychange", () => {
     if (document.hidden && game.state === "running") {
         game.screenFlow.togglePause();

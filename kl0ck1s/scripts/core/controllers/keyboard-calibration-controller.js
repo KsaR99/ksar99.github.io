@@ -32,39 +32,6 @@ function mean(values) {
     return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
-/**
- * Drives the "Calibrate keyboard" exercise reachable from Options: spawns a
- * fresh, re-centered board, walks the player through
- * KEYBOARD_CALIBRATION_ROUNDS "hold LEFT/RIGHT, then release whenever you
- * like" gestures (each behind its own 3-2-1 countdown, same as
- * SensitivityCalibrationController), and derives new keyboardDAS/keyboardARR
- * settings from how the player actually holds a direction key:
- *
- * - Reaction time (prompt shown -> first keydown) stands in for how snappy
- *   the player wants the initial delay before auto-repeat kicks in (DAS): a
- *   player who reacts fast and expects the piece to already be moving wants
- *   a short DAS; a more relaxed player is less bothered by a longer one.
- * - Hold time versus columns actually travelled - under the CURRENT
- *   keyboardDAS/keyboardARR, i.e. real auto-repeat, not simulated - stands
- *   in for their preferred auto-repeat interval (ARR): the DAS delay is
- *   subtracted off first (that first extra column is DAS-paced, not
- *   ARR-paced), then what's left is split across the remaining columns to
- *   get an average ms-per-repeat figure.
- *
- * Like SensitivityCalibrationController's drag-only sampling, a round only
- * contributes an ARR sample if auto-repeat genuinely outlasted the DAS delay
- * (columnsMoved of 3+, i.e. at least one column moved at the real ARR pace
- * rather than the DAS-triggered one) - a quick tap, or a hold released
- * during/right at the end of DAS, still contributes a reaction/DAS sample,
- * it just has nothing reliable to say about ARR.
- *
- * Known simplification: if a hold runs long enough to drive the piece into
- * the board edge, further holding no longer moves it, which would make that
- * round's ARR sample look slower than it really was. Rounds are centered
- * first to give room in both directions, but a very long hold can still hit
- * the edge - same class of approximation the sensitivity controller already
- * accepts for its own overshoot-based reading.
- */
 export class KeyboardCalibrationController {
     constructor(game) {
         this.game = game;
@@ -154,9 +121,6 @@ export class KeyboardCalibrationController {
         const game = this.game;
         game.hud.hideOverlay();
 
-        // Centered so a hold in either direction has room to actually move -
-        // unlike sensitivity calibration's edge-targeted gestures, this one
-        // doesn't care which way the player goes, only how they hold.
         game.pieceController.moveToColumn(Math.floor(game.board.cols / 2));
 
         this.roundStartX = game.current.x;
@@ -190,12 +154,6 @@ export class KeyboardCalibrationController {
         if (banner) banner.classList.remove("board__calibration--visible");
     }
 
-    /**
-     * Own keydown/keyup listeners just for timing - separate from
-     * KeyboardInput's, which keeps driving the actual piece movement (and
-     * real auto-repeat) throughout the hold exactly as it would in a normal
-     * round, since "calibrating-keyboard" is in PIECE_CONTROLLABLE_STATES.
-     */
     _bindKeyTracking() {
         const game = this.game;
         if (!game.dom) return;
@@ -241,7 +199,7 @@ export class KeyboardCalibrationController {
         this.samples.push({reactionMs, holdMs, columnsMoved});
 
         this.armed = false;
-        this.roundIndex += 1;
+        ++this.roundIndex;
 
         if (this.roundIndex >= this.totalRounds) {
             this._finish();
@@ -257,24 +215,13 @@ export class KeyboardCalibrationController {
         this._hideBanner();
 
         const reactionSamples = this.samples.map((sample) => sample.reactionMs);
-        // A hold's timeline is: immediate move at t=0, then the first
-        // *repeat* only fires after the DAS delay, and only the gaps after
-        // that are actually paced by ARR - so columnsMoved needs at least 3
-        // (immediate + DAS-triggered + one real ARR-paced step) before
-        // holdMs minus that DAS delay, split across the remaining
-        // (columnsMoved - 2) gaps, means anything. Without subtracting DAS
-        // first, a short hold's time is dominated by the DAS wait rather
-        // than the repeat rate, which skews the derived ARR toward DAS
-        // instead of the player's actual repeat pace.
+
         const activeDas = game.settings.keyboardDAS ?? DEFAULT_DAS_MS;
         const arrSamples = this.samples
             .filter((sample) => sample.columnsMoved >= 3)
             .map((sample) => (sample.holdMs - activeDas) / (sample.columnsMoved - 2));
 
-        // Candidate values are staged, not applied - same as
-        // SensitivityCalibrationController: the player reviews the result
-        // and explicitly Save/Discard/Restart rather than the round
-        // auto-committing the moment it finishes.
+
         const pending = {};
         let newDas = null;
         let newArr = null;
@@ -296,7 +243,6 @@ export class KeyboardCalibrationController {
         this._bindResultButtons();
     }
 
-    /** Applies whatever _finish() staged in _pendingSettings and persists it - called by the result screen's Save button. */
     _acceptResult() {
         const game = this.game;
         Object.assign(game.settings, this._pendingSettings);
@@ -311,8 +257,6 @@ export class KeyboardCalibrationController {
         const restartButton = game.dom?.querySelector('[data-role="keyboard-calibration-result-restart-button"]');
 
         if (saveButton) {
-            // Nothing to save if neither DAS nor ARR could be derived - hide
-            // the option rather than let it silently no-op.
             if (Object.keys(this._pendingSettings ?? {}).length === 0) {
                 saveButton.hidden = true;
             } else {

@@ -469,17 +469,6 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     gap: 0.4rem;
     line-height: 1.5;
     letter-spacing: 1px;
-    /* min-height, not height: at a fixed height, "justify-content: center"
-       centers overflowing content around the box's midpoint, pushing the
-       top half out above the box where .board__overlay's scroll can't
-       reach it (scrollTop can't go negative). With min-height, .screen
-       can grow to fit tall content instead — centering only kicks in
-       while there's actually slack to center within.
-       flex-shrink: 0 is required alongside it: a flex item's default
-       flex-shrink:1 would otherwise still compress .screen back down to
-       exactly 100% whenever content is taller (that's the container's
-       only available space), silently reintroducing the same clipped/
-       trapped-overflow problem min-height was meant to prevent. */
     min-height: 100%;
     flex-shrink: 0;
     width: 100%;
@@ -726,12 +715,6 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     transition: width 0.15s ease, background-color 0.3s ease;
 }
 
-/* Ultra's round clock / Survival's next-garbage timer: the fill turns
-   yellow inside the last 10s, red inside the last 5s (see
-   ModeController.objectiveUrgency()). Sprint has no clock, so it never
-   gets a data-urgency attribute - its fill color is set inline instead,
-   ramping continuously from neutral to "good" as lines close in on the
-   target (see HUD.update()). */
 .progress-bar--objective[data-urgency="warning"] .progress-bar__fill {
     background: var(--warn);
 }

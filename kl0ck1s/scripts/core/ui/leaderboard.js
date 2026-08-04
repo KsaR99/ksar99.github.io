@@ -25,10 +25,6 @@ export class Leaderboard {
         return entry.mode || "marathon";
     }
 
-    // Sprint and Cheese Race are both races against the clock - fastest
-    // finish wins, so they're ranked by time rather than score. Every other
-    // mode (including the score-attack finishes of Dig Survival/Countdown)
-    // ranks by score, same as Marathon/Ultra/Survival always have.
     isTimedRaceMode(mode) {
         return mode === "sprint" || mode === "cheeseRace";
     }
@@ -38,7 +34,6 @@ export class Leaderboard {
         return b.score - a.score;
     }
 
-    /** Entries for one mode, sorted best-first by that mode's own ranking criteria (score, or time for Sprint). */
     forMode(mode) {
         return this.cache
             .filter((entry) => this.entryMode(entry) === mode)
@@ -113,10 +108,6 @@ export class Leaderboard {
     async setLastName(name) {
         this.lastNameCache = name;
         await this.store.set(Leaderboard.NAME_KEY, name);
-    }
-
-    bestScore(mode = "marathon") {
-        return this.bestEntry(mode)?.score ?? 0;
     }
 
     todayBestEntry() {

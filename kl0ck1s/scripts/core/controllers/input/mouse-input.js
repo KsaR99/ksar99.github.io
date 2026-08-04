@@ -5,13 +5,6 @@ import {PIECE_CONTROLLABLE_STATES} from "../../game/game-constants.js";
 
 const SOFT_DROP_REPEAT_INTERVAL_MS = 50;
 
-/**
- * Mouse input source: moving the pointer left/right steers the current
- * piece toward the column under it, right click rotates, left click
- * hard-drops, middle click soft-drops (repeating while held, like the down
- * arrow). Column math (canvas rect + cell size) lives on the renderer,
- * which owns that geometry - this source only maps input to piece actions.
- */
 export class MouseInput extends InputSource {
     constructor(game, steeringArbiter) {
         super(game, steeringArbiter);
@@ -26,18 +19,6 @@ export class MouseInput extends InputSource {
         this.softDropIntervalId = undefined;
     }
 
-    /**
-     * Steers the piece to the column under clientX and marks the pointer as
-     * the active steering source. Mouse control maps cursor position to
-     * board column directly (1:1, not relative deltas), so "sensitivity"
-     * here means how much that mapping is stretched around the board's
-     * horizontal center: at the default 1x it's an exact passthrough
-     * (unchanged from before this setting existed); above 1x, a smaller
-     * physical cursor movement swings the piece further (edges of the board
-     * become reachable without leaving the board's own width); below 1x, the
-     * cursor has to travel further than the board's width to reach either
-     * edge.
-     */
     steerTo(clientX) {
         const game = this.game;
         const sensitivity = game.settings?.mouseSensitivity ?? 1;
@@ -88,10 +69,6 @@ export class MouseInput extends InputSource {
                 game.pieceController.rotate();
             } else if (event.button === 0) {
                 event.preventDefault();
-                // Recompute from the click's own coordinates - under fast
-                // movement, queued mousemove events (each doing its own
-                // collision-check walk) can lag behind the pointer, so the
-                // piece may still be catching up when the click fires.
                 this.steerTo(event.clientX);
                 game.pieceController.hardDrop();
             } else if (event.button === 1) {
@@ -104,8 +81,6 @@ export class MouseInput extends InputSource {
             }
         };
 
-        // Middle-click also triggers "auxclick" and, without the mousedown
-        // preventDefault above, the browser's autoscroll icon - stop that too.
         const onAuxClick = (event) => {
             if (event.button === 1) event.preventDefault();
         };

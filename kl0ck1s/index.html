@@ -667,9 +667,6 @@
 </template>
 
 <script>
-    // Mobile chrome: stats/controls drawers + fullscreen toggle.
-    // Deliberately independent of the game module (main.js) — pure DOM/CSS,
-    // so it keeps working no matter how the game bundle is wired up.
     (function () {
         const appRoot = document.getElementById("app-root");
         const scrim = document.querySelector('[data-role="drawer-scrim"]');
@@ -682,10 +679,6 @@
         const fabFullscreen = document.querySelector('[data-role="fab-fullscreen"]');
 
         function notifyResize() {
-            // Let any size-aware canvas/renderer recompute after the CSS
-            // transition finishes (drawers are transform-only, so they
-            // don't actually resize .app__board, but a toggle is still a
-            // reasonable moment for anything listening on resize to re-check).
             requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
         }
 
@@ -745,9 +738,6 @@
                         document.body.classList.toggle("faux-fullscreen");
                     }
                 } catch (err) {
-                    // Fullscreen can be denied (no user gesture, iframe
-                    // restrictions, etc.) — fall back to the CSS-only mode
-                    // rather than leaving the button inert.
                     document.body.classList.toggle("faux-fullscreen");
                 }
                 notifyResize();

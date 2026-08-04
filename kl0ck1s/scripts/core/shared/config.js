@@ -18,7 +18,6 @@ export const SCORING = Object.freeze({
     LOCK_DELAY: 500,
     LOCK_DELAY_MAX_RESETS: 15,
     MAX_GROUNDED_TIME: 3000,
-    // Fallback for Game.getFallingSoundRate() if a tier is ever missing.
     DEFAULT_FALLING_SOUND_RATE: 0.5,
 });
 
@@ -40,12 +39,6 @@ export const DIFFICULTIES = Object.freeze({
     pro: {startLevel: 30, groundedTime: 1000, fallingSoundRate: 0.50},
 });
 
-// Board theme (background + accent border) now lives in main.css, under
-// .board[data-theme="..."] - keyed by the same effect names as
-// EffectOverlay/options.effect (none/matrix/rain/snow/vhs). Renderer.setTheme()
-// just flips the data-theme attribute; see effect-overlay.js for where that's
-// called from.
-
 export const DEFAULT_DIFFICULTY = "hard";
 
 export const GAME_MODES = Object.freeze({
@@ -56,36 +49,16 @@ export const GAME_MODES = Object.freeze({
         sprintTarget: null, timeLimitMs: null, garbage: true,
         garbageIntervalMs: 20000, garbageLinesMin: 1, garbageLinesMax: 2,
     }),
-    // Board starts pre-filled with a `cheeseRows`-tall stack of one-gap-per-row
-    // garbage (ModeController.setupBoard()) - dig it all out (board fully
-    // clear) as fast as you can. Ranked on the leaderboard by time, same as
-    // Sprint (see Leaderboard.compareEntries()).
     cheeseRace: Object.freeze({
         sprintTarget: null, timeLimitMs: null, garbage: false, cheeseRows: 10,
     }),
-    // Same pre-filled starting stack as Cheese Race, but instead of racing to
-    // clear it, every line you clear is immediately resupplied at the bottom
-    // (ModeController.onLinesCleared()) - the stack never shrinks, so the
-    // only way to lose is topping out. Survive long enough to dig `digTarget`
-    // total lines to win.
     digSurvival: Object.freeze({
         sprintTarget: null, timeLimitMs: null, garbage: false, cheeseRows: 4, digTarget: 100,
     }),
-    // Starts with `countdownStartMs` on the clock, ticking down every frame;
-    // hits zero and the round ends. Every line clear adds time back
-    // (ModeController.onLinesCleared()) - `countdownBonusMs[n]` is the bonus
-    // for an n-line clear (index clamped to the array's last entry, so a
-    // tetris and a triple can share the top bonus without a 5th entry).
     countdown: Object.freeze({
         sprintTarget: null, timeLimitMs: null, garbage: false,
         countdownStartMs: 60000, countdownBonusMs: [3000, 3000, 5000, 8000],
     }),
-    // Not an actual playable mode - a picker entry. ModeController.resolveRandomMode()
-    // swaps it out for a randomly-picked real mode the moment Start is pressed
-    // (see ScreenFlow.handleEnter()), so nothing ever actually runs a round as
-    // "random" itself; `isRandom` just tells that resolver (and the mode
-    // carousel's cycling logic) to leave this entry out of the pool it picks
-    // from.
     random: Object.freeze({sprintTarget: null, timeLimitMs: null, garbage: false, isRandom: true}),
 });
 
@@ -218,12 +191,6 @@ export const CREDITS_TIMING = Object.freeze({
 
 export const NEXT_PREVIEW_CELL_SIZE = 22;
 
-// Drives MusicDirector's tension-based track switching (see
-// services/music-director.js). tensionFor(board) returns 0..1 based on how
-// high the stack is; _tierForTension walks TRACK_KEYS' index up/down as
-// tension crosses THRESHOLDS, with HYSTERESIS as a buffer so it doesn't
-// flip-flop right at a boundary. TRACK_KEYS[tier] must be a key that exists
-// in SOUND_FILES (category "music") below.
 export const MUSIC_TENSION = Object.freeze({
     TRACK_KEYS: ["tetrisowyShvt", "tetrisowyShvt2", "tetrisowyShvt3"],
     THRESHOLDS: [0, 0.33, 0.66],
@@ -240,52 +207,25 @@ export const MUSIC_TENSION = Object.freeze({
     // crossfade. Step size is set so PITCH_MAX_SEMITONES is reached in
     // exactly PITCH_RETURN_MS / PITCH_STEP_INTERVAL_MS steps (10s / 1s = 10
     // steps of 0.25), keeping the ramp-up and the glide-back-down symmetric.
-    PITCH_STEP_SEMITONES: 0.25,
-    PITCH_MAX_SEMITONES: 2.5,
-    PITCH_STEP_INTERVAL_MS: 1000,
-    PITCH_RETURN_MS: 10000,
+    PITCH_STEP_SEMITONES: 0.1,
+    PITCH_MAX_SEMITONES: 1.5,
+    PITCH_STEP_INTERVAL_MS: 300,
+    PITCH_RETURN_MS: 7000,
 });
 
-// Each sound is tagged with a "category" (sfx/music) - the SoundManager uses
-// it to route the sound through the matching volume bus, and the options
-// screen uses it to sort the per-sound volume sliders into their section.
-// `src` can also be an array of paths - a pool of interchangeable variants
-// that SoundManager.play() picks from at random each time a *plain* play()
-// call is made (no explicit variant requested).
 export const SOUND_FILES = Object.freeze({
-    // Deliberately 4 separate keys rather than one "lineClear" sound with 4
-    // random variants - which sound plays should depend on how many lines
-    // were cleared (single/double/triple/tetris), not be random. See
-    // PieceController.lockCurrentPiece(), which picks the key from the
-    // actual cleared-line count.
     lineClear1: Object.freeze({src: "assets/audio/sounds/line-clear-1.opus", category: "sfx"}),
     lineClear2: Object.freeze({src: "assets/audio/sounds/line-clear-2.opus", category: "sfx"}),
     lineClear3: Object.freeze({src: "assets/audio/sounds/line-clear-3.opus", category: "sfx"}),
     lineClear4: Object.freeze({src: "assets/audio/sounds/line-clear-4.opus", category: "sfx"}),
-    // Hard drop's instant slam - see PieceController.hardDrop()/
-    // lockCurrentPiece(). A piece that locks naturally instead (grounded/
-    // lock-delay timing out) plays "pieceLock" below, never both together.
     drop: Object.freeze({src: "assets/audio/sounds/drop.opus", category: "sfx"}),
     gameOver: Object.freeze({src: "assets/audio/sounds/game-over.opus", category: "sfx"}),
     levelUp: Object.freeze({src: "assets/audio/sounds/level-up.opus", category: "sfx"}),
     rotate: Object.freeze({src: "assets/audio/sounds/rotate.opus", category: "sfx"}),
-    // Plays once, the moment the falling piece first touches down and lock
-    // delay starts counting - i.e. the ~1.5s window the player still has to
-    // slide/rotate it into place before it locks. Named to match the
-    // existing `groundedTime`/`MAX_GROUNDED_TIME` fields in SCORING/DIFFICULTIES.
     grounded: Object.freeze({src: "assets/audio/sounds/grounded.opus", category: "sfx"}),
     falling: Object.freeze({src: "assets/audio/sounds/falling.opus", category: "sfx"}),
-    // Plays instead of "drop" whenever a piece locks naturally - i.e. the
-    // "grounded" cue's window ran out rather than the player hard-dropping
-    // it. See PieceController.lockCurrentPiece().
     pieceLock: Object.freeze({src: "assets/audio/sounds/piece-lock.opus", category: "sfx"}),
     // music
-    // `label` is what shows up in the options screen's music list (Screens.options ->
-    // fillSoundRows in ui/screens.js). Music tracks are proper names, not meant to be
-    // translated per-language, so the label is set once right here - unlike the SFX
-    // above, which get their (actually-translated) name from sounds.<key> in each
-    // assets/i18n/<lang>.json instead. Add a new track by just adding an entry with a
-    // label below; no i18n or index.html changes needed.
     tetrisowyShvt: Object.freeze({
         src: "assets/audio/music/tetrisowy-shvt-1.opus",
         category: "music",

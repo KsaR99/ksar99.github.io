@@ -16,13 +16,6 @@ import {SensitivityCalibrationController} from "../controllers/sensitivity-calib
 import {KeyboardCalibrationController} from "../controllers/keyboard-calibration-controller.js";
 import {MusicDirector} from "../services/music-director.js";
 
-/**
- * Central game state + the update/render loop. Gameplay, controls, screens,
- * settings, effects, difficulty and stats each live in their own controller
- * (see the imports above); Game wires them together and owns the fields they
- * share (state, board, current piece, ...). Add new controllers the same way
- * to extend the game without growing this file.
- */
 export class Game {
     constructor({
                     board,
@@ -150,45 +143,18 @@ export class Game {
         this.settings = this.settingsController.defaultSettings();
     }
 
-    /** Aggregated stats consumed by the HUD; see StatsTracker for the fields. */
     get stats() {
         return this.statsTracker.stats;
     }
 
-    /**
-     * Max time (ms) the current difficulty tier allows a piece to sit resting
-     * before it's force-locked, regardless of further lock-delay resets from
-     * moves/rotations. Falls back to the scoring-wide default for tiers that
-     * don't override it (e.g. easy). Shared by update()'s lock check and the
-     * "grounded" sound's playback-rate scaling, so both always agree on the
-     * same window for the current tier.
-     */
     getMaxGroundedTime() {
         return this.difficulties[this.levelTier]?.groundedTime ?? this.scoring.MAX_GROUNDED_TIME;
     }
 
-    /**
-     * Base playback rate (0..1) for the "falling" cue at the current
-     * difficulty tier - see PieceController.fallingSoundPlaybackRate(). Read
-     * live off `levelTier` (not the originally selected `difficulty`), same
-     * as getMaxGroundedTime() above, so it keeps climbing as the player's
-     * level pushes into a faster tier mid-round.
-     */
     getFallingSoundRate() {
         return this.difficulties[this.levelTier]?.fallingSoundRate ?? this.scoring.DEFAULT_FALLING_SOUND_RATE;
     }
 
-    /**
-     * The playback rate the options screen's sound preview should use for
-     * `key`, so previewing a sound sounds exactly like it does in a real
-     * game - "falling" and "grounded" are pitched per the current
-     * difficulty/level tier (see getFallingSoundRate()/groundedSoundPlaybackRate()),
-     * "lineClear*" is always pitched down a flat amount, and everything else
-     * plays at its authored speed. Reads live off `levelTier`/`difficulty`
-     * (same fields the real gameplay cues read), so switching difficulty on
-     * the idle screen and then opening options previews the newly selected
-     * tier immediately - no round has to actually be running.
-     */
     previewPlaybackRateFor(key) {
         if (key === "falling") return this.getFallingSoundRate();
         if (key === "grounded") return this.pieceController.groundedSoundPlaybackRate();
@@ -226,7 +192,6 @@ export class Game {
         this.hud.update(this.stats);
     }
 
-    /** Clears the fall-trail ring buffer and speed measurement, e.g. on spawn/lock/round reset so old echoes/timing don't leak into the next piece. */
     resetFallTrail() {
         this.fallTrailCount = 0;
         this.fallTrailHead = 0;
@@ -237,38 +202,16 @@ export class Game {
         this.effectiveShiftIntervalMs = Infinity;
     }
 
-    /**
-     * Call whenever the current piece moves down exactly one row - from
-     * automatic gravity (update()) or from a manual soft drop
-     * (PieceController.softDrop()). Tracks the real elapsed time between
-     * successive calls as `effectiveDropIntervalMs`, which is what actually
-     * drives the fall trail's length - see fallTrailLengthForInterval in
-     * game-constants.js.
-     */
     noteRowStep() {
         ({lastTime: this.lastRowStepTime, effectiveMs: this.effectiveDropIntervalMs} =
             smoothedInterval(this.lastRowStepTime, this.effectiveDropIntervalMs, nowMs()));
     }
 
-    /**
-     * Call whenever the current piece moves left/right by one column - from
-     * a single tap-move or a DAS auto-repeat tick. Mirrors noteRowStep():
-     * tracks the real elapsed time between successive horizontal steps as
-     * `effectiveShiftIntervalMs`, so fast side-to-side movement can size the
-     * fall trail the same way fast falling does (see updateFallTrail()).
-     */
     noteColStep() {
         ({lastTime: this.lastColStepTime, effectiveMs: this.effectiveShiftIntervalMs} =
             smoothedInterval(this.lastColStepTime, this.effectiveShiftIntervalMs, nowMs()));
     }
 
-    /**
-     * Returns the piece's current *visual* x - mid-tween if a shiftAnim is
-     * already in progress, otherwise its logical x. Used as the `fromX` when
-     * starting a new shift tween, so a horizontal move that lands mid-way
-     * through the previous tween (e.g. fast DAS auto-repeat) continues
-     * smoothly from where it visually is instead of snapping backward.
-     */
     getShiftDisplayX() {
         if (!this.shiftAnim) return this.current.x;
         const t = Math.min(1, this.shiftAnim.elapsed / this.shiftAnim.duration);
@@ -346,11 +289,7 @@ export class Game {
             this.lockDelayTimer += delta;
             this.groundedTime += delta;
             const maxGroundedTime = this.getMaxGroundedTime();
-            // Re-check collision here rather than reusing `resting`: modeController.update()
-            // above (Survival's garbage rows) can reshape the board without moving the
-            // falling piece, so the value computed before it can be stale by the time we
-            // decide whether to lock - a piece could get locked (and its landing spot
-            // checked for full lines) against a board state it never actually rested on.
+
             const stillResting = this.board.collides(this.current, 0, 1);
             if (stillResting && (this.lockDelayTimer >= this.scoring.LOCK_DELAY || this.groundedTime >= maxGroundedTime)) {
                 this.pieceController.lockCurrentPiece();
@@ -367,19 +306,6 @@ export class Game {
         }
     }
 
-    /**
-     * Returns the piece as it should be drawn this frame. This is where the
-     * *visual* position can differ from the logical grid position in
-     * `this.current` - during a rotation animation (existing tween), during
-     * a horizontal shift animation (shiftAnim, started by PieceController on
-     * every successful move so x eases over a few frames instead of jumping
-     * a whole column instantly - this is also what gives the fall trail
-     * enough distinct in-between x values to actually spread out visually),
-     * and while falling (fractional y based on how far we are into the
-     * current drop step). The latter is what keeps falling pieces looking
-     * smooth at high levels, where dropInterval gets short enough that whole-
-     * cell steps would otherwise read as stutter.
-     */
     getRenderedPiece() {
         const base = this.current;
         if (!base) return base;
@@ -411,18 +337,6 @@ export class Game {
         return rendered;
     }
 
-    /**
-     * Pushes the current frame's position (both x and y) into the fall-trail
-     * ring buffer, sized per the current *measured* movement speed - whether
-     * that's falling (effectiveDropIntervalMs) or shifting left/right
-     * (effectiveShiftIntervalMs), see noteRowStep()/noteColStep(). Whichever
-     * axis is currently moving faster (smaller interval) wins, so a piece
-     * that's DAS-ing across the board without falling still gets a trail,
-     * same as one falling fast without moving sideways. Storing x per-snapshot
-     * (rather than reading it live from the current piece at draw time) lets
-     * the trail echo horizontal movement, not just falling.
-     * Reuses preallocated slot objects - no allocation on the hot path.
-     */
     updateFallTrail(renderedPiece) {
         const moveIntervalMs = Math.min(this.effectiveDropIntervalMs, this.effectiveShiftIntervalMs);
         const trailLength = fallTrailLengthForInterval(moveIntervalMs);

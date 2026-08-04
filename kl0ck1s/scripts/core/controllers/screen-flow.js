@@ -15,18 +15,11 @@ import {
     SENSITIVITY_STEP,
 } from "../game/game-constants.js";
 
-/** Rounds to the nearest step and clamps into [min, max] - same rule the calibration controllers use to keep numbers entered by hand in range. */
 function clampToStep(value, min, max, step) {
     const clamped = Math.max(min, Math.min(max, value));
     return Math.round(clamped / step) * step;
 }
 
-/**
- * Owns the non-gameplay screen state machine: idle, countdown, pause, the
- * game-over entry/saved flow and the options menu. Talks to `screens`/`hud`
- * to render, and back into DifficultyController/SettingsController for the
- * bits those screens expose (difficulty picker, options toggles).
- */
 export class ScreenFlow {
     constructor(game) {
         this.game = game;
@@ -76,16 +69,6 @@ export class ScreenFlow {
         this.updateMenuSelectorFocus();
     }
 
-    /**
-     * Moves keyboard focus between the mode picker, difficulty picker and
-     * nickname field on the idle/gameOver-saved screens (ArrowDown/ArrowUp)
-     * - a no-op everywhere else, same as PieceController.handleHorizontalArrow()'s
-     * left/right, which reads game.menuSelector to decide which group
-     * ArrowLeft/ArrowRight should actually cycle. Reaching "nickname" moves
-     * actual DOM focus into the text field - see bindNameInput()'s own
-     * ArrowUp listener for the way back, since a focused <input> swallows
-     * arrow keys before they reach the global handler below.
-     */
     moveMenuFocus(dir) {
         const game = this.game;
         if (game.state !== "idle" && game.state !== "gameOver-saved") return;
@@ -99,7 +82,6 @@ export class ScreenFlow {
         this.updateMenuSelectorFocus();
     }
 
-    /** Paints the difficulty--focused outline on whichever picker group matches game.menuSelector, or moves DOM focus into the nickname field. */
     updateMenuSelectorFocus() {
         const game = this.game;
         if (!game.dom) return;
@@ -153,12 +135,6 @@ export class ScreenFlow {
         });
     }
 
-    /**
-     * Shown right after Start is pressed, before the countdown - explains
-     * what the chosen mode is about (rules pulled from modes.<mode>.rules)
-     * behind a Continue button. Skippable via its own settings toggle
-     * (independent of skipCountdown), same as the countdown itself.
-     */
     showModeInfo() {
         const game = this.game;
         if (game.settings.skipModeInfo) {
@@ -230,17 +206,11 @@ export class ScreenFlow {
         game.musicDirector.start(game.board);
     }
 
-    /** Topping out - kept as a thin alias since PieceController.spawnNext() calls this by name. */
     async gameOver() {
         return this.endRound("topOut");
     }
 
-    /**
-     * Ends the current round for any reason: topping out (Marathon/Survival,
-     * or any mode), Sprint hitting its line target, or Ultra's clock running
-     * out. Feeds the same game-over-entry/leaderboard flow for all three -
-     * only the sound, title and whether the run gets saved differ.
-     */
+
     async endRound(reason = "topOut") {
         const game = this.game;
         game.state = "gameOver-entry";
@@ -268,11 +238,6 @@ export class ScreenFlow {
             timeMs: game.elapsedMs,
         };
 
-        // Sprint/Cheese Race only make it onto the leaderboard if they were
-        // actually finished - an unfinished run has no meaningful time to
-        // rank by (Dig Survival and Countdown are ranked by score instead,
-        // so a run cut short by topping out still counts, same as Marathon/
-        // Ultra/Survival).
         const raceUnfinished =
             (game.mode === "sprint" && reason !== "sprintComplete") ||
             (game.mode === "cheeseRace" && reason !== "cheeseClear");
@@ -367,11 +332,7 @@ export class ScreenFlow {
         if (!["running", "paused", "clearing", "countdown", "gameOver-entry", "gameOver-saved"].includes(game.state)) {
             return;
         }
-        // Mid-round (running/paused/clearing/countdown) game.mode is already
-        // whatever resolveRandomMode() resolved "random" to earlier, so this
-        // is a no-op then - but from gameOver-saved, restoreSelectedMode()
-        // (see continueFromGameOverEntry()) may have just put game.mode back
-        // to "random" itself, which prepareNewRound() can't actually play.
+
         game.modeController.resolveRandomMode();
         this.startCountdown();
     }
@@ -504,7 +465,8 @@ export class ScreenFlow {
             return;
         }
 
-        if (!["idle", "running", "paused", "gameOver-saved", "gameOver-entry"].includes(game.state)) return;
+        if (!["idle", "running", "paused", "gameOver-saved", "gameOver-entry"].includes(game.state))
+            return;
 
         game.previousStateBeforeOptions = game.state;
         if (game.state === "running") {
@@ -521,15 +483,6 @@ export class ScreenFlow {
         this.bindOptionsMenu();
     }
 
-    /**
-     * Handles a click on a sound's preview button: delegates the actual
-     * play/pause/switch decision to SoundManager.previewToggle(), then syncs
-     * every preview button's icon to match. Only one preview is ever alive
-     * (see previewToggle()), so every *other* button is reset to "play"
-     * first - if this click ends up switching to a different sound, that
-     * reset already matches reality; if it's the same button, the reset
-     * pass simply skips it.
-     */
     togglePreviewButton(button, list) {
         const game = this.game;
         const key = button.dataset.soundKey;
@@ -545,7 +498,6 @@ export class ScreenFlow {
         this.setPreviewButtonState(button, state === "playing" ? "pause" : "play");
     }
 
-    /** Paints a single preview button's icon/aria-label for "play" or "pause" state. */
     setPreviewButtonState(button, state) {
         const game = this.game;
         button.textContent = state === "pause" ? "⏸" : "▶";
@@ -676,10 +628,6 @@ export class ScreenFlow {
             });
         }
 
-        // Mouse/touch sensitivity and keyboard DAS/ARR can also be set by hand
-        // here, as an alternative to running the "Calibrate" exercises below -
-        // both write to the same game.settings keys, so either path keeps the
-        // other in sync next time this screen is opened.
         if (mouseSensitivityInput) {
             mouseSensitivityInput.min = SENSITIVITY_MIN;
             mouseSensitivityInput.max = SENSITIVITY_MAX;
@@ -702,8 +650,6 @@ export class ScreenFlow {
             touchSensitivityInput.min = SENSITIVITY_MIN;
             touchSensitivityInput.max = SENSITIVITY_MAX;
             touchSensitivityInput.step = SENSITIVITY_STEP;
-            // No value means "auto" - touch-input.js derives a default from
-            // the screen/board size itself when the setting is unset.
             touchSensitivityInput.value = game.settings.touchSensitivity ?? "";
 
             touchSensitivityInput.addEventListener("change", () => {
@@ -770,9 +716,6 @@ export class ScreenFlow {
             });
         }
 
-        // Category (sfx/music) volume sliders - there's at most one per
-        // category so a plain querySelectorAll + forEach is enough, unlike
-        // the per-sound rows below which are built dynamically.
         game.dom.querySelectorAll('[data-role="category-volume-slider"]').forEach((slider) => {
             slider.addEventListener("input", () => {
                 const category = slider.dataset.category;
@@ -783,9 +726,6 @@ export class ScreenFlow {
             });
         });
 
-        // Per-sound rows are generated from SOUND_FILES, so their sliders/
-        // preview buttons are bound once via delegation on each sound-list
-        // container instead of one listener per row.
         game.dom.querySelectorAll('[data-role="sound-list"]').forEach((list) => {
             list.addEventListener("input", (event) => {
                 const slider = event.target.closest('[data-role="sound-volume-slider"]');

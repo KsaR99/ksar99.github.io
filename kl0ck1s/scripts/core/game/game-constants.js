@@ -1,6 +1,5 @@
 "use strict";
 
-/** Which board corners count as the "front" of a T piece for each rotation state, used for T-spin detection. */
 export const T_FRONT_CORNERS = [
     ["topLeft", "topRight"],
     ["topRight", "bottomRight"],
@@ -8,13 +7,6 @@ export const T_FRONT_CORNERS = [
     ["topLeft", "bottomLeft"],
 ];
 
-/**
- * Derives the reverse-rotation (counterclockwise) kicks from a table of
- * forward (clockwise) kicks. The kick that undoes a "from>to" rotation is the
- * exact inverse translation of the kick that performed it, so "to>from" is
- * just "from>to" with each offset negated. This lets the source tables below
- * only list the four clockwise transitions while still supporting rotate(-1).
- */
 function invertKicks(kicks) {
     return kicks.map(([dx, dy]) => [-dx, -dy]);
 }
@@ -66,18 +58,9 @@ export const COUNTDOWN_STEPS = [
     {number: 1, tint: "green"},
 ];
 
-/** States in which PieceController's movement methods (move/rotate/drop) are allowed to act. */
 export const PIECE_CONTROLLABLE_STATES = new Set(["running", "calibrating", "calibrating-keyboard"]);
 
-/**
- * Number of full passes the sensitivity-calibration exercise repeats - see
- * SensitivityCalibrationController. Each pass runs through every step in
- * SENSITIVITY_CALIBRATION_STEPS once (two "one column, wall-stopped" tutorial
- * steps to teach basic control, then two full center-to-edge drags that
- * actually feed the sensitivity estimate), and the estimate is recomputed and
- * live-applied after every pass so later passes already feel calibrated.
- */
-export const SENSITIVITY_CALIBRATION_ROUNDS = 3;
+export const SENSITIVITY_CALIBRATION_ROUNDS = 5;
 export const SENSITIVITY_CALIBRATION_STEPS = [
     "tutorialLeft", "tutorialRight", "dragToLeftEdge", "dragToRightEdge",
 ];
@@ -85,11 +68,6 @@ export const SENSITIVITY_MIN = 0.5;
 export const SENSITIVITY_MAX = 2;
 export const SENSITIVITY_STEP = 0.05;
 
-// DAS ("delayed auto-shift" - how long a direction key must be held before
-// auto-repeat kicks in) / ARR ("auto-repeat rate" - the interval between
-// repeats once it has) calibration, mirroring the sensitivity constants
-// above. See KeyboardCalibrationController for how a hold is turned into
-// values in these ranges.
 export const KEYBOARD_CALIBRATION_ROUNDS = 3;
 export const DAS_MIN = 50;
 export const DAS_MAX = 300;
@@ -98,34 +76,11 @@ export const ARR_MIN = 0;
 export const ARR_MAX = 80;
 export const ARR_STEP = 2;
 
-/**
- * Falling-piece motion trail ("echo"). Purely a visual smoothing aid for
- * fast drops, where the interval between rows gets short enough that the
- * piece's whole-cell y-steps become visible as stutter. The trail only ever
- * reflects vertical motion (see Game.updateFallTrail) - horizontal movement
- * never lengthens or offsets it.
- *
- * Deliberately keyed off the *actual* drop interval (ms/row) rather than the
- * level number: level only sets the gravity baseline, but soft-drop (holding
- * "down") can make even level 1 fall just as fast as a high level normally
- * would. Scaling off dropInterval means both cases - a high level, or a low
- * level with soft-drop held - get the same trail once they reach the same
- * real speed.
- *
- * - FALL_TRAIL_SLOW_INTERVAL_MS: dropInterval at/above this is already slow
- *   enough to look smooth - trail is fully off.
- * - FALL_TRAIL_FAST_INTERVAL_MS: dropInterval at/below this gets the full,
- *   max-length trail. Between the two thresholds the length scales linearly.
- * - FALL_TRAIL_MAX_LENGTH: hard cap on how many echo frames are kept/drawn.
- * - FALL_TRAIL_MAX_ALPHA: opacity of the closest (freshest) echo frame; each
- *   older frame fades linearly toward 0.
- */
 export const FALL_TRAIL_SLOW_INTERVAL_MS = 500;
 export const FALL_TRAIL_FAST_INTERVAL_MS = 40;
 export const FALL_TRAIL_MAX_LENGTH = 15;
 export const FALL_TRAIL_MAX_ALPHA = 0.15;
 
-/** How many trail snapshots should be kept/drawn for a given current drop interval (ms/row). */
 export function fallTrailLengthForInterval(dropIntervalMs) {
     if (!(dropIntervalMs < FALL_TRAIL_SLOW_INTERVAL_MS)) return 0;
 

@@ -7,18 +7,10 @@ const PREVENT_DEFAULT_KEYS = new Set([
 ]);
 
 const REPEATABLE_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowDown"]);
-// Fallbacks only - once settings are loaded, startRepeat() reads the
-// player's calibrated game.settings.keyboardDAS/keyboardARR instead (see
-// KeyboardCalibrationController). These match what used to be hardcoded here.
-// Exported so KeyboardCalibrationController can subtract the actual DAS that
-// was in effect during a hold when it back-derives an ARR sample.
+
 export const DEFAULT_DAS_MS = 100;
 export const DEFAULT_ARR_MS = 16;
 
-// Keys that move/rotate/drop the piece. Using one of these should win over
-// pointer steering for a short window - see SteeringArbiter.markKeyboardSteer.
-// Exported so other discrete-press sources (e.g. the touch button bar) can
-// apply the same rule without duplicating the list.
 export const MOVEMENT_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Space", "KeyZ", "KeyA"]);
 
 function isTypingInField(event) {
@@ -26,12 +18,6 @@ function isTypingInField(event) {
     return tag === "INPUT" || tag === "TEXTAREA";
 }
 
-/**
- * Keyboard input source: arrow keys, space, enter, and the various letter
- * shortcuts. Knows nothing about mouse/touch - only maps key events to calls
- * on the other controllers, and tells the shared SteeringArbiter whenever it
- * takes over steering from a pointer source.
- */
 export class KeyboardInput extends InputSource {
     /**
      * @param {object} game

@@ -55,28 +55,18 @@ export class Renderer {
         this._bgGrid = null;
         this._bgRows = 0;
         this._bgCols = 0;
-
-        // Precomputed once per resize instead of on every columnFromClientX()
-        // call - getBoundingClientRect() forces a layout reflow, and
-        // columnFromClientX() can be called dozens of times per second while
-        // a pointer/touch is dragging across the board.
         this._boardScaleX = 1;
 
-        // Keeps boardCanvasRect fresh even while the game is paused/game-over
-        // (drawBoard() - which used to be the only place refreshing the
-        // rect - doesn't run in those states, so a resize while paused would
-        // otherwise leave a stale rect until the next drawBoard() call).
         this._onWindowResize = () => this.refreshBoardCanvasRect();
         window.addEventListener("resize", this._onWindowResize);
     }
 
-    /** Re-caches the board canvas's bounding rect. Call whenever the canvas is resized or repositioned. */
     refreshBoardCanvasRect() {
         this.boardCanvasRect = this.boardCanvas.getBoundingClientRect();
         this._boardScaleX = this.boardCanvas.width / this.boardCanvasRect.width;
     }
 
-    /** Releases the resize listener. Call when the renderer/game is torn down. */
+    /** @todo: unused? */
     destroy() {
         window.removeEventListener("resize", this._onWindowResize);
     }
@@ -97,19 +87,6 @@ export class Renderer {
         this.gridEnabled = enabled;
     }
 
-    /**
-     * Translates a mouse event's clientX into a board column, accounting for
-     * the canvas's backing-store size vs. its on-screen CSS size (they can
-     * differ, e.g. on high-DPI displays or when the canvas is scaled by CSS).
-     * Not clamped to the board width — callers rely on collision checks to
-     * stop movement at the edges.
-     *
-     * Uses the cached boardCanvasRect/scale instead of calling
-     * getBoundingClientRect() here - this can be invoked many times per
-     * second during a drag, and getBoundingClientRect() forces a layout
-     * reflow each time. The cache is kept fresh by drawBoard() every frame
-     * during play, and by the resize listener otherwise.
-     */
     columnFromClientX(clientX) {
         if (!this.boardCanvasRect) this.refreshBoardCanvasRect();
 
@@ -117,14 +94,6 @@ export class Renderer {
         return Math.floor(x / this.boardConfig.CELL_SIZE);
     }
 
-    /**
-     * Switches the board's visual theme by setting data-theme on the board
-     * div - the actual background/accent colors live in main.css under
-     * .board[data-theme="..."], keyed by the same effect names as
-     * EffectOverlay (none/matrix/rain/snow/vhs). Keeping the colors in CSS
-     * (rather than passed in here) means this stays a one-line attribute
-     * flip and new themes only ever need a new CSS block, no JS changes.
-     */
     setTheme(theme) {
         this.boardDiv.dataset.theme = theme || "none";
     }
@@ -217,12 +186,6 @@ export class Renderer {
         });
     }
 
-    /**
-     * Draws the fading "echo" trail behind the falling/moving piece. Each
-     * ring-buffer slot carries its own x and y (see Game.updateFallTrail),
-     * so the trail follows both vertical falls and horizontal moves instead
-     * of being pinned to the current piece's x.
-     */
     drawFallTrail(trail, headIndex, count) {
         if (count === 0) return;
 
@@ -280,13 +243,6 @@ export class Renderer {
         });
     }
 
-    /**
-     * Masks the still-full rows (they're only actually removed from the
-     * board once the clear animation finishes - see PieceController.
-     * finishLineClear()) with the same "empty socket" tile used for the
-     * rest of the empty grid, so the shattered fragments drawn on top
-     * aren't flying off of visibly-still-solid blocks underneath.
-     */
     maskClearingRows(lineIndices) {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx} = this;
@@ -326,15 +282,6 @@ export class Renderer {
         ctx.restore();
     }
 
-    /**
-     * Draws the shattered-block line-clear effect: each cell in the
-     * clearing rows was pre-split into a grid of fragments (see
-     * PieceController.buildClearFragments()), each carrying its own random
-     * flight vector and spin. Fragments are positioned/rotated purely as a
-     * function of `progress` (0..1, same clock the flash above uses - see
-     * Game.render()) rather than accumulated per-frame, so the effect is
-     * frame-rate independent and trivially resettable.
-     */
     drawClearingLines(lineIndices, fragments, progress) {
         if (!fragments || fragments.length === 0) return;
 
@@ -383,11 +330,6 @@ export class Renderer {
         const textWidth = ctx.measureText(text).width;
         const boxWidth = textWidth + paddingX * 2;
         const boxHeight = fontSize + paddingY * 2;
-
-        // Centered vertically on the board rather than pinned near the
-        // bottom - the bottom is exactly where the stack piles up in a
-        // normal game, so the banner used to land right on top of the
-        // blocks it was supposed to be announcing a level-up over.
         const centerY = boardCanvas.height / 2;
 
         ctx.shadowBlur = 8;
@@ -403,9 +345,6 @@ export class Renderer {
             ctx.shadowBlur = 0;
         }
 
-        // A dark outline behind the fill keeps the text legible over the
-        // board's own busy colors even where the box's semi-transparent
-        // background lets some of them bleed through.
         ctx.lineWidth = Math.max(2, fontSize * 0.12);
         ctx.strokeStyle = "oklch(0 0 0 / 0.2)";
         ctx.strokeText(text, centerX, centerY);

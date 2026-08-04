@@ -116,7 +116,6 @@ export class Board {
         const newOccupancy = new Uint32Array(this.rows);
         const newColors = new Uint8Array(this.rows * this.cols);
 
-        // Rebuild bottom-up: kept rows keep their relative order, shifted down.
         let dest = this.rows - 1;
         for (let i = keptRows.length - 1; i >= 0; i--, dest--) {
             const src = keptRows[i];
@@ -133,12 +132,6 @@ export class Board {
         return cleared;
     }
 
-    /**
-     * Shifts the whole board up by `count` rows and fills that many new
-     * rows at the bottom, each solid except for one random gap column.
-     * Returns {toppedOut: true} if any of the rows pushed off the top were
-     * occupied - the caller should treat that as an instant game over.
-     */
     addGarbageLines(count) {
         if (count <= 0) return {toppedOut: false};
 
@@ -172,7 +165,7 @@ export class Board {
 
         this.occupancy = newOccupancy;
         this.colors = newColors;
-        this.version++;
+        ++this.version;
         return {toppedOut};
     }
 }

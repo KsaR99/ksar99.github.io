@@ -5,15 +5,6 @@ import {MatrixEffect} from "../effects/matrix-effect.js";
 import {Rain} from "../effects/rain.js";
 import {Snow} from "../effects/snow.js";
 
-/**
- * Drives the board's visual filter overlay (VHS noise, matrix rain, rain, snow, ...)
- * and, since the two are meant to match, the board theme (background + accent
- * border, see .board[data-theme] in main.css) that goes along with whichever
- * effect is selected. Owns the effect canvas: given `canvas`/`ctx`, it builds
- * every effect instance itself. Adding a new effect later means adding it
- * here and a matching .board[data-theme="..."] block in main.css — nothing
- * else in the game (or main.js) needs to know the effect classes exist.
- */
 export class EffectOverlay {
     constructor(game, {canvas = null, ctx = null} = {}) {
         this.game = game;
@@ -25,14 +16,12 @@ export class EffectOverlay {
         } : {};
     }
 
-    /** Resizes every effect's backing canvas/buffers. Call whenever the board canvas resizes. */
     resize(width, height) {
         for (const instance of Object.values(this.effects)) {
             instance?.resize(width, height);
         }
     }
 
-    /** Sets which effect is selected and immediately syncs the overlay and board theme to it. */
     setActive(effect) {
         this.game.activeEffect = effect ?? "none";
         this.game.renderer.setTheme(this.game.activeEffect);

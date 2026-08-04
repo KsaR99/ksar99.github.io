@@ -36,17 +36,14 @@ export class I18n {
         this.browserLocale = null;
     }
 
-    /** Prefers the visitor's own regional tag (e.g. "en-GB") when known, otherwise the language's default region. */
     get locale() {
         return this.browserLocale || this.dict.locale || "en-US";
     }
 
-    /** Map of supported language codes to their native display names, e.g. {en: "English", pl: "Polski"}. */
     get languages() {
         return LANGUAGES;
     }
 
-    /** Reads the browser's preferred languages and picks the first supported one, keeping its full regional tag (e.g. "en-GB"). */
     detectBrowserLanguage() {
         const candidates = this.navigatorRef?.languages?.length
             ? this.navigatorRef.languages
@@ -59,7 +56,6 @@ export class I18n {
         return {lang: DEFAULT_LANGUAGE, locale: null};
     }
 
-    /** Stored preference (with its remembered regional tag) wins; otherwise fall back to browser detection (first run). */
     resolveInitialLanguage() {
         const stored = this.storage?.getItem(STORAGE_KEY);
         if (stored && SUPPORTED_LANGUAGES.includes(stored)) {
@@ -74,7 +70,6 @@ export class I18n {
         return response.json();
     }
 
-    /** Resolves the initial language (stored choice, or browser detection on first run) and loads it. */
     async init() {
         const stored = this.storage?.getItem(STORAGE_KEY);
         const {lang, locale} = this.resolveInitialLanguage();
@@ -128,7 +123,7 @@ export class I18n {
 
         if (typeof value !== "string") return key;
 
-        return value.replace(/\{(\w+)\}/g, (match, name) => (name in vars ? String(vars[name]) : match));
+        return value.replace(/\{(\w+)}/g, (match, name) => (name in vars ? String(vars[name]) : match));
     }
 
     /**

@@ -9,10 +9,6 @@ import {
 } from "../shared/utils.js";
 import {levelForLines, pointsForLineClear, pointsForSpin} from "../game/scoring.js";
 
-/**
- * Owns scoring and run statistics: score, lines, level progression, drought,
- * combos, clear/spin counters and the derived `stats` object consumed by the HUD.
- */
 export class StatsTracker {
     constructor(game) {
         this.game = game;
@@ -74,7 +70,7 @@ export class StatsTracker {
         };
     }
 
-    /** Resets all run statistics for a brand new round. */
+    /** @todo: stop music? */
     reset() {
         const game = this.game;
         game.score = 0;
@@ -95,7 +91,6 @@ export class StatsTracker {
         game.levelUpLevel = null;
     }
 
-    /** Tracks the "drought": how many pieces in a row have appeared since the last "I" piece. */
     registerPieceSpawn(type) {
         const game = this.game;
         ++game.piecesSpawned;

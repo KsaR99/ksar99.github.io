@@ -30,23 +30,11 @@ export class MusicDirector {
         this.currentInstanceId = null;
         this.fadingOutIds = new Set();
         this._fadeTimeouts = new Map();
-        /**
-         * tier -> instance id of that tier's track. An instance stays in
-         * here (paused, not stopped) after its tier is faded out, so coming
-         * back to the same tier later resumes it from the offset it left
-         * off at instead of restarting the track from 0 - see _fadeIn()/
-         * _fadeOutAndPause() below.
-         */
         this.tierInstances = new Map();
 
-        // --- Tension-trend pitch modulation state - see _updatePitch(). ---
-        /** Last tension value sampled at a pitch-step boundary; null until the first sample after start(). */
         this._pitchLastTension = null;
-        /** Accumulates update()'s delta between pitch-step checks. */
         this._pitchAccumMs = 0;
-        /** Current pitch offset in semitones, -pitchMaxSemitones..+pitchMaxSemitones. */
         this._pitchSemitones = 0;
-        /** Set the instant tension stops trending, so the steady-glide-to-0 below always covers the same pitchReturnMs span regardless of where it started from. */
         this._pitchDecayFrom = 0;
         this._pitchDecayElapsedMs = 0;
         this._pitchSteady = true;
@@ -106,18 +94,6 @@ export class MusicDirector {
         this._updatePitch(tension, delta);
     }
 
-    /**
-     * Nudges the currently playing track's pitch based on which way tension
-     * (board.rows, i.e. stack height) is trending - independent of the
-     * tier/track it's on. Every pitchStepIntervalMs: tension higher than last
-     * sample steps pitch up by pitchStepSemitones (capped at
-     * +pitchMaxSemitones), tension lower steps it down (capped at
-     * -pitchMaxSemitones). Tension holding steady instead glides pitch back
-     * to 0 linearly over pitchReturnMs, starting fresh from wherever pitch
-     * was the moment it stopped trending - so a later resumed trend and a
-     * later steady stretch both restart from the actual current value
-     * rather than assuming it was at the max.
-     */
     _updatePitch(tension, delta) {
         if (this._pitchLastTension === null) {
             this._pitchLastTension = tension;
@@ -140,8 +116,6 @@ export class MusicDirector {
                 changed = true;
             } else {
                 if (!this._pitchSteady) {
-                    // Tension just stopped trending - start the glide back
-                    // to 0 fresh from whatever pitch actually is right now.
                     this._pitchSteady = true;
                     this._pitchDecayFrom = this._pitchSemitones;
                     this._pitchDecayElapsedMs = 0;
@@ -160,20 +134,11 @@ export class MusicDirector {
         if (changed) this._applyPitch();
     }
 
-    /** Ramps the currently playing instance's detune to match _pitchSemitones, over one pitch-step interval so it glides rather than snapping on every step. */
     _applyPitch() {
         if (this.currentInstanceId === null) return;
         this.soundManager.rampInstanceDetune(this.currentInstanceId, this._pitchSemitones * 100, this.pitchStepIntervalMs);
     }
 
-    /**
-     * Starts (or resumes) `tier`'s track, faded in from silence. If that
-     * tier still has a paused instance waiting in the background (from an
-     * earlier fade-out - see _fadeOutAndPause()), picks up from there
-     * instead of starting over; falls back to a fresh play() if there's
-     * nothing to resume (first time this tier is reached, or its instance
-     * already ran past its own end - resume() itself guards against that).
-     */
     _fadeIn(tier) {
         const key = this.trackKeys[tier];
         if (!key) return;
@@ -201,9 +166,6 @@ export class MusicDirector {
         this.currentInstanceId = id;
         this.tierInstances.set(tier, id);
         this.soundManager.fadeInstanceVolume(id, 1, this.fadeDurationMs);
-        // Carry the current tension-trend pitch offset over to the new
-        // instance too, so switching tiers doesn't reset pitch to 0 - see
-        // _updatePitch()/_applyPitch() above.
         this.soundManager.setDetune(id, this._pitchSemitones * 100);
     }
 
@@ -214,15 +176,6 @@ export class MusicDirector {
         this._fadeIn(tier);
     }
 
-    /**
-     * Fades `id` (the track belonging to `tier`) out, then pauses it rather
-     * than stopping it for good, so _fadeIn() can resume it later if tension
-     * comes back to `tier`. If `tier` was re-entered with a *different*
-     * fresh instance before this fade-out finished (tension bounced back
-     * and forth faster than fadeDurationMs), this instance is not the one
-     * left in tierInstances anymore - stop it outright instead of pausing
-     * it, so it doesn't linger silently forever.
-     */
     _fadeOutAndPause(id, tier, durationMs) {
         this.soundManager.fadeInstanceVolume(id, 0, durationMs);
         this.fadingOutIds.add(id);
@@ -238,7 +191,6 @@ export class MusicDirector {
         this._fadeTimeouts.set(id, timeoutId);
     }
 
-    /** Fades `id` out and discards it for good - used by stop() below, never for a tier crossfade (see _fadeOutAndPause()). */
     _fadeOutAndStop(id, durationMs) {
         this.soundManager.fadeInstanceVolume(id, 0, durationMs);
         this.fadingOutIds.add(id);
@@ -264,9 +216,6 @@ export class MusicDirector {
         this.currentInstanceId = null;
         if (currentId !== null) this._fadeOutAndStop(currentId, durationMs);
 
-        // Discard every other tier's background-paused instance too - a new
-        // round starts fresh, nothing should resume mid-track from a
-        // previous one.
         this.tierInstances.forEach((id) => {
             if (id !== currentId) this.soundManager.stop(id);
         });

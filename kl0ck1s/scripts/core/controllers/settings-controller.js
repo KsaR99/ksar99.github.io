@@ -2,11 +2,6 @@
 
 import {SETTINGS_KEY} from "../game/game-constants.js";
 
-/**
- * Owns persisted user settings (volume, visual toggles, chosen effect, ...):
- * defaults, loading/saving through the settings store, and applying them to
- * the renderer/DOM. Delegates the actual overlay effect switch to EffectOverlay.
- */
 export class SettingsController {
     constructor(game) {
         this.game = game;
@@ -27,17 +22,10 @@ export class SettingsController {
             mouseControl: false,
             mouseSensitivity: 1,
             touchSensitivity: null,
-            // Defaults match the hardcoded values keyboard-input.js/touch-input.js
-            // used before these became calibratable - see KeyboardCalibrationController.
             keyboardDAS: 100,
             keyboardARR: 16,
             fallTrail: true,
-            // Bus volumes (0..1) for each sound category, applied on top of
-            // the master `volume` above.
             categoryVolumes: {sfx: 1, music: 0.1},
-            // Per-sound volume overrides (0..1), keyed by SOUND_FILES key.
-            // A key missing here just means "full volume" - entries are only
-            // written once the player actually drags that sound's slider.
             soundVolumes: {},
         };
     }
@@ -79,7 +67,6 @@ export class SettingsController {
         this.applyPerformanceSettings();
     }
 
-    /** Pushes the stored category/per-sound volumes into the SoundManager. Called on load; individual slider changes call soundManager.setCategoryVolume/setSoundVolume directly instead of round-tripping through here. */
     applyAudioSettings() {
         const game = this.game;
         const {categoryVolumes, soundVolumes} = game.settings;
@@ -104,15 +91,6 @@ export class SettingsController {
         game.renderer.setGhostEnabled(ghost);
         game.renderer.setGridEnabled(gridLines);
 
-        // Fall trail has no per-cell renderer setter like the others above -
-        // game.render()/updateFallTrail() check game.settings.fallTrail
-        // directly each frame. Clearing it here just means flipping the
-        // toggle off mid-run makes any already-visible echoes disappear
-        // immediately, instead of lingering until the piece next locks/spawns.
-        // shiftAnim only exists to feed the trail distinct in-between x
-        // values (see PieceController.moveHorizontal/moveToColumn), so it's
-        // cut short too - otherwise a move made just before toggling off
-        // would keep sliding for its last few frames instead of snapping.
         if (!fallTrail) {
             game.resetFallTrail();
             game.shiftAnim = null;

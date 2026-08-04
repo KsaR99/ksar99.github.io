@@ -5,12 +5,6 @@ import {KeyboardInput} from "./input/keyboard-input.js";
 import {MouseInput} from "./input/mouse-input.js";
 import {TouchInput} from "./input/touch-input.js";
 
-/**
- * Composition root for input. Owns the shared SteeringArbiter and wires up
- * each input source (keyboard, mouse, touch) against it. Callers (main.js)
- * keep using the same bindControls() / bindMouseControls() /
- * bindControlsToggle() / bindTouchControls() surface.
- */
 export class InputController {
     constructor(game) {
         this.game = game;
@@ -26,13 +20,6 @@ export class InputController {
         });
     }
 
-    /**
-     * Toggles the collapsed/expanded state of the sidebar controls list. UI
-     * concern, not tied to any input source. Two lists share this data-role
-     * (a keyboard-shortcut one and a touch-gesture one - see index.html);
-     * only one is ever visible per breakpoint, but both are kept in sync so
-     * whichever one the CSS shows is already in the right state.
-     */
     toggleControlsList() {
         const game = this.game;
         if (!game.dom) return;
@@ -69,7 +56,6 @@ export class InputController {
         this.mouse.bind();
     }
 
-    /** Binds on-canvas touch gestures (drag/tap/swipe) and the on-screen touch-controls button bar. */
     bindTouchControls() {
         const game = this.game;
         this.touch.bind();

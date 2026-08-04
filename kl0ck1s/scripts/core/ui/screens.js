@@ -19,13 +19,6 @@ function fillModeCarousel(container, selectedMode, i18n) {
     container.querySelector('[data-field="modeLabel"]').textContent = i18n.t(`modes.${selectedMode}.name`);
 }
 
-/**
- * Fills the single shared panel below the mode picker with the currently
- * selected mode's rules text, prefixed with 💡. Called once per screen
- * render (idle/gameOverSaved); ModeController re-renders the whole screen
- * on every mode change (click or arrow key), so this always reflects the
- * current selection without needing its own change listener.
- */
 function fillModeDescription(container, selectedMode, i18n) {
     if (!container) return;
     container.textContent = `💡 ${i18n.t(`modes.${selectedMode}.description`)}`;
@@ -255,9 +248,6 @@ export const Screens = {
         screen.querySelector('[data-field="leaderboard"]').appendChild(renderLeaderboard(list, highlightEntry));
         i18n.applyStatic(screen);
 
-        // Sprint/Ultra finishing on their own terms aren't a "GAME OVER" -
-        // swap in a mode-specific title. topOut (and any other/unknown
-        // reason) keeps whatever applyStatic() already set above.
         const titleKeyByReason = {
             sprintComplete: "screens.gameOverEntry.titleSprintComplete",
             timeUp: "screens.gameOverEntry.titleTimeUp",

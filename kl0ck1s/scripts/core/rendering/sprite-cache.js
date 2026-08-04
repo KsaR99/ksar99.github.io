@@ -45,14 +45,6 @@ export function createBlockSprite(color, size, canvasFactory = () => document.cr
     return sprite;
 }
 
-/**
- * Empty-cell "socket" sprite: a gray inset bevel, the mirror image of
- * createBlockSprite()'s outset one. Filled pieces get light-top-left/
- * dark-bottom-right (reads as raised); this flips it - dark top-left,
- * light bottom-right - the classic CSS `border-style: inset` look, so the
- * empty grid reads as a recessed socket the (raised) klocki blocks drop
- * into, instead of plain grid lines.
- */
 export function createGridCellSprite(size, canvasFactory = () => document.createElement("canvas")) {
     const sprite = canvasFactory();
     sprite.width = size;

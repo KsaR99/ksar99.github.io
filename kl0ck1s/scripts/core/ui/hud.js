@@ -116,12 +116,6 @@ export class HUD {
         this._setText(this.linesEl, "lines", lines);
         this._setText(this.bestEl, "best", best);
 
-        // Sprint/Cheese Race/Dig Survival ("ramp" objective color mode - see
-        // ModeController.objectiveColorMode()) already show this exact same
-        // number as "X / target" in the objective row right below, so the
-        // plain lines count here would just be a duplicate. Hidden only for
-        // those three; every other mode (including Marathon, which has no
-        // objective at all) keeps showing it as before.
         if (this.linesRowEl) {
             const hideLinesRow = objectiveColorMode === "ramp";
             if (this._cache.hasLinesRow !== !hideLinesRow) {
@@ -174,11 +168,6 @@ export class HUD {
                     this._cache.objectivePercent = objectivePercent;
                     this._cache.objectiveColorMode = objectiveColorMode;
                     this.objectiveBarEl.style.width = `${objectivePercent}%`;
-
-                    // "ramp" mode (Sprint): ease the fill color from neutral toward
-                    // "good" as lines closed in on the target - set directly here
-                    // rather than via a CSS class, since it needs the continuous
-                    // percent rather than a handful of discrete steps.
                     this.objectiveBarEl.style.backgroundColor = objectiveColorMode === "ramp"
                         ? `color-mix(in oklch, var(--accent-2) ${100 - objectivePercent}%, var(--good) ${objectivePercent}%)`
                         : "";

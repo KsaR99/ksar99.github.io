@@ -4,25 +4,15 @@ import {InputSource} from "./input-source.js";
 import {MOVEMENT_KEYS} from "./keyboard-input.js";
 import {PIECE_CONTROLLABLE_STATES} from "../../game/game-constants.js";
 
-// Codes that make sense to auto-repeat while a touch-controls button is
-// held down, mirroring KeyboardInput's REPEATABLE_KEYS behavior.
 const REPEATABLE_CODES = new Set(["ArrowLeft", "ArrowRight", "ArrowDown"]);
-// Fallbacks only - once settings are loaded, startRepeat() reads the
-// player's calibrated game.settings.keyboardDAS/keyboardARR instead, same as
-// KeyboardInput (see KeyboardCalibrationController). The on-screen D-pad
-// deliberately shares the keyboard's calibrated DAS/ARR rather than having
-// its own - it's simulating the same discrete key-repeat behavior.
+
 const DEFAULT_DAS_MS = 120;
 const DEFAULT_ARR_MS = 16;
 
-// On-canvas gesture tuning.
 const TAP_MAX_MOVEMENT_PX = 12;
 const TAP_MAX_DURATION_MS = 250;
 const SWIPE_DOWN_THRESHOLD_RATIO = 0.22;
 
-// Fraction of the screen's width a drag needs to cover to steer the piece
-// all the way across the board - lets one-handed thumb reach control the
-// full board without needing to physically drag edge-to-edge.
 const DRAG_DISTANCE_IN_SCREENS = 0.8;
 
 /**
@@ -59,15 +49,7 @@ export class TouchInput extends InputSource {
         this._dragged = false;
         this._horizontalGesture = false;
         this._dragSensitivity = 1;
-
-        // Column the piece was last steered to - avoids re-computing/re-issuing
-        // moveToColumn() on every touchmove when the finger is still hovering
-        // over the same board column (very common during a fast drag).
         this._lastSteerColumn = null;
-
-        // rAF coalescing: touchmove can fire many times per animation frame
-        // (especially during a fast swipe). We only keep the latest touch
-        // point and process it once per frame instead of once per event.
         this._pendingTouch = null;
         this._moveFrameId = null;
 
@@ -76,13 +58,11 @@ export class TouchInput extends InputSource {
         this._heldTimers = new Map();
     }
 
-    // --- canvas: drag to steer, tap to rotate, swipe down to hard-drop ---
-
     steerTo(clientX) {
         const game = this.game;
         const column = game.renderer.columnFromClientX(clientX);
         if (column === null || column === undefined) return;
-        if (column === this._lastSteerColumn) return; // same cell as last time - nothing to do
+        if (column === this._lastSteerColumn) return;
         this._lastSteerColumn = column;
         this.steeringArbiter.markPointerSteer();
         game.pieceController.moveToColumn(column);
@@ -97,7 +77,7 @@ export class TouchInput extends InputSource {
     }
 
     _scheduleMoveFrame() {
-        if (this._moveFrameId !== null) return; // already scheduled for this frame
+        if (this._moveFrameId !== null) return;
         this._moveFrameId = requestAnimationFrame(() => {
             this._moveFrameId = null;
             this._processPendingTouch();
@@ -162,13 +142,9 @@ export class TouchInput extends InputSource {
             if (this._activeTouchId === null) return;
             const touch = findActiveTouch(event.changedTouches);
             if (!touch) return;
-            // Must stay synchronous - preventDefault() has no effect if
-            // deferred to a later frame, and we'd lose scroll suppression.
+
             event.preventDefault();
 
-            // Defer the actual math/steering to the next animation frame,
-            // keeping only the latest touch point. Collapses however many
-            // touchmove events land within one frame into a single update.
             this._pendingTouch = touch;
             this._scheduleMoveFrame();
         };
@@ -245,8 +221,6 @@ export class TouchInput extends InputSource {
         this._buttonsRoot = null;
     }
 
-    // --- button bar: press-and-hold repeat for movement, tap for the rest ---
-
     stopRepeat(code) {
         const timers = this._heldTimers.get(code);
         if (!timers) return;
@@ -275,7 +249,6 @@ export class TouchInput extends InputSource {
         this._heldTimers.set(code, {timeoutId});
     }
 
-    /** Binds every [data-key-action] button under `root` (the touch-controls bar). */
     bindButtons(root) {
         if (!root) return;
         this._buttonsRoot = root;

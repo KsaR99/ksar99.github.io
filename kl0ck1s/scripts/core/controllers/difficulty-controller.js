@@ -1,6 +1,5 @@
 "use strict";
 
-/** Owns difficulty selection (start level, lines/level pacing). Board theming no longer follows difficulty - see EffectOverlay. */
 export class DifficultyController {
     constructor(game) {
         this.game = game;
