@@ -1261,7 +1261,7 @@ details.options[open] {
 
 .board__calibration {
     position: absolute;
-    top: 0.75rem;
+    top: 50%;
     left: 50%;
     transform: translateX(-50%);
     z-index: 3;

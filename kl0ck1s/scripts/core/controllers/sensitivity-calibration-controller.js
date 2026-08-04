@@ -22,16 +22,15 @@ const GESTURE_MATCHERS = {
 };
 
 const GESTURE_INSTRUCTION_KEYS = {
-    tutorialLeft: "moveLeft",
-    tutorialRight: "moveRight",
-    dragToLeftEdge: "sideToEdge",
-    dragToRightEdge: "sideToEdge",
+    tutorialLeft: "click",
+    tutorialRight: "click",
+    dragToLeftEdge: "toWall",
+    dragToRightEdge: "toWall",
 };
-const GESTURE_ARROW_BEFORE = new Set(["tutorialLeft", "dragToLeftEdge"]);
 
 function instructionText(i18n, gesture) {
-    const base = i18n.t(`screens.calibration.gestures.${GESTURE_INSTRUCTION_KEYS[gesture]}`);
-    return GESTURE_ARROW_BEFORE.has(gesture) ? `◄ ${base}` : `${base} ►`;
+    const kbd = `<kbd class="kbd kbd--hint">${GESTURE_DIR_SIGN[gesture] < 0 ? "◄" : "►"}</kbd>`;
+    return i18n.t(`screens.calibration.gestures.${GESTURE_INSTRUCTION_KEYS[gesture]}`, {kbd});
 }
 
 function clampSensitivity(value) {
@@ -73,6 +72,7 @@ export class SensitivityCalibrationController {
         this._canvas = null;
         this._onPointerDown = null;
         this._onPointerMove = null;
+        this._onPointerUp = null;
     }
 
     start() {
@@ -308,7 +308,7 @@ export class SensitivityCalibrationController {
 
         const instructionEl = banner.querySelector('[data-field="instruction"]');
         const progressEl = banner.querySelector('[data-field="progress"]');
-        if (instructionEl) instructionEl.textContent = instructionText(game.i18n, gesture);
+        if (instructionEl) instructionEl.innerHTML = instructionText(game.i18n, gesture);
         if (progressEl) {
             const pass = Math.floor(this.stepIndex / this.stepsPerPass) + 1;
             const step = (this.stepIndex % this.stepsPerPass) + 1;
@@ -354,6 +354,12 @@ export class SensitivityCalibrationController {
             this.lastPointerX = event.clientX;
             this.lastPointerType = event.pointerType;
             this.maxDxInDirection = 0;
+            if (canvas.setPointerCapture) {
+                try {
+                    canvas.setPointerCapture(event.pointerId);
+                } catch {
+                }
+            }
         };
 
         this._onPointerMove = (event) => {
@@ -368,8 +374,16 @@ export class SensitivityCalibrationController {
             if (signedDx > this.maxDxInDirection) this.maxDxInDirection = signedDx;
         };
 
+        this._onPointerUp = (event) => {
+            if (canvas.releasePointerCapture && canvas.hasPointerCapture?.(event.pointerId)) {
+                canvas.releasePointerCapture(event.pointerId);
+            }
+        };
+
         canvas.addEventListener("pointerdown", this._onPointerDown);
         canvas.addEventListener("pointermove", this._onPointerMove);
+        canvas.addEventListener("pointerup", this._onPointerUp);
+        canvas.addEventListener("pointercancel", this._onPointerUp);
         this._canvas = canvas;
     }
 
@@ -377,8 +391,11 @@ export class SensitivityCalibrationController {
         if (!this._canvas) return;
         this._canvas.removeEventListener("pointerdown", this._onPointerDown);
         this._canvas.removeEventListener("pointermove", this._onPointerMove);
+        this._canvas.removeEventListener("pointerup", this._onPointerUp);
+        this._canvas.removeEventListener("pointercancel", this._onPointerUp);
         this._canvas = null;
         this._onPointerDown = null;
         this._onPointerMove = null;
+        this._onPointerUp = null;
     }
 }

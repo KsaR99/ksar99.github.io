@@ -101,15 +101,14 @@
         },
         "calibration": {
             "gestures": {
-                "moveLeft": "Verplaats het blok naar links",
-                "moveRight": "Verplaats het blok naar rechts",
                 "sideToCenter": "Sleep het blok naar de middelste kolom",
                 "sideToEdge": "Sleep het blok naar de buitenste kolom",
+                "toWall": "Sleep naar de muur {kbd}",
+                "click": "Eén keer klikken {kbd}",
                 "hardDrop": "Voer een snelle val uit",
                 "softDropOne": "Voer een stap zacht vallen uit",
                 "rotate": "Draai het blok",
-                "holdLeft": "Houd LINKS ingedrukt en laat dan los",
-                "holdRight": "Houd RECHTS ingedrukt en laat dan los"
+                "hold": "Houd {kbd} ingedrukt en laat dan los"
             },
             "progress": "Ronde {pass}/{totalPasses} · Stap {step}/{steps}",
             "resultTitle": "GEVOELIGHEIDSKALIBRATIE",

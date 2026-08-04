@@ -101,15 +101,14 @@
         },
         "calibration": {
             "gestures": {
-                "moveLeft": "Move the piece left",
-                "moveRight": "Move the piece right",
                 "sideToCenter": "Drag the piece to the center column",
                 "sideToEdge": "Drag the piece to the edge column",
+                "toWall": "Drag to the wall {kbd}",
+                "click": "Click once {kbd}",
                 "hardDrop": "Hard drop the piece",
                 "softDropOne": "Soft drop the piece",
                 "rotate": "Rotate the piece",
-                "holdLeft": "Hold LEFT, then release",
-                "holdRight": "Hold RIGHT, then release"
+                "hold": "Hold {kbd}, then release"
             },
             "progress": "Round {pass}/{totalPasses} · Step {step}/{steps}",
             "resultTitle": "SENSITIVITY CALIBRATION",

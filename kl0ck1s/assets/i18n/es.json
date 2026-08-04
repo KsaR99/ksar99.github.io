@@ -101,15 +101,14 @@
         },
         "calibration": {
             "gestures": {
-                "moveLeft": "Mueve la pieza a la izquierda",
-                "moveRight": "Mueve la pieza a la derecha",
                 "sideToCenter": "Arrastra la pieza a la columna central",
                 "sideToEdge": "Arrastra la pieza a la columna del borde",
+                "toWall": "Arrastra hacia el muro {kbd}",
+                "click": "Haz clic una vez {kbd}",
                 "hardDrop": "Haz una caída rápida",
                 "softDropOne": "Haz un paso de caída suave",
                 "rotate": "Gira la pieza",
-                "holdLeft": "Mantén pulsada IZQUIERDA y luego suelta",
-                "holdRight": "Mantén pulsada DERECHA y luego suelta"
+                "hold": "Mantén pulsada {kbd} y luego suelta"
             },
             "progress": "Ronda {pass}/{totalPasses} · Paso {step}/{steps}",
             "resultTitle": "CALIBRACIÓN DE SENSIBILIDAD",

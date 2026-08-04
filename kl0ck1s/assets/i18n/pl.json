@@ -101,15 +101,14 @@
         },
         "calibration": {
             "gestures": {
-                "moveLeft": "Przesuń klocek w lewo",
-                "moveRight": "Przesuń klocek w prawo",
                 "sideToCenter": "Przeciągnij klocek do środkowej kolumny",
                 "sideToEdge": "Przeciągnij klocek do skrajnej kolumny",
+                "toWall": "Do ściany {kbd}",
+                "click": "Kliknij raz {kbd}",
                 "hardDrop": "Wykonaj szybki spadek",
                 "softDropOne": "Wykonaj krok miękkiego spadku",
                 "rotate": "Obróć klocek",
-                "holdLeft": "Przytrzymaj LEWO, a potem puść",
-                "holdRight": "Przytrzymaj PRAWO, a potem puść"
+                "hold": "Przytrzymaj {kbd}, a potem puść"
             },
             "progress": "Runda {pass}/{totalPasses} · Krok {step}/{steps}",
             "resultTitle": "KALIBRACJA CZUŁOŚCI",

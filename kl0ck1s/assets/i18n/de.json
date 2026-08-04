@@ -101,15 +101,14 @@
         },
         "calibration": {
             "gestures": {
-                "moveLeft": "Bewege den Stein nach links",
-                "moveRight": "Bewege den Stein nach rechts",
                 "sideToCenter": "Ziehe den Stein zur mittleren Spalte",
                 "sideToEdge": "Ziehe den Stein zur äußersten Spalte",
+                "toWall": "Zur Wand ziehen {kbd}",
+                "click": "Einmal klicken {kbd}",
                 "hardDrop": "Führe ein hartes Fallen aus",
                 "softDropOne": "Führe einen Schritt sanftes Fallen aus",
                 "rotate": "Drehe den Stein",
-                "holdLeft": "Halte LINKS gedrückt und lasse dann los",
-                "holdRight": "Halte RECHTS gedrückt und lasse dann los"
+                "hold": "Halte {kbd} gedrückt und lasse dann los"
             },
             "progress": "Runde {pass}/{totalPasses} · Schritt {step}/{steps}",
             "resultTitle": "EMPFINDLICHKEITSKALIBRIERUNG",

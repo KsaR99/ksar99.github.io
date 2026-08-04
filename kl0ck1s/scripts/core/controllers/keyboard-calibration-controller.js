@@ -13,6 +13,7 @@ import {
 import {DEFAULT_DAS_MS} from "./input/keyboard-input.js";
 
 const HOLD_GESTURE_CODES = {holdLeft: "ArrowLeft", holdRight: "ArrowRight"};
+const HOLD_GESTURE_GLYPHS = {holdLeft: "◄", holdRight: "►"};
 
 function clampToStep(value, min, max, step) {
     const clamped = Math.max(min, Math.min(max, value));
@@ -67,6 +68,7 @@ export class KeyboardCalibrationController {
         game.isPlayingSession = false;
         game.hud.setPlaying(false);
         game.prepareNewRound();
+        game.hud.hideOverlay();
 
         this.active = true;
         this.samples = [];
@@ -103,23 +105,19 @@ export class KeyboardCalibrationController {
             return;
         }
 
-        const {number, tint} = COUNTDOWN_STEPS[this.countdownIndex];
-        if (!this.game.hud.updateCountdown(number, tint)) {
-            this.game.hud.showScreen(this.game.screens.countdown(number, tint, this.game.dom), {transparentOverlay: true});
-        }
+        this._updateCountdownDisplay();
     }
 
     _armCountdown() {
         this.armed = false;
         this.countdownIndex = 0;
         this.countdownTimer = 0;
-        const {number, tint} = COUNTDOWN_STEPS[this.countdownIndex];
-        this.game.hud.showScreen(this.game.screens.countdown(number, tint, this.game.dom), {transparentOverlay: true});
+        this._updateCountdownDisplay();
     }
 
     _armRound() {
         const game = this.game;
-        game.hud.hideOverlay();
+        this._clearCountdownDisplay();
 
         game.pieceController.moveToColumn(Math.floor(game.board.cols / 2));
 
@@ -139,11 +137,16 @@ export class KeyboardCalibrationController {
 
         const instructionEl = banner.querySelector('[data-field="instruction"]');
         const progressEl = banner.querySelector('[data-field="progress"]');
-        if (instructionEl) instructionEl.textContent = game.i18n.t(`screens.calibration.gestures.${gesture}`);
+        if (instructionEl) {
+            const kbd = `<kbd class="kbd kbd--hint">${HOLD_GESTURE_GLYPHS[gesture]}</kbd>`;
+            instructionEl.innerHTML = game.i18n.t("screens.calibration.gestures.hold", {kbd});
+        }
         if (progressEl) {
             progressEl.textContent = game.i18n.t("screens.calibration.progress", {
-                done: this.roundIndex,
-                total: this.totalRounds,
+                pass: this.roundIndex + 1,
+                totalPasses: this.totalRounds,
+                step: 1,
+                steps: 1,
             });
         }
         banner.classList.add("board__calibration--visible");
@@ -152,6 +155,25 @@ export class KeyboardCalibrationController {
     _hideBanner() {
         const banner = this.game.dom?.querySelector('[data-role="calibration-banner"]');
         if (banner) banner.classList.remove("board__calibration--visible");
+    }
+
+    _updateCountdownDisplay() {
+        const banner = this.game.dom?.querySelector('[data-role="calibration-banner"]');
+        const el = banner?.querySelector('[data-field="countdown"]');
+        if (!el) return;
+
+        const {number, tint} = COUNTDOWN_STEPS[this.countdownIndex];
+        el.textContent = number;
+        el.dataset.tint = tint;
+        el.classList.remove("board__calibration__countdown--pop");
+        void el.offsetWidth;
+        el.classList.add("board__calibration__countdown--pop");
+    }
+
+    _clearCountdownDisplay() {
+        const banner = this.game.dom?.querySelector('[data-role="calibration-banner"]');
+        const el = banner?.querySelector('[data-field="countdown"]');
+        if (el) el.textContent = "";
     }
 
     _bindKeyTracking() {
