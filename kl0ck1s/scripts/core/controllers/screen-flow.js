@@ -1,6 +1,25 @@
 "use strict";
 
-import {APP_NAME, COUNTDOWN_STEPS, NICKNAME_PATTERN} from "../game/game-constants.js";
+import {
+    APP_NAME,
+    ARR_MAX,
+    ARR_MIN,
+    ARR_STEP,
+    COUNTDOWN_STEPS,
+    DAS_MAX,
+    DAS_MIN,
+    DAS_STEP,
+    NICKNAME_PATTERN,
+    SENSITIVITY_MAX,
+    SENSITIVITY_MIN,
+    SENSITIVITY_STEP,
+} from "../game/game-constants.js";
+
+/** Rounds to the nearest step and clamps into [min, max] - same rule the calibration controllers use to keep numbers entered by hand in range. */
+function clampToStep(value, min, max, step) {
+    const clamped = Math.max(min, Math.min(max, value));
+    return Math.round(clamped / step) * step;
+}
 
 /**
  * Owns the non-gameplay screen state machine: idle, countdown, pause, the
@@ -360,6 +379,10 @@ export class ScreenFlow {
     handleEscape() {
         if (this.game.state === "options") {
             this.toggleOptions();
+        } else if (this.game.state === "calibrating" || this.game.state === "calibrating-result") {
+            this.game.sensitivityCalibrationController.cancel();
+        } else if (this.game.state === "calibrating-keyboard" || this.game.state === "calibrating-keyboard-result") {
+            this.game.keyboardCalibrationController.cancel();
         } else {
             this.togglePause();
         }
@@ -548,7 +571,12 @@ export class ScreenFlow {
         const effectSelect = game.dom.querySelector('[data-role="effect-select"]');
         const skipCountdownCheckbox = game.dom.querySelector('[data-role="skip-countdown-checkbox"]');
         const mouseControlCheckbox = game.dom.querySelector('[data-role="mouse-control-checkbox"]');
-        const mouseSensitivitySlider = game.dom.querySelector('[data-role="mouse-sensitivity-slider"]');
+        const mouseSensitivityInput = game.dom.querySelector('[data-role="mouse-sensitivity-input"]');
+        const touchSensitivityInput = game.dom.querySelector('[data-role="touch-sensitivity-input"]');
+        const keyboardDasInput = game.dom.querySelector('[data-role="keyboard-das-input"]');
+        const keyboardArrInput = game.dom.querySelector('[data-role="keyboard-arr-input"]');
+        const calibrateSensitivityButton = game.dom.querySelector('[data-role="calibrate-sensitivity-button"]');
+        const calibrateKeyboardButton = game.dom.querySelector('[data-role="calibrate-keyboard-button"]');
         const closeButton = game.dom.querySelector('[data-role="options-close-button"]');
         const closeKey = game.dom.querySelector('[data-role="options-close-key"]');
 
@@ -643,15 +671,102 @@ export class ScreenFlow {
         if (mouseControlCheckbox) {
             mouseControlCheckbox.addEventListener("change", () => {
                 game.settings.mouseControl = mouseControlCheckbox.checked;
-                if (mouseSensitivitySlider) mouseSensitivitySlider.disabled = !mouseControlCheckbox.checked;
+                if (mouseSensitivityInput) mouseSensitivityInput.disabled = !mouseControlCheckbox.checked;
                 settingsController.saveSettings();
             });
         }
 
-        if (mouseSensitivitySlider) {
-            mouseSensitivitySlider.addEventListener("input", () => {
-                game.settings.mouseSensitivity = mouseSensitivitySlider.value / 100;
+        // Mouse/touch sensitivity and keyboard DAS/ARR can also be set by hand
+        // here, as an alternative to running the "Calibrate" exercises below -
+        // both write to the same game.settings keys, so either path keeps the
+        // other in sync next time this screen is opened.
+        if (mouseSensitivityInput) {
+            mouseSensitivityInput.min = SENSITIVITY_MIN;
+            mouseSensitivityInput.max = SENSITIVITY_MAX;
+            mouseSensitivityInput.step = SENSITIVITY_STEP;
+            mouseSensitivityInput.value = game.settings.mouseSensitivity ?? 1;
+            mouseSensitivityInput.disabled = !game.settings.mouseControl;
+
+            mouseSensitivityInput.addEventListener("change", () => {
+                const parsed = parseFloat(mouseSensitivityInput.value);
+                const value = clampToStep(
+                    Number.isFinite(parsed) ? parsed : 1, SENSITIVITY_MIN, SENSITIVITY_MAX, SENSITIVITY_STEP
+                );
+                mouseSensitivityInput.value = value;
+                game.settings.mouseSensitivity = value;
                 settingsController.saveSettings();
+            });
+        }
+
+        if (touchSensitivityInput) {
+            touchSensitivityInput.min = SENSITIVITY_MIN;
+            touchSensitivityInput.max = SENSITIVITY_MAX;
+            touchSensitivityInput.step = SENSITIVITY_STEP;
+            // No value means "auto" - touch-input.js derives a default from
+            // the screen/board size itself when the setting is unset.
+            touchSensitivityInput.value = game.settings.touchSensitivity ?? "";
+
+            touchSensitivityInput.addEventListener("change", () => {
+                if (touchSensitivityInput.value === "") {
+                    delete game.settings.touchSensitivity;
+                    settingsController.saveSettings();
+                    return;
+                }
+                const parsed = parseFloat(touchSensitivityInput.value);
+                if (!Number.isFinite(parsed)) {
+                    touchSensitivityInput.value = game.settings.touchSensitivity ?? "";
+                    return;
+                }
+                const value = clampToStep(parsed, SENSITIVITY_MIN, SENSITIVITY_MAX, SENSITIVITY_STEP);
+                touchSensitivityInput.value = value;
+                game.settings.touchSensitivity = value;
+                settingsController.saveSettings();
+            });
+        }
+
+        if (keyboardDasInput) {
+            keyboardDasInput.min = DAS_MIN;
+            keyboardDasInput.max = DAS_MAX;
+            keyboardDasInput.step = DAS_STEP;
+            keyboardDasInput.value = game.settings.keyboardDAS ?? DAS_MIN;
+
+            keyboardDasInput.addEventListener("change", () => {
+                const parsed = parseFloat(keyboardDasInput.value);
+                const value = clampToStep(
+                    Number.isFinite(parsed) ? parsed : DAS_MIN, DAS_MIN, DAS_MAX, DAS_STEP
+                );
+                keyboardDasInput.value = value;
+                game.settings.keyboardDAS = value;
+                settingsController.saveSettings();
+            });
+        }
+
+        if (keyboardArrInput) {
+            keyboardArrInput.min = ARR_MIN;
+            keyboardArrInput.max = ARR_MAX;
+            keyboardArrInput.step = ARR_STEP;
+            keyboardArrInput.value = game.settings.keyboardARR ?? ARR_MIN;
+
+            keyboardArrInput.addEventListener("change", () => {
+                const parsed = parseFloat(keyboardArrInput.value);
+                const value = clampToStep(
+                    Number.isFinite(parsed) ? parsed : ARR_MIN, ARR_MIN, ARR_MAX, ARR_STEP
+                );
+                keyboardArrInput.value = value;
+                game.settings.keyboardARR = value;
+                settingsController.saveSettings();
+            });
+        }
+
+        if (calibrateSensitivityButton) {
+            calibrateSensitivityButton.addEventListener("click", () => {
+                game.sensitivityCalibrationController.start();
+            });
+        }
+
+        if (calibrateKeyboardButton) {
+            calibrateKeyboardButton.addEventListener("click", () => {
+                game.keyboardCalibrationController.start();
             });
         }
 

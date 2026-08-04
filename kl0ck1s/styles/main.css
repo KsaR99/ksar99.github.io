@@ -560,7 +560,8 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .countdown__number {
+    .countdown__number,
+    .board__calibration__countdown--pop {
         animation: none;
     }
 
@@ -1263,6 +1264,78 @@ details.options[open] {
 
 .options__resume {
     align-self: center;
+}
+
+.options__preview-button--wide {
+    flex: none;
+    width: auto;
+    aspect-ratio: auto;
+    padding: 0.35em 0.75em;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.board__calibration {
+    position: absolute;
+    top: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0.9rem;
+    max-width: 90%;
+    border-radius: var(--radius);
+    background: oklch(from var(--bg-2) l c h / 0.85);
+    text-align: center;
+    pointer-events: none;
+}
+
+.board__calibration--visible {
+    display: flex;
+}
+
+.board__calibration__instruction {
+    font-weight: 600;
+}
+
+.board__calibration__progress {
+    opacity: 0.75;
+    font-size: 0.85em;
+}
+
+/* Renders the same 3-2-1 countdown as .countdown__number, but inline inside
+   the small calibration banner instead of a full-screen overlay - the board
+   and falling piece stay visible/steerable underneath throughout (see
+   SensitivityCalibrationController._updateCountdownDisplay). min-height
+   keeps the banner from jumping in height between "showing a digit" and
+   "cleared" (see _clearCountdownDisplay). */
+.board__calibration__countdown {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: bold;
+    line-height: 1;
+    min-height: 1.2em;
+    color: var(--text);
+}
+
+.board__calibration__countdown[data-tint="red"] {
+    color: oklch(0.55 0.22 25);
+}
+
+.board__calibration__countdown[data-tint="yellow"] {
+    color: oklch(0.86 0.19 95);
+}
+
+.board__calibration__countdown[data-tint="green"] {
+    color: oklch(0.72 0.19 145);
+}
+
+.board__calibration__countdown--pop {
+    animation: countdown-pop 0.8s ease-out;
 }
 
 .options__row:has([data-role="mouse-control-checkbox"]),

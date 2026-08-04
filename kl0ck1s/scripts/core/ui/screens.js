@@ -160,6 +160,42 @@ export const Screens = {
         return screen;
     },
 
+    calibrationResult(sensitivity, dom = document, i18n) {
+        const screen = clone(dom, "tpl-screen-calibration-result");
+        const successEl = screen.querySelector('[data-role="calibration-success"]');
+        const failedEl = screen.querySelector('[data-role="calibration-failed"]');
+        const valueEl = screen.querySelector('[data-field="sensitivityValue"]');
+
+        if (sensitivity != null) {
+            if (valueEl) valueEl.textContent = `${Math.round(sensitivity * 100)}%`;
+            if (failedEl) failedEl.hidden = true;
+        } else {
+            if (successEl) successEl.hidden = true;
+        }
+
+        i18n.applyStatic(screen);
+        return screen;
+    },
+
+    keyboardCalibrationResult(dasMs, arrMs, dom = document, i18n) {
+        const screen = clone(dom, "tpl-screen-keyboard-calibration-result");
+        const successEl = screen.querySelector('[data-role="keyboard-calibration-success"]');
+        const failedEl = screen.querySelector('[data-role="keyboard-calibration-failed"]');
+        const dasEl = screen.querySelector('[data-field="dasValue"]');
+        const arrEl = screen.querySelector('[data-field="arrValue"]');
+
+        if (dasMs != null || arrMs != null) {
+            if (dasEl) dasEl.textContent = dasMs != null ? `${Math.round(dasMs)} ms` : "-";
+            if (arrEl) arrEl.textContent = arrMs != null ? `${Math.round(arrMs)} ms` : "-";
+            if (failedEl) failedEl.hidden = true;
+        } else {
+            if (successEl) successEl.hidden = true;
+        }
+
+        i18n.applyStatic(screen);
+        return screen;
+    },
+
     countdown(number, tint, dom = document) {
         const screen = clone(dom, "tpl-screen-countdown");
         screen.querySelector('[data-role="countdown-screen"]').dataset.tint = tint;

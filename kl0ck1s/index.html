@@ -91,6 +91,11 @@
             <canvas class="board__filter-canvas" id="filter-canvas"></canvas>
         </div>
         <div class="board__overlay" id="overlay"></div>
+        <div class="board__calibration" data-role="calibration-banner">
+            <p class="board__calibration__instruction" data-field="instruction"></p>
+            <p class="board__calibration__countdown" data-field="countdown"></p>
+            <p class="board__calibration__progress" data-field="progress"></p>
+        </div>
         <div aria-hidden="true" class="board__credits" data-role="credits">
             <div class="board__credits__scroll" data-role="credits-scroll"></div>
         </div>
@@ -383,9 +388,38 @@
             </label>
             <label class="options__row">
                 <span data-i18n="screens.options.mouseSensitivity">Mouse sensitivity</span>
-                <input class="options__input options__input--range" data-role="mouse-sensitivity-slider"
-                       max="200" min="50" step="5" type="range">
+                <input class="options__input options__input--number" data-role="mouse-sensitivity-input"
+                       inputmode="decimal" type="number">
             </label>
+            <label class="options__row">
+                <span data-i18n="screens.options.touchSensitivity">Touch sensitivity</span>
+                <input class="options__input options__input--number" data-role="touch-sensitivity-input"
+                       inputmode="decimal" placeholder="auto" type="number">
+            </label>
+            <div class="options__row">
+                <span data-i18n="screens.options.calibrateSensitivity">Calibrate sensitivity</span>
+                <button class="options__preview-button options__preview-button--wide"
+                        data-i18n="screens.options.calibrateSensitivityButton"
+                        data-role="calibrate-sensitivity-button" type="button">Calibrate
+                </button>
+            </div>
+            <label class="options__row">
+                <span data-i18n="screens.options.keyboardDas">Keyboard DAS (ms)</span>
+                <input class="options__input options__input--number" data-role="keyboard-das-input"
+                       inputmode="numeric" type="number">
+            </label>
+            <label class="options__row">
+                <span data-i18n="screens.options.keyboardArr">Keyboard ARR (ms)</span>
+                <input class="options__input options__input--number" data-role="keyboard-arr-input"
+                       inputmode="numeric" type="number">
+            </label>
+            <div class="options__row">
+                <span data-i18n="screens.options.calibrateKeyboard">Calibrate keyboard</span>
+                <button class="options__preview-button options__preview-button--wide"
+                        data-i18n="screens.options.calibrateKeyboardButton"
+                        data-role="calibrate-keyboard-button" type="button">Calibrate
+                </button>
+            </div>
         </details>
 
         <button class="options__resume button button--accent" data-i18n="screens.options.close"
@@ -533,6 +567,53 @@
     <div class="screen screen--countdown" data-role="countdown-screen">
         <p class="brand__title">Kl0ck1's</p>
         <div class="countdown__number" data-field="number"></div>
+    </div>
+</template>
+
+<template id="tpl-screen-calibration-result">
+    <div class="screen">
+        <h2 class="screen__title" data-i18n="screens.calibration.resultTitle">SENSITIVITY CALIBRATED</h2>
+        <p class="screen__hint" data-role="calibration-success">
+            <span data-i18n="screens.calibration.resultSuccessBefore">New sensitivity:</span>
+            <strong class="screen__hint-highlight" data-field="sensitivityValue"></strong>
+        </p>
+        <p class="screen__hint" data-i18n="screens.calibration.resultFailed" data-role="calibration-failed">
+            Not enough data was captured - try again.
+        </p>
+        <button class="options__resume button button--accent" data-i18n="screens.calibration.resultSave"
+                data-role="calibration-result-save-button" type="button">Save
+        </button>
+        <button class="options__resume button" data-i18n="screens.calibration.resultRestart"
+                data-role="calibration-result-restart-button" type="button">Restart
+        </button>
+        <button class="options__resume button" data-i18n="screens.calibration.resultDiscard"
+                data-role="calibration-result-discard-button" type="button">Discard
+        </button>
+    </div>
+</template>
+
+<template id="tpl-screen-keyboard-calibration-result">
+    <div class="screen">
+        <h2 class="screen__title" data-i18n="screens.keyboardCalibration.resultTitle">KEYBOARD CALIBRATED</h2>
+        <p class="screen__hint" data-role="keyboard-calibration-success">
+            <span data-i18n="screens.keyboardCalibration.resultDas">DAS:</span>
+            <strong class="screen__hint-highlight" data-field="dasValue"></strong>
+            <span data-i18n="screens.keyboardCalibration.resultArr">ARR:</span>
+            <strong class="screen__hint-highlight" data-field="arrValue"></strong>
+        </p>
+        <p class="screen__hint" data-i18n="screens.keyboardCalibration.resultFailed"
+           data-role="keyboard-calibration-failed">
+            Not enough data was captured - try again.
+        </p>
+        <button class="options__resume button button--accent" data-i18n="screens.keyboardCalibration.resultSave"
+                data-role="keyboard-calibration-result-save-button" type="button">Save
+        </button>
+        <button class="options__resume button" data-i18n="screens.keyboardCalibration.resultRestart"
+                data-role="keyboard-calibration-result-restart-button" type="button">Restart
+        </button>
+        <button class="options__resume button" data-i18n="screens.keyboardCalibration.resultDiscard"
+                data-role="keyboard-calibration-result-discard-button" type="button">Discard
+        </button>
     </div>
 </template>
 

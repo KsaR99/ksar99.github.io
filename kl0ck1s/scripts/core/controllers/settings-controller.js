@@ -26,6 +26,11 @@ export class SettingsController {
             skipModeInfo: false,
             mouseControl: false,
             mouseSensitivity: 1,
+            touchSensitivity: null,
+            // Defaults match the hardcoded values keyboard-input.js/touch-input.js
+            // used before these became calibratable - see KeyboardCalibrationController.
+            keyboardDAS: 100,
+            keyboardARR: 16,
             fallTrail: true,
             // Bus volumes (0..1) for each sound category, applied on top of
             // the master `volume` above.

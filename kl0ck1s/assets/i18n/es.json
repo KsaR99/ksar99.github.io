@@ -90,7 +90,44 @@
             "effectRain": "Lluvia",
             "effectSnow": "Nieve",
             "close": "Cerrar",
-            "mouseSensitivity": "Sensibilidad del ratón"
+            "mouseSensitivity": "Sensibilidad del ratón",
+            "touchSensitivity": "Sensibilidad táctil",
+            "calibrateSensitivity": "Calibración de sensibilidad",
+            "calibrateSensitivityButton": "Calibrar",
+            "keyboardDas": "DAS del teclado (ms)",
+            "keyboardArr": "ARR del teclado (ms)",
+            "calibrateKeyboard": "Calibrar teclado",
+            "calibrateKeyboardButton": "Calibrar"
+        },
+        "calibration": {
+            "gestures": {
+                "moveLeft": "Mueve la pieza a la izquierda",
+                "moveRight": "Mueve la pieza a la derecha",
+                "sideToCenter": "Arrastra la pieza a la columna central",
+                "sideToEdge": "Arrastra la pieza a la columna del borde",
+                "hardDrop": "Haz una caída rápida",
+                "softDropOne": "Haz un paso de caída suave",
+                "rotate": "Gira la pieza",
+                "holdLeft": "Mantén pulsada IZQUIERDA y luego suelta",
+                "holdRight": "Mantén pulsada DERECHA y luego suelta"
+            },
+            "progress": "Ronda {pass}/{totalPasses} · Paso {step}/{steps}",
+            "resultTitle": "CALIBRACIÓN DE SENSIBILIDAD",
+            "resultSuccessBefore": "Tu sensibilidad se ha ajustado a",
+            "resultFailed": "No se pudo calcular la sensibilidad — inténtalo de nuevo arrastrando con el ratón o el dedo.",
+            "resultClose": "Cerrar",
+            "resultSave": "Guardar",
+            "resultDiscard": "Descartar",
+            "resultRestart": "Reiniciar"
+        },
+        "keyboardCalibration": {
+            "resultTitle": "CALIBRACIÓN DE TECLADO",
+            "resultDas": "DAS:",
+            "resultArr": "ARR:",
+            "resultFailed": "No se capturaron suficientes datos — intenta mantener pulsada una tecla de dirección al menos una vez.",
+            "resultSave": "Guardar",
+            "resultDiscard": "Descartar",
+            "resultRestart": "Reiniciar"
         },
         "loading": {
             "leaderboardHint": "Cargando clasificación..."

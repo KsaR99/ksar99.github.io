@@ -66,6 +66,38 @@ export const COUNTDOWN_STEPS = [
     {number: 1, tint: "green"},
 ];
 
+/** States in which PieceController's movement methods (move/rotate/drop) are allowed to act. */
+export const PIECE_CONTROLLABLE_STATES = new Set(["running", "calibrating", "calibrating-keyboard"]);
+
+/**
+ * Number of full passes the sensitivity-calibration exercise repeats - see
+ * SensitivityCalibrationController. Each pass runs through every step in
+ * SENSITIVITY_CALIBRATION_STEPS once (two "one column, wall-stopped" tutorial
+ * steps to teach basic control, then two full center-to-edge drags that
+ * actually feed the sensitivity estimate), and the estimate is recomputed and
+ * live-applied after every pass so later passes already feel calibrated.
+ */
+export const SENSITIVITY_CALIBRATION_ROUNDS = 3;
+export const SENSITIVITY_CALIBRATION_STEPS = [
+    "tutorialLeft", "tutorialRight", "dragToLeftEdge", "dragToRightEdge",
+];
+export const SENSITIVITY_MIN = 0.5;
+export const SENSITIVITY_MAX = 2;
+export const SENSITIVITY_STEP = 0.05;
+
+// DAS ("delayed auto-shift" - how long a direction key must be held before
+// auto-repeat kicks in) / ARR ("auto-repeat rate" - the interval between
+// repeats once it has) calibration, mirroring the sensitivity constants
+// above. See KeyboardCalibrationController for how a hold is turned into
+// values in these ranges.
+export const KEYBOARD_CALIBRATION_ROUNDS = 3;
+export const DAS_MIN = 50;
+export const DAS_MAX = 300;
+export const DAS_STEP = 5;
+export const ARR_MIN = 0;
+export const ARR_MAX = 80;
+export const ARR_STEP = 2;
+
 /**
  * Falling-piece motion trail ("echo"). Purely a visual smoothing aid for
  * fast drops, where the interval between rows gets short enough that the

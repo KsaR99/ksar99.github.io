@@ -90,7 +90,44 @@
             "effectRain": "Rain",
             "effectSnow": "Snow",
             "close": "Close",
-            "mouseSensitivity": "Mouse sensitivity"
+            "mouseSensitivity": "Mouse sensitivity",
+            "touchSensitivity": "Touch sensitivity",
+            "calibrateSensitivity": "Sensitivity calibration",
+            "calibrateSensitivityButton": "Calibrate",
+            "keyboardDas": "Keyboard DAS (ms)",
+            "keyboardArr": "Keyboard ARR (ms)",
+            "calibrateKeyboard": "Calibrate keyboard",
+            "calibrateKeyboardButton": "Calibrate"
+        },
+        "calibration": {
+            "gestures": {
+                "moveLeft": "Move the piece left",
+                "moveRight": "Move the piece right",
+                "sideToCenter": "Drag the piece to the center column",
+                "sideToEdge": "Drag the piece to the edge column",
+                "hardDrop": "Hard drop the piece",
+                "softDropOne": "Soft drop the piece",
+                "rotate": "Rotate the piece",
+                "holdLeft": "Hold LEFT, then release",
+                "holdRight": "Hold RIGHT, then release"
+            },
+            "progress": "Round {pass}/{totalPasses} · Step {step}/{steps}",
+            "resultTitle": "SENSITIVITY CALIBRATION",
+            "resultSuccessBefore": "Your sensitivity is now set to",
+            "resultFailed": "Couldn't calculate a sensitivity value — try again using a mouse drag or touch swipe.",
+            "resultClose": "Close",
+            "resultSave": "Save",
+            "resultDiscard": "Discard",
+            "resultRestart": "Restart"
+        },
+        "keyboardCalibration": {
+            "resultTitle": "KEYBOARD CALIBRATION",
+            "resultDas": "DAS:",
+            "resultArr": "ARR:",
+            "resultFailed": "Not enough data was captured — try holding a direction key for at least one round.",
+            "resultSave": "Save",
+            "resultDiscard": "Discard",
+            "resultRestart": "Restart"
         },
         "loading": {
             "leaderboardHint": "Loading leaderboard..."

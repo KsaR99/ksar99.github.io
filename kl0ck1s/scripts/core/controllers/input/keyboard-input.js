@@ -7,8 +7,13 @@ const PREVENT_DEFAULT_KEYS = new Set([
 ]);
 
 const REPEATABLE_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowDown"]);
-const REPEAT_INITIAL_DELAY_MS = 100;
-const REPEAT_INTERVAL_MS = 16;
+// Fallbacks only - once settings are loaded, startRepeat() reads the
+// player's calibrated game.settings.keyboardDAS/keyboardARR instead (see
+// KeyboardCalibrationController). These match what used to be hardcoded here.
+// Exported so KeyboardCalibrationController can subtract the actual DAS that
+// was in effect during a hold when it back-derives an ARR sample.
+export const DEFAULT_DAS_MS = 100;
+export const DEFAULT_ARR_MS = 16;
 
 // Keys that move/rotate/drop the piece. Using one of these should win over
 // pointer steering for a short window - see SteeringArbiter.markKeyboardSteer.
@@ -90,10 +95,13 @@ export class KeyboardInput extends InputSource {
 
     startRepeat(code, action) {
         this.stopRepeat(code);
+        const settings = this.game.settings;
+        const dasMs = settings?.keyboardDAS ?? DEFAULT_DAS_MS;
+        const arrMs = settings?.keyboardARR ?? DEFAULT_ARR_MS;
         const timeoutId = setTimeout(() => {
-            const intervalId = setInterval(action, REPEAT_INTERVAL_MS);
+            const intervalId = setInterval(action, arrMs);
             this.heldTimers.set(code, {intervalId});
-        }, REPEAT_INITIAL_DELAY_MS);
+        }, dasMs);
         this.heldTimers.set(code, {timeoutId});
     }
 

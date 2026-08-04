@@ -1,6 +1,7 @@
 "use strict";
 
 import {InputSource} from "./input-source.js";
+import {PIECE_CONTROLLABLE_STATES} from "../../game/game-constants.js";
 
 const SOFT_DROP_REPEAT_INTERVAL_MS = 50;
 
@@ -67,18 +68,20 @@ export class MouseInput extends InputSource {
         const onContextMenu = (event) => event.preventDefault();
 
         const onMouseMove = (event) => {
-            if (!game.settings?.mouseControl) return;
+            const calibrating = game.state === "calibrating";
+            if (!game.settings?.mouseControl && !calibrating) return;
 
             game.pointerClientX = event.clientX;
-            if (game.state !== "running") return;
-            if (this.steeringArbiter.isPointerSuppressed()) return;
+            if (!PIECE_CONTROLLABLE_STATES.has(game.state)) return;
+            if (!calibrating && this.steeringArbiter.isPointerSuppressed()) return;
 
             this.steerTo(event.clientX);
         };
 
         const onMouseDown = (event) => {
-            if (!game.settings?.mouseControl) return;
-            if (game.state !== "running") return;
+            const calibrating = game.state === "calibrating";
+            if (!game.settings?.mouseControl && !calibrating) return;
+            if (!PIECE_CONTROLLABLE_STATES.has(game.state)) return;
 
             if (event.button === 2) {
                 event.preventDefault();

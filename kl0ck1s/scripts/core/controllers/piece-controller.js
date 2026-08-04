@@ -2,7 +2,7 @@
 
 import {Piece} from "../game/piece.js";
 import {pointsForHardDrop, pointsForSoftDrop} from "../game/scoring.js";
-import {getKickTable, T_FRONT_CORNERS} from "../game/game-constants.js";
+import {getKickTable, PIECE_CONTROLLABLE_STATES, T_FRONT_CORNERS} from "../game/game-constants.js";
 import {getTightBounds} from "../shared/utils.js";
 import {LINE_CLEAR_SOUND_PLAYBACK_RATE} from "../shared/config.js";
 
@@ -307,7 +307,7 @@ export class PieceController {
 
     moveHorizontal(dir) {
         const game = this.game;
-        if (game.state !== "running") return;
+        if (!PIECE_CONTROLLABLE_STATES.has(game.state)) return;
         if (!game.board.collides(game.current, dir, 0)) {
             const fromX = game.getShiftDisplayX();
             game.current.x += dir;
@@ -317,6 +317,7 @@ export class PieceController {
                 ? {fromX, toX: game.current.x, elapsed: 0, duration: 60}
                 : null;
             if (game.board.collides(game.current, 0, 1)) this.resetLockDelay();
+            game.sensitivityCalibrationController?.notify("move", {x: game.current.x, via: "step"});
         }
     }
 
@@ -343,7 +344,7 @@ export class PieceController {
      */
     moveToColumn(targetColumn) {
         const game = this.game;
-        if (game.state !== "running") return;
+        if (!PIECE_CONTROLLABLE_STATES.has(game.state)) return;
 
         const bounds = getTightBounds(game.current.mask, game.current.width, game.current.height);
         const offsetX = bounds.minX || 0;
@@ -352,7 +353,15 @@ export class PieceController {
             0,
             Math.min(targetColumn, game.board.cols - bounds.width)
         );
-        const targetX = targetColumn - offsetX;
+        let targetX = targetColumn - offsetX;
+
+        // During the sensitivity-calibration exercise's tutorial steps, the
+        // piece is only ever meant to travel a single column regardless of
+        // how far the drag itself continues past that - see
+        // SensitivityCalibrationController.clampDragTargetX(). A no-op the
+        // rest of the time (calibration inactive/unarmed, or a real
+        // full-range drag step).
+        targetX = game.sensitivityCalibrationController?.clampDragTargetX?.(targetX) ?? targetX;
 
         if (targetX === game.current.x) return;
 
@@ -381,11 +390,13 @@ export class PieceController {
         if (game.board.collides(game.current, 0, 1)) {
             this.resetLockDelay();
         }
+
+        game.sensitivityCalibrationController?.notify("move", {x: game.current.x, via: "drag"});
     }
 
     softDrop() {
         const game = this.game;
-        if (game.state !== "running") return;
+        if (!PIECE_CONTROLLABLE_STATES.has(game.state)) return;
         if (game.board.collides(game.current, 0, 1)) return;
 
         ++game.current.y;
@@ -393,11 +404,12 @@ export class PieceController {
         game.statsTracker.addScore(pointsForSoftDrop(game.scoring));
         game.dropCounter = 0;
         game.noteRowStep();
+        game.sensitivityCalibrationController?.notify("softDrop", {});
     }
 
     hardDrop() {
         const game = this.game;
-        if (game.state !== "running") return;
+        if (!PIECE_CONTROLLABLE_STATES.has(game.state)) return;
         if (game.hardDropUsed) return;
 
         game.hardDropUsed = true;
@@ -406,6 +418,7 @@ export class PieceController {
         game.current.y += cellsDropped;
 
         game.statsTracker.addScore(pointsForHardDrop(cellsDropped, game.scoring));
+        game.sensitivityCalibrationController?.notify("hardDrop", {});
         this.lockCurrentPiece();
         game.dropCounter = 0;
     }
@@ -438,7 +451,7 @@ export class PieceController {
      */
     rotate(dir = 1) {
         const game = this.game;
-        if (game.state !== "running") return;
+        if (!PIECE_CONTROLLABLE_STATES.has(game.state)) return;
 
         const rotatedMask = game.current.rotated(dir);
         const fromState = game.current.rotationState;
@@ -467,6 +480,7 @@ export class PieceController {
                 // stack). Every rotation - kicked or not, any piece, 90° or
                 // 180° - now snaps to its new position instantly instead.
                 game.rotationAnim = null;
+                game.sensitivityCalibrationController?.notify("rotate", {});
                 return;
             }
         }

@@ -90,7 +90,44 @@
             "effectRain": "Дождь",
             "effectSnow": "Снег",
             "close": "Закрыть",
-            "mouseSensitivity": "Чувствительность мыши"
+            "mouseSensitivity": "Чувствительность мыши",
+            "touchSensitivity": "Чувствительность сенсора",
+            "calibrateSensitivity": "Калибровка чувствительности",
+            "calibrateSensitivityButton": "Калибровать",
+            "keyboardDas": "DAS клавиатуры (мс)",
+            "keyboardArr": "ARR клавиатуры (мс)",
+            "calibrateKeyboard": "Калибровка клавиатуры",
+            "calibrateKeyboardButton": "Калибровать"
+        },
+        "calibration": {
+            "gestures": {
+                "moveLeft": "Сдвиньте фигуру влево",
+                "moveRight": "Сдвиньте фигуру вправо",
+                "sideToCenter": "Перетащите фигуру в центральный столбец",
+                "sideToEdge": "Перетащите фигуру в крайний столбец",
+                "hardDrop": "Выполните мгновенное падение",
+                "softDropOne": "Выполните шаг плавного падения",
+                "rotate": "Поверните фигуру",
+                "holdLeft": "Удерживайте ВЛЕВО, затем отпустите",
+                "holdRight": "Удерживайте ВПРАВО, затем отпустите"
+            },
+            "progress": "Раунд {pass}/{totalPasses} · Шаг {step}/{steps}",
+            "resultTitle": "КАЛИБРОВКА ЧУВСТВИТЕЛЬНОСТИ",
+            "resultSuccessBefore": "Ваша чувствительность установлена на",
+            "resultFailed": "Не удалось рассчитать чувствительность — попробуйте снова, перетаскивая мышью или пальцем.",
+            "resultClose": "Закрыть",
+            "resultSave": "Сохранить",
+            "resultDiscard": "Отменить",
+            "resultRestart": "Заново"
+        },
+        "keyboardCalibration": {
+            "resultTitle": "КАЛИБРОВКА КЛАВИАТУРЫ",
+            "resultDas": "DAS:",
+            "resultArr": "ARR:",
+            "resultFailed": "Недостаточно данных — попробуйте удержать клавишу направления хотя бы один раз.",
+            "resultSave": "Сохранить",
+            "resultDiscard": "Отменить",
+            "resultRestart": "Заново"
         },
         "loading": {
             "leaderboardHint": "Загрузка таблицы лидеров..."

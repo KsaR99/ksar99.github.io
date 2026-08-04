@@ -2,12 +2,18 @@
 
 import {InputSource} from "./input-source.js";
 import {MOVEMENT_KEYS} from "./keyboard-input.js";
+import {PIECE_CONTROLLABLE_STATES} from "../../game/game-constants.js";
 
 // Codes that make sense to auto-repeat while a touch-controls button is
 // held down, mirroring KeyboardInput's REPEATABLE_KEYS behavior.
 const REPEATABLE_CODES = new Set(["ArrowLeft", "ArrowRight", "ArrowDown"]);
-const REPEAT_INITIAL_DELAY_MS = 120;
-const REPEAT_INTERVAL_MS = 16;
+// Fallbacks only - once settings are loaded, startRepeat() reads the
+// player's calibrated game.settings.keyboardDAS/keyboardARR instead, same as
+// KeyboardInput (see KeyboardCalibrationController). The on-screen D-pad
+// deliberately shares the keyboard's calibrated DAS/ARR rather than having
+// its own - it's simulating the same discrete key-repeat behavior.
+const DEFAULT_DAS_MS = 120;
+const DEFAULT_ARR_MS = 16;
 
 // On-canvas gesture tuning.
 const TAP_MAX_MOVEMENT_PX = 12;
@@ -113,7 +119,7 @@ export class TouchInput extends InputSource {
                 this._horizontalGesture = Math.abs(dx) > Math.abs(dy);
             }
         }
-        if (this._dragged && this._horizontalGesture && game.state === "running") {
+        if (this._dragged && this._horizontalGesture && PIECE_CONTROLLABLE_STATES.has(game.state)) {
             const scaledClientX = this._startX + dx * this._dragSensitivity;
             this.steerTo(scaledClientX);
         }
@@ -134,7 +140,7 @@ export class TouchInput extends InputSource {
         };
 
         const onTouchStart = (event) => {
-            if (game.state !== "running") return;
+            if (!PIECE_CONTROLLABLE_STATES.has(game.state)) return;
             const touch = event.changedTouches[0];
             if (!touch || this._activeTouchId !== null) return;
             event.preventDefault();
@@ -148,7 +154,8 @@ export class TouchInput extends InputSource {
 
             const boardRect = canvas.getBoundingClientRect();
             const screenWidth = window.visualViewport?.width ?? window.innerWidth;
-            this._dragSensitivity = boardRect.width / (screenWidth * DRAG_DISTANCE_IN_SCREENS);
+            this._dragSensitivity = game.settings?.touchSensitivity
+                ?? (boardRect.width / (screenWidth * DRAG_DISTANCE_IN_SCREENS));
         };
 
         const onTouchMove = (event) => {
@@ -184,7 +191,7 @@ export class TouchInput extends InputSource {
             const dy = touch.clientY - this._startY;
             const dx = touch.clientX - this._startX;
 
-            if (game.state === "running") {
+            if (PIECE_CONTROLLABLE_STATES.has(game.state)) {
                 if (!this._dragged && dt <= TAP_MAX_DURATION_MS) {
                     game.pieceController.rotate();
                 } else {
@@ -258,10 +265,13 @@ export class TouchInput extends InputSource {
 
     startRepeat(code, action) {
         this.stopRepeat(code);
+        const settings = this.game.settings;
+        const dasMs = settings?.keyboardDAS ?? DEFAULT_DAS_MS;
+        const arrMs = settings?.keyboardARR ?? DEFAULT_ARR_MS;
         const timeoutId = setTimeout(() => {
-            const intervalId = setInterval(action, REPEAT_INTERVAL_MS);
+            const intervalId = setInterval(action, arrMs);
             this._heldTimers.set(code, {intervalId});
-        }, REPEAT_INITIAL_DELAY_MS);
+        }, dasMs);
         this._heldTimers.set(code, {timeoutId});
     }
 
