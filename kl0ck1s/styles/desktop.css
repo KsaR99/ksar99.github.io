@@ -92,9 +92,8 @@ body {
 
 [data-role="next-piece-card"] .next-piece__canvas {
     display: block;
-    width: 96px;
-    height: 96px;
-    background: var(--bg-2);
+    width: 6.5em;
+    height: 6.5em;
 }
 
 [data-role="difficulty-stat"] {
