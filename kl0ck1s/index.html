@@ -280,25 +280,79 @@
                 data-i18n="screens.options.closeHintAfter">to close</span>
         </p>
 
-        <div class="options" data-role="options-group-language">
-            <h3 class="options__title options__title--static" data-i18n="screens.options.languageTitle">Language</h3>
+        <div class="options" data-role="options-group-general">
+            <h3 class="options__title options__title--static" data-i18n="screens.options.generalTitle">General</h3>
             <label class="options__row">
                 <span data-i18n="screens.options.language">Language</span>
                 <select class="options__input options__input--select" data-role="lang-select"></select>
-            </label>
-        </div>
-
-        <details class="options" data-role="options-group-sound">
-            <summary class="options__title" data-i18n="screens.options.soundTitle">Sound</summary>
-            <label class="options__row">
-                <span data-i18n="screens.options.mute">Mute</span>
-                <input class="options__input options__input--checkbox" data-role="mute-checkbox" type="checkbox">
             </label>
             <label class="options__row">
                 <span data-i18n="screens.options.volume">Volume</span>
                 <input class="options__input options__input--range" data-role="volume-slider"
                        max="100" min="0" type="range">
             </label>
+            <label class="options__row">
+                <span data-i18n="screens.options.mute">Mute</span>
+                <input class="options__input options__input--checkbox" data-role="mute-checkbox" type="checkbox">
+            </label>
+            <label class="options__row">
+                <span data-i18n="screens.options.hudRight">HUD on the right</span>
+                <input class="options__input options__input--checkbox" data-role="hud-right-checkbox" type="checkbox">
+            </label>
+            <label class="options__row">
+                <span data-i18n="screens.options.effect">Screen filter</span>
+                <select class="options__input options__input--select" data-role="effect-select">
+                    <option data-i18n="screens.options.effectNone" value="none">None</option>
+                    <option data-i18n="screens.options.effectVhs" value="vhs">VHS noise</option>
+                    <option data-i18n="screens.options.effectMatrix" value="matrix">Matrix</option>
+                    <option data-i18n="screens.options.effectRain" value="rain">Rain</option>
+                    <option data-i18n="screens.options.effectSnow" value="snow">Snow</option>
+                </select>
+            </label>
+        </div>
+
+        <details class="options" data-role="options-group-controls">
+            <summary class="options__title" data-i18n="screens.options.controlsTitle">Controls</summary>
+            <label class="options__row">
+                <span data-i18n="screens.options.mouseControl">Mouse control</span>
+                <input class="options__input options__input--checkbox" data-role="mouse-control-checkbox"
+                       type="checkbox">
+            </label>
+            <label class="options__row">
+                <span data-i18n="screens.options.mouseSensitivity">Mouse sensitivity</span>
+                <input class="options__input options__input--number" data-role="mouse-sensitivity-input"
+                       inputmode="decimal" type="number">
+            </label>
+            <label class="options__row">
+                <span data-i18n="screens.options.touchSensitivity">Touch sensitivity</span>
+                <input class="options__input options__input--number" data-role="touch-sensitivity-input"
+                       inputmode="decimal" placeholder="auto" type="number">
+            </label>
+            <div class="options__row">
+                <span data-i18n="screens.options.calibrateSensitivity">Calibrate sensitivity</span>
+                <button class="options__preview-button options__preview-button--wide"
+                        data-i18n="screens.options.calibrateSensitivityButton"
+                        data-role="calibrate-sensitivity-button" type="button">Calibrate
+                </button>
+            </div>
+        </details>
+
+        <details class="options" data-role="options-group-gameplay">
+            <summary class="options__title" data-i18n="screens.options.gameplayTitle">Gameplay</summary>
+            <label class="options__row">
+                <span data-i18n="screens.options.skipCountdown">Skip countdown</span>
+                <input class="options__input options__input--checkbox" data-role="skip-countdown-checkbox"
+                       type="checkbox">
+            </label>
+            <label class="options__row">
+                <span data-i18n="screens.options.skipModeInfo">Skip mode info screen</span>
+                <input class="options__input options__input--checkbox" data-role="skip-mode-info-checkbox"
+                       type="checkbox">
+            </label>
+        </details>
+
+        <details class="options" data-role="options-group-sound">
+            <summary class="options__title" data-i18n="screens.options.soundTitle">Sound</summary>
 
             <details class="options__group" data-role="sound-group-sfx">
                 <summary class="options__group-summary" data-i18n="screens.options.sfxTitle">SFX</summary>
@@ -319,14 +373,6 @@
                 </label>
                 <div class="options__sound-list" data-role="sound-list"></div>
             </details>
-        </details>
-
-        <details class="options" data-role="options-group-layout">
-            <summary class="options__title" data-i18n="screens.options.layoutTitle">Layout</summary>
-            <label class="options__row">
-                <span data-i18n="screens.options.hudRight">HUD on the right</span>
-                <input class="options__input options__input--checkbox" data-role="hud-right-checkbox" type="checkbox">
-            </label>
         </details>
 
         <details class="options" data-role="options-group-graphics">
@@ -357,53 +403,11 @@
                     <input class="options__input options__input--checkbox" data-role="fall-trail-checkbox"
                            type="checkbox">
                 </label>
-                <label class="options__row">
-                    <span data-i18n="screens.options.effect">Screen filter</span>
-                    <select class="options__input options__input--select" data-role="effect-select">
-                        <option data-i18n="screens.options.effectNone" value="none">None</option>
-                        <option data-i18n="screens.options.effectVhs" value="vhs">VHS noise</option>
-                        <option data-i18n="screens.options.effectMatrix" value="matrix">Matrix</option>
-                        <option data-i18n="screens.options.effectRain" value="rain">Rain</option>
-                        <option data-i18n="screens.options.effectSnow" value="snow">Snow</option>
-                    </select>
-                </label>
             </details>
         </details>
 
-        <details class="options" data-role="options-group-gameplay">
-            <summary class="options__title" data-i18n="screens.options.gameplayTitle">Gameplay</summary>
-            <label class="options__row">
-                <span data-i18n="screens.options.skipCountdown">Skip countdown</span>
-                <input class="options__input options__input--checkbox" data-role="skip-countdown-checkbox"
-                       type="checkbox">
-            </label>
-            <label class="options__row">
-                <span data-i18n="screens.options.skipModeInfo">Skip mode info screen</span>
-                <input class="options__input options__input--checkbox" data-role="skip-mode-info-checkbox"
-                       type="checkbox">
-            </label>
-            <label class="options__row">
-                <span data-i18n="screens.options.mouseControl">Mouse control</span>
-                <input class="options__input options__input--checkbox" data-role="mouse-control-checkbox"
-                       type="checkbox">
-            </label>
-            <label class="options__row">
-                <span data-i18n="screens.options.mouseSensitivity">Mouse sensitivity</span>
-                <input class="options__input options__input--number" data-role="mouse-sensitivity-input"
-                       inputmode="decimal" type="number">
-            </label>
-            <label class="options__row">
-                <span data-i18n="screens.options.touchSensitivity">Touch sensitivity</span>
-                <input class="options__input options__input--number" data-role="touch-sensitivity-input"
-                       inputmode="decimal" placeholder="auto" type="number">
-            </label>
-            <div class="options__row">
-                <span data-i18n="screens.options.calibrateSensitivity">Calibrate sensitivity</span>
-                <button class="options__preview-button options__preview-button--wide"
-                        data-i18n="screens.options.calibrateSensitivityButton"
-                        data-role="calibrate-sensitivity-button" type="button">Calibrate
-                </button>
-            </div>
+        <details class="options" data-role="options-group-advanced">
+            <summary class="options__title" data-i18n="screens.options.advancedTitle">Advanced</summary>
             <label class="options__row">
                 <span data-i18n="screens.options.keyboardDas">Keyboard DAS (ms)</span>
                 <input class="options__input options__input--number" data-role="keyboard-das-input"
