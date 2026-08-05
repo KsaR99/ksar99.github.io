@@ -1,8 +1,5 @@
 {
     "locale": "es-ES",
-    "app": {
-        "subtitle": "Ordena las líneas, consigue puntos."
-    },
     "sidebar": {
         "nextPiece": "Siguiente pieza",
         "score": "Puntuación",

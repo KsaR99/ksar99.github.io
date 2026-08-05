@@ -1,8 +1,5 @@
 {
     "locale": "en-US",
-    "app": {
-        "subtitle": "Arrange the lines, score points."
-    },
     "sidebar": {
         "nextPiece": "Next piece",
         "score": "Score",

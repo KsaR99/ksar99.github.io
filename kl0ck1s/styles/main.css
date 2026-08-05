@@ -655,11 +655,36 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     color: transparent;
 }
 
+.brand__title-flip {
+    display: inline-block;
+    transform-origin: 50% 50%;
+    transition: transform 0.4s ease-in-out;
+    background: linear-gradient(350deg, oklch(0.905399 0.15455 194.76), oklch(0.5635 0.2408 260.82), oklch(0.772 0.1738 64.55), oklch(0.968 0.211 109.77), oklch(0.73558 0.22389 146.13), oklch(0.5812 0.2986 307.03), oklch(0.6489 0.237 26.97));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.brand__title-flip--rotated {
+    transform: rotate(90deg);
+}
+
 .brand__subtitle {
     color: var(--muted);
     font-size: 0.85rem;
     text-align: center;
     user-select: none;
+}
+
+.brand__subtitle--clickable {
+    cursor: pointer;
+    transition: color 0.15s ease, filter 0.15s ease;
+}
+
+.brand__subtitle--clickable:hover,
+.brand__subtitle--clickable:focus-visible {
+    color: var(--text);
+    filter: brightness(1.35);
 }
 
 .next-piece__canvas {

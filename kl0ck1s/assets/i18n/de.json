@@ -1,8 +1,5 @@
 {
     "locale": "de-DE",
-    "app": {
-        "subtitle": "Ordne die Reihen, sammle Punkte."
-    },
     "sidebar": {
         "nextPiece": "Nächster Stein",
         "score": "Punkte",

@@ -1,8 +1,5 @@
 {
     "locale": "pl-PL",
-    "app": {
-        "subtitle": "Ułóż linie, zdobywaj punkty."
-    },
     "sidebar": {
         "nextPiece": "Następny klocek",
         "score": "Wynik",

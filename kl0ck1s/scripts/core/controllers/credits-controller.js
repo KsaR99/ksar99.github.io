@@ -2,7 +2,7 @@
 
 import {CREDITS, CREDITS_TIMING} from "../shared/config.js";
 
-const ACTIVITY_EVENTS = ["pointerdown", "keydown", "wheel"];
+const FLIP_DURATION_MS = 400;
 
 // @ToDo: calibration?
 const GAMEPLAY_STATES = new Set(["countdown", "running", "clearing"]);
@@ -10,38 +10,52 @@ const GAMEPLAY_STATES = new Set(["countdown", "running", "clearing"]);
 export class CreditsController {
     constructor(game) {
         this.game = game;
-        this._idleTimer = null;
-        this._onActivity = this._onActivity.bind(this);
+        this._flipTimer = null;
+        this._onVersionClick = this._onVersionClick.bind(this);
+        this._onCreditsClick = this._onCreditsClick.bind(this);
     }
 
     bind() {
         const game = this.game;
         if (!game.dom) return;
-        ACTIVITY_EVENTS.forEach((type) => game.dom.addEventListener(type, this._onActivity, {passive: true}));
-        this._schedule(CREDITS_TIMING.IDLE_DELAY_MS);
+
+        const version = game.dom.querySelector('[data-role="brand-version"]');
+        version?.addEventListener("click", this._onVersionClick);
+
+        const root = game.dom.querySelector('[data-role="credits"]');
+        root?.addEventListener("click", this._onCreditsClick);
     }
 
     _isCreditsLink(event) {
         return Boolean(event.target.closest?.('[data-role="credits-link"]'));
     }
 
-    _onActivity(event) {
-        if (this._isCreditsLink(event)) return;
-        this._hide();
-        this._schedule(CREDITS_TIMING.IDLE_DELAY_MS);
+    _onVersionClick() {
+        const game = this.game;
+        if (GAMEPLAY_STATES.has(game.state)) return;
+
+        const root = game.dom.querySelector('[data-role="credits"]');
+        if (root?.classList.contains("board__credits--visible")) return;
+
+        const flip = game.dom.querySelector('[data-role="brand-title-flip"]');
+        flip?.classList.add("brand__title-flip--rotated");
+
+        clearTimeout(this._flipTimer);
+        this._flipTimer = setTimeout(() => this._show(), FLIP_DURATION_MS);
     }
 
-    _schedule(delay) {
-        clearTimeout(this._idleTimer);
-        this._idleTimer = setTimeout(() => this._show(), delay);
+    _onCreditsClick(event) {
+        if (this._isCreditsLink(event)) return;
+
+        const root = this.game.dom?.querySelector('[data-role="credits"]');
+        if (!root || !root.classList.contains("board__credits--visible")) return;
+
+        this._closeAnimated();
     }
 
     _show() {
         const game = this.game;
-        if (GAMEPLAY_STATES.has(game.state)) {
-            this._schedule(CREDITS_TIMING.IDLE_DELAY_MS);
-            return;
-        }
+        if (GAMEPLAY_STATES.has(game.state)) return;
 
         const root = game.dom.querySelector('[data-role="credits"]');
         const scroll = game.dom.querySelector('[data-role="credits-scroll"]');
@@ -70,30 +84,52 @@ export class CreditsController {
         scroll.style.transform = "";
 
         const topHiddenY = -scroll.scrollHeight;
-        const bottomHiddenY = root.clientHeight;
         const centeredY = (root.clientHeight - scroll.scrollHeight) / 2;
-
-        const holdFraction = Math.min(0.9, CREDITS_TIMING.HOLD_DURATION_MS / CREDITS_TIMING.SCROLL_DURATION_MS);
-        const enterEnd = (1 - holdFraction) / 2;
-        const holdEnd = enterEnd + holdFraction;
 
         scroll.animate(
             [
                 {transform: `translateY(${topHiddenY}px)`, offset: 0},
-                {transform: `translateY(${centeredY}px)`, offset: enterEnd},
-                {transform: `translateY(${centeredY}px)`, offset: holdEnd},
-                {transform: `translateY(${bottomHiddenY}px)`, offset: 1},
+                {transform: `translateY(${centeredY}px)`, offset: 1},
             ],
-            {duration: CREDITS_TIMING.SCROLL_DURATION_MS, easing: "ease-in-out", iterations: Infinity}
+            {duration: CREDITS_TIMING.ENTER_DURATION_MS, easing: "ease-in-out", fill: "forwards"}
         );
 
         root.classList.add("board__credits--visible");
         root.setAttribute("aria-hidden", "false");
+    }
 
-        this._schedule(CREDITS_TIMING.IDLE_DELAY_MS);
+    _closeAnimated() {
+        const game = this.game;
+        const root = game.dom.querySelector('[data-role="credits"]');
+        const scroll = game.dom.querySelector('[data-role="credits-scroll"]');
+        if (!root || !scroll) {
+            this._hide();
+            return;
+        }
+
+        scroll.getAnimations().forEach((anim) => {
+            anim.commitStyles();
+            anim.cancel();
+        });
+
+        const bottomHiddenY = root.clientHeight;
+        const currentTransform = scroll.style.transform || "translateY(0px)";
+
+        scroll.animate(
+            [
+                {transform: currentTransform},
+                {transform: `translateY(${bottomHiddenY}px)`},
+            ],
+            {duration: CREDITS_TIMING.EXIT_DURATION_MS, easing: "ease-in"}
+        ).finished
+            .then(() => this._hide())
+            .catch(() => this._hide());
     }
 
     _hide() {
+        const flip = this.game.dom?.querySelector('[data-role="brand-title-flip"]');
+        flip?.classList.remove("brand__title-flip--rotated");
+
         const root = this.game.dom?.querySelector('[data-role="credits"]');
         if (!root) return;
         root.classList.remove("board__credits--visible");
