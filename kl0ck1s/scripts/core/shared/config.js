@@ -28,16 +28,16 @@ export const SPIN_POINTS = Object.freeze({
 });
 
 export const LEVEL_UP_BANNER_DURATION_MS = 420; // 420
-export const LINE_CLEAR_ANIMATION_DURATION_MS = 210; // 210
+export const LINE_CLEAR_ANIMATION_DURATION_MS = 260; // 260
 export const LINE_CLEAR_SOUND_PLAYBACK_RATE = 0.6;
-export const LINE_CLEAR_FLASH_PHASE_FRACTION = 0.3;
+export const LINE_CLEAR_FLASH_PHASE_FRACTION = 0.25;
 
 export const DIFFICULTIES = Object.freeze({
-    easy: {startLevel: 1, fallingSoundRate: 0.10},
-    medium: {startLevel: 10, groundedTime: 2500, fallingSoundRate: 0.20},
-    hard: {startLevel: 15, groundedTime: 2000, fallingSoundRate: 0.30},
-    expert: {startLevel: 20, groundedTime: 1500, fallingSoundRate: 0.40},
-    pro: {startLevel: 30, groundedTime: 1000, fallingSoundRate: 0.50},
+    easy: {startLevel: 1, fallingSoundRate: 0.20},
+    medium: {startLevel: 10, groundedTime: 2500, fallingSoundRate: 0.30},
+    hard: {startLevel: 15, groundedTime: 2000, fallingSoundRate: 0.40},
+    expert: {startLevel: 20, groundedTime: 1500, fallingSoundRate: 0.50},
+    pro: {startLevel: 30, groundedTime: 1000, fallingSoundRate: 0.60},
 });
 
 export const DEFAULT_DIFFICULTY = "hard";

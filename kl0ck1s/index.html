@@ -9,9 +9,9 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+Mono:wght@100..900&display=swap"
         rel="stylesheet">
-    <link href="styles/main.css?v=22" rel="stylesheet">
-    <link href="styles/mobile.css?v=22" media="(width < 48rem)" rel="stylesheet">
-    <link href="styles/desktop.css?v=22" media="(width >= 48rem)" rel="stylesheet">
+    <link href="styles/main.css?v=23" rel="stylesheet">
+    <link href="styles/mobile.css?v=23" media="(width < 48rem)" rel="stylesheet">
+    <link href="styles/desktop.css?v=23" media="(width >= 48rem)" rel="stylesheet">
 </head>
 <body>
 <div class="app" id="app-root">
@@ -33,7 +33,7 @@
         <div class="card">
             <p class="brand__title" data-role="brand-title">Kl0ck1<span class="brand__title-flip"
                                                                         data-role="brand-title-flip">'s</span></p>
-            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.6-alpha</p>
+            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.6.1-alpha</p>
         </div>
 
         <div class="card stats" data-role="stats-card">
@@ -236,8 +236,8 @@
         </div>
         <div class="nickname-form">
             <input class="nickname-form__input" data-i18n-placeholder="screens.idle.namePlaceholder"
-                   data-role="name-input" maxlength="16" pattern="[a-zA-Z\d_\-]{3,16}" placeholder="Your nickname"
-                   required type="text">
+                   data-role="name-input" maxlength="16" name="nickname" pattern="[a-zA-Z\d_\-]{3,16}"
+                   placeholder="Your nickname" required type="text">
         </div>
 
         <button class="button button--accent" data-i18n="screens.idle.startButton"
@@ -540,8 +540,8 @@
         </div>
         <div class="nickname-form">
             <input class="nickname-form__input" data-i18n-placeholder="screens.idle.namePlaceholder"
-                   data-role="name-input" maxlength="16" pattern="[a-zA-Z\d_\-]{3,16}" placeholder="Your nickname"
-                   required type="text">
+                   data-role="name-input" maxlength="16" name="nickname" pattern="[a-zA-Z\d_\-]{3,16}"
+                   placeholder="Your nickname" required type="text">
         </div>
         <button class="button button--accent" data-i18n="screens.gameOverSaved.playAgainButton"
                 data-role="start-button" type="button">Play again
@@ -755,6 +755,6 @@
         window.addEventListener("orientationchange", notifyResize);
     })();
 </script>
-<script src="scripts/app/main.js?v=22" type="module"></script>
+<script src="scripts/app/main.js?v=23" type="module"></script>
 </body>
 </html>

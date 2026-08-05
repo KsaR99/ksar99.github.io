@@ -401,10 +401,10 @@ export class PieceController {
                 for (let fy = 0; fy < fragmentsPerAxis; fy++) {
                     for (let fx = 0; fx < fragmentsPerAxis; fx++) {
                         const startX = x * size + (fx + 0.5) * fragSize;
-                        const startY = y * size + (fy + 0.5) * fragSize;
+                        const startY = y * size + (fy + 0.2) * fragSize;
 
                         const angle = Math.random() * Math.PI * 2;
-                        const distance = size * (0.7 + Math.random() * 1.3);
+                        const distance = size * (0.2 + Math.random() * 0.5);
 
                         fragments.push({
                             startX,
