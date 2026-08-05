@@ -1,0 +1,281 @@
+{
+    "locale": "fr-FR",
+    "sidebar": {
+        "nextPiece": "Pièce suivante",
+        "score": "Score",
+        "time": "Temps",
+        "lines": "Lignes",
+        "best": "Meilleur",
+        "drought": "Sécheresse",
+        "tetrisRate": "T4L",
+        "pps": "PPS",
+        "objective": "Objectif",
+        "statusLive": "Partie en cours",
+        "statusLast": "Dernière partie"
+    },
+    "controls": {
+        "toggle": "Commandes",
+        "rotate": "Tourner",
+        "rotate180": "Rotation 180°",
+        "moveLeftRight": "Déplacer gauche / droite",
+        "softDrop": "Chute lente",
+        "hardDrop": "Chute rapide",
+        "pause": "Pause",
+        "start": "Démarrer / nouvelle partie",
+        "mute": "Couper le son",
+        "options": "Options",
+        "spaceKey": "Espace",
+        "restart": "Redémarrer",
+        "exitToMenu": "Quitter vers le menu",
+        "touchMove": "Déplacer",
+        "touchMoveGesture": "Glisser sur le plateau",
+        "touchRotateGesture": "Toucher le plateau",
+        "touchHardDropGesture": "Glisser vers le bas",
+        "touchSoftDropGesture": "Maintenir ▼",
+        "touchPauseGesture": "Bouton ❚❚"
+    },
+    "screens": {
+        "idle": {
+            "hint": "Difficulté",
+            "modeHint": "Mode",
+            "startButton": "Démarrer",
+            "namePlaceholder": "Ton pseudo"
+        },
+        "modeInfo": {
+            "subtitle": "Mode : {mode}",
+            "continueButton": "Continuer"
+        },
+        "paused": {
+            "title": "PAUSE",
+            "resumeHintBefore": "Appuie sur",
+            "resumeHintAfter": "pour reprendre",
+            "optionsHintBefore": "Appuie sur",
+            "optionsHintAfter": "pour ouvrir les options",
+            "resumeButton": "Reprendre"
+        },
+        "options": {
+            "title": "OPTIONS",
+            "closeHintBefore": "Appuie sur",
+            "closeHintAfter": "pour fermer",
+            "generalTitle": "Général",
+            "language": "Langue",
+            "soundTitle": "Son",
+            "mute": "Muet",
+            "volume": "Volume",
+            "sfxTitle": "Effets sonores",
+            "musicTitle": "Musique",
+            "categoryVolume": "Volume de la catégorie",
+            "preview": "Aperçu",
+            "pause": "Pause",
+            "hudRight": "HUD à droite",
+            "gameplayTitle": "Gameplay",
+            "skipCountdown": "Passer le compte à rebours",
+            "skipModeInfo": "Passer l'écran d'info du mode",
+            "controlsTitle": "Commandes",
+            "mouseControl": "Contrôle à la souris",
+            "graphicsTitle": "Graphismes",
+            "ghost": "Pièce fantôme",
+            "gridLines": "Lignes de grille",
+            "performanceTitle": "Performance",
+            "glow": "Lueur (flou)",
+            "transparency": "Transparence",
+            "fallTrail": "Traînée de chute",
+            "effect": "Filtre d'écran",
+            "effectNone": "Aucun",
+            "effectVhs": "Bruit VHS",
+            "effectMatrix": "Matrix",
+            "effectRain": "Pluie",
+            "effectSnow": "Neige",
+            "close": "Fermer",
+            "mouseSensitivity": "Sensibilité de la souris",
+            "touchSensitivity": "Sensibilité tactile",
+            "calibrateSensitivity": "Calibration de la sensibilité",
+            "calibrateSensitivityButton": "Calibrer",
+            "advancedTitle": "Avancé",
+            "keyboardDas": "DAS clavier (ms)",
+            "keyboardArr": "ARR clavier (ms)",
+            "calibrateKeyboard": "Calibrer le clavier",
+            "calibrateKeyboardButton": "Calibrer"
+        },
+        "calibration": {
+            "gestures": {
+                "sideToCenter": "Glisse la pièce vers la colonne centrale",
+                "sideToEdge": "Glisse la pièce vers la colonne du bord",
+                "toWall": "Glisse jusqu'au mur {kbd}",
+                "click": "Clique une fois {kbd}",
+                "hardDrop": "Effectue une chute rapide",
+                "softDropOne": "Effectue une étape de chute lente",
+                "rotate": "Tourne la pièce",
+                "hold": "Maintiens {kbd}, puis relâche"
+            },
+            "progress": "Manche {pass}/{totalPasses} · Étape {step}/{steps}",
+            "resultTitle": "CALIBRATION DE LA SENSIBILITÉ",
+            "resultSuccessBefore": "Ta sensibilité est maintenant réglée sur",
+            "resultFailed": "Impossible de calculer une valeur de sensibilité — réessaie avec un glissement à la souris ou au doigt.",
+            "resultClose": "Fermer",
+            "resultSave": "Enregistrer",
+            "resultDiscard": "Ignorer",
+            "resultRestart": "Recommencer"
+        },
+        "keyboardCalibration": {
+            "resultTitle": "CALIBRATION DU CLAVIER",
+            "resultDas": "DAS :",
+            "resultArr": "ARR :",
+            "resultFailed": "Pas assez de données recueillies — essaie de maintenir une touche directionnelle pendant au moins une manche.",
+            "resultSave": "Enregistrer",
+            "resultDiscard": "Ignorer",
+            "resultRestart": "Recommencer"
+        },
+        "loading": {
+            "leaderboardHint": "Chargement du classement..."
+        },
+        "gameOverEntry": {
+            "title": "GAME OVER",
+            "titleSprintComplete": "SPRINT TERMINÉ",
+            "titleTimeUp": "TEMPS ÉCOULÉ",
+            "titleCheeseClear": "FROMAGE NETTOYÉ",
+            "titleDigComplete": "CREUSAGE TERMINÉ",
+            "scoreLabel": "Score :",
+            "levelLabel": "niveau",
+            "linesLabel": "lignes",
+            "todayBestLabel": "Meilleur score du jour :",
+            "todayBestBy": "par",
+            "submit": "Continuer",
+            "statsTitle": "Statistiques de la session",
+            "gameTimeLabel": "Temps",
+            "droughtLabel": "D.MAX",
+            "droughtTotalLabel": "D.TOTAL",
+            "droughtAvgLabel": "D.MOY",
+            "burnLabel": "BRN",
+            "transitionLabel": "TRNS",
+            "tetrisRateLabel": "Taux de 4 lignes (T4L)",
+            "clearsLabel": "Lignes effacées (1/2/3/4 à la fois)",
+            "ppsLabel": "PPS",
+            "spinsLabel": "Spins (T / T-mini / autre)",
+            "maxComboLabel": "Combo le plus long",
+            "efficiencyLabel": "Efficacité (pts/ligne)"
+        },
+        "gameOverSaved": {
+            "title": "SCORE ENREGISTRÉ",
+            "playAgainButton": "Rejouer"
+        }
+    },
+    "leaderboard": {
+        "title": "Classement",
+        "empty": "Aucun score pour l'instant — sois le premier à jouer !",
+        "headers": {
+            "name": "Nom",
+            "score": "Score",
+            "time": "Temps",
+            "level": "Niv.",
+            "lines": "Lignes",
+            "date": "Date"
+        },
+        "defaultName": "Joueur"
+    },
+    "credits": {
+        "roleDeveloper": "Ingénieur logiciel",
+        "roleTester": "Testeur",
+        "roleMusic": "Musique",
+        "roleSfx": "SFX"
+    },
+    "difficulty": {
+        "easy": "Débutant",
+        "medium": "Amateur",
+        "hard": "Vétéran",
+        "expert": "Expert",
+        "pro": "PRO",
+        "levelPrefix": "niveau {level}"
+    },
+    "modes": {
+        "marathon": {
+            "name": "Marathon",
+            "description": "Jeu classique infini",
+            "rules": [
+                "♾️ Jeu sans fin — efface des lignes et monte de niveau",
+                "📈 La vitesse de chute augmente à chaque niveau",
+                "🏆 Le score et le niveau le plus haut atteint comptent tous les deux"
+            ]
+        },
+        "sprint": {
+            "name": "Sprint",
+            "description": "Efface 40 lignes le plus vite possible",
+            "rules": [
+                "🎯 Objectif : effacer 40 lignes",
+                "⏱️ Ton temps final compte — va vite",
+                "🚫 Une partie non terminée ne sera pas enregistrée dans le classement"
+            ]
+        },
+        "ultra": {
+            "name": "Ultra",
+            "description": "Meilleur score en 3 minutes",
+            "rules": [
+                "⏱️ Tu as exactement 3 minutes",
+                "💯 Fais le meilleur score possible avant la fin du temps",
+                "📊 Seul ton score final compte"
+            ]
+        },
+        "survival": {
+            "name": "Survie",
+            "description": "Attention aux lignes qui montent",
+            "rules": [
+                "🧱 Des lignes de débris montent sans cesse depuis le bas",
+                "🕳️ Trouve et utilise les trous dans les débris",
+                "☠️ La partie se termine quand le plateau est plein"
+            ]
+        },
+        "cheeseRace": {
+            "name": "Course au fromage",
+            "description": "Creuse une pile préconstruite le plus vite possible",
+            "rules": [
+                "🧀 Le plateau commence avec 10 lignes de débris avec un trou",
+                "⏱️ Creuse tout le plus vite possible",
+                "🚫 Une partie non terminée ne sera pas enregistrée dans le classement"
+            ]
+        },
+        "digSurvival": {
+            "name": "Creusage Survie",
+            "description": "Creuse pour toujours - les débris repoussent aussitôt que tu effaces une ligne. Survis et creuse 100 lignes au total.",
+            "rules": [
+                "🧀 Commence avec une petite pile de débris au fond",
+                "♻️ Chaque ligne creusée repousse aussitôt depuis le bas - la pile ne s'épuise jamais",
+                "🎯 Creuse un total de 100 lignes pour gagner",
+                "☠️ La partie se termine quand le plateau est plein"
+            ]
+        },
+        "countdown": {
+            "name": "Compte à rebours",
+            "description": "Efface des lignes pour empêcher l'horloge d'atteindre zéro",
+            "rules": [
+                "⏱️ Commence avec 60 secondes à l'horloge",
+                "➕ Chaque ligne effacée ajoute du temps (plus pour 4 lignes)",
+                "⏳ La partie se termine quand l'horloge atteint zéro"
+            ]
+        },
+        "random": {
+            "name": "Aléatoire",
+            "description": "Choisit un des autres modes pour toi quand tu appuies sur Démarrer",
+            "rules": [
+                "🎲 Choisit au hasard un des autres modes",
+                "▶️ La manche se joue alors exactement comme ce mode",
+                "🔁 Choisis à nouveau Aléatoire pour une autre surprise"
+            ]
+        }
+    },
+    "game": {
+        "levelUpBanner": "NIVEAU {level}"
+    },
+    "sounds": {
+        "lineClear1": "ligne",
+        "lineClear2": "II : ligne",
+        "lineClear3": "III : ligne",
+        "lineClear4": "IV : ligne",
+        "drop": "Chute de pièce",
+        "gameOver": "Game over",
+        "levelUp": "Niveau supérieur",
+        "rotate": "Rotation",
+        "grounded": "Pièce posée",
+        "falling": "Pièce en chute",
+        "pieceLock": "Verrouillage de pièce"
+    }
+}

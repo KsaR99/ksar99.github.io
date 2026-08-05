@@ -1,0 +1,281 @@
+{
+    "locale": "id-ID",
+    "sidebar": {
+        "nextPiece": "Balok berikutnya",
+        "score": "Skor",
+        "time": "Waktu",
+        "lines": "Baris",
+        "best": "Terbaik",
+        "drought": "Kekeringan",
+        "tetrisRate": "4LR",
+        "pps": "PPS",
+        "objective": "Tujuan",
+        "statusLive": "Permainan saat ini",
+        "statusLast": "Permainan terakhir"
+    },
+    "controls": {
+        "toggle": "Kontrol",
+        "rotate": "Putar",
+        "rotate180": "Putar 180°",
+        "moveLeftRight": "Gerak kiri / kanan",
+        "softDrop": "Jatuh lembut",
+        "hardDrop": "Jatuh cepat",
+        "pause": "Jeda",
+        "start": "Mulai / permainan baru",
+        "mute": "Bisukan suara",
+        "options": "Opsi",
+        "spaceKey": "Spasi",
+        "restart": "Mulai ulang",
+        "exitToMenu": "Keluar ke menu",
+        "touchMove": "Gerak",
+        "touchMoveGesture": "Seret di papan",
+        "touchRotateGesture": "Ketuk papan",
+        "touchHardDropGesture": "Geser ke bawah",
+        "touchSoftDropGesture": "Tahan ▼",
+        "touchPauseGesture": "Tombol ❚❚"
+    },
+    "screens": {
+        "idle": {
+            "hint": "Kesulitan",
+            "modeHint": "Mode",
+            "startButton": "Mulai",
+            "namePlaceholder": "Nama panggilanmu"
+        },
+        "modeInfo": {
+            "subtitle": "Mode: {mode}",
+            "continueButton": "Lanjutkan"
+        },
+        "paused": {
+            "title": "JEDA",
+            "resumeHintBefore": "Tekan",
+            "resumeHintAfter": "untuk melanjutkan",
+            "optionsHintBefore": "Tekan",
+            "optionsHintAfter": "untuk membuka opsi",
+            "resumeButton": "Lanjutkan"
+        },
+        "options": {
+            "title": "OPSI",
+            "closeHintBefore": "Tekan",
+            "closeHintAfter": "untuk menutup",
+            "generalTitle": "Umum",
+            "language": "Bahasa",
+            "soundTitle": "Suara",
+            "mute": "Bisukan",
+            "volume": "Volume",
+            "sfxTitle": "Efek suara",
+            "musicTitle": "Musik",
+            "categoryVolume": "Volume kategori",
+            "preview": "Pratinjau",
+            "pause": "Jeda",
+            "hudRight": "HUD di kanan",
+            "gameplayTitle": "Gameplay",
+            "skipCountdown": "Lewati hitung mundur",
+            "skipModeInfo": "Lewati layar info mode",
+            "controlsTitle": "Kontrol",
+            "mouseControl": "Kontrol mouse",
+            "graphicsTitle": "Grafis",
+            "ghost": "Balok hantu",
+            "gridLines": "Garis kisi",
+            "performanceTitle": "Performa",
+            "glow": "Cahaya (blur)",
+            "transparency": "Transparansi",
+            "fallTrail": "Jejak jatuh",
+            "effect": "Filter layar",
+            "effectNone": "Tidak ada",
+            "effectVhs": "Noise VHS",
+            "effectMatrix": "Matrix",
+            "effectRain": "Hujan",
+            "effectSnow": "Salju",
+            "close": "Tutup",
+            "mouseSensitivity": "Sensitivitas mouse",
+            "touchSensitivity": "Sensitivitas sentuh",
+            "calibrateSensitivity": "Kalibrasi sensitivitas",
+            "calibrateSensitivityButton": "Kalibrasi",
+            "advancedTitle": "Lanjutan",
+            "keyboardDas": "DAS keyboard (ms)",
+            "keyboardArr": "ARR keyboard (ms)",
+            "calibrateKeyboard": "Kalibrasi keyboard",
+            "calibrateKeyboardButton": "Kalibrasi"
+        },
+        "calibration": {
+            "gestures": {
+                "sideToCenter": "Seret balok ke kolom tengah",
+                "sideToEdge": "Seret balok ke kolom tepi",
+                "toWall": "Seret ke dinding {kbd}",
+                "click": "Klik sekali {kbd}",
+                "hardDrop": "Lakukan jatuh cepat",
+                "softDropOne": "Lakukan satu langkah jatuh lembut",
+                "rotate": "Putar balok",
+                "hold": "Tahan {kbd}, lalu lepaskan"
+            },
+            "progress": "Ronde {pass}/{totalPasses} · Langkah {step}/{steps}",
+            "resultTitle": "KALIBRASI SENSITIVITAS",
+            "resultSuccessBefore": "Sensitivitasmu kini diatur ke",
+            "resultFailed": "Tidak dapat menghitung nilai sensitivitas — coba lagi dengan menyeret mouse atau mengusap layar sentuh.",
+            "resultClose": "Tutup",
+            "resultSave": "Simpan",
+            "resultDiscard": "Buang",
+            "resultRestart": "Ulangi"
+        },
+        "keyboardCalibration": {
+            "resultTitle": "KALIBRASI KEYBOARD",
+            "resultDas": "DAS:",
+            "resultArr": "ARR:",
+            "resultFailed": "Data yang terkumpul tidak cukup — coba tahan tombol arah setidaknya satu putaran.",
+            "resultSave": "Simpan",
+            "resultDiscard": "Buang",
+            "resultRestart": "Ulangi"
+        },
+        "loading": {
+            "leaderboardHint": "Memuat papan peringkat..."
+        },
+        "gameOverEntry": {
+            "title": "PERMAINAN BERAKHIR",
+            "titleSprintComplete": "SPRINT SELESAI",
+            "titleTimeUp": "WAKTU HABIS",
+            "titleCheeseClear": "KEJU DIBERSIHKAN",
+            "titleDigComplete": "PENGGALIAN SELESAI",
+            "scoreLabel": "Skor:",
+            "levelLabel": "level",
+            "linesLabel": "baris",
+            "todayBestLabel": "Terbaik hari ini:",
+            "todayBestBy": "oleh",
+            "submit": "Lanjutkan",
+            "statsTitle": "Statistik sesi",
+            "gameTimeLabel": "Waktu",
+            "droughtLabel": "D.MAX",
+            "droughtTotalLabel": "D.TOTAL",
+            "droughtAvgLabel": "D.AVG",
+            "burnLabel": "BRN",
+            "transitionLabel": "TRNS",
+            "tetrisRateLabel": "Tingkat 4 baris (4LR)",
+            "clearsLabel": "Pembersihan (1/2/3/4 baris)",
+            "ppsLabel": "PPS",
+            "spinsLabel": "Spin (T / T-mini / lainnya)",
+            "maxComboLabel": "Kombo terpanjang",
+            "efficiencyLabel": "Efisiensi (poin/baris)"
+        },
+        "gameOverSaved": {
+            "title": "SKOR TERSIMPAN",
+            "playAgainButton": "Main lagi"
+        }
+    },
+    "leaderboard": {
+        "title": "Papan peringkat",
+        "empty": "Belum ada skor — jadilah yang pertama bermain!",
+        "headers": {
+            "name": "Nama",
+            "score": "Skor",
+            "time": "Waktu",
+            "level": "Lvl",
+            "lines": "Baris",
+            "date": "Tanggal"
+        },
+        "defaultName": "Pemain"
+    },
+    "credits": {
+        "roleDeveloper": "Insinyur perangkat lunak",
+        "roleTester": "Penguji",
+        "roleMusic": "Musik",
+        "roleSfx": "SFX"
+    },
+    "difficulty": {
+        "easy": "Pemula",
+        "medium": "Amatir",
+        "hard": "Veteran",
+        "expert": "Ahli",
+        "pro": "PRO",
+        "levelPrefix": "level {level}"
+    },
+    "modes": {
+        "marathon": {
+            "name": "Maraton",
+            "description": "Permainan klasik tanpa akhir",
+            "rules": [
+                "♾️ Permainan tanpa akhir — bersihkan baris dan naik level",
+                "📈 Kecepatan jatuh meningkat setiap level",
+                "🏆 Skor dan level tertinggi yang dicapai sama-sama dihitung"
+            ]
+        },
+        "sprint": {
+            "name": "Sprint",
+            "description": "Bersihkan 40 baris secepat mungkin",
+            "rules": [
+                "🎯 Tujuan: bersihkan 40 baris",
+                "⏱️ Waktu selesaimu yang dihitung — cepatlah",
+                "🚫 Permainan yang belum selesai tidak akan disimpan ke papan peringkat"
+            ]
+        },
+        "ultra": {
+            "name": "Ultra",
+            "description": "Skor tertinggi dalam 3 menit",
+            "rules": [
+                "⏱️ Kamu punya waktu tepat 3 menit",
+                "💯 Raih skor setinggi mungkin sebelum waktu habis",
+                "📊 Hanya skor akhir yang dihitung"
+            ]
+        },
+        "survival": {
+            "name": "Bertahan Hidup",
+            "description": "Waspadai baris yang naik",
+            "rules": [
+                "🧱 Baris sampah terus naik dari bawah",
+                "🕳️ Temukan dan manfaatkan celah pada sampah",
+                "☠️ Permainan berakhir saat papan penuh"
+            ]
+        },
+        "cheeseRace": {
+            "name": "Balapan Keju",
+            "description": "Gali tumpukan yang sudah dibangun sebelumnya secepat mungkin",
+            "rules": [
+                "🧀 Papan dimulai dengan 10 baris sampah dengan satu celah",
+                "⏱️ Gali semuanya secepat mungkin",
+                "🚫 Permainan yang belum selesai tidak akan disimpan ke papan peringkat"
+            ]
+        },
+        "digSurvival": {
+            "name": "Gali Bertahan Hidup",
+            "description": "Gali selamanya - sampah langsung tumbuh kembali setiap kali kamu membersihkannya. Bertahanlah dan gali total 100 baris.",
+            "rules": [
+                "🧀 Dimulai dengan tumpukan sampah kecil di bawah",
+                "♻️ Setiap baris yang digali langsung tumbuh kembali dari bawah - tumpukan tidak akan pernah habis",
+                "🎯 Gali total 100 baris untuk menang",
+                "☠️ Permainan berakhir saat papan penuh"
+            ]
+        },
+        "countdown": {
+            "name": "Hitung Mundur",
+            "description": "Bersihkan baris agar jam tidak mencapai nol",
+            "rules": [
+                "⏱️ Dimulai dengan 60 detik di jam",
+                "➕ Setiap baris yang dibersihkan menambah waktu (lebih banyak untuk 4 baris)",
+                "⏳ Permainan berakhir saat jam mencapai nol"
+            ]
+        },
+        "random": {
+            "name": "Acak",
+            "description": "Memilihkan salah satu mode lain untukmu saat kamu menekan Mulai",
+            "rules": [
+                "🎲 Memilih secara acak salah satu mode lain",
+                "▶️ Ronde tersebut kemudian dimainkan persis seperti mode itu",
+                "🔁 Pilih Acak lagi untuk kejutan lainnya"
+            ]
+        }
+    },
+    "game": {
+        "levelUpBanner": "LEVEL {level}"
+    },
+    "sounds": {
+        "lineClear1": "baris",
+        "lineClear2": "II: baris",
+        "lineClear3": "III: baris",
+        "lineClear4": "IV: baris",
+        "drop": "Balok jatuh",
+        "gameOver": "Permainan berakhir",
+        "levelUp": "Naik level",
+        "rotate": "Putar",
+        "grounded": "Balok mendarat",
+        "falling": "Balok jatuh",
+        "pieceLock": "Balok terkunci"
+    }
+}

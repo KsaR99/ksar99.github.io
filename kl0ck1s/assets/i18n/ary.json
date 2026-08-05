@@ -1,0 +1,281 @@
+{
+    "locale": "ary-MA",
+    "sidebar": {
+        "nextPiece": "القطعة اللي جاية",
+        "score": "النقط",
+        "time": "الوقت",
+        "lines": "خطوط",
+        "best": "أحسن نتيجة",
+        "drought": "الجفاف",
+        "tetrisRate": "4LR",
+        "pps": "PPS",
+        "objective": "الهدف",
+        "statusLive": "اللعبة الحالية",
+        "statusLast": "آخر لعبة"
+    },
+    "controls": {
+        "toggle": "أزرار التحكم",
+        "rotate": "دوّر",
+        "rotate180": "دوّر 180°",
+        "moveLeftRight": "تحرك لليسار / لليمين",
+        "softDrop": "نزول بشوية",
+        "hardDrop": "نزول فالحين",
+        "pause": "وقف",
+        "start": "بدا / لعبة جديدة",
+        "mute": "سكّت الصوت",
+        "options": "الإعدادات",
+        "spaceKey": "المسافة",
+        "restart": "عاود من جديد",
+        "exitToMenu": "خرج للقائمة",
+        "touchMove": "تحرك",
+        "touchMoveGesture": "جرّ فوق اللوحة",
+        "touchRotateGesture": "دوز على اللوحة",
+        "touchHardDropGesture": "امسح لتحت",
+        "touchSoftDropGesture": "بقى ضاغط ▼",
+        "touchPauseGesture": "زر ❚❚"
+    },
+    "screens": {
+        "idle": {
+            "hint": "الصعوبة",
+            "modeHint": "الوضعية",
+            "startButton": "بدا",
+            "namePlaceholder": "لقب ديالك"
+        },
+        "modeInfo": {
+            "subtitle": "الوضعية: {mode}",
+            "continueButton": "كمّل"
+        },
+        "paused": {
+            "title": "وقفة",
+            "resumeHintBefore": "دوز على",
+            "resumeHintAfter": "باش تكمّل",
+            "optionsHintBefore": "دوز على",
+            "optionsHintAfter": "باش تحل الإعدادات",
+            "resumeButton": "كمّل"
+        },
+        "options": {
+            "title": "الإعدادات",
+            "closeHintBefore": "دوز على",
+            "closeHintAfter": "باش تسدّ",
+            "generalTitle": "عام",
+            "language": "اللغة",
+            "soundTitle": "الصوت",
+            "mute": "سكوت",
+            "volume": "شدة الصوت",
+            "sfxTitle": "المؤثرات الصوتية",
+            "musicTitle": "الموسيقى",
+            "categoryVolume": "شدة الصوت ديال الفئة",
+            "preview": "استمع",
+            "pause": "وقف",
+            "hudRight": "لوحة المعلومات فاليمين",
+            "gameplayTitle": "طريقة اللعب",
+            "skipCountdown": "تخطى العد التنازلي",
+            "skipModeInfo": "تخطى شاشة معلومات الوضعية",
+            "controlsTitle": "التحكم",
+            "mouseControl": "التحكم بالماوس",
+            "graphicsTitle": "الرسوميات",
+            "ghost": "القطعة الشبح",
+            "gridLines": "خطوط الشبكة",
+            "performanceTitle": "الأداء",
+            "glow": "توهج (تمويه)",
+            "transparency": "الشفافية",
+            "fallTrail": "أثر السقوط",
+            "effect": "فلتر الشاشة",
+            "effectNone": "بلا شي",
+            "effectVhs": "تشويش VHS",
+            "effectMatrix": "ماتريكس",
+            "effectRain": "شتا",
+            "effectSnow": "الثلج",
+            "close": "سد",
+            "mouseSensitivity": "حساسية الماوس",
+            "touchSensitivity": "حساسية اللمس",
+            "calibrateSensitivity": "معايرة الحساسية",
+            "calibrateSensitivityButton": "عاير",
+            "advancedTitle": "متقدم",
+            "keyboardDas": "DAS ديال الكيبورد (ms)",
+            "keyboardArr": "ARR ديال الكيبورد (ms)",
+            "calibrateKeyboard": "معايرة الكيبورد",
+            "calibrateKeyboardButton": "عاير"
+        },
+        "calibration": {
+            "gestures": {
+                "sideToCenter": "جرّ القطعة للعمود اللي فالوسط",
+                "sideToEdge": "جرّ القطعة للعمود اللي فالحافة",
+                "toWall": "جرّ حتى للحيط {kbd}",
+                "click": "كليكي مرة وحدة {kbd}",
+                "hardDrop": "دير نزول فالحين",
+                "softDropOne": "دير خطوة نزول بشوية",
+                "rotate": "دوّر القطعة",
+                "hold": "بقى ضاغط على {kbd}، من بعد حل"
+            },
+            "progress": "الجولة {pass}/{totalPasses} · الخطوة {step}/{steps}",
+            "resultTitle": "معايرة الحساسية",
+            "resultSuccessBefore": "الحساسية ديالك دابا مضبوطة على",
+            "resultFailed": "ما قدرناش نحسبو قيمة الحساسية — عاود المحاولة بجرّ الماوس أو اللمس.",
+            "resultClose": "سد",
+            "resultSave": "حفظ",
+            "resultDiscard": "تجاهل",
+            "resultRestart": "عاود"
+        },
+        "keyboardCalibration": {
+            "resultTitle": "معايرة الكيبورد",
+            "resultDas": "DAS:",
+            "resultArr": "ARR:",
+            "resultFailed": "ما تجمعاتش بيانات كافية — حاول تبقى ضاغط على زر الاتجاه فجولة وحدة على الأقل.",
+            "resultSave": "حفظ",
+            "resultDiscard": "تجاهل",
+            "resultRestart": "عاود"
+        },
+        "loading": {
+            "leaderboardHint": "كيتحمّل الترتيب..."
+        },
+        "gameOverEntry": {
+            "title": "خلصات اللعبة",
+            "titleSprintComplete": "السبرينت كمّل",
+            "titleTimeUp": "خلص الوقت",
+            "titleCheeseClear": "الفرماج تنظف",
+            "titleDigComplete": "الحفر كمّل",
+            "scoreLabel": "النقط:",
+            "levelLabel": "المستوى",
+            "linesLabel": "خطوط",
+            "todayBestLabel": "أحسن نتيجة ديال اليوم:",
+            "todayBestBy": "من طرف",
+            "submit": "كمّل",
+            "statsTitle": "إحصائيات الجلسة",
+            "gameTimeLabel": "الوقت",
+            "droughtLabel": "D.MAX",
+            "droughtTotalLabel": "D.TOTAL",
+            "droughtAvgLabel": "D.AVG",
+            "burnLabel": "BRN",
+            "transitionLabel": "TRNS",
+            "tetrisRateLabel": "نسبة 4 خطوط (4LR)",
+            "clearsLabel": "التنظيفات (1/2/3/4 خطوط)",
+            "ppsLabel": "PPS",
+            "spinsLabel": "دورات (T / T-mini / أخرى)",
+            "maxComboLabel": "أطول كومبو",
+            "efficiencyLabel": "الفعالية (نقط/خط)"
+        },
+        "gameOverSaved": {
+            "title": "تسجلات النقط",
+            "playAgainButton": "العب مرة أخرى"
+        }
+    },
+    "leaderboard": {
+        "title": "الترتيب",
+        "empty": "مازال ماكاين حتى نتيجة — كون أول واحد يلعب!",
+        "headers": {
+            "name": "السمية",
+            "score": "النقط",
+            "time": "الوقت",
+            "level": "المستوى",
+            "lines": "خطوط",
+            "date": "التاريخ"
+        },
+        "defaultName": "اللاعب"
+    },
+    "credits": {
+        "roleDeveloper": "مهندس برمجيات",
+        "roleTester": "مختبر",
+        "roleMusic": "الموسيقى",
+        "roleSfx": "المؤثرات الصوتية"
+    },
+    "difficulty": {
+        "easy": "مبتدئ",
+        "medium": "هاوي",
+        "hard": "محترف",
+        "expert": "خبير",
+        "pro": "PRO",
+        "levelPrefix": "المستوى {level}"
+    },
+    "modes": {
+        "marathon": {
+            "name": "الماراطون",
+            "description": "اللعبة الكلاسيكية اللي ماعندهاش نهاية",
+            "rules": [
+                "♾️ لعبة بلا نهاية — نظف الخطوط وطلع فالمستويات",
+                "📈 سرعة السقوط كتزيد مع كل مستوى",
+                "🏆 النقط والمستوى الأعلى اللي وصلتي ليه كيتحسبو بجوج"
+            ]
+        },
+        "sprint": {
+            "name": "السبرينت",
+            "description": "نظف 40 خط بأسرع ما يمكن",
+            "rules": [
+                "🎯 الهدف: نظف 40 خط",
+                "⏱️ الوقت ديالك هو اللي كيتحسب — سرع",
+                "🚫 اللعبة اللي ماكملاتش ما غاديش تتسجل فالترتيب"
+            ]
+        },
+        "ultra": {
+            "name": "أولترا",
+            "description": "أعلى نقط ف3 دقايق",
+            "rules": [
+                "⏱️ عندك بالضبط 3 دقايق",
+                "💯 اجمع أعلى نقط قبل ما يخلص الوقت",
+                "📊 غير النقط النهائية هي اللي كتتحسب"
+            ]
+        },
+        "survival": {
+            "name": "النجاة",
+            "description": "رد بالك للخطوط اللي كتطلع",
+            "rules": [
+                "🧱 خطوط الزبل كتطلع بلا توقف من تحت",
+                "🕳️ لقى واستافد من الفراغات فالزبل",
+                "☠️ اللعبة كتسالي مليمن اللوحة تعمر"
+            ]
+        },
+        "cheeseRace": {
+            "name": "سباق الفرماج",
+            "description": "احفر كومة مبنية من قبل بأسرع ما يمكن",
+            "rules": [
+                "🧀 اللوحة كتبدا ب10 صفوف ديال الزبل فيهم فراغ",
+                "⏱️ احفر كلشي بأسرع ما يمكن",
+                "🚫 اللعبة اللي ماكملاتش ما غاديش تتسجل فالترتيب"
+            ]
+        },
+        "digSurvival": {
+            "name": "الحفر للنجاة",
+            "description": "احفر بلا توقف - الزبل كيرجع يكبر فالحين كل مرة كتنظف خط. نجّي وحفر 100 خط بالمجموع.",
+            "rules": [
+                "🧀 كتبدا بكومة صغيرة ديال الزبل فالقاع",
+                "♻️ كل خط كتحفرو كيرجع يكبر فالحين من تحت - الكومة ماكتسالاش",
+                "🎯 احفر 100 خط بالمجموع باش تربح",
+                "☠️ اللعبة كتسالي مليمن اللوحة تعمر"
+            ]
+        },
+        "countdown": {
+            "name": "العد التنازلي",
+            "description": "نظف الخطوط باش الساعة ما توصلش للصفر",
+            "rules": [
+                "⏱️ كتبدا ب60 ثانية فالساعة",
+                "➕ كل خط كتنظفو كيرجع ليك الوقت (كثر بزاف مع 4 خطوط)",
+                "⏳ اللعبة كتسالي مليمن الساعة توصل للصفر"
+            ]
+        },
+        "random": {
+            "name": "عشوائي",
+            "description": "كيختار ليك وضعية من الوضعيات الأخرى مليمن كتضغط بدا",
+            "rules": [
+                "🎲 كيختار عشوائيا وضعية من الوضعيات الأخرى",
+                "▶️ الجولة كتلعب من بعد بالضبط بحال هاد الوضعية",
+                "🔁 اختار عشوائي مرة أخرى باش تجي مفاجأة أخرى"
+            ]
+        }
+    },
+    "game": {
+        "levelUpBanner": "المستوى {level}"
+    },
+    "sounds": {
+        "lineClear1": "خط",
+        "lineClear2": "II: خط",
+        "lineClear3": "III: خط",
+        "lineClear4": "IV: خط",
+        "drop": "سقوط القطعة",
+        "gameOver": "خلصات اللعبة",
+        "levelUp": "طلوع المستوى",
+        "rotate": "دوران",
+        "grounded": "القطعة هبطت",
+        "falling": "القطعة كتهبط",
+        "pieceLock": "قفل القطعة"
+    }
+}

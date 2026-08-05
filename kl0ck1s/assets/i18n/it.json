@@ -1,0 +1,281 @@
+{
+    "locale": "it-IT",
+    "sidebar": {
+        "nextPiece": "Prossimo pezzo",
+        "score": "Punteggio",
+        "time": "Tempo",
+        "lines": "Linee",
+        "best": "Record",
+        "drought": "Siccità",
+        "tetrisRate": "4LR",
+        "pps": "PPS",
+        "objective": "Obiettivo",
+        "statusLive": "Partita in corso",
+        "statusLast": "Ultima partita"
+    },
+    "controls": {
+        "toggle": "Comandi",
+        "rotate": "Ruota",
+        "rotate180": "Ruota 180°",
+        "moveLeftRight": "Muovi sinistra / destra",
+        "softDrop": "Discesa lenta",
+        "hardDrop": "Discesa rapida",
+        "pause": "Pausa",
+        "start": "Avvia / nuova partita",
+        "mute": "Disattiva audio",
+        "options": "Opzioni",
+        "spaceKey": "Spazio",
+        "restart": "Riavvia",
+        "exitToMenu": "Esci al menu",
+        "touchMove": "Muovi",
+        "touchMoveGesture": "Trascina sulla griglia",
+        "touchRotateGesture": "Tocca la griglia",
+        "touchHardDropGesture": "Scorri verso il basso",
+        "touchSoftDropGesture": "Tieni premuto ▼",
+        "touchPauseGesture": "Pulsante ❚❚"
+    },
+    "screens": {
+        "idle": {
+            "hint": "Difficoltà",
+            "modeHint": "Modalità",
+            "startButton": "Avvia",
+            "namePlaceholder": "Il tuo nickname"
+        },
+        "modeInfo": {
+            "subtitle": "Modalità: {mode}",
+            "continueButton": "Continua"
+        },
+        "paused": {
+            "title": "PAUSA",
+            "resumeHintBefore": "Premi",
+            "resumeHintAfter": "per riprendere",
+            "optionsHintBefore": "Premi",
+            "optionsHintAfter": "per aprire le opzioni",
+            "resumeButton": "Riprendi"
+        },
+        "options": {
+            "title": "OPZIONI",
+            "closeHintBefore": "Premi",
+            "closeHintAfter": "per chiudere",
+            "generalTitle": "Generali",
+            "language": "Lingua",
+            "soundTitle": "Audio",
+            "mute": "Silenzia",
+            "volume": "Volume",
+            "sfxTitle": "Effetti sonori",
+            "musicTitle": "Musica",
+            "categoryVolume": "Volume categoria",
+            "preview": "Anteprima",
+            "pause": "Pausa",
+            "hudRight": "HUD a destra",
+            "gameplayTitle": "Gioco",
+            "skipCountdown": "Salta conto alla rovescia",
+            "skipModeInfo": "Salta schermata info modalità",
+            "controlsTitle": "Comandi",
+            "mouseControl": "Controllo con il mouse",
+            "graphicsTitle": "Grafica",
+            "ghost": "Pezzo fantasma",
+            "gridLines": "Linee della griglia",
+            "performanceTitle": "Prestazioni",
+            "glow": "Bagliore (sfocatura)",
+            "transparency": "Trasparenza",
+            "fallTrail": "Scia di caduta",
+            "effect": "Filtro schermo",
+            "effectNone": "Nessuno",
+            "effectVhs": "Rumore VHS",
+            "effectMatrix": "Matrix",
+            "effectRain": "Pioggia",
+            "effectSnow": "Neve",
+            "close": "Chiudi",
+            "mouseSensitivity": "Sensibilità del mouse",
+            "touchSensitivity": "Sensibilità tocco",
+            "calibrateSensitivity": "Calibrazione sensibilità",
+            "calibrateSensitivityButton": "Calibra",
+            "advancedTitle": "Avanzate",
+            "keyboardDas": "DAS tastiera (ms)",
+            "keyboardArr": "ARR tastiera (ms)",
+            "calibrateKeyboard": "Calibra tastiera",
+            "calibrateKeyboardButton": "Calibra"
+        },
+        "calibration": {
+            "gestures": {
+                "sideToCenter": "Trascina il pezzo nella colonna centrale",
+                "sideToEdge": "Trascina il pezzo nella colonna del bordo",
+                "toWall": "Trascina fino al muro {kbd}",
+                "click": "Clicca una volta {kbd}",
+                "hardDrop": "Fai cadere rapidamente il pezzo",
+                "softDropOne": "Fai scendere lentamente il pezzo",
+                "rotate": "Ruota il pezzo",
+                "hold": "Tieni premuto {kbd}, poi rilascia"
+            },
+            "progress": "Round {pass}/{totalPasses} · Passo {step}/{steps}",
+            "resultTitle": "CALIBRAZIONE SENSIBILITÀ",
+            "resultSuccessBefore": "La tua sensibilità è ora impostata a",
+            "resultFailed": "Impossibile calcolare un valore di sensibilità — riprova trascinando con il mouse o con uno swipe tattile.",
+            "resultClose": "Chiudi",
+            "resultSave": "Salva",
+            "resultDiscard": "Scarta",
+            "resultRestart": "Riavvia"
+        },
+        "keyboardCalibration": {
+            "resultTitle": "CALIBRAZIONE TASTIERA",
+            "resultDas": "DAS:",
+            "resultArr": "ARR:",
+            "resultFailed": "Non sono stati raccolti dati sufficienti — prova a tenere premuto un tasto direzionale per almeno un round.",
+            "resultSave": "Salva",
+            "resultDiscard": "Scarta",
+            "resultRestart": "Riavvia"
+        },
+        "loading": {
+            "leaderboardHint": "Caricamento classifica..."
+        },
+        "gameOverEntry": {
+            "title": "FINE PARTITA",
+            "titleSprintComplete": "SPRINT COMPLETATO",
+            "titleTimeUp": "TEMPO SCADUTO",
+            "titleCheeseClear": "FORMAGGIO ELIMINATO",
+            "titleDigComplete": "SCAVO COMPLETATO",
+            "scoreLabel": "Punteggio:",
+            "levelLabel": "livello",
+            "linesLabel": "linee",
+            "todayBestLabel": "Miglior punteggio di oggi:",
+            "todayBestBy": "di",
+            "submit": "Continua",
+            "statsTitle": "Statistiche sessione",
+            "gameTimeLabel": "Tempo",
+            "droughtLabel": "D.MAX",
+            "droughtTotalLabel": "D.TOT",
+            "droughtAvgLabel": "D.MEDIA",
+            "burnLabel": "BRN",
+            "transitionLabel": "TRNS",
+            "tetrisRateLabel": "Tasso 4 linee (4LR)",
+            "clearsLabel": "Linee eliminate (1/2/3/4)",
+            "ppsLabel": "PPS",
+            "spinsLabel": "Spin (T / T-mini / altro)",
+            "maxComboLabel": "Combo più lunga",
+            "efficiencyLabel": "Efficienza (punti/linea)"
+        },
+        "gameOverSaved": {
+            "title": "PUNTEGGIO SALVATO",
+            "playAgainButton": "Gioca ancora"
+        }
+    },
+    "leaderboard": {
+        "title": "Classifica",
+        "empty": "Ancora nessun punteggio — sii il primo a giocare!",
+        "headers": {
+            "name": "Nome",
+            "score": "Punti",
+            "time": "Tempo",
+            "level": "Lvl",
+            "lines": "Linee",
+            "date": "Data"
+        },
+        "defaultName": "Giocatore"
+    },
+    "credits": {
+        "roleDeveloper": "Ingegnere software",
+        "roleTester": "Tester",
+        "roleMusic": "Musica",
+        "roleSfx": "Effetti sonori"
+    },
+    "difficulty": {
+        "easy": "Principiante",
+        "medium": "Amatore",
+        "hard": "Veterano",
+        "expert": "Esperto",
+        "pro": "PRO",
+        "levelPrefix": "livello {level}"
+    },
+    "modes": {
+        "marathon": {
+            "name": "Maratona",
+            "description": "Gioco classico infinito",
+            "rules": [
+                "♾️ Partita infinita — elimina linee e sali di livello",
+                "📈 La velocità di caduta aumenta a ogni livello",
+                "🏆 Contano sia il punteggio che il livello più alto raggiunto"
+            ]
+        },
+        "sprint": {
+            "name": "Sprint",
+            "description": "Elimina 40 linee il più velocemente possibile",
+            "rules": [
+                "🎯 Obiettivo: elimina 40 linee",
+                "⏱️ Conta il tuo tempo di completamento — vai veloce",
+                "🚫 Una partita non completata non verrà salvata in classifica"
+            ]
+        },
+        "ultra": {
+            "name": "Ultra",
+            "description": "Punteggio più alto in 3 minuti",
+            "rules": [
+                "⏱️ Hai esattamente 3 minuti",
+                "💯 Fai il punteggio più alto possibile prima che scada il tempo",
+                "📊 Conta solo il punteggio finale"
+            ]
+        },
+        "survival": {
+            "name": "Sopravvivenza",
+            "description": "Attento alle linee che salgono",
+            "rules": [
+                "🧱 Le linee di detriti continuano a salire dal basso",
+                "🕳️ Trova e usa i varchi nei detriti",
+                "☠️ La partita finisce quando la griglia si riempie"
+            ]
+        },
+        "cheeseRace": {
+            "name": "Corsa al formaggio",
+            "description": "Scava una pila pre-costruita il più velocemente possibile",
+            "rules": [
+                "🧀 La griglia inizia con 10 righe di detriti con un varco",
+                "⏱️ Scava tutto il più velocemente possibile",
+                "🚫 Una partita non completata non verrà salvata in classifica"
+            ]
+        },
+        "digSurvival": {
+            "name": "Scavo Sopravvivenza",
+            "description": "Scava per sempre — i detriti ricrescono subito ogni volta che li elimini. Sopravvivi e scava 100 linee in totale.",
+            "rules": [
+                "🧀 Inizia con una piccola pila di detriti sul fondo",
+                "♻️ Ogni linea scavata ricresce subito dal basso — la pila non finisce mai",
+                "🎯 Scava un totale di 100 linee per vincere",
+                "☠️ La partita finisce quando la griglia si riempie"
+            ]
+        },
+        "countdown": {
+            "name": "Conto alla rovescia",
+            "description": "Elimina linee per impedire che l'orologio arrivi a zero",
+            "rules": [
+                "⏱️ Inizia con 60 secondi sull'orologio",
+                "➕ Ogni linea eliminata aggiunge tempo (di più per 4 linee)",
+                "⏳ La partita finisce quando l'orologio arriva a zero"
+            ]
+        },
+        "random": {
+            "name": "Casuale",
+            "description": "Sceglie una delle altre modalità per te quando premi Avvia",
+            "rules": [
+                "🎲 Sceglie a caso una delle altre modalità",
+                "▶️ Il round si gioca esattamente come quella modalità",
+                "🔁 Scegli di nuovo Casuale per un'altra sorpresa"
+            ]
+        }
+    },
+    "game": {
+        "levelUpBanner": "LIVELLO {level}"
+    },
+    "sounds": {
+        "lineClear1": "linea",
+        "lineClear2": "II: linea",
+        "lineClear3": "III: linea",
+        "lineClear4": "IV: linea",
+        "drop": "Caduta pezzo",
+        "gameOver": "Fine partita",
+        "levelUp": "Livello superiore",
+        "rotate": "Rotazione",
+        "grounded": "Pezzo atterrato",
+        "falling": "Pezzo in caduta",
+        "pieceLock": "Blocco pezzo"
+    }
+}

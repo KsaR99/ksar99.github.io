@@ -1,0 +1,281 @@
+{
+    "locale": "cs-CZ",
+    "sidebar": {
+        "nextPiece": "Další díl",
+        "score": "Skóre",
+        "time": "Čas",
+        "lines": "Řádky",
+        "best": "Nejlepší",
+        "drought": "Sucho",
+        "tetrisRate": "T4Ř",
+        "pps": "PPS",
+        "objective": "Cíl",
+        "statusLive": "Aktuální hra",
+        "statusLast": "Poslední hra"
+    },
+    "controls": {
+        "toggle": "Ovládání",
+        "rotate": "Otočit",
+        "rotate180": "Otočit o 180°",
+        "moveLeftRight": "Pohyb vlevo / vpravo",
+        "softDrop": "Pomalý pád",
+        "hardDrop": "Rychlý pád",
+        "pause": "Pauza",
+        "start": "Start / nová hra",
+        "mute": "Ztlumit zvuk",
+        "options": "Možnosti",
+        "spaceKey": "Mezerník",
+        "restart": "Restart",
+        "exitToMenu": "Odejít do menu",
+        "touchMove": "Pohyb",
+        "touchMoveGesture": "Táhni po hrací ploše",
+        "touchRotateGesture": "Klepni na hrací plochu",
+        "touchHardDropGesture": "Přejeď dolů",
+        "touchSoftDropGesture": "Podrž ▼",
+        "touchPauseGesture": "Tlačítko ❚❚"
+    },
+    "screens": {
+        "idle": {
+            "hint": "Obtížnost",
+            "modeHint": "Režim",
+            "startButton": "Start",
+            "namePlaceholder": "Tvoje přezdívka"
+        },
+        "modeInfo": {
+            "subtitle": "Režim: {mode}",
+            "continueButton": "Pokračovat"
+        },
+        "paused": {
+            "title": "PAUZA",
+            "resumeHintBefore": "Stiskni",
+            "resumeHintAfter": "pro pokračování",
+            "optionsHintBefore": "Stiskni",
+            "optionsHintAfter": "pro otevření možností",
+            "resumeButton": "Pokračovat"
+        },
+        "options": {
+            "title": "MOŽNOSTI",
+            "closeHintBefore": "Stiskni",
+            "closeHintAfter": "pro zavření",
+            "generalTitle": "Obecné",
+            "language": "Jazyk",
+            "soundTitle": "Zvuk",
+            "mute": "Ztlumit",
+            "volume": "Hlasitost",
+            "sfxTitle": "Zvukové efekty",
+            "musicTitle": "Hudba",
+            "categoryVolume": "Hlasitost kategorie",
+            "preview": "Přehrát",
+            "pause": "Pauza",
+            "hudRight": "HUD vpravo",
+            "gameplayTitle": "Hratelnost",
+            "skipCountdown": "Přeskočit odpočet",
+            "skipModeInfo": "Přeskočit informace o režimu",
+            "controlsTitle": "Ovládání",
+            "mouseControl": "Ovládání myší",
+            "graphicsTitle": "Grafika",
+            "ghost": "Duch dílu",
+            "gridLines": "Mřížka",
+            "performanceTitle": "Výkon",
+            "glow": "Záře (rozostření)",
+            "transparency": "Průhlednost",
+            "fallTrail": "Stopa pádu",
+            "effect": "Filtr obrazovky",
+            "effectNone": "Žádný",
+            "effectVhs": "VHS šum",
+            "effectMatrix": "Matrix",
+            "effectRain": "Déšť",
+            "effectSnow": "Sníh",
+            "close": "Zavřít",
+            "mouseSensitivity": "Citlivost myši",
+            "touchSensitivity": "Citlivost dotyku",
+            "calibrateSensitivity": "Kalibrace citlivosti",
+            "calibrateSensitivityButton": "Kalibrovat",
+            "advancedTitle": "Pokročilé",
+            "keyboardDas": "DAS klávesnice (ms)",
+            "keyboardArr": "ARR klávesnice (ms)",
+            "calibrateKeyboard": "Kalibrace klávesnice",
+            "calibrateKeyboardButton": "Kalibrovat"
+        },
+        "calibration": {
+            "gestures": {
+                "sideToCenter": "Přetáhni díl do prostředního sloupce",
+                "sideToEdge": "Přetáhni díl do krajního sloupce",
+                "toWall": "Přetáhni ke zdi {kbd}",
+                "click": "Klikni jednou {kbd}",
+                "hardDrop": "Proveď rychlý pád",
+                "softDropOne": "Proveď krok pomalého pádu",
+                "rotate": "Otoč díl",
+                "hold": "Podrž {kbd}, poté pusť"
+            },
+            "progress": "Kolo {pass}/{totalPasses} · Krok {step}/{steps}",
+            "resultTitle": "KALIBRACE CITLIVOSTI",
+            "resultSuccessBefore": "Tvoje citlivost je nyní nastavena na",
+            "resultFailed": "Nepodařilo se vypočítat citlivost — zkus to znovu tažením myší nebo prstem.",
+            "resultClose": "Zavřít",
+            "resultSave": "Uložit",
+            "resultDiscard": "Zahodit",
+            "resultRestart": "Restart"
+        },
+        "keyboardCalibration": {
+            "resultTitle": "KALIBRACE KLÁVESNICE",
+            "resultDas": "DAS:",
+            "resultArr": "ARR:",
+            "resultFailed": "Nebylo zachyceno dost dat — zkus podržet směrovou klávesu alespoň jednou.",
+            "resultSave": "Uložit",
+            "resultDiscard": "Zahodit",
+            "resultRestart": "Restart"
+        },
+        "loading": {
+            "leaderboardHint": "Načítání žebříčku..."
+        },
+        "gameOverEntry": {
+            "title": "KONEC HRY",
+            "titleSprintComplete": "SPRINT DOKONČEN",
+            "titleTimeUp": "ČAS VYPRŠEL",
+            "titleCheeseClear": "SÝR VYČIŠTĚN",
+            "titleDigComplete": "KOPÁNÍ DOKONČENO",
+            "scoreLabel": "Skóre:",
+            "levelLabel": "úroveň",
+            "linesLabel": "řádky",
+            "todayBestLabel": "Dnešní nejlepší:",
+            "todayBestBy": "od",
+            "submit": "Pokračovat",
+            "statsTitle": "Statistiky hry",
+            "gameTimeLabel": "Čas",
+            "droughtLabel": "D.MAX",
+            "droughtTotalLabel": "D.TOTAL",
+            "droughtAvgLabel": "D.PRŮM",
+            "burnLabel": "BRN",
+            "transitionLabel": "TRNS",
+            "tetrisRateLabel": "Míra 4 řádků (T4Ř)",
+            "clearsLabel": "Vyčištění (1/2/3/4 řádky)",
+            "ppsLabel": "PPS",
+            "spinsLabel": "Spiny (T / T-mini / ostatní)",
+            "maxComboLabel": "Nejdelší kombo",
+            "efficiencyLabel": "Efektivita (body/řádek)"
+        },
+        "gameOverSaved": {
+            "title": "SKÓRE ULOŽENO",
+            "playAgainButton": "Hrát znovu"
+        }
+    },
+    "leaderboard": {
+        "title": "Žebříček",
+        "empty": "Zatím žádné skóre — buď první, kdo si zahraje!",
+        "headers": {
+            "name": "Jméno",
+            "score": "Skóre",
+            "time": "Čas",
+            "level": "Úr.",
+            "lines": "Řádky",
+            "date": "Datum"
+        },
+        "defaultName": "Hráč"
+    },
+    "credits": {
+        "roleDeveloper": "Softwarový inženýr",
+        "roleTester": "Tester",
+        "roleMusic": "Hudba",
+        "roleSfx": "SFX"
+    },
+    "difficulty": {
+        "easy": "Začátečník",
+        "medium": "Amatér",
+        "hard": "Pokročilý",
+        "expert": "Expert",
+        "pro": "PRO",
+        "levelPrefix": "úroveň {level}"
+    },
+    "modes": {
+        "marathon": {
+            "name": "Maraton",
+            "description": "Klasická nekonečná hra",
+            "rules": [
+                "♾️ Nekonečná hra — mazej řádky a stoupej v úrovních",
+                "📈 Rychlost pádu se zvyšuje s každou úrovní",
+                "🏆 Počítá se skóre i nejvyšší dosažená úroveň"
+            ]
+        },
+        "sprint": {
+            "name": "Sprint",
+            "description": "Vyčisti 40 řádků co nejrychleji",
+            "rules": [
+                "🎯 Cíl: vyčistit 40 řádků",
+                "⏱️ Počítá se tvůj čas — buď rychlý",
+                "🚫 Nedokončená hra se neuloží do žebříčku"
+            ]
+        },
+        "ultra": {
+            "name": "Ultra",
+            "description": "Nejvyšší skóre za 3 minuty",
+            "rules": [
+                "⏱️ Máš přesně 3 minuty",
+                "💯 Dosáhni co nejvyššího skóre, než čas vyprší",
+                "📊 Počítá se pouze konečné skóre"
+            ]
+        },
+        "survival": {
+            "name": "Přežití",
+            "description": "Dávej pozor na stoupající řádky",
+            "rules": [
+                "🧱 Řádky se smetím neustále stoupají zespodu",
+                "🕳️ Najdi a využij mezery ve smetí",
+                "☠️ Hra končí, když se hrací plocha zaplní"
+            ]
+        },
+        "cheeseRace": {
+            "name": "Sýrový závod",
+            "description": "Odkopej předem postavenou hromadu co nejrychleji",
+            "rules": [
+                "🧀 Hrací plocha začíná s 10 řádky smetí s mezerou",
+                "⏱️ Odkopej vše co nejrychleji",
+                "🚫 Nedokončená hra se neuloží do žebříčku"
+            ]
+        },
+        "digSurvival": {
+            "name": "Kopání na přežití",
+            "description": "Kopej donekonečna — smetí okamžitě doroste, jakmile ho vyčistíš. Přežij a vykopej celkem 100 řádků.",
+            "rules": [
+                "🧀 Začíná s malou hromadou smetí na dně",
+                "♻️ Každý vykopaný řádek okamžitě doroste zespodu — hromada nikdy nedojde",
+                "🎯 Vykopej celkem 100 řádků a vyhraj",
+                "☠️ Hra končí, když se hrací plocha zaplní"
+            ]
+        },
+        "countdown": {
+            "name": "Odpočet",
+            "description": "Mazej řádky, aby hodiny nedošly na nulu",
+            "rules": [
+                "⏱️ Začíná s 60 sekundami na hodinách",
+                "➕ Každé vyčištění řádku přidá čas (více za 4 řádky)",
+                "⏳ Hra končí, když hodiny dojdou na nulu"
+            ]
+        },
+        "random": {
+            "name": "Náhodný",
+            "description": "Při stisknutí Start za tebe vybere jeden z ostatních režimů",
+            "rules": [
+                "🎲 Náhodně vybere jeden z ostatních režimů",
+                "▶️ Kolo se pak hraje přesně jako ten režim",
+                "🔁 Vyber Náhodný znovu pro další překvapení"
+            ]
+        }
+    },
+    "game": {
+        "levelUpBanner": "ÚROVEŇ {level}"
+    },
+    "sounds": {
+        "lineClear1": "řádek",
+        "lineClear2": "II: řádek",
+        "lineClear3": "III: řádek",
+        "lineClear4": "IV: řádek",
+        "drop": "Pád dílu",
+        "gameOver": "Konec hry",
+        "levelUp": "Postup na úroveň",
+        "rotate": "Otočení",
+        "grounded": "Díl na zemi",
+        "falling": "Díl padá",
+        "pieceLock": "Zamknutí dílu"
+    }
+}

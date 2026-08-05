@@ -1,0 +1,281 @@
+{
+    "locale": "ja-JP",
+    "sidebar": {
+        "nextPiece": "次のピース",
+        "score": "スコア",
+        "time": "時間",
+        "lines": "ライン",
+        "best": "ベスト",
+        "drought": "ドロート",
+        "tetrisRate": "4LR",
+        "pps": "PPS",
+        "objective": "目標",
+        "statusLive": "現在のゲーム",
+        "statusLast": "前回のゲーム"
+    },
+    "controls": {
+        "toggle": "操作方法",
+        "rotate": "回転",
+        "rotate180": "180°回転",
+        "moveLeftRight": "左右移動",
+        "softDrop": "ソフトドロップ",
+        "hardDrop": "ハードドロップ",
+        "pause": "ポーズ",
+        "start": "スタート / 新しいゲーム",
+        "mute": "ミュート",
+        "options": "オプション",
+        "spaceKey": "スペース",
+        "restart": "リスタート",
+        "exitToMenu": "メニューに戻る",
+        "touchMove": "移動",
+        "touchMoveGesture": "盤面をドラッグ",
+        "touchRotateGesture": "盤面をタップ",
+        "touchHardDropGesture": "下にスワイプ",
+        "touchSoftDropGesture": "▼を長押し",
+        "touchPauseGesture": "❚❚ボタン"
+    },
+    "screens": {
+        "idle": {
+            "hint": "難易度",
+            "modeHint": "モード",
+            "startButton": "スタート",
+            "namePlaceholder": "ニックネーム"
+        },
+        "modeInfo": {
+            "subtitle": "モード：{mode}",
+            "continueButton": "続ける"
+        },
+        "paused": {
+            "title": "ポーズ中",
+            "resumeHintBefore": "",
+            "resumeHintAfter": "で再開",
+            "optionsHintBefore": "",
+            "optionsHintAfter": "でオプションを開く",
+            "resumeButton": "再開"
+        },
+        "options": {
+            "title": "オプション",
+            "closeHintBefore": "",
+            "closeHintAfter": "で閉じる",
+            "generalTitle": "一般",
+            "language": "言語",
+            "soundTitle": "サウンド",
+            "mute": "ミュート",
+            "volume": "音量",
+            "sfxTitle": "効果音",
+            "musicTitle": "音楽",
+            "categoryVolume": "カテゴリー音量",
+            "preview": "プレビュー",
+            "pause": "一時停止",
+            "hudRight": "HUDを右に表示",
+            "gameplayTitle": "ゲームプレイ",
+            "skipCountdown": "カウントダウンをスキップ",
+            "skipModeInfo": "モード情報画面をスキップ",
+            "controlsTitle": "操作",
+            "mouseControl": "マウス操作",
+            "graphicsTitle": "グラフィック",
+            "ghost": "ゴーストピース",
+            "gridLines": "グリッド線",
+            "performanceTitle": "パフォーマンス",
+            "glow": "発光（ぼかし）",
+            "transparency": "透明度",
+            "fallTrail": "落下の軌跡",
+            "effect": "画面エフェクト",
+            "effectNone": "なし",
+            "effectVhs": "VHSノイズ",
+            "effectMatrix": "マトリックス",
+            "effectRain": "雨",
+            "effectSnow": "雪",
+            "close": "閉じる",
+            "mouseSensitivity": "マウス感度",
+            "touchSensitivity": "タッチ感度",
+            "calibrateSensitivity": "感度キャリブレーション",
+            "calibrateSensitivityButton": "キャリブレーション",
+            "advancedTitle": "詳細設定",
+            "keyboardDas": "キーボードDAS（ms）",
+            "keyboardArr": "キーボードARR（ms）",
+            "calibrateKeyboard": "キーボードキャリブレーション",
+            "calibrateKeyboardButton": "キャリブレーション"
+        },
+        "calibration": {
+            "gestures": {
+                "sideToCenter": "ピースを中央の列にドラッグ",
+                "sideToEdge": "ピースを端の列にドラッグ",
+                "toWall": "壁までドラッグ {kbd}",
+                "click": "1回クリック {kbd}",
+                "hardDrop": "ハードドロップを実行",
+                "softDropOne": "ソフトドロップを1回実行",
+                "rotate": "ピースを回転",
+                "hold": "{kbd}を押し続けてから離す"
+            },
+            "progress": "ラウンド {pass}/{totalPasses} · ステップ {step}/{steps}",
+            "resultTitle": "感度キャリブレーション",
+            "resultSuccessBefore": "感度は次の値に設定されました：",
+            "resultFailed": "感度を計算できませんでした。マウスドラッグまたはタッチスワイプでもう一度お試しください。",
+            "resultClose": "閉じる",
+            "resultSave": "保存",
+            "resultDiscard": "破棄",
+            "resultRestart": "やり直す"
+        },
+        "keyboardCalibration": {
+            "resultTitle": "キーボードキャリブレーション",
+            "resultDas": "DAS：",
+            "resultArr": "ARR：",
+            "resultFailed": "十分なデータを取得できませんでした。少なくとも1回は方向キーを押し続けてみてください。",
+            "resultSave": "保存",
+            "resultDiscard": "破棄",
+            "resultRestart": "やり直す"
+        },
+        "loading": {
+            "leaderboardHint": "ランキングを読み込み中..."
+        },
+        "gameOverEntry": {
+            "title": "ゲームオーバー",
+            "titleSprintComplete": "スプリント完了",
+            "titleTimeUp": "タイムアップ",
+            "titleCheeseClear": "チーズクリア",
+            "titleDigComplete": "掘削完了",
+            "scoreLabel": "スコア：",
+            "levelLabel": "レベル",
+            "linesLabel": "ライン",
+            "todayBestLabel": "本日のベスト：",
+            "todayBestBy": "by",
+            "submit": "続ける",
+            "statsTitle": "セッション統計",
+            "gameTimeLabel": "時間",
+            "droughtLabel": "D.MAX",
+            "droughtTotalLabel": "D.TOTAL",
+            "droughtAvgLabel": "D.AVG",
+            "burnLabel": "BRN",
+            "transitionLabel": "TRNS",
+            "tetrisRateLabel": "4ライン率（4LR）",
+            "clearsLabel": "消去数（1/2/3/4ライン）",
+            "ppsLabel": "PPS",
+            "spinsLabel": "スピン（T / T-mini / その他）",
+            "maxComboLabel": "最長コンボ",
+            "efficiencyLabel": "効率（点/ライン）"
+        },
+        "gameOverSaved": {
+            "title": "スコアを保存しました",
+            "playAgainButton": "もう一度プレイ"
+        }
+    },
+    "leaderboard": {
+        "title": "ランキング",
+        "empty": "まだスコアがありません — 最初のプレイヤーになろう！",
+        "headers": {
+            "name": "名前",
+            "score": "スコア",
+            "time": "時間",
+            "level": "Lv",
+            "lines": "ライン",
+            "date": "日付"
+        },
+        "defaultName": "プレイヤー"
+    },
+    "credits": {
+        "roleDeveloper": "ソフトウェアエンジニア",
+        "roleTester": "テスター",
+        "roleMusic": "音楽",
+        "roleSfx": "効果音"
+    },
+    "difficulty": {
+        "easy": "ルーキー",
+        "medium": "アマチュア",
+        "hard": "ベテラン",
+        "expert": "エキスパート",
+        "pro": "PRO",
+        "levelPrefix": "レベル {level}"
+    },
+    "modes": {
+        "marathon": {
+            "name": "マラソン",
+            "description": "クラシックな無限プレイ",
+            "rules": [
+                "♾️ 無限に続くゲーム — ラインを消してレベルアップ",
+                "📈 レベルが上がるごとに落下速度が上昇",
+                "🏆 スコアと到達した最高レベルの両方が記録される"
+            ]
+        },
+        "sprint": {
+            "name": "スプリント",
+            "description": "できるだけ早く40ラインを消そう",
+            "rules": [
+                "🎯 目標：40ライン消去",
+                "⏱️ タイムが記録される — 全力で急ごう",
+                "🚫 未完了のプレイはランキングに保存されません"
+            ]
+        },
+        "ultra": {
+            "name": "ウルトラ",
+            "description": "3分間でのハイスコアを競う",
+            "rules": [
+                "⏱️ 制限時間はちょうど3分",
+                "💯 時間切れになるまでできるだけ高得点を目指そう",
+                "📊 最終スコアのみが記録される"
+            ]
+        },
+        "survival": {
+            "name": "サバイバル",
+            "description": "せり上がるラインに注意",
+            "rules": [
+                "🧱 ガベージラインが下から絶えずせり上がる",
+                "🕳️ ガベージの隙間を見つけて活用しよう",
+                "☠️ 盤面が埋まるとゲームオーバー"
+            ]
+        },
+        "cheeseRace": {
+            "name": "チーズレース",
+            "description": "あらかじめ積まれたスタックをできるだけ早く掘り崩そう",
+            "rules": [
+                "🧀 盤面は隙間のあるガベージ10段からスタート",
+                "⏱️ できるだけ早くすべて掘り崩そう",
+                "🚫 未完了のプレイはランキングに保存されません"
+            ]
+        },
+        "digSurvival": {
+            "name": "ディグサバイバル",
+            "description": "永遠に掘り続ける — ラインを消すたびにガベージがすぐに元通りになる。生き残りながら合計100ライン掘ろう。",
+            "rules": [
+                "🧀 底に小さなガベージの山からスタート",
+                "♻️ 掘ったラインは下からすぐに元通りになる — ガベージは尽きない",
+                "🎯 合計100ライン掘れば勝利",
+                "☠️ 盤面が埋まるとゲームオーバー"
+            ]
+        },
+        "countdown": {
+            "name": "カウントダウン",
+            "description": "時計がゼロになる前にラインを消そう",
+            "rules": [
+                "⏱️ 残り60秒からスタート",
+                "➕ ライン消去で時間が回復（4ラインならさらに多く）",
+                "⏳ 時計がゼロになるとゲームオーバー"
+            ]
+        },
+        "random": {
+            "name": "ランダム",
+            "description": "スタートを押すと他のモードの中から1つを選んでくれる",
+            "rules": [
+                "🎲 他のモードからランダムに1つを選択",
+                "▶️ そのラウンドは選ばれたモードとして進行する",
+                "🔁 もう一度ランダムを選んでサプライズを楽しもう"
+            ]
+        }
+    },
+    "game": {
+        "levelUpBanner": "レベル {level}"
+    },
+    "sounds": {
+        "lineClear1": "ライン",
+        "lineClear2": "II: ライン",
+        "lineClear3": "III: ライン",
+        "lineClear4": "IV: ライン",
+        "drop": "ピース落下",
+        "gameOver": "ゲームオーバー",
+        "levelUp": "レベルアップ",
+        "rotate": "回転",
+        "grounded": "ピース着地",
+        "falling": "ピース落下中",
+        "pieceLock": "ピースロック"
+    }
+}

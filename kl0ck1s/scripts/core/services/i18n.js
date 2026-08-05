@@ -7,6 +7,14 @@ const LANGUAGES = {
     de: "Deutsch",
     nl: "Nederlands",
     ru: "Русский",
+    cs: "Čeština",
+    sk: "Slovenčina",
+    it: "Italiano",
+    ja: "日本語",
+    fr: "Français",
+    ko: "한국어",
+    id: "Bahasa Indonesia",
+    ary: "الدارجة المغربية",
 };
 const SUPPORTED_LANGUAGES = Object.keys(LANGUAGES);
 const DEFAULT_LANGUAGE = "en";
@@ -49,9 +57,24 @@ export class I18n {
             ? this.navigatorRef.languages
             : [this.navigatorRef?.language].filter(Boolean);
 
+        // Longest codes first, so 3-letter codes (e.g. "ary") are tried before
+        // being shadowed by a shorter macro-language match (e.g. "ar").
+        const sortedCodes = [...SUPPORTED_LANGUAGES].sort((a, b) => b.length - a.length);
+
         for (const candidate of candidates) {
-            const short = candidate.slice(0, 2).toLowerCase();
-            if (SUPPORTED_LANGUAGES.includes(short)) return {lang: short, locale: candidate};
+            const lower = candidate.toLowerCase();
+
+            // Browsers report Moroccan Arabic as a region subtag (ar-MA/ar-EH)
+            // rather than the "ary" language code, so special-case it.
+            if (SUPPORTED_LANGUAGES.includes("ary") && /^ar-(ma|eh)\b/.test(lower)) {
+                return {lang: "ary", locale: candidate};
+            }
+
+            for (const code of sortedCodes) {
+                if (lower === code || lower.startsWith(`${code}-`)) {
+                    return {lang: code, locale: candidate};
+                }
+            }
         }
         return {lang: DEFAULT_LANGUAGE, locale: null};
     }
