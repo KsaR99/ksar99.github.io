@@ -2,6 +2,7 @@
 
 import {forEachShapeCell, getTightBounds, lightenOklch, withAlpha} from "../shared/utils.js";
 import {FALL_TRAIL_MAX_ALPHA} from "../game/game-constants.js";
+import {LINE_CLEAR_FLASH_PHASE_FRACTION} from "../shared/config.js";
 
 export class Renderer {
     /**
@@ -177,6 +178,71 @@ export class Renderer {
         ctx.drawImage(this.backgroundCanvas, 0, 0);
     }
 
+    /**
+     * Draws the board during the "clearing" state: rows above the ones being
+     * cleared are drawn already sliding down toward their post-clear
+     * position (dropRows[y] rows, eased in by `progress`), while the
+     * clearing rows themselves go through the flash -> disappear -> particles
+     * sequence. Everything is drawn cell-by-cell (no cached background),
+     * since the per-row offsets change every frame.
+     */
+    drawClearingFrame(board, lineIndices, dropRows, fragments, progress) {
+        const size = this.boardConfig.CELL_SIZE;
+        const {ctx, boardCanvas} = this;
+
+        this.refreshBoardCanvasRect();
+
+        const p = Math.min(1, progress);
+        const flashEnd = LINE_CLEAR_FLASH_PHASE_FRACTION;
+        const maskStart = flashEnd * 0.5;
+        const fallProgress = p < maskStart ? 0 : Math.min(1, (p - maskStart) / (1 - maskStart));
+        const rowsGone = p >= maskStart;
+        const clearingSet = new Set(lineIndices);
+
+        ctx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
+        if (this.gridEnabled) this.drawGrid(board, ctx);
+
+        for (let y = 0; y < board.rows; y++) {
+            const isClearingRow = clearingSet.has(y);
+            if (isClearingRow && rowsGone) continue;
+
+            const yPos = isClearingRow ? y : y + (dropRows[y] || 0) * fallProgress;
+            for (let x = 0; x < board.cols; x++) {
+                const colorIndex = board.colors[y * board.cols + x];
+                if (!colorIndex) continue;
+                this.drawCell(ctx, x, yPos, this.colorPalette[colorIndex], size);
+            }
+        }
+
+        if (fragments && fragments.length > 0 && rowsGone) {
+            const particleProgress = fallProgress;
+            const fragmentAlpha = 0.75 * (1 - particleProgress);
+
+            ctx.save();
+            ctx.globalAlpha = fragmentAlpha;
+
+            for (const frag of fragments) {
+                const x = frag.startX + frag.dx * particleProgress;
+                const y = frag.startY + frag.dy * particleProgress;
+                const rotation = frag.rotation0 + frag.dRotation * particleProgress;
+
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(rotation);
+                ctx.fillStyle = frag.color;
+                ctx.fillRect(-frag.halfSize, -frag.halfSize, frag.size, frag.size);
+                ctx.restore();
+            }
+
+            ctx.restore();
+        }
+
+        if (p < flashEnd) {
+            const flashProgress = p < maskStart ? 0 : (p - maskStart) / (flashEnd - maskStart);
+            this.drawClearingFlash(lineIndices, flashProgress);
+        }
+    }
+
     drawPiece(piece) {
         const size = this.boardConfig.CELL_SIZE;
         forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
@@ -243,24 +309,6 @@ export class Renderer {
         });
     }
 
-    maskClearingRows(lineIndices) {
-        const size = this.boardConfig.CELL_SIZE;
-        const {ctx} = this;
-        const sprite = this.gridEnabled
-            ? this.spriteCache.getGridCell(size)
-            : null;
-
-        lineIndices.forEach((y) => {
-            if (sprite) {
-                for (let x = 0; x < this.boardConfig.COLS; x++) {
-                    ctx.drawImage(sprite, x * size, y * size, size, size);
-                }
-            } else {
-                ctx.clearRect(0, y * size, this.boardConfig.COLS * size, size);
-            }
-        });
-    }
-
     drawClearingFlash(lineIndices, progress) {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx} = this;
@@ -273,40 +321,11 @@ export class Renderer {
             ctx.shadowBlur = size * progress;
         }
 
-        ctx.fillStyle = `oklch(1 0 0 / 0.5)`;
+        ctx.fillStyle = `oklch(1 0 0 / ${alpha})`;
 
         lineIndices.forEach((y) => {
             ctx.fillRect(0, y * size, this.boardConfig.COLS * size, size);
         });
-
-        ctx.restore();
-    }
-
-    drawClearingLines(lineIndices, fragments, progress) {
-        if (!fragments || fragments.length === 0) return;
-
-        const {ctx} = this;
-        const p = Math.min(1, progress);
-        const fragmentAlpha = 0.75;
-
-        this.maskClearingRows(lineIndices);
-        this.drawClearingFlash(lineIndices, p);
-
-        ctx.save();
-        ctx.globalAlpha = fragmentAlpha;
-
-        for (const frag of fragments) {
-            const x = frag.startX + frag.dx * p;
-            const y = frag.startY + frag.dy * p;
-            const rotation = frag.rotation0 + frag.dRotation * p;
-
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(rotation);
-            ctx.fillStyle = frag.color;
-            ctx.fillRect(-frag.halfSize, -frag.halfSize, frag.size, frag.size);
-            ctx.restore();
-        }
 
         ctx.restore();
     }

@@ -57,15 +57,11 @@ export class I18n {
             ? this.navigatorRef.languages
             : [this.navigatorRef?.language].filter(Boolean);
 
-        // Longest codes first, so 3-letter codes (e.g. "ary") are tried before
-        // being shadowed by a shorter macro-language match (e.g. "ar").
         const sortedCodes = [...SUPPORTED_LANGUAGES].sort((a, b) => b.length - a.length);
 
         for (const candidate of candidates) {
             const lower = candidate.toLowerCase();
 
-            // Browsers report Moroccan Arabic as a region subtag (ar-MA/ar-EH)
-            // rather than the "ary" language code, so special-case it.
             if (SUPPORTED_LANGUAGES.includes("ary") && /^ar-(ma|eh)\b/.test(lower)) {
                 return {lang: "ary", locale: candidate};
             }

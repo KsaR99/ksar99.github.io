@@ -29,6 +29,7 @@ export class PieceController {
         game.pendingSpin = null;
         game.clearingLines = [];
         game.clearingFragments = [];
+        game.clearingDropRows = [];
         game.clearingTimer = 0;
         this.resetPerPieceState();
 
@@ -364,7 +365,22 @@ export class PieceController {
         game.state = "clearing";
         game.clearingLines = fullRows;
         game.clearingFragments = this.buildClearFragments(fullRows);
+        game.clearingDropRows = this.buildDropRows(fullRows, game.board.rows);
         game.clearingTimer = 0;
+    }
+
+    /**
+     * dropRows[y] = how many rows y needs to visually fall by once the rows
+     * in `fullRows` disappear (i.e. how many cleared rows sit below y).
+     * Used to animate the remaining stack sliding down smoothly during the
+     * clear animation, instead of snapping into place once it finishes.
+     */
+    buildDropRows(fullRows, rowCount) {
+        const dropRows = new Array(rowCount).fill(0);
+        for (let y = 0; y < rowCount; y++) {
+            dropRows[y] = fullRows.reduce((count, clearedY) => count + (clearedY > y ? 1 : 0), 0);
+        }
+        return dropRows;
     }
 
     buildClearFragments(rows) {
@@ -388,7 +404,7 @@ export class PieceController {
                         const startY = y * size + (fy + 0.5) * fragSize;
 
                         const angle = Math.random() * Math.PI * 2;
-                        const distance = size * (0.05 + Math.random() * 0.1);
+                        const distance = size * (0.7 + Math.random() * 1.3);
 
                         fragments.push({
                             startX,
@@ -421,6 +437,7 @@ export class PieceController {
         game.pendingSpin = null;
         game.clearingLines = [];
         game.clearingFragments = [];
+        game.clearingDropRows = [];
         game.dropCounter = 0;
 
         const toppedOutFromResupply = game.modeController.onLinesCleared(cleared);

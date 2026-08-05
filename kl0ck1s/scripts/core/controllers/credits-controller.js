@@ -4,7 +4,6 @@ import {CREDITS, CREDITS_TIMING} from "../shared/config.js";
 
 const FLIP_DURATION_MS = 400;
 
-// @ToDo: calibration?
 const GAMEPLAY_STATES = new Set(["countdown", "running", "clearing"]);
 
 export class CreditsController {

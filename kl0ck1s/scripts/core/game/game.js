@@ -92,6 +92,7 @@ export class Game {
         this.pendingSpin = null;
         this.clearingLines = [];
         this.clearingFragments = [];
+        this.clearingDropRows = [];
         this.clearingTimer = 0;
 
         this.fallTrail = Array.from({length: FALL_TRAIL_MAX_LENGTH}, () => ({
@@ -365,10 +366,18 @@ export class Game {
 
     render() {
         this.effectOverlay.update();
-        this.renderer.drawBoard(this.board);
 
         const showPieceBehindOptions = this.state === "options"
             && ["running", "paused"].includes(this.previousStateBeforeOptions);
+
+        if (this.state === "clearing") {
+            const progress = Math.min(1, this.clearingTimer / this.lineClearAnimationDuration);
+            this.renderer.drawClearingFrame(
+                this.board, this.clearingLines, this.clearingDropRows, this.clearingFragments, progress
+            );
+        } else {
+            this.renderer.drawBoard(this.board);
+        }
 
         if (this.state === "running" || this.state === "paused" || this.state === "calibrating"
             || this.state === "calibrating-keyboard" || showPieceBehindOptions) {
@@ -387,9 +396,6 @@ export class Game {
             }
 
             this.renderer.drawPiece(renderedPiece);
-        } else if (this.state === "clearing") {
-            const progress = Math.min(1, this.clearingTimer / this.lineClearAnimationDuration);
-            this.renderer.drawClearingLines(this.clearingLines, this.clearingFragments, progress);
         }
 
         if (this.levelUpTimer > 0) {
