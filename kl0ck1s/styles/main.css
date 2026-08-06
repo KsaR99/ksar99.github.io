@@ -11,6 +11,7 @@
     --good: oklch(0.6 0.16 150.78);
     --warn: oklch(0.8 0.19 95);
     --danger: oklch(0.6 0.22 25);
+    --stats__status--live-color: var(--good);
     --nickname-form__input--bg: oklch(22.054% 0.02402 273.436);
     --nickname-form__input--placeholder: oklch(0.99 0 0);
     --screen__title-color: oklch(0.86 0.36 144.2);
@@ -104,6 +105,7 @@ body {
         --body-bg: radial-gradient(circle at 50% 100%, oklch(0.52 0.25 333.31) 0, oklch(0.22 0.06 326.54) 50%);
         --line: oklch(0.42 0.17 326.9);
         --muted: oklch(0.71 0.06 330.4);
+        --stats__status--live-color: oklch(0.66 0.26 326.99);
         --nickname-form__input--bg: oklch(0.34 0.16 338.2);
         --kbd-border-color: oklch(0.54 0.18 330.58);
         --mode-description--bg: oklch(0.23 0.03 342.34 / 0.6);
@@ -721,7 +723,7 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 }
 
 .stats__status--live {
-    color: var(--good);
+    color: var(--stats__status--live-color);
 }
 
 /* !important is deliberate: this is a JS-toggled "hide this card"
