@@ -122,7 +122,7 @@ export class Renderer {
     shakeMove(dir) {
         if (!this.shakeEnabled || !this.boardEl || !dir) return;
         clearTimeout(this._shakeTimer);
-        this._boardOffsetX = dir < 0 ? 0.5 : -0.5;
+        this._boardOffsetX = dir < 0 ? 0.6 : -0.6;
         this._applyBoardOffset(70);
         this._shakeTimer = setTimeout(() => {
             this._boardOffsetX = 0;
