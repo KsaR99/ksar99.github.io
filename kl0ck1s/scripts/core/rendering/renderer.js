@@ -1,7 +1,7 @@
 "use strict";
 
 import {forEachShapeCell, getTightBounds, lightenOklch, withAlpha} from "../shared/utils.js";
-import {FALL_TRAIL_MAX_ALPHA} from "../game/game-constants.js";
+import {FALL_TRAIL_MAX_ALPHA, HARD_DROP_TRAIL_MAX_ALPHA} from "../game/game-constants.js";
 import {LINE_CLEAR_FLASH_PHASE_FRACTION} from "../shared/config.js";
 
 export class Renderer {
@@ -21,6 +21,7 @@ export class Renderer {
      */
     constructor({
                     bodyEl,
+                    boardEl = null,
                     ctx,
                     boardCanvas,
                     nextCtx,
@@ -33,6 +34,7 @@ export class Renderer {
                     i18n = null
                 }) {
         this.bodyEl = bodyEl;
+        this.boardEl = boardEl;
         this.ctx = ctx;
         this.boardCanvas = boardCanvas;
         this.nextCtx = nextCtx;
@@ -47,6 +49,9 @@ export class Renderer {
         this.transparencyEnabled = true;
         this.ghostEnabled = true;
         this.gridEnabled = true;
+        this.shakeEnabled = true;
+        this._boardOffsetX = 0;
+        this._boardOffsetY = 0;
         this.boardCanvasRect = null;
 
         this.backgroundCanvas = document.createElement("canvas");
@@ -70,6 +75,9 @@ export class Renderer {
     /** @todo: unused? */
     destroy() {
         window.removeEventListener("resize", this._onWindowResize);
+        clearTimeout(this._shakeTimer);
+        clearTimeout(this._squashTimerA);
+        clearTimeout(this._squashTimerB);
     }
 
     setGlowEnabled(enabled) {
@@ -86,6 +94,56 @@ export class Renderer {
 
     setGridEnabled(enabled) {
         this.gridEnabled = enabled;
+    }
+
+    setShakeEnabled(enabled) {
+        this.shakeEnabled = enabled;
+        if (!enabled) this.resetBoardTransform();
+    }
+
+    resetBoardTransform() {
+        clearTimeout(this._shakeTimer);
+        clearTimeout(this._squashTimerA);
+        clearTimeout(this._squashTimerB);
+        this._boardOffsetX = 0;
+        this._boardOffsetY = 0;
+        if (!this.boardEl) return;
+        this.boardEl.style.transition = "none";
+        this.boardEl.style.transform = "translate(0, 0)";
+    }
+
+    _applyBoardOffset(transitionMs) {
+        const el = this.boardEl;
+        if (!el) return;
+        el.style.transition = `transform ${transitionMs}ms ease-out`;
+        el.style.transform = `translate(${this._boardOffsetX ?? 0}rem, ${this._boardOffsetY ?? 0}rem)`;
+    }
+
+    shakeMove(dir) {
+        if (!this.shakeEnabled || !this.boardEl || !dir) return;
+        clearTimeout(this._shakeTimer);
+        this._boardOffsetX = dir < 0 ? 0.5 : -0.5;
+        this._applyBoardOffset(70);
+        this._shakeTimer = setTimeout(() => {
+            this._boardOffsetX = 0;
+            this._applyBoardOffset(120);
+        }, 70);
+    }
+
+    shakeHardDrop() {
+        if (!this.shakeEnabled || !this.boardEl) return;
+        clearTimeout(this._squashTimerA);
+        clearTimeout(this._squashTimerB);
+        this._boardOffsetY = 0.5;
+        this._applyBoardOffset(70);
+        this._squashTimerA = setTimeout(() => {
+            this._boardOffsetY = -0.25;
+            this._applyBoardOffset(90);
+            this._squashTimerB = setTimeout(() => {
+                this._boardOffsetY = 0;
+                this._applyBoardOffset(120);
+            }, 90);
+        }, 70);
     }
 
     columnFromClientX(clientX) {
@@ -266,6 +324,33 @@ export class Renderer {
                 const y = snap.y + r;
                 if (y < 0) return;
                 this.drawCell(ctx, x, y, `oklch(from ${snap.color} calc(l + 0.75) c h / 0.3)`, size);
+            });
+        }
+        ctx.restore();
+    }
+
+    drawHardDropTrail(entries, progress) {
+        if (!entries || entries.length === 0) return;
+
+        const size = this.boardConfig.CELL_SIZE;
+        const {ctx} = this;
+        const count = entries.length;
+        const fade = 1 - Math.min(1, progress);
+
+        ctx.save();
+        for (let i = 0; i < count; i++) {
+            const entry = entries[i];
+            if (!entry.mask) continue;
+
+            const alpha = HARD_DROP_TRAIL_MAX_ALPHA * (1 - i / count) * fade;
+            if (alpha <= 0.02) continue;
+
+            ctx.globalAlpha = alpha;
+            forEachShapeCell(entry.mask, entry.width, entry.height, (r, c) => {
+                const x = entry.x + c;
+                const y = entry.y + r;
+                if (y < 0) return;
+                this.drawCell(ctx, x, y, `oklch(from ${entry.color} calc(l + 0.2) c h / 0.95)`, size);
             });
         }
         ctx.restore();

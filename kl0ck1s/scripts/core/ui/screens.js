@@ -55,6 +55,7 @@ const DIFF_LABEL_KEYS = {
     skipModeInfo: "screens.options.skipModeInfo",
     ghost: "screens.options.ghost",
     gridLines: "screens.options.gridLines",
+    screenShake: "screens.options.screenShake",
     glow: "screens.options.glow",
     transparency: "screens.options.transparency",
     fallTrail: "screens.options.fallTrail",
@@ -152,6 +153,8 @@ export const Screens = {
         screen.querySelector('[data-role="hud-right-checkbox"]').checked = settings.hudRight;
         screen.querySelector('[data-role="ghost-checkbox"]').checked = settings.ghost;
         screen.querySelector('[data-role="grid-checkbox"]').checked = settings.gridLines;
+        const screenShakeCheckbox = screen.querySelector('[data-role="screen-shake-checkbox"]');
+        if (screenShakeCheckbox) screenShakeCheckbox.checked = Boolean(settings.screenShake);
         screen.querySelector('[data-role="glow-checkbox"]').checked = settings.glow;
         screen.querySelector('[data-role="transparency-checkbox"]').checked = settings.transparency;
         const fallTrailCheckbox = screen.querySelector('[data-role="fall-trail-checkbox"]');

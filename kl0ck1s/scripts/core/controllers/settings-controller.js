@@ -17,6 +17,7 @@ export class SettingsController {
             hudRight: false,
             ghost: true,
             gridLines: true,
+            screenShake: true,
             skipCountdown: false,
             skipModeInfo: false,
             mouseControl: false,
@@ -87,11 +88,12 @@ export class SettingsController {
 
     applyPerformanceSettings() {
         const game = this.game;
-        const {glow, transparency, effect, ghost, gridLines, fallTrail} = game.settings;
+        const {glow, transparency, effect, ghost, gridLines, fallTrail, screenShake} = game.settings;
         game.renderer.setGlowEnabled(glow);
         game.renderer.setTransparencyEnabled(transparency);
         game.renderer.setGhostEnabled(ghost);
         game.renderer.setGridEnabled(gridLines);
+        game.renderer.setShakeEnabled(screenShake);
 
         if (!fallTrail) {
             game.resetFallTrail();

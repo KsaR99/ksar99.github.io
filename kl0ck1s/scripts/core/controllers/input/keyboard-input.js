@@ -39,8 +39,8 @@ export class KeyboardInput extends InputSource {
         const game = this.game;
         const isMenuScreen = () => game.state === "idle" || game.state === "gameOver-saved";
         return {
-            ArrowLeft: () => game.pieceController.handleHorizontalArrow(-1),
-            ArrowRight: () => game.pieceController.handleHorizontalArrow(1),
+            ArrowLeft: (isRepeat) => game.pieceController.handleHorizontalArrow(-1, isRepeat),
+            ArrowRight: (isRepeat) => game.pieceController.handleHorizontalArrow(1, isRepeat),
             ArrowDown: () => isMenuScreen() ? game.screenFlow.moveMenuFocus(1) : game.pieceController.softDrop(),
             ArrowUp: () => isMenuScreen() ? game.screenFlow.moveMenuFocus(-1) : game.pieceController.rotate(),
             Space: () => game.pieceController.hardDrop(),
@@ -114,16 +114,16 @@ export class KeyboardInput extends InputSource {
             if (!baseAction) return;
 
             const action = MOVEMENT_KEYS.has(event.code)
-                ? () => {
+                ? (isRepeat) => {
                     this.steeringArbiter.markKeyboardSteer();
-                    baseAction();
+                    baseAction(isRepeat);
                 }
                 : baseAction;
 
             if (REPEATABLE_KEYS.has(event.code)) {
                 if (event.repeat) return;
-                action();
-                this.startRepeat(event.code, action);
+                action(false);
+                this.startRepeat(event.code, () => action(true));
                 return;
             }
 

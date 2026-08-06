@@ -263,16 +263,16 @@ export class TouchInput extends InputSource {
             const action = this.getAction(code);
             if (!action) return;
 
-            const runAction = () => {
+            const runAction = (isRepeat) => {
                 if (MOVEMENT_KEYS.has(code)) this.steeringArbiter.markKeyboardSteer();
-                action();
+                action(isRepeat);
             };
 
             if (REPEATABLE_CODES.has(code)) {
                 const onPointerDown = (event) => {
                     event.preventDefault();
-                    runAction();
-                    this.startRepeat(code, runAction);
+                    runAction(false);
+                    this.startRepeat(code, () => runAction(true));
                 };
                 const onPointerUp = () => this.stopRepeat(code);
 

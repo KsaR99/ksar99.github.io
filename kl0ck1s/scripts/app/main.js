@@ -113,6 +113,7 @@ const spriteCache = new SpriteCache(KLOCKOMINOS, () => document.createElement("c
 
 const renderer = new Renderer({
     bodyEl,
+    boardEl: boardDiv,
     ctx,
     boardCanvas,
     nextCtx,

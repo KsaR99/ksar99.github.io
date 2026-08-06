@@ -2,7 +2,12 @@
 
 import {dropIntervalForLevel, nowMs, smoothedInterval, tierForLevel} from "../shared/utils.js";
 import {LINE_CLEAR_SOUND_PLAYBACK_RATE} from "../shared/config.js";
-import {COUNTDOWN_STEPS, FALL_TRAIL_MAX_LENGTH, fallTrailLengthForInterval} from "./game-constants.js";
+import {
+    COUNTDOWN_STEPS,
+    FALL_TRAIL_MAX_LENGTH,
+    fallTrailLengthForInterval,
+    HARD_DROP_TRAIL_DURATION_MS
+} from "./game-constants.js";
 import {InputController} from "../controllers/input-controller.js";
 import {PieceController} from "../controllers/piece-controller.js";
 import {StatsTracker} from "../controllers/stats-tracker.js";
@@ -101,6 +106,7 @@ export class Game {
         this.fallTrailHead = 0;
         this.fallTrailCount = 0;
         this._trailPieceRef = null;
+        this.hardDropTrail = null;
 
         this.lastRowStepTime = 0;
         this.effectiveDropIntervalMs = Infinity;
@@ -203,6 +209,27 @@ export class Game {
         this.effectiveShiftIntervalMs = Infinity;
     }
 
+    beginHardDropTrail(piece, cellsDropped) {
+        if (!this.settings.fallTrail || cellsDropped <= 0) {
+            this.hardDropTrail = null;
+            return;
+        }
+
+        const entries = [];
+        for (let step = 0; step <= cellsDropped; step++) {
+            entries.push({
+                x: piece.x,
+                y: piece.y - step,
+                mask: piece.mask,
+                width: piece.width,
+                height: piece.height,
+                color: piece.color,
+            });
+        }
+
+        this.hardDropTrail = {entries, elapsed: 0, duration: HARD_DROP_TRAIL_DURATION_MS};
+    }
+
     noteRowStep() {
         ({lastTime: this.lastRowStepTime, effectiveMs: this.effectiveDropIntervalMs} =
             smoothedInterval(this.lastRowStepTime, this.effectiveDropIntervalMs, nowMs()));
@@ -232,6 +259,13 @@ export class Game {
             this.shiftAnim.elapsed += delta;
             if (this.shiftAnim.elapsed >= this.shiftAnim.duration) {
                 this.shiftAnim = null;
+            }
+        }
+
+        if (this.hardDropTrail) {
+            this.hardDropTrail.elapsed += delta;
+            if (this.hardDropTrail.elapsed >= this.hardDropTrail.duration) {
+                this.hardDropTrail = null;
             }
         }
 
@@ -377,6 +411,11 @@ export class Game {
             );
         } else {
             this.renderer.drawBoard(this.board);
+        }
+
+        if (this.hardDropTrail) {
+            const progress = Math.min(1, this.hardDropTrail.elapsed / this.hardDropTrail.duration);
+            this.renderer.drawHardDropTrail(this.hardDropTrail.entries, progress);
         }
 
         if (this.state === "running" || this.state === "paused" || this.state === "calibrating"

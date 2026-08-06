@@ -539,6 +539,7 @@ export class ScreenFlow {
         const hudRightCheckbox = game.dom.querySelector('[data-role="hud-right-checkbox"]');
         const ghostCheckbox = game.dom.querySelector('[data-role="ghost-checkbox"]');
         const gridCheckbox = game.dom.querySelector('[data-role="grid-checkbox"]');
+        const screenShakeCheckbox = game.dom.querySelector('[data-role="screen-shake-checkbox"]');
         const glowCheckbox = game.dom.querySelector('[data-role="glow-checkbox"]');
         const transparencyCheckbox = game.dom.querySelector('[data-role="transparency-checkbox"]');
         const fallTrailCheckbox = game.dom.querySelector('[data-role="fall-trail-checkbox"]');
@@ -590,6 +591,14 @@ export class ScreenFlow {
         if (gridCheckbox) {
             gridCheckbox.addEventListener("change", () => {
                 game.settings.gridLines = gridCheckbox.checked;
+                settingsController.applyPerformanceSettings();
+                settingsController.saveSettings();
+            });
+        }
+
+        if (screenShakeCheckbox) {
+            screenShakeCheckbox.addEventListener("change", () => {
+                game.settings.screenShake = screenShakeCheckbox.checked;
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
             });

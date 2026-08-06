@@ -179,9 +179,10 @@ export class PieceController {
     stopAllGameplaySounds() {
         this.stopGameplaySounds();
         this.game.soundManager.stopCategory("sfx");
+        this.game.soundManager.stopCategory("voices");
     }
 
-    moveHorizontal(dir) {
+    moveHorizontal(dir, isRepeat = false) {
         const game = this.game;
         if (!PIECE_CONTROLLABLE_STATES.has(game.state)) return;
         if (!game.board.collides(game.current, dir, 0)) {
@@ -189,6 +190,7 @@ export class PieceController {
             game.current.x += dir;
             game.lastAction = "move";
             game.noteColStep();
+            if (isRepeat) game.renderer.shakeMove(dir);
             game.shiftAnim = game.settings.fallTrail
                 ? {fromX, toX: game.current.x, elapsed: 0, duration: 60}
                 : null;
@@ -197,7 +199,7 @@ export class PieceController {
         }
     }
 
-    handleHorizontalArrow(dir) {
+    handleHorizontalArrow(dir, isRepeat = false) {
         const game = this.game;
         if (game.state === "idle" || game.state === "gameOver-saved") {
             if (game.menuSelector === "mode") {
@@ -206,7 +208,7 @@ export class PieceController {
                 game.difficultyController.changeDifficulty(dir);
             }
         } else {
-            this.moveHorizontal(dir);
+            this.moveHorizontal(dir, isRepeat);
         }
     }
 
@@ -281,6 +283,8 @@ export class PieceController {
 
         game.statsTracker.addScore(pointsForHardDrop(cellsDropped, game.scoring));
         game.sensitivityCalibrationController?.notify("hardDrop", {});
+        game.renderer.shakeHardDrop();
+        game.beginHardDropTrail(game.current, cellsDropped);
         this.lockCurrentPiece();
         game.dropCounter = 0;
     }
