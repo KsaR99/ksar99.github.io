@@ -95,7 +95,24 @@
             "keyboardDas": "DAS klávesnice (ms)",
             "keyboardArr": "ARR klávesnice (ms)",
             "calibrateKeyboard": "Kalibrácia klávesnice",
-            "calibrateKeyboardButton": "Kalibrovať"
+            "calibrateKeyboardButton": "Kalibrovať",
+            "dataTitle": "Import / export",
+            "exportLabel": "Exportovať nastavenia do súboru",
+            "exportButton": "Exportovať",
+            "importLabel": "Importovať nastavenia zo súboru",
+            "importButton": "Importovať",
+            "importDiffTitle": "Import nastavení",
+            "importDiffSubtitle": "Počet možností líšiacich sa od aktuálnych nastavení: {count}",
+            "importSelectAll": "Vybrať všetko",
+            "importApply": "Použiť vybrané",
+            "importCancel": "Zrušiť",
+            "importClose": "OK",
+            "importNoChanges": "Importovaný súbor zodpovedá aktuálnym nastaveniam — nie je čo meniť.",
+            "importInvalid": "Tento súbor nevyzerá ako platný export nastavení.",
+            "valueOn": "Zap.",
+            "valueOff": "Vyp.",
+            "autoValue": "auto",
+            "soundVolumesLabel": "Hlasitosť jednotlivých zvukov"
         },
         "calibration": {
             "gestures": {

@@ -95,7 +95,24 @@
             "keyboardDas": "DAS keyboard (ms)",
             "keyboardArr": "ARR keyboard (ms)",
             "calibrateKeyboard": "Kalibrasi keyboard",
-            "calibrateKeyboardButton": "Kalibrasi"
+            "calibrateKeyboardButton": "Kalibrasi",
+            "dataTitle": "Impor / Ekspor",
+            "exportLabel": "Ekspor opsi ke berkas",
+            "exportButton": "Ekspor",
+            "importLabel": "Impor opsi dari berkas",
+            "importButton": "Impor",
+            "importDiffTitle": "Impor opsi",
+            "importDiffSubtitle": "{count} opsi berbeda dari pengaturan Anda saat ini",
+            "importSelectAll": "Pilih semua",
+            "importApply": "Terapkan yang dipilih",
+            "importCancel": "Batal",
+            "importClose": "OK",
+            "importNoChanges": "Berkas yang diimpor sama dengan opsi Anda saat ini — tidak ada yang perlu diubah.",
+            "importInvalid": "Berkas ini sepertinya bukan hasil ekspor opsi yang valid.",
+            "valueOn": "Aktif",
+            "valueOff": "Nonaktif",
+            "autoValue": "otomatis",
+            "soundVolumesLabel": "Volume suara masing-masing"
         },
         "calibration": {
             "gestures": {

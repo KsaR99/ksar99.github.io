@@ -95,7 +95,24 @@
             "keyboardDas": "키보드 DAS (ms)",
             "keyboardArr": "키보드 ARR (ms)",
             "calibrateKeyboard": "키보드 보정",
-            "calibrateKeyboardButton": "보정하기"
+            "calibrateKeyboardButton": "보정하기",
+            "dataTitle": "가져오기 / 내보내기",
+            "exportLabel": "옵션을 파일로 내보내기",
+            "exportButton": "내보내기",
+            "importLabel": "파일에서 옵션 가져오기",
+            "importButton": "가져오기",
+            "importDiffTitle": "옵션 가져오기",
+            "importDiffSubtitle": "현재 설정과 다른 옵션: {count}개",
+            "importSelectAll": "모두 선택",
+            "importApply": "선택 항목 적용",
+            "importCancel": "취소",
+            "importClose": "확인",
+            "importNoChanges": "가져온 파일이 현재 옵션과 동일합니다 — 변경할 내용이 없습니다.",
+            "importInvalid": "이 파일은 올바른 옵션 내보내기 파일이 아닌 것 같습니다.",
+            "valueOn": "켜짐",
+            "valueOff": "꺼짐",
+            "autoValue": "자동",
+            "soundVolumesLabel": "개별 소리 볼륨"
         },
         "calibration": {
             "gestures": {

@@ -106,6 +106,81 @@ export class SettingsController {
         game.effectOverlay.setActive(effect);
     }
 
+    settingsKeys() {
+        return Object.keys(this.defaultSettings());
+    }
+
+    exportSettings() {
+        const game = this.game;
+        const {difficulty, mode, ...settings} = game.settings;
+        const payload = {
+            app: "kl0ck1s",
+            exportedAt: new Date().toISOString(),
+            language: game.i18n?.lang ?? "en",
+            settings,
+        };
+        return JSON.stringify(payload, null, 2);
+    }
+
+    parseImportedSettings(raw) {
+        let parsed;
+        try {
+            parsed = JSON.parse(raw);
+        } catch {
+            throw new Error("Invalid JSON");
+        }
+
+        const settings = parsed && typeof parsed === "object" ? parsed.settings : null;
+        if (!settings || typeof settings !== "object") throw new Error("Invalid settings file");
+
+        const language = typeof parsed.language === "string" ? parsed.language : null;
+        return {settings, language};
+    }
+
+    diffSettings({settings, language}) {
+        const game = this.game;
+        const changes = [];
+
+        this.settingsKeys().forEach((key) => {
+            if (!(key in settings)) return;
+            const oldValue = game.settings[key];
+            const newValue = settings[key];
+            if (JSON.stringify(oldValue) === JSON.stringify(newValue)) return;
+            changes.push({key, kind: "setting", oldValue, newValue});
+        });
+
+        if (language && game.i18n && language !== game.i18n.lang) {
+            changes.push({key: "language", kind: "language", oldValue: game.i18n.lang, newValue: language});
+        }
+
+        return changes;
+    }
+
+    async applySettingsChanges(changes) {
+        const game = this.game;
+        let languageChange = null;
+
+        changes.forEach((change) => {
+            if (change.kind === "language") {
+                languageChange = change.newValue;
+            } else {
+                game.settings[change.key] = change.newValue;
+            }
+        });
+
+        if (changes.some((change) => change.kind === "setting")) {
+            game.soundManager.setVolume(game.settings.volume);
+            game.soundManager.setMuted(game.settings.muted);
+            this.applyAudioSettings();
+            this.applyPerformanceSettings();
+            this.saveSettings();
+        }
+
+        if (languageChange) {
+            await game.i18n.setLanguage(languageChange);
+        }
+    }
+
     toggleSound() {
         const game = this.game;
         game.settings.muted = !game.settings.muted;

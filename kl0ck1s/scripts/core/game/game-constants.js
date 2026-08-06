@@ -49,6 +49,7 @@ export function getKickTable(type) {
 }
 
 export const SETTINGS_KEY = "klockis-settings";
+export const SETTINGS_EXPORT_FILENAME = "klockis-settings.json";
 export const APP_NAME = "Kl0ck1's";
 export const NICKNAME_PATTERN = /^[a-zA-Z\d_-]{3,16}$/u;
 

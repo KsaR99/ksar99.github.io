@@ -95,7 +95,24 @@
             "keyboardDas": "キーボードDAS（ms）",
             "keyboardArr": "キーボードARR（ms）",
             "calibrateKeyboard": "キーボードキャリブレーション",
-            "calibrateKeyboardButton": "キャリブレーション"
+            "calibrateKeyboardButton": "キャリブレーション",
+            "dataTitle": "インポート / エクスポート",
+            "exportLabel": "オプションをファイルにエクスポート",
+            "exportButton": "エクスポート",
+            "importLabel": "ファイルからオプションをインポート",
+            "importButton": "インポート",
+            "importDiffTitle": "オプションのインポート",
+            "importDiffSubtitle": "現在の設定と異なるオプション: {count} 件",
+            "importSelectAll": "すべて選択",
+            "importApply": "選択項目を適用",
+            "importCancel": "キャンセル",
+            "importClose": "OK",
+            "importNoChanges": "インポートしたファイルは現在のオプションと同じです。変更はありません。",
+            "importInvalid": "このファイルは有効なオプションのエクスポートではないようです。",
+            "valueOn": "オン",
+            "valueOff": "オフ",
+            "autoValue": "自動",
+            "soundVolumesLabel": "個別の音量"
         },
         "calibration": {
             "gestures": {

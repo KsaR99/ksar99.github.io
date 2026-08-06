@@ -95,7 +95,24 @@
             "keyboardDas": "Toetsenbord-DAS (ms)",
             "keyboardArr": "Toetsenbord-ARR (ms)",
             "calibrateKeyboard": "Toetsenbord kalibreren",
-            "calibrateKeyboardButton": "Kalibreren"
+            "calibrateKeyboardButton": "Kalibreren",
+            "dataTitle": "Importeren / Exporteren",
+            "exportLabel": "Opties exporteren naar een bestand",
+            "exportButton": "Exporteren",
+            "importLabel": "Opties importeren uit een bestand",
+            "importButton": "Importeren",
+            "importDiffTitle": "Opties importeren",
+            "importDiffSubtitle": "{count} optie(s) wijken af van je huidige instellingen",
+            "importSelectAll": "Alles selecteren",
+            "importApply": "Selectie toepassen",
+            "importCancel": "Annuleren",
+            "importClose": "OK",
+            "importNoChanges": "Het geïmporteerde bestand komt overeen met je huidige opties — niets om te wijzigen.",
+            "importInvalid": "Dit bestand lijkt geen geldige optie-export te zijn.",
+            "valueOn": "Aan",
+            "valueOff": "Uit",
+            "autoValue": "auto",
+            "soundVolumesLabel": "Individuele geluidsvolumes"
         },
         "calibration": {
             "gestures": {

@@ -95,7 +95,24 @@
             "keyboardDas": "DAS клавиатуры (мс)",
             "keyboardArr": "ARR клавиатуры (мс)",
             "calibrateKeyboard": "Калибровка клавиатуры",
-            "calibrateKeyboardButton": "Калибровать"
+            "calibrateKeyboardButton": "Калибровать",
+            "dataTitle": "Импорт / Экспорт",
+            "exportLabel": "Экспортировать настройки в файл",
+            "exportButton": "Экспорт",
+            "importLabel": "Импортировать настройки из файла",
+            "importButton": "Импорт",
+            "importDiffTitle": "Импорт настроек",
+            "importDiffSubtitle": "Количество параметров, отличающихся от текущих настроек: {count}",
+            "importSelectAll": "Выбрать всё",
+            "importApply": "Применить выбранное",
+            "importCancel": "Отмена",
+            "importClose": "OK",
+            "importNoChanges": "Импортированный файл совпадает с текущими настройками — менять нечего.",
+            "importInvalid": "Этот файл не похож на корректный экспорт настроек.",
+            "valueOn": "Вкл.",
+            "valueOff": "Выкл.",
+            "autoValue": "авто",
+            "soundVolumesLabel": "Громкость отдельных звуков"
         },
         "calibration": {
             "gestures": {

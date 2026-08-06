@@ -1324,6 +1324,82 @@ details.options[open] {
     letter-spacing: 0.06em;
 }
 
+.options__panels {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    width: 100%;
+}
+
+.options[hidden],
+.options__panels[hidden] {
+    display: none;
+}
+
+.options__import-review {
+    gap: 0.5rem;
+}
+
+.options__import-review__subtitle {
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+
+.options__import-review__empty {
+    font-size: 0.85rem;
+    color: var(--text);
+}
+
+.options__import-review__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    max-height: 40vh;
+    overflow-y: auto;
+}
+
+.options__import-review__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.options__row--select-all {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.4em;
+}
+
+.options__row--diff {
+    gap: 0.5rem;
+}
+
+.options__diff-label {
+    flex: 1;
+    min-width: 0;
+}
+
+.options__diff-value {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.options__diff-value--old {
+    color: var(--muted);
+    text-decoration: line-through;
+}
+
+.options__diff-value--new {
+    color: var(--accent-2);
+    font-weight: 700;
+}
+
+.options__diff-value__arrow {
+    color: var(--muted);
+}
+
 .board__calibration {
     position: absolute;
     top: 50%;

@@ -95,7 +95,24 @@
             "keyboardDas": "DAS ديال الكيبورد (ms)",
             "keyboardArr": "ARR ديال الكيبورد (ms)",
             "calibrateKeyboard": "معايرة الكيبورد",
-            "calibrateKeyboardButton": "عاير"
+            "calibrateKeyboardButton": "عاير",
+            "dataTitle": "استيراد / تصدير",
+            "exportLabel": "تصدير الخيارات إلى ملف",
+            "exportButton": "تصدير",
+            "importLabel": "استيراد الخيارات من ملف",
+            "importButton": "استيراد",
+            "importDiffTitle": "استيراد الخيارات",
+            "importDiffSubtitle": "{count} خيار كيختلف على الإعدادات ديالك دابا",
+            "importSelectAll": "اختيار الكل",
+            "importApply": "طبق المحدد",
+            "importCancel": "إلغاء",
+            "importClose": "موافق",
+            "importNoChanges": "الملف اللي جبتي بحال الخيارات ديالك دابا — ماكاين والو نبدلو.",
+            "importInvalid": "هاد الملف ماشي تصدير خيارات صحيح.",
+            "valueOn": "مشعل",
+            "valueOff": "مطفي",
+            "autoValue": "أوتوماتيكي",
+            "soundVolumesLabel": "صوت كل حاجة بوحدها"
         },
         "calibration": {
             "gestures": {

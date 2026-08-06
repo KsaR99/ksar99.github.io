@@ -42,6 +42,49 @@ function fillSoundRows(dom, container, keys, soundVolumes, i18n) {
     });
 }
 
+const DIFF_LABEL_KEYS = {
+    language: "screens.options.language",
+    volume: "screens.options.volume",
+    muted: "screens.options.mute",
+    hudRight: "screens.options.hudRight",
+    effect: "screens.options.effect",
+    mouseControl: "screens.options.mouseControl",
+    mouseSensitivity: "screens.options.mouseSensitivity",
+    touchSensitivity: "screens.options.touchSensitivity",
+    skipCountdown: "screens.options.skipCountdown",
+    skipModeInfo: "screens.options.skipModeInfo",
+    ghost: "screens.options.ghost",
+    gridLines: "screens.options.gridLines",
+    glow: "screens.options.glow",
+    transparency: "screens.options.transparency",
+    fallTrail: "screens.options.fallTrail",
+    keyboardDAS: "screens.options.keyboardDas",
+    keyboardARR: "screens.options.keyboardArr",
+    categoryVolumes: "screens.options.categoryVolume",
+    soundVolumes: "screens.options.soundVolumesLabel",
+};
+
+const EFFECT_LABEL_KEYS = {
+    none: "screens.options.effectNone",
+    vhs: "screens.options.effectVhs",
+    matrix: "screens.options.effectMatrix",
+    rain: "screens.options.effectRain",
+    snow: "screens.options.effectSnow",
+};
+
+function formatSettingValue(key, value, i18n) {
+    if (key === "language") return i18n.languages[value] ?? value;
+    if (key === "effect") return i18n.t(EFFECT_LABEL_KEYS[value] ?? "screens.options.effectNone");
+    if (key === "touchSensitivity") return value == null ? i18n.t("screens.options.autoValue") : `${Math.round(value * 100)}%`;
+    if (key === "volume" || key === "mouseSensitivity") return `${Math.round(value * 100)}%`;
+    if (key === "keyboardDAS" || key === "keyboardARR") return `${Math.round(value)} ms`;
+    if (typeof value === "boolean") return i18n.t(value ? "screens.options.valueOn" : "screens.options.valueOff");
+    if (key === "categoryVolumes" || key === "soundVolumes") {
+        return Object.entries(value ?? {}).map(([k, v]) => `${k}: ${Math.round(v * 100)}%`).join(", ") || "—";
+    }
+    return String(value);
+}
+
 function fillModeInfoRules(dom, container, mode, i18n) {
     const rules = i18n.raw(`modes.${mode}.rules`) ?? [];
     rules.forEach((rule) => {
@@ -143,6 +186,21 @@ export const Screens = {
 
         i18n.applyStatic(screen);
         return screen;
+    },
+
+    renderImportDiffRows(dom, container, changes, i18n) {
+        container.innerHTML = "";
+        changes.forEach((change) => {
+            const row = clone(dom, "tpl-options-diff-row").querySelector('[data-role="options-diff-row"]');
+            const labelKey = DIFF_LABEL_KEYS[change.key];
+            row.querySelector('[data-field="label"]').textContent = labelKey ? i18n.t(labelKey) : change.key;
+            row.querySelector('[data-field="oldValue"]').textContent = formatSettingValue(change.key, change.oldValue, i18n);
+            row.querySelector('[data-field="newValue"]').textContent = formatSettingValue(change.key, change.newValue, i18n);
+            const checkbox = row.querySelector('[data-role="options-diff-checkbox"]');
+            checkbox.checked = true;
+            checkbox.dataset.key = change.key;
+            container.appendChild(row);
+        });
     },
 
     modeInfo(mode, dom = document, i18n) {

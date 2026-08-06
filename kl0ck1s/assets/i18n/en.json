@@ -95,7 +95,24 @@
             "keyboardDas": "Keyboard DAS (ms)",
             "keyboardArr": "Keyboard ARR (ms)",
             "calibrateKeyboard": "Calibrate keyboard",
-            "calibrateKeyboardButton": "Calibrate"
+            "calibrateKeyboardButton": "Calibrate",
+            "dataTitle": "Import / Export",
+            "exportLabel": "Export options to a file",
+            "exportButton": "Export",
+            "importLabel": "Import options from a file",
+            "importButton": "Import",
+            "importDiffTitle": "Import options",
+            "importDiffSubtitle": "{count} option(s) differ from your current settings",
+            "importSelectAll": "Select all",
+            "importApply": "Apply selected",
+            "importCancel": "Cancel",
+            "importClose": "OK",
+            "importNoChanges": "The imported file matches your current options — nothing to change.",
+            "importInvalid": "This file doesn't look like a valid options export.",
+            "valueOn": "On",
+            "valueOff": "Off",
+            "autoValue": "auto",
+            "soundVolumesLabel": "Individual sound volumes"
         },
         "calibration": {
             "gestures": {
