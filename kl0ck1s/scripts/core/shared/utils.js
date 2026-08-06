@@ -1,6 +1,29 @@
 "use strict";
 
-import {SCORING} from "./config.js";
+import {SCORING, VOICE_COUNTING_NUMBERS, voiceCountingKey} from "./config.js";
+
+/**
+ * Splits a number into the counting-voice numbers needed to say it aloud,
+ * e.g. 3 -> [3], 20 -> [20], 21 -> [20, 1], 100 -> [100].
+ * Only covers what the counting voice pack has (1-19, tens up to 90, 100).
+ */
+export function numberToCountingParts(number) {
+    if (!Number.isInteger(number) || number <= 0) return [];
+    if (VOICE_COUNTING_NUMBERS.includes(number)) return [number];
+    if (number > 0 && number < 100) {
+        const tens = Math.floor(number / 10) * 10;
+        const ones = number % 10;
+        if (VOICE_COUNTING_NUMBERS.includes(tens) && VOICE_COUNTING_NUMBERS.includes(ones)) {
+            return [tens, ones];
+        }
+    }
+    return [];
+}
+
+/** Voice-sound keys (in SOUND_FILES) needed to say a number aloud. */
+export function numberToVoiceKeys(number) {
+    return numberToCountingParts(number).map(voiceCountingKey);
+}
 
 /** Iterates filled cells of a packed shape mask, calling cb(row, col) for each. */
 export function forEachShapeCell(mask, width, height, cb) {

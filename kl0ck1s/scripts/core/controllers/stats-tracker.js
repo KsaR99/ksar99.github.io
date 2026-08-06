@@ -5,6 +5,7 @@ import {
     formatDuration,
     formatDurationPrecise,
     formatNumber,
+    numberToVoiceKeys,
     tierForLevel
 } from "../shared/utils.js";
 import {levelForLines, pointsForLineClear, pointsForSpin} from "../game/scoring.js";
@@ -136,6 +137,7 @@ export class StatsTracker {
             }
 
             game.soundManager.play("levelUp");
+            game.soundManager.playSequence(["voiceLevel", ...numberToVoiceKeys(game.level)]);
             game.levelUpLevel = game.level;
             game.levelUpTimer = game.levelUpBannerDuration;
         }

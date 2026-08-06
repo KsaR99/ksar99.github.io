@@ -11,6 +11,7 @@ import {
     KEYBOARD_CALIBRATION_ROUNDS,
 } from "../game/game-constants.js";
 import {DEFAULT_DAS_MS} from "./input/keyboard-input.js";
+import {voiceCountingKey} from "../shared/config.js";
 
 const HOLD_GESTURE_CODES = {holdLeft: "ArrowLeft", holdRight: "ArrowRight"};
 const HOLD_GESTURE_GLYPHS = {holdLeft: "◄", holdRight: "►"};
@@ -101,6 +102,7 @@ export class KeyboardCalibrationController {
         this.countdownIndex++;
 
         if (this.countdownIndex >= COUNTDOWN_STEPS.length) {
+            this.game.soundManager.play("voiceLetsGo");
             this._armRound();
             return;
         }
@@ -163,6 +165,7 @@ export class KeyboardCalibrationController {
         if (!el) return;
 
         const {number, tint} = COUNTDOWN_STEPS[this.countdownIndex];
+        this.game.soundManager.play(voiceCountingKey(number));
         el.textContent = number;
         el.dataset.tint = tint;
         el.classList.remove("board__calibration__countdown--pop");

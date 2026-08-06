@@ -27,7 +27,7 @@ export const SPIN_POINTS = Object.freeze({
     OTHER: [100, 200, 400, 600],
 });
 
-export const LEVEL_UP_BANNER_DURATION_MS = 420; // 420
+export const LEVEL_UP_BANNER_DURATION_MS = 350;
 export const LINE_CLEAR_ANIMATION_DURATION_MS = 260; // 260
 export const LINE_CLEAR_SOUND_PLAYBACK_RATE = 0.6;
 export const LINE_CLEAR_FLASH_PHASE_FRACTION = 0.25;
@@ -180,7 +180,7 @@ COLOR_PALETTE.push("oklch(0.42 0.015 271)");
 
 export const CREDITS = Object.freeze([
     Object.freeze({name: "Sa_ymon", link: "https://www.twitch.tv/sa_ymon", roles: ["developer", "sfx"]}),
-    Object.freeze({name: "Danio Dragon", link: "https://www.twitch.tv/danio_dragon", roles: ["tester"]}),
+    Object.freeze({name: "Danio_Dragon", link: "https://www.twitch.tv/danio_dragon", roles: ["tester"]}),
     Object.freeze({name: "Aleksander Żak", link: "https://www.twitch.tv/grubyolson", roles: ["music", "sfx"]}),
 ]);
 
@@ -213,7 +213,24 @@ export const MUSIC_TENSION = Object.freeze({
     PITCH_RETURN_MS: 7000,
 });
 
+export const VOICE_COUNTING_NUMBERS = Object.freeze([
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+    20, 30, 40, 50, 60, 70, 80, 90, 100,
+]);
+
+export function voiceCountingKey(number) {
+    return `voiceCount${number}`;
+}
+
+const VOICE_COUNTING_SOUND_FILES = Object.fromEntries(
+    VOICE_COUNTING_NUMBERS.map((number) => [
+        voiceCountingKey(number),
+        Object.freeze({src: `assets/audio/voices/counting/${number}.opus`, category: "voices", label: String(number)}),
+    ])
+);
+
 export const SOUND_FILES = Object.freeze({
+    // sounds / sfx
     lineClear1: Object.freeze({src: "assets/audio/sounds/line-clear-1.opus", category: "sfx"}),
     lineClear2: Object.freeze({src: "assets/audio/sounds/line-clear-2.opus", category: "sfx"}),
     lineClear3: Object.freeze({src: "assets/audio/sounds/line-clear-3.opus", category: "sfx"}),
@@ -225,6 +242,11 @@ export const SOUND_FILES = Object.freeze({
     grounded: Object.freeze({src: "assets/audio/sounds/grounded.opus", category: "sfx"}),
     falling: Object.freeze({src: "assets/audio/sounds/falling.opus", category: "sfx"}),
     pieceLock: Object.freeze({src: "assets/audio/sounds/piece-lock.opus", category: "sfx"}),
+    // voices
+    voiceGameOver: Object.freeze({src: "assets/audio/voices/game-over.opus", category: "voices", label: "Game over"}),
+    voiceLetsGo: Object.freeze({src: "assets/audio/voices/lets-go.opus", category: "voices", label: "Let's go"}),
+    voiceLevel: Object.freeze({src: "assets/audio/voices/level.opus", category: "voices", label: "Level"}),
+    ...VOICE_COUNTING_SOUND_FILES,
     // music
     tetrisowyShvt: Object.freeze({
         src: "assets/audio/music/tetrisowy-shvt-1.opus",

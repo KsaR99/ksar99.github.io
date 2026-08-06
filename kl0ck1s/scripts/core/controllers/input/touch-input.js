@@ -6,7 +6,7 @@ import {PIECE_CONTROLLABLE_STATES} from "../../game/game-constants.js";
 
 const REPEATABLE_CODES = new Set(["ArrowLeft", "ArrowRight", "ArrowDown"]);
 
-const DEFAULT_DAS_MS = 120;
+const DEFAULT_DAS_MS = 125;
 const DEFAULT_ARR_MS = 16;
 
 const TAP_MAX_MOVEMENT_PX = 12;

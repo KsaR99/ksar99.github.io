@@ -126,7 +126,7 @@ export const Screens = {
             const categoryVolumes = settings.categoryVolumes ?? {};
             const soundVolumes = settings.soundVolumes ?? {};
 
-            ["sfx", "music"].forEach((category) => {
+            ["sfx", "music", "voices"].forEach((category) => {
                 const keys = soundManager.keysInCategory(category);
                 const group = screen.querySelector(`[data-role="sound-group-${category}"]`);
                 if (!group) return;

@@ -9,6 +9,7 @@ import {
     SENSITIVITY_STEP,
 } from "../game/game-constants.js";
 import {getTightBounds} from "../shared/utils.js";
+import {voiceCountingKey} from "../shared/config.js";
 
 const GESTURE_DIR_SIGN = {tutorialLeft: -1, tutorialRight: 1, dragToLeftEdge: -1, dragToRightEdge: 1};
 const TUTORIAL_GESTURES = new Set(["tutorialLeft", "tutorialRight"]);
@@ -128,6 +129,7 @@ export class SensitivityCalibrationController {
         this.countdownIndex++;
 
         if (this.countdownIndex >= COUNTDOWN_STEPS.length) {
+            this.game.soundManager.play("voiceLetsGo");
             this._armRound();
             return;
         }
@@ -330,6 +332,7 @@ export class SensitivityCalibrationController {
         if (!el) return;
 
         const {number, tint} = COUNTDOWN_STEPS[this.countdownIndex];
+        this.game.soundManager.play(voiceCountingKey(number));
         el.textContent = number;
         el.dataset.tint = tint;
         el.classList.remove("board__calibration__countdown--pop");

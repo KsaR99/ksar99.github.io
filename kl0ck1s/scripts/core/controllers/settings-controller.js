@@ -22,10 +22,10 @@ export class SettingsController {
             mouseControl: false,
             mouseSensitivity: 1,
             touchSensitivity: null,
-            keyboardDAS: 100,
+            keyboardDAS: 125,
             keyboardARR: 16,
             fallTrail: true,
-            categoryVolumes: {sfx: 1, music: 0.1},
+            categoryVolumes: {sfx: 1, music: 0.1, voices: 0.7},
             soundVolumes: {},
         };
     }
@@ -37,17 +37,19 @@ export class SettingsController {
 
     async loadSettings() {
         const game = this.game;
-        let settings = this.defaultSettings();
+        const defaults = this.defaultSettings();
+        let settings = defaults;
         let hasStoredSettings = false;
 
         try {
             const storedRaw = await game.settingsStore.get(SETTINGS_KEY);
             if (storedRaw) {
-                settings = {...settings, ...JSON.parse(storedRaw)};
+                settings = {...defaults, ...JSON.parse(storedRaw)};
+                settings.categoryVolumes = {...defaults.categoryVolumes, ...(settings.categoryVolumes ?? {})};
                 hasStoredSettings = true;
             }
         } catch {
-            settings = this.defaultSettings();
+            settings = defaults;
         }
 
         if (!hasStoredSettings && this.prefersReducedMotion()) {
@@ -113,11 +115,20 @@ export class SettingsController {
     exportSettings() {
         const game = this.game;
         const {difficulty, mode, ...settings} = game.settings;
+        const defaults = this.defaultSettings();
+
+        const nonDefaultSettings = {};
+        Object.entries(settings).forEach(([key, value]) => {
+            if (JSON.stringify(value) !== JSON.stringify(defaults[key])) {
+                nonDefaultSettings[key] = value;
+            }
+        });
+
         const payload = {
             app: "kl0ck1s",
             exportedAt: new Date().toISOString(),
             language: game.i18n?.lang ?? "en",
-            settings,
+            settings: nonDefaultSettings,
         };
         return JSON.stringify(payload, null, 2);
     }
@@ -140,11 +151,11 @@ export class SettingsController {
     diffSettings({settings, language}) {
         const game = this.game;
         const changes = [];
+        const defaults = this.defaultSettings();
 
         this.settingsKeys().forEach((key) => {
-            if (!(key in settings)) return;
             const oldValue = game.settings[key];
-            const newValue = settings[key];
+            const newValue = key in settings ? settings[key] : defaults[key];
             if (JSON.stringify(oldValue) === JSON.stringify(newValue)) return;
             changes.push({key, kind: "setting", oldValue, newValue});
         });
@@ -163,6 +174,11 @@ export class SettingsController {
         changes.forEach((change) => {
             if (change.kind === "language") {
                 languageChange = change.newValue;
+            } else if (change.key === "categoryVolumes") {
+                game.settings.categoryVolumes = {
+                    ...this.defaultSettings().categoryVolumes,
+                    ...change.newValue,
+                };
             } else {
                 game.settings[change.key] = change.newValue;
             }

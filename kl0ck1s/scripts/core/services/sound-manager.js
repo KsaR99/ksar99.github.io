@@ -1,6 +1,6 @@
 "use strict";
 
-export const SOUND_CATEGORIES = Object.freeze(["sfx", "music"]);
+export const SOUND_CATEGORIES = Object.freeze(["sfx", "music", "voices"]);
 
 let nextInstanceId = 1;
 
@@ -159,6 +159,14 @@ export class SoundManager {
 
         source.start(0);
         return id;
+    }
+
+    /** Plays sound keys one after another, each starting once the previous one ends. */
+    playSequence(keys, opts = {}) {
+        const [first, ...rest] = keys;
+        if (!first) return null;
+        if (rest.length === 0) return this.play(first, opts);
+        return this.play(first, {...opts, onEnded: () => this.playSequence(rest, opts)});
     }
 
     _instance(id) {

@@ -9,9 +9,9 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+Mono:wght@100..900&display=swap"
         rel="stylesheet">
-    <link href="styles/main.css?v=25" rel="stylesheet">
-    <link href="styles/mobile.css?v=25" media="(width < 48rem)" rel="stylesheet">
-    <link href="styles/desktop.css?v=25" media="(width >= 48rem)" rel="stylesheet">
+    <link href="styles/main.css?v=26" rel="stylesheet">
+    <link href="styles/mobile.css?v=26" media="(width < 48rem)" rel="stylesheet">
+    <link href="styles/desktop.css?v=26" media="(width >= 48rem)" rel="stylesheet">
     <meta content="notranslate" name="google">
     <meta content="index, follow" name="robots">
     <meta content="https://github.com/KsaR99" name="author">
@@ -37,7 +37,7 @@
         <div class="card">
             <p class="brand__title" data-role="brand-title">Kl0ck1<span class="brand__title-flip"
                                                                         data-role="brand-title-flip">'s</span></p>
-            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.7-alpha</p>
+            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.8-alpha</p>
         </div>
 
         <div class="card stats" data-role="stats-card">
@@ -379,6 +379,16 @@
                     </label>
                     <div class="options__sound-list" data-role="sound-list"></div>
                 </details>
+
+                <details class="options__group" data-role="sound-group-voices">
+                    <summary class="options__group-summary" data-i18n="screens.options.voicesTitle">Voices</summary>
+                    <label class="options__row">
+                        <span data-i18n="screens.options.categoryVolume">Category volume</span>
+                        <input class="options__input options__input--range" data-category="voices"
+                               data-role="category-volume-slider" max="100" min="0" type="range">
+                    </label>
+                    <div class="options__sound-list" data-role="sound-list"></div>
+                </details>
             </details>
 
             <details class="options" data-role="options-group-graphics">
@@ -484,7 +494,8 @@
                         data-role="options-import-apply" type="button">Apply selected
                 </button>
             </div>
-            <button class="button button--accent" data-i18n="screens.options.importClose" data-role="options-import-close"
+            <button class="button button--accent" data-i18n="screens.options.importClose"
+                    data-role="options-import-close"
                     hidden type="button">OK
             </button>
         </div>
@@ -829,6 +840,6 @@
         window.addEventListener("orientationchange", notifyResize);
     })();
 </script>
-<script src="scripts/app/main.js?v=25" type="module"></script>
+<script src="scripts/app/main.js?v=26" type="module"></script>
 </body>
 </html>

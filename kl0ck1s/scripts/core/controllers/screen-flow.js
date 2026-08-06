@@ -15,6 +15,8 @@ import {
     SENSITIVITY_STEP,
     SETTINGS_EXPORT_FILENAME,
 } from "../game/game-constants.js";
+import {numberToVoiceKeys} from "../shared/utils.js";
+import {voiceCountingKey} from "../shared/config.js";
 
 function clampToStep(value, min, max, step) {
     const clamped = Math.max(min, Math.min(max, value));
@@ -176,6 +178,7 @@ export class ScreenFlow {
         game.countdownTimer = 0;
 
         const {number, tint} = COUNTDOWN_STEPS[game.countdownIndex];
+        game.soundManager.play(voiceCountingKey(number));
         game.hud.showScreen(
             game.screens.countdown(number, tint, game.dom),
             {transparentOverlay: true}
@@ -185,6 +188,7 @@ export class ScreenFlow {
     advanceCountdownStep() {
         const game = this.game;
         const {number, tint} = COUNTDOWN_STEPS[game.countdownIndex];
+        game.soundManager.play(voiceCountingKey(number));
         if (!game.hud.updateCountdown(number, tint)) {
             this.renderCountdownStep();
         }
@@ -206,6 +210,14 @@ export class ScreenFlow {
         game.hud.setPlaying(true);
         game.hud.hideOverlay();
         game.musicDirector.start(game.board);
+
+        if (!game.settings.skipCountdown) {
+            game.soundManager.playSequence([
+                "voiceLetsGo",
+                "voiceLevel",
+                ...numberToVoiceKeys(game.level),
+            ]);
+        }
     }
 
     async gameOver() {
@@ -220,7 +232,12 @@ export class ScreenFlow {
         game.hud.setPlaying(false);
         game.musicDirector.stop();
         game.pieceController.stopAllGameplaySounds();
-        game.soundManager.play(reason === "topOut" ? "gameOver" : "levelUp");
+        if (reason === "topOut") {
+            game.soundManager.play("gameOver");
+            game.soundManager.play("voiceGameOver");
+        } else {
+            game.soundManager.play("levelUp");
+        }
         game.hud.showScreen(game.screens.loading(
             game.i18n.t("screens.gameOverEntry.title"), game.i18n.t("screens.loading.leaderboardHint"), game.dom
         ));

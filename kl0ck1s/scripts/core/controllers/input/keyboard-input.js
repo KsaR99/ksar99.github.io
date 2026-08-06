@@ -8,7 +8,7 @@ const PREVENT_DEFAULT_KEYS = new Set([
 
 const REPEATABLE_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowDown"]);
 
-export const DEFAULT_DAS_MS = 100;
+export const DEFAULT_DAS_MS = 125;
 export const DEFAULT_ARR_MS = 16;
 
 export const MOVEMENT_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Space", "KeyZ", "KeyA"]);
