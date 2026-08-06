@@ -78,6 +78,7 @@
             "ghost": "ゴーストピース",
             "gridLines": "グリッド線",
             "screenShake": "画面シェイク",
+            "heightSaturation": "高さによる彩度",
             "performanceTitle": "パフォーマンス",
             "glow": "発光（ぼかし）",
             "transparency": "透明度",

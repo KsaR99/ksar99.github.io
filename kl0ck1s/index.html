@@ -9,9 +9,9 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+Mono:wght@100..900&display=swap"
         rel="stylesheet">
-    <link href="styles/main.css?v=29" rel="stylesheet">
-    <link href="styles/mobile.css?v=29" media="(width < 48rem)" rel="stylesheet">
-    <link href="styles/desktop.css?v=29" media="(width >= 48rem)" rel="stylesheet">
+    <link href="styles/main.css?v=28" rel="stylesheet">
+    <link href="styles/mobile.css?v=28" media="(width < 48rem)" rel="stylesheet">
+    <link href="styles/desktop.css?v=28" media="(width >= 48rem)" rel="stylesheet">
     <meta content="notranslate" name="google">
     <meta content="index, follow" name="robots">
     <meta content="https://github.com/KsaR99" name="author">
@@ -37,7 +37,7 @@
         <div class="card">
             <p class="brand__title" data-role="brand-title">Kl0ck1<span class="brand__title-flip"
                                                                         data-role="brand-title-flip">'s</span></p>
-            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.9.2-alpha</p>
+            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.10-alpha</p>
         </div>
 
         <div class="card stats" data-role="stats-card">
@@ -404,6 +404,11 @@
                 <label class="options__row">
                     <span data-i18n="screens.options.screenShake">Screen shake</span>
                     <input class="options__input options__input--checkbox" data-role="screen-shake-checkbox"
+                           type="checkbox">
+                </label>
+                <label class="options__row">
+                    <span data-i18n="screens.options.heightSaturation">Height saturation</span>
+                    <input class="options__input options__input--checkbox" data-role="height-saturation-checkbox"
                            type="checkbox">
                 </label>
 
@@ -845,6 +850,6 @@
         window.addEventListener("orientationchange", notifyResize);
     })();
 </script>
-<script src="scripts/app/main.js?v=29" type="module"></script>
+<script src="scripts/app/main.js?v=28" type="module"></script>
 </body>
 </html>

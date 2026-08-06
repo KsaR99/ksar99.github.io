@@ -56,6 +56,7 @@ const DIFF_LABEL_KEYS = {
     ghost: "screens.options.ghost",
     gridLines: "screens.options.gridLines",
     screenShake: "screens.options.screenShake",
+    heightSaturation: "screens.options.heightSaturation",
     glow: "screens.options.glow",
     transparency: "screens.options.transparency",
     fallTrail: "screens.options.fallTrail",
@@ -155,6 +156,8 @@ export const Screens = {
         screen.querySelector('[data-role="grid-checkbox"]').checked = settings.gridLines;
         const screenShakeCheckbox = screen.querySelector('[data-role="screen-shake-checkbox"]');
         if (screenShakeCheckbox) screenShakeCheckbox.checked = Boolean(settings.screenShake);
+        const heightSaturationCheckbox = screen.querySelector('[data-role="height-saturation-checkbox"]');
+        if (heightSaturationCheckbox) heightSaturationCheckbox.checked = Boolean(settings.heightSaturation);
         screen.querySelector('[data-role="glow-checkbox"]').checked = settings.glow;
         screen.querySelector('[data-role="transparency-checkbox"]').checked = settings.transparency;
         const fallTrailCheckbox = screen.querySelector('[data-role="fall-trail-checkbox"]');

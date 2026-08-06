@@ -78,6 +78,7 @@
             "ghost": "고스트 블록",
             "gridLines": "격자선",
             "screenShake": "화면 흔들림",
+            "heightSaturation": "높이별 채도",
             "performanceTitle": "성능",
             "glow": "발광 (흐림 효과)",
             "transparency": "투명도",

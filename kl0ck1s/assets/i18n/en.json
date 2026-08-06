@@ -78,6 +78,7 @@
             "ghost": "Ghost piece",
             "gridLines": "Grid lines",
             "screenShake": "Screen shake",
+            "heightSaturation": "Height saturation",
             "performanceTitle": "Performance",
             "glow": "Glow (blur)",
             "transparency": "Transparency",

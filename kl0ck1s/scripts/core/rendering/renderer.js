@@ -50,6 +50,7 @@ export class Renderer {
         this.ghostEnabled = true;
         this.gridEnabled = true;
         this.shakeEnabled = true;
+        this.heightSaturationEnabled = true;
         this._boardOffsetX = 0;
         this._boardOffsetY = 0;
         this.boardCanvasRect = null;
@@ -61,7 +62,16 @@ export class Renderer {
         this._bgGrid = null;
         this._bgRows = 0;
         this._bgCols = 0;
+        this._bgSat = null;
         this._boardScaleX = 1;
+
+        this._clearingStaticCanvas = document.createElement("canvas");
+        this._clearingStaticCtx = this._clearingStaticCanvas.getContext("2d", {colorSpace: "display-p3"});
+        this._clearingStaticVersion = -1;
+        this._clearingStaticSize = 0;
+        this._clearingStaticFromRow = -1;
+        this._clearingStaticGrid = null;
+        this._clearingStaticSat = null;
 
         this._onWindowResize = () => this.refreshBoardCanvasRect();
         window.addEventListener("resize", this._onWindowResize);
@@ -101,6 +111,22 @@ export class Renderer {
         if (!enabled) this.resetBoardTransform();
     }
 
+    setHeightSaturationEnabled(enabled) {
+        this.heightSaturationEnabled = enabled;
+    }
+
+    rowSaturationFactor(y, rows) {
+        if (!this.heightSaturationEnabled) return 1;
+        const distanceFromBottom = (rows - 1) - y;
+        return Math.max(0, 1 - distanceFromBottom * 0.05);
+    }
+
+    colorForRow(color, y, rows) {
+        const factor = this.rowSaturationFactor(y, rows);
+        if (factor >= 1) return color;
+        return `oklch(from ${color} l calc(c * ${factor}) h)`;
+    }
+
     resetBoardTransform() {
         clearTimeout(this._shakeTimer);
         clearTimeout(this._squashTimerA);
@@ -122,7 +148,7 @@ export class Renderer {
     shakeMove(dir) {
         if (!this.shakeEnabled || !this.boardEl || !dir) return;
         clearTimeout(this._shakeTimer);
-        this._boardOffsetX = dir < 0 ? 0.4 : -0.4;
+        this._boardOffsetX = dir < 0 ? 0.5 : -0.5;
         this._applyBoardOffset(70);
         this._shakeTimer = setTimeout(() => {
             this._boardOffsetX = 0;
@@ -134,10 +160,10 @@ export class Renderer {
         if (!this.shakeEnabled || !this.boardEl) return;
         clearTimeout(this._squashTimerA);
         clearTimeout(this._squashTimerB);
-        this._boardOffsetY = 0.5;
+        this._boardOffsetY = 0.6;
         this._applyBoardOffset(70);
         this._squashTimerA = setTimeout(() => {
-            this._boardOffsetY = -0.25;
+            this._boardOffsetY = -0.5;
             this._applyBoardOffset(90);
             this._squashTimerB = setTimeout(() => {
                 this._boardOffsetY = 0;
@@ -182,11 +208,11 @@ export class Renderer {
         }
     }
 
-    drawGrid(board, context = this.ctx) {
+    drawGrid(board, context = this.ctx, fromRow = 0, toRow = board.rows - 1) {
         const size = this.boardConfig.CELL_SIZE;
         const sprite = this.spriteCache.getGridCell(size);
 
-        for (let y = 0; y < board.rows; y++) {
+        for (let y = fromRow; y <= toRow; y++) {
             for (let x = 0; x < board.cols; x++) {
                 context.drawImage(sprite, x * size, y * size, size, size);
             }
@@ -198,7 +224,8 @@ export class Renderer {
             || this._bgSize !== size
             || this._bgGrid !== this.gridEnabled
             || this._bgRows !== board.rows
-            || this._bgCols !== board.cols;
+            || this._bgCols !== board.cols
+            || this._bgSat !== this.heightSaturationEnabled;
 
         if (!dirty) return;
 
@@ -214,7 +241,7 @@ export class Renderer {
         for (let y = 0; y < board.rows; y++) {
             for (let x = 0; x < board.cols; x++) {
                 const colorIndex = board.colors[y * board.cols + x];
-                if (colorIndex) this.drawCell(bgCtx, x, y, this.colorPalette[colorIndex], size);
+                if (colorIndex) this.drawCell(bgCtx, x, y, this.colorForRow(this.colorPalette[colorIndex], y, board.rows), size);
             }
         }
 
@@ -223,6 +250,47 @@ export class Renderer {
         this._bgGrid = this.gridEnabled;
         this._bgRows = board.rows;
         this._bgCols = board.cols;
+        this._bgSat = this.heightSaturationEnabled;
+    }
+
+    _ensureClearingStaticBackground(board, size, staticFromRow) {
+        const dirty = this._clearingStaticVersion !== board.version
+            || this._clearingStaticSize !== size
+            || this._clearingStaticFromRow !== staticFromRow
+            || this._clearingStaticGrid !== this.gridEnabled
+            || this._clearingStaticSat !== this.heightSaturationEnabled;
+
+        if (!dirty) return;
+
+        const rowsCount = Math.max(0, board.rows - staticFromRow);
+        const width = board.cols * size;
+        const height = rowsCount * size;
+        if (this._clearingStaticCanvas.width !== width) this._clearingStaticCanvas.width = width;
+        if (this._clearingStaticCanvas.height !== height) this._clearingStaticCanvas.height = height;
+
+        const sCtx = this._clearingStaticCtx;
+        sCtx.clearRect(0, 0, width, height);
+
+        const gridSprite = this.gridEnabled ? this.spriteCache.getGridCell(size) : null;
+
+        for (let y = staticFromRow; y < board.rows; y++) {
+            const localY = y - staticFromRow;
+            if (gridSprite) {
+                for (let x = 0; x < board.cols; x++) {
+                    sCtx.drawImage(gridSprite, x * size, localY * size, size, size);
+                }
+            }
+            for (let x = 0; x < board.cols; x++) {
+                const colorIndex = board.colors[y * board.cols + x];
+                if (colorIndex) this.drawCell(sCtx, x, localY, this.colorForRow(this.colorPalette[colorIndex], y, board.rows), size);
+            }
+        }
+
+        this._clearingStaticVersion = board.version;
+        this._clearingStaticSize = size;
+        this._clearingStaticFromRow = staticFromRow;
+        this._clearingStaticGrid = this.gridEnabled;
+        this._clearingStaticSat = this.heightSaturationEnabled;
     }
 
     drawBoard(board) {
@@ -249,10 +317,15 @@ export class Renderer {
         const rowsGone = p >= maskStart;
         const clearingSet = new Set(lineIndices);
 
-        ctx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
-        if (this.gridEnabled) this.drawGrid(board, ctx);
+        const affectedMaxRow = lineIndices.length ? Math.max(...lineIndices) : -1;
+        const staticFromRow = affectedMaxRow + 1;
+        this._ensureClearingStaticBackground(board, size, staticFromRow);
 
-        for (let y = 0; y < board.rows; y++) {
+        ctx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
+        if (this.gridEnabled) this.drawGrid(board, ctx, 0, affectedMaxRow);
+        if (staticFromRow < board.rows) ctx.drawImage(this._clearingStaticCanvas, 0, staticFromRow * size);
+
+        for (let y = 0; y <= affectedMaxRow; y++) {
             const isClearingRow = clearingSet.has(y);
             if (isClearingRow && rowsGone) continue;
 
@@ -260,7 +333,7 @@ export class Renderer {
             for (let x = 0; x < board.cols; x++) {
                 const colorIndex = board.colors[y * board.cols + x];
                 if (!colorIndex) continue;
-                this.drawCell(ctx, x, yPos, this.colorPalette[colorIndex], size);
+                this.drawCell(ctx, x, yPos, this.colorForRow(this.colorPalette[colorIndex], y, board.rows), size);
             }
         }
 
@@ -323,7 +396,7 @@ export class Renderer {
                 const x = snap.x + c;
                 const y = snap.y + r;
                 if (y < 0) return;
-                this.drawCell(ctx, x, y, `oklch(from ${snap.color} calc(l + 0.75) c h / 0.3)`, size);
+                this.drawCell(ctx, x, y, `oklch(from ${snap.color} calc(l + 0.75) c h / 0.35)`, size);
             });
         }
         ctx.restore();
@@ -350,7 +423,7 @@ export class Renderer {
                 const x = entry.x + c;
                 const y = entry.y + r;
                 if (y < 0) return;
-                this.drawCell(ctx, x, y, `oklch(from ${entry.color} calc(l + 0.2) c h / 0.95)`, size);
+                this.drawCell(ctx, x, y, `oklch(from ${entry.color} calc(l + 0.3) c h / 0.7)`, size);
             });
         }
         ctx.restore();
@@ -436,7 +509,7 @@ export class Renderer {
 
         if (this.glowEnabled) {
             ctx.shadowBlur = fontSize * 0.25;
-            ctx.shadowColor = "oklch(0.464 0.043 75.925 / 0.85)";
+            ctx.shadowColor = "oklch(0.491 0.064 124.064 / 0.85)";
         } else {
             ctx.shadowBlur = 0;
         }
