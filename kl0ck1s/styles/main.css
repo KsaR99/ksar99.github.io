@@ -254,16 +254,6 @@ body.hud-right .card[data-role="next-piece-card"] {
     flex-direction: row-reverse;
 }
 
-/* Next piece + level/progress mini-readout: pulled out of the (hidden)
-   stats drawer and pinned as a transparent strip above the board, so
-   they stay visible during play without spending sidebar space. Same
-   elements/IDs as the sidebar versions - no JS changes needed, the game
-   code keeps updating #next-piece-canvas / #difficulty-bar as before. */
-/* Combined with the .card class on purpose (not just [data-role=...]):
-   a bare attribute selector has the same specificity as .card, so
-   whichever rule happened to sit later in the file would silently win
-   and overwrite padding/background here. Compounding the selectors
-   makes this rule unambiguously win regardless of source order. */
 .card[data-role="next-piece-card"] {
     position: fixed;
     top: 50%;
@@ -293,10 +283,6 @@ body.hud-right .card[data-role="next-piece-card"] {
 
 [data-role="difficulty-stat"] {
     position: fixed;
-    /* Same row as .mobile-fabs: aligned top, height matches a FAB button.
-       Horizontally it sits in the gap between the stats/controls group
-       (2 buttons + the gap between them) and the fullscreen group (1
-       button), with --fab-gap breathing room on each side. */
     top: calc(var(--safe-t) + 0.5rem);
     height: var(--fab-size);
     left: calc(var(--safe-l) + 0.5rem + (var(--fab-size) * 2) + (var(--fab-gap) * 2));

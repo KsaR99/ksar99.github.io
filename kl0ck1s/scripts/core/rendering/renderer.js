@@ -178,14 +178,6 @@ export class Renderer {
         ctx.drawImage(this.backgroundCanvas, 0, 0);
     }
 
-    /**
-     * Draws the board during the "clearing" state: rows above the ones being
-     * cleared are drawn already sliding down toward their post-clear
-     * position (dropRows[y] rows, eased in by `progress`), while the
-     * clearing rows themselves go through the flash -> disappear -> particles
-     * sequence. Everything is drawn cell-by-cell (no cached background),
-     * since the per-row offsets change every frame.
-     */
     drawClearingFrame(board, lineIndices, dropRows, fragments, progress) {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx, boardCanvas} = this;

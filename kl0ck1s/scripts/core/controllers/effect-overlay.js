@@ -28,7 +28,6 @@ export class EffectOverlay {
         this.update();
     }
 
-    /** Called every render frame: syncs overlay visibility to game state (only active while playing). */
     update() {
         const game = this.game;
         const effect = game.activeEffect;

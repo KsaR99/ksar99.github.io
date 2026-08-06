@@ -184,6 +184,18 @@ export class SoundManager {
             .forEach((instance) => this.stop(instance.id));
     }
 
+    stopCategory(category) {
+        [...this.instances.values()]
+            .filter((instance) => instance.category === category)
+            .forEach((instance) => this.stop(instance.id));
+    }
+
+    unlock() {
+        const context = this.ensureContext();
+        if (context) this._resumeIfSuspended();
+        return context;
+    }
+
     pause(id) {
         const instance = this._instance(id);
         if (!instance || instance.paused || !this.context) return;

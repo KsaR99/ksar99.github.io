@@ -70,7 +70,6 @@ export class StatsTracker {
         };
     }
 
-    /** @todo: stop music? */
     reset() {
         const game = this.game;
         game.score = 0;

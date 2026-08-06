@@ -185,7 +185,13 @@ function handleViewportResize() {
 (window?.visualViewport || window).addEventListener("resize", handleViewportResize);
 
 document.addEventListener("visibilitychange", () => {
-    if (document.hidden && game.state === "running") {
-        game.screenFlow.togglePause();
+    if (document.hidden) {
+        if (game.state === "running") game.screenFlow.togglePause();
+    } else {
+        game.soundManager.unlock();
     }
+});
+
+["pointerdown", "keydown", "touchstart"].forEach((type) => {
+    window.addEventListener(type, () => game.soundManager.unlock(), {passive: true});
 });

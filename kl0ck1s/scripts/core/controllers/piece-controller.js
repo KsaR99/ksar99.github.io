@@ -176,6 +176,11 @@ export class PieceController {
         this.stopFallingSound();
     }
 
+    stopAllGameplaySounds() {
+        this.stopGameplaySounds();
+        this.game.soundManager.stopCategory("sfx");
+    }
+
     moveHorizontal(dir) {
         const game = this.game;
         if (!PIECE_CONTROLLABLE_STATES.has(game.state)) return;
@@ -369,12 +374,6 @@ export class PieceController {
         game.clearingTimer = 0;
     }
 
-    /**
-     * dropRows[y] = how many rows y needs to visually fall by once the rows
-     * in `fullRows` disappear (i.e. how many cleared rows sit below y).
-     * Used to animate the remaining stack sliding down smoothly during the
-     * clear animation, instead of snapping into place once it finishes.
-     */
     buildDropRows(fullRows, rowCount) {
         const dropRows = new Array(rowCount).fill(0);
         for (let y = 0; y < rowCount; y++) {

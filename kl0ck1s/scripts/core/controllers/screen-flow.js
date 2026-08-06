@@ -159,6 +159,7 @@ export class ScreenFlow {
 
     startCountdown() {
         const game = this.game;
+        game.soundManager.unlock();
         game.prepareNewRound();
         game.hud.setHasPlayedBefore(true);
 
@@ -217,7 +218,7 @@ export class ScreenFlow {
         game.isPlayingSession = false;
         game.hud.setPlaying(false);
         game.musicDirector.stop();
-        game.pieceController.stopGameplaySounds();
+        game.pieceController.stopAllGameplaySounds();
         game.soundManager.play(reason === "topOut" ? "gameOver" : "levelUp");
         game.hud.showScreen(game.screens.loading(
             game.i18n.t("screens.gameOverEntry.title"), game.i18n.t("screens.loading.leaderboardHint"), game.dom
@@ -258,8 +259,8 @@ export class ScreenFlow {
     exitToMenu() {
         const game = this.game;
         if (!["running", "paused", "countdown", "clearing"].includes(game.state)) return;
-        game.pieceController.stopGameplaySounds();
-        game.musicDirector.stop();
+        game.pieceController.stopAllGameplaySounds();
+        game.musicDirector.stop(0);
         this.showIdleScreen().then();
     }
 
@@ -317,7 +318,7 @@ export class ScreenFlow {
         const game = this.game;
         if (game.state === "running") {
             game.state = "paused";
-            game.pieceController.stopGameplaySounds();
+            game.pieceController.stopAllGameplaySounds();
             game.musicDirector.pause();
             this.renderPauseMenu();
         } else if (game.state === "paused") {
@@ -332,6 +333,9 @@ export class ScreenFlow {
         if (!["running", "paused", "clearing", "countdown", "gameOver-entry", "gameOver-saved"].includes(game.state)) {
             return;
         }
+
+        game.pieceController.stopAllGameplaySounds();
+        game.musicDirector.stop(0);
 
         game.modeController.resolveRandomMode();
         this.startCountdown();
@@ -470,7 +474,7 @@ export class ScreenFlow {
 
         game.previousStateBeforeOptions = game.state;
         if (game.state === "running") {
-            game.pieceController.stopGameplaySounds();
+            game.pieceController.stopAllGameplaySounds();
             game.musicDirector.pause();
         }
         game.state = "options";

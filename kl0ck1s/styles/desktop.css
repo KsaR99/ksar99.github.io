@@ -1,12 +1,3 @@
-/* ============================================================
-   Desktop overrides on top of main.css's mobile-first base rules.
-   Restores the original 3-column row layout and hides every
-   mobile-only control. Loaded instead of mobile.css above `48rem`
-   (see index.html) — relies on main.css being loaded first, so
-   these rules only need to state what actually changes, not
-   reset every mobile-only property back to a neutral value.
-   ============================================================ */
-
 body {
     overflow: visible;
     padding: 0.25rem;
