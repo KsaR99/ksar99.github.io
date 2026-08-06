@@ -303,6 +303,7 @@ body.hud-right .card[data-role="next-piece-card"] {
     border-radius: var(--radius);
     border: 1px solid var(--board-accent, var(--line));
     box-shadow: var(--board-accent, oklch(0.39 0 0)) 0 0 1.15rem 0.25rem;
+    will-change: transform;
 }
 
 body.perf-no-glow .board {
