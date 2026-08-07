@@ -12,9 +12,13 @@ export const SCORING = Object.freeze({
     POINTS_PER_LINES: [0, 100, 300, 500, 800],
     SOFT_DROP_POINT: 1,
     HARD_DROP_POINT: 2,
-    BASE_DROP_INTERVAL: 1000,
-    MIN_DROP_INTERVAL: 100,
-    DROP_INTERVAL_STEP: 75,
+    // Official Tetris Guideline curve: time(level) = (0.8 - (level-1)*0.007)^(level-1) seconds.
+    // See dropIntervalForLevel() in shared/utils.js for the formula itself.
+    GUIDELINE_DROP_BASE: 0.8,
+    GUIDELINE_DROP_STEP: 0.007,
+    // Floor so the drop timer stays meaningful once the curve goes sub-frame (~level 20+),
+    // instead of collapsing to 0ms and behaving unpredictably against a delta-time loop.
+    MIN_DROP_INTERVAL: 16.67,
     LOCK_DELAY: 500,
     LOCK_DELAY_MAX_RESETS: 15,
     MAX_GROUNDED_TIME: 3000,
@@ -32,12 +36,18 @@ export const LINE_CLEAR_ANIMATION_DURATION_MS = 260;
 export const LINE_CLEAR_SOUND_PLAYBACK_RATE = 0.6;
 export const LINE_CLEAR_FLASH_PHASE_FRACTION = 0.3;
 
+// Start levels are picked against the guideline drop curve (see dropIntervalForLevel):
+// gravity stops getting any faster once the curve dips below MIN_DROP_INTERVAL
+// (~level 13-14), so pushing a startLevel past that only changes lock/sound feel,
+// not fall speed. easy/medium/hard/expert sit below that point so each tier is
+// still perceptibly faster than the last; pro starts past it on purpose, as the
+// "true 20G, instant drop from piece one" tier.
 export const DIFFICULTIES = Object.freeze({
-    easy: {startLevel: 1, fallingSoundRate: 0.20},
-    medium: {startLevel: 10, groundedTime: 2500, fallingSoundRate: 0.30},
-    hard: {startLevel: 15, groundedTime: 2000, fallingSoundRate: 0.40},
-    expert: {startLevel: 20, groundedTime: 1500, fallingSoundRate: 0.50},
-    pro: {startLevel: 30, groundedTime: 1000, fallingSoundRate: 0.60},
+    easy: {startLevel: 1, fallingSoundRate: 0.40}, // ~1000ms/row
+    medium: {startLevel: 5, groundedTime: 2500, fallingSoundRate: 0.50}, // ~355ms/row
+    hard: {startLevel: 9, groundedTime: 2000, fallingSoundRate: 0.60}, // ~94ms/row
+    expert: {startLevel: 13, groundedTime: 1500, fallingSoundRate: 0.70}, // ~18ms/row, just above the floor
+    pro: {startLevel: 19, groundedTime: 1000, fallingSoundRate: 0.8}, // floored: instant drop (20G) from the start
 });
 
 export const DEFAULT_DIFFICULTY = "hard";

@@ -63,10 +63,12 @@ export function lightenOklch(color, amount = 0.9, maxLightness = 0.7) {
 }
 
 export function dropIntervalForLevel(level, scoring = SCORING) {
-    return Math.max(
-        scoring.MIN_DROP_INTERVAL,
-        scoring.BASE_DROP_INTERVAL - (level - 1) * scoring.DROP_INTERVAL_STEP
-    );
+    // Official Tetris Guideline speed curve:
+    // time (seconds) = (0.8 - (level-1) * 0.007) ^ (level-1)
+    // level 1 -> 1000ms, level 10 -> ~64ms, level 15 -> ~7ms, etc.
+    const base = Math.max(0.001, scoring.GUIDELINE_DROP_BASE - (level - 1) * scoring.GUIDELINE_DROP_STEP);
+    const seconds = base ** (level - 1);
+    return Math.max(scoring.MIN_DROP_INTERVAL, seconds * 1000);
 }
 
 export function tierForLevel(level, difficulties) {
