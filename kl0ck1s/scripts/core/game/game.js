@@ -440,7 +440,10 @@ export class Game {
 
         const body = this.dom?.body;
         if (body) {
-            body.classList.toggle("cursor-hidden", ["running", "clearing"].includes(this.state) && !this.settings.mouseControl);
+            body.classList.toggle(
+                "cursor-hidden",
+                ["running", "clearing", "countdown"].includes(this.state) && !this.settings.mouseControl
+            );
         }
 
         const showPieceBehindOptions = this.state === "options"

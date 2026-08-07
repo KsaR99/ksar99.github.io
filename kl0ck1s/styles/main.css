@@ -139,7 +139,6 @@ body {
     background: var(--body-bg, oklch(0.1291 0 0));
     font-family: var(--font-body);
     color: var(--text);
-    padding: 0;
     overflow: hidden;
     color-scheme: dark;
 }

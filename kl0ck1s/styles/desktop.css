@@ -1,7 +1,3 @@
-body {
-    overflow: visible;
-}
-
 .app {
     flex-direction: row;
     align-items: flex-start;
