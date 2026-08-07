@@ -23,7 +23,7 @@ const NOISE_MASK = NOISE_SIZE - 1;
 export class VHS {
     constructor(canvas, ctx = null) {
         this.canvas = canvas;
-        this.ctx = ctx ?? canvas.getContext("2d", {colorSpace: "display-p3", willReadFrequently: true});
+        this.ctx = ctx ?? canvas.getContext("2d", {willReadFrequently: true});
         this.active = false;
         this.rafId = null;
         this.frameCount = 0;

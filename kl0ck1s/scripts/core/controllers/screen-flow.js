@@ -15,7 +15,7 @@ import {
     SENSITIVITY_STEP,
     SETTINGS_EXPORT_FILENAME,
 } from "../game/game-constants.js";
-import {numberToVoiceKeys} from "../shared/utils.js";
+import {copyTextToClipboard, numberToVoiceKeys} from "../shared/utils.js";
 import {voiceCountingKey} from "../shared/config.js";
 import {defaultKeyBindings} from "../shared/key-bindings.js";
 
@@ -604,6 +604,8 @@ export class ScreenFlow {
             });
         }
 
+        this.bindBenchmark();
+
         if (ghostCheckbox) {
             ghostCheckbox.addEventListener("change", () => {
                 game.settings.ghost = ghostCheckbox.checked;
@@ -818,6 +820,84 @@ export class ScreenFlow {
         this.bindLangSelect();
         this.bindOptionsDataMenu();
         this.bindKeybindList();
+    }
+
+    bindBenchmark() {
+        const game = this.game;
+        const button = game.dom.querySelector('[data-role="benchmark-run-button"]');
+        const statusEl = game.dom.querySelector('[data-role="benchmark-status"]');
+        const resultsEl = game.dom.querySelector('[data-role="benchmark-results"]');
+        const copyButton = game.dom.querySelector('[data-role="benchmark-copy-button"]');
+        if (!button) return;
+
+        let lastRun = null;
+
+        button.addEventListener("click", async () => {
+            if (button.disabled) return;
+            button.disabled = true;
+            if (resultsEl) resultsEl.hidden = true;
+            if (copyButton) copyButton.hidden = true;
+            lastRun = null;
+
+            if (statusEl) {
+                statusEl.hidden = false;
+                statusEl.textContent = game.i18n.t("screens.options.benchmarkRunning", {percent: 0});
+            }
+
+            try {
+                const {results, totalMs, pieceCount} = await game.benchmarkController.run({
+                    pieceCount: 500,
+                    onProgress: (done, total) => {
+                        if (!statusEl) return;
+                        const percent = Math.round((done / total) * 100);
+                        statusEl.textContent = game.i18n.t("screens.options.benchmarkRunning", {percent});
+                    },
+                });
+
+                const slowest = results[0];
+                const slowestLabel = slowest
+                    ? game.i18n.t(`benchmark.categories.${slowest.key}`)
+                    : "";
+
+                if (statusEl) {
+                    statusEl.textContent = game.i18n.t("screens.options.benchmarkDone", {
+                        pieces: pieceCount,
+                        ms: Math.round(totalMs),
+                        label: slowestLabel,
+                        percent: slowest ? Math.round(slowest.percent) : 0,
+                    });
+                }
+
+                if (resultsEl) {
+                    game.screens.renderBenchmarkResults(game.dom, resultsEl, results, game.i18n);
+                    resultsEl.hidden = false;
+                }
+
+                lastRun = {results, totalMs, pieceCount};
+                if (copyButton) copyButton.hidden = false;
+            } finally {
+                button.disabled = false;
+            }
+        });
+
+        if (copyButton) {
+            const defaultLabel = copyButton.textContent;
+            copyButton.addEventListener("click", async () => {
+                if (!lastRun || copyButton.disabled) return;
+
+                const text = game.screens.formatBenchmarkResultsText(lastRun.results, game.i18n, lastRun);
+                const copied = await copyTextToClipboard(text, game.dom);
+
+                copyButton.textContent = game.i18n.t(
+                    copied ? "screens.options.benchmarkCopied" : "screens.options.benchmarkCopyFailed"
+                );
+                copyButton.disabled = true;
+                setTimeout(() => {
+                    copyButton.textContent = defaultLabel;
+                    copyButton.disabled = false;
+                }, 1500);
+            });
+        }
     }
 
     bindKeybindList() {

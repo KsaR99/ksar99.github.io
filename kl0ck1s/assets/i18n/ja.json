@@ -128,7 +128,16 @@
             "keyboardHint": "キーをクリックして割り当て直す",
             "keyboardResetButton": "初期設定に戻す",
             "keyboardPressKey": "キーを押してください…",
-            "keyboardReset": "キーをリセット"
+            "keyboardReset": "キーをリセット",
+            "developerTitle": "Developer",
+            "benchmark": "Benchmark",
+            "benchmarkHint": "Simulates a fast random game and times each part of the engine to find the slowest one.",
+            "benchmarkButton": "Run benchmark",
+            "benchmarkRunning": "Running… ({percent}%)",
+            "benchmarkDone": "Simulated {pieces} pieces in {ms} ms. Slowest: {label} ({percent}%).",
+            "benchmarkCopyButton": "Copy results",
+            "benchmarkCopied": "Copied to clipboard",
+            "benchmarkCopyFailed": "Copy failed"
         },
         "calibration": {
             "gestures": {
@@ -310,5 +319,24 @@
         "grounded": "ピース着地",
         "falling": "ピース落下中",
         "pieceLock": "ピースロック"
+    },
+    "benchmark": {
+        "categories": {
+            "pieceGeneration": "Piece generation",
+            "movement": "Movement checks",
+            "rotation": "Rotation & kicks",
+            "dropOffset": "Hard-drop offset calc",
+            "lockPiece": "Locking piece to board",
+            "lineClearDetect": "Detecting full lines",
+            "lineClearApply": "Clearing full lines",
+            "scoring": "Scoring",
+            "renderRefreshRect": "Render: canvas rect refresh",
+            "renderBackgroundRebuild": "Render: board background rebuild",
+            "renderBlit": "Render: board blit",
+            "renderDrawPiece": "Render: falling piece",
+            "renderDrawGhost": "Render: ghost piece",
+            "audioPlay": "Audio: play trigger",
+            "audioStop": "Audio: stop trigger"
+        }
     }
 }

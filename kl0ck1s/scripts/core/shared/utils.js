@@ -152,3 +152,12 @@ export function formatDurationPrecise(ms) {
 
     return hours > 0 ? `${hours}:${mm}:${ss}.${cc}` : `${mm}:${ss}.${cc}`;
 }
+
+export async function copyTextToClipboard(text) {
+    try {
+        await globalThis.navigator?.clipboard?.writeText(text);
+        return true;
+    } catch {
+        return false;
+    }
+}

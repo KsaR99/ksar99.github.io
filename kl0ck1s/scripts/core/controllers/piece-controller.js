@@ -358,6 +358,7 @@ export class PieceController {
         this.stopGameplaySounds();
         game.soundManager.play(isHardDrop ? "drop" : "pieceLock");
         game.board.lockPiece(game.current);
+        game.renderer.notifyPieceLocked(game.current, game.board);
 
         const fullRows = game.board.getFullLineIndices();
 
@@ -430,7 +431,9 @@ export class PieceController {
 
     finishLineClear() {
         const game = this.game;
+        const clearedRowIndices = game.clearingLines;
         const cleared = game.board.clearFullLines();
+        game.renderer.notifyLinesCleared(game.board, clearedRowIndices);
         if (game.pendingSpin) game.statsTracker.registerSpin(game.pendingSpin, cleared);
         game.statsTracker.registerLineClears(cleared, false);
 
@@ -444,7 +447,6 @@ export class PieceController {
         game.dropCounter = 0;
 
         const toppedOutFromResupply = game.modeController.onLinesCleared(cleared);
-        game.hud.update(game.stats);
         if (toppedOutFromResupply) return;
         if (game.modeController.checkObjectiveComplete()) return;
 

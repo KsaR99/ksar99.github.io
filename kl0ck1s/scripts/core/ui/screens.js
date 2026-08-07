@@ -1,7 +1,7 @@
 "use strict";
 
 import {formatNumber} from "../shared/utils.js";
-import {SOUND_FILES} from "../shared/config.js";
+import {DEV_MODE, SOUND_FILES} from "../shared/config.js";
 import {defaultKeyBindings, formatKeyCode, KEY_BIND_SLOTS} from "../shared/key-bindings.js";
 
 function clone(dom, templateId) {
@@ -115,6 +115,23 @@ const DIFF_LABEL_KEYS = {
     keyBindings: "screens.options.keyboardTitle",
 };
 
+const BENCHMARK_LABEL_KEYS = {
+    pieceGeneration: "benchmark.categories.pieceGeneration",
+    movement: "benchmark.categories.movement",
+    rotation: "benchmark.categories.rotation",
+    dropOffset: "benchmark.categories.dropOffset",
+    lockPiece: "benchmark.categories.lockPiece",
+    lineClearDetect: "benchmark.categories.lineClearDetect",
+    lineClearApply: "benchmark.categories.lineClearApply",
+    scoring: "benchmark.categories.scoring",
+    renderBackgroundRebuild: "benchmark.categories.renderBackgroundRebuild",
+    renderBlit: "benchmark.categories.renderBlit",
+    renderDrawPiece: "benchmark.categories.renderDrawPiece",
+    renderDrawGhost: "benchmark.categories.renderDrawGhost",
+    audioPlay: "benchmark.categories.audioPlay",
+    audioStop: "benchmark.categories.audioStop",
+};
+
 const THEME_LABEL_KEYS = {
     none: "screens.options.themeNone",
     vhs: "screens.options.themeVHS",
@@ -203,6 +220,8 @@ export const Screens = {
         volumeSlider.value = Math.round(settings.volume * 100);
         volumeSlider.disabled = settings.muted;
         screen.querySelector('[data-role="hud-right-checkbox"]').checked = settings.hudRight;
+        const developerGroup = screen.querySelector('[data-role="options-group-developer"]');
+        if (developerGroup) developerGroup.hidden = !DEV_MODE;
         screen.querySelector('[data-role="ghost-checkbox"]').checked = settings.ghost;
         screen.querySelector('[data-role="grid-checkbox"]').checked = settings.gridLines;
         const screenShakeCheckbox = screen.querySelector('[data-role="screen-shake-checkbox"]');
@@ -275,6 +294,49 @@ export const Screens = {
             checkbox.dataset.key = change.key;
             container.appendChild(row);
         });
+    },
+
+    renderBenchmarkResults(dom, container, results, i18n) {
+        container.innerHTML = "";
+        results.forEach((result, index) => {
+            const row = clone(dom, "tpl-benchmark-row").querySelector('[data-role="benchmark-row"]');
+            const labelKey = BENCHMARK_LABEL_KEYS[result.key];
+            row.querySelector('[data-field="label"]').textContent = labelKey ? i18n.t(labelKey) : result.key;
+            row.querySelector('[data-field="value"]').textContent =
+                `${result.totalMs.toFixed(1)} ms · ${Math.round(result.percent)}% · ${result.avgMs.toFixed(3)} ms/op`;
+            if (index === 0) row.classList.add("options__benchmark-row--top");
+            container.appendChild(row);
+        });
+    },
+
+    /**
+     * Same data as renderBenchmarkResults(), as one plain-text block instead of DOM
+     * rows - for the "copy results" button, so the whole run can be pasted as text
+     * (bug reports, chat, etc.) instead of having to screenshot or retype the list.
+     */
+    formatBenchmarkResultsText(results, i18n, {pieceCount, totalMs} = {}) {
+        const lines = [];
+
+        if (pieceCount != null && totalMs != null) {
+            const slowest = results[0];
+            const slowestLabelKey = slowest ? BENCHMARK_LABEL_KEYS[slowest.key] : null;
+            const slowestLabel = slowestLabelKey ? i18n.t(slowestLabelKey) : (slowest?.key ?? "");
+            lines.push(i18n.t("screens.options.benchmarkDone", {
+                pieces: pieceCount,
+                ms: Math.round(totalMs),
+                label: slowestLabel,
+                percent: slowest ? Math.round(slowest.percent) : 0,
+            }));
+            lines.push("");
+        }
+
+        results.forEach((result) => {
+            const labelKey = BENCHMARK_LABEL_KEYS[result.key];
+            const label = labelKey ? i18n.t(labelKey) : result.key;
+            lines.push(`${label}: ${result.totalMs.toFixed(1)} ms · ${Math.round(result.percent)}% · ${result.avgMs.toFixed(3)} ms/op`);
+        });
+
+        return lines.join("\n");
     },
 
     modeInfo(mode, dom = document, i18n) {

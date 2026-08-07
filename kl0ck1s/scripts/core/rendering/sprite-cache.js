@@ -55,7 +55,7 @@ export function createBlockSprite(color, size, canvasFactory = () => document.cr
     sprite.width = size;
     sprite.height = size;
 
-    const spriteCtx = sprite.getContext("2d", {colorSpace: "display-p3"});
+    const spriteCtx = sprite.getContext("2d");
     spriteCtx.imageSmoothingEnabled = false;
 
     paintBlock(spriteCtx, 0, 0, size, color);
@@ -68,7 +68,7 @@ export function createGridCellSprite(size, canvasFactory = () => document.create
     sprite.width = size;
     sprite.height = size;
 
-    const spriteCtx = sprite.getContext("2d", {colorSpace: "display-p3"});
+    const spriteCtx = sprite.getContext("2d");
     spriteCtx.imageSmoothingEnabled = false;
 
     const bevel = Math.max(1, Math.round(size * 0.12));
@@ -111,7 +111,7 @@ export function createGlowSprite(color, size, canvasFactory = () => document.cre
     sprite.width = size + pad * 2;
     sprite.height = size + pad * 2;
 
-    const spriteCtx = sprite.getContext("2d", {colorSpace: "display-p3"});
+    const spriteCtx = sprite.getContext("2d");
     spriteCtx.imageSmoothingEnabled = false;
 
     spriteCtx.shadowColor = color;
@@ -152,7 +152,7 @@ export class SpriteCache {
         this.atlas.width = size * SATURATION_LEVELS;
         this.atlas.height = size * Math.max(1, colors.length);
 
-        const atlasCtx = this.atlas.getContext("2d", {colorSpace: "display-p3"});
+        const atlasCtx = this.atlas.getContext("2d");
         atlasCtx.imageSmoothingEnabled = false;
 
         colors.forEach((color, row) => this._paintRow(atlasCtx, row, color));
@@ -176,13 +176,13 @@ export class SpriteCache {
             const grown = this.canvasFactory();
             grown.width = this.atlas.width;
             grown.height = neededHeight;
-            const growCtx = grown.getContext("2d", {colorSpace: "display-p3"});
+            const growCtx = grown.getContext("2d");
             growCtx.imageSmoothingEnabled = false;
             growCtx.drawImage(this.atlas, 0, 0);
             this.atlas = grown;
         }
         this.atlasRows.set(color, row);
-        this._paintRow(this.atlas.getContext("2d", {colorSpace: "display-p3"}), row, color);
+        this._paintRow(this.atlas.getContext("2d"), row, color);
         return row;
     }
 

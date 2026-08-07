@@ -28,6 +28,7 @@ export class Renderer {
                     nextCtx,
                     nextCanvas,
                     spriteCache,
+                    nextSpriteCache = spriteCache,
                     boardConfig,
                     klockominos,
                     colorPalette,
@@ -41,6 +42,7 @@ export class Renderer {
         this.nextCtx = nextCtx;
         this.nextCanvas = nextCanvas;
         this.spriteCache = spriteCache;
+        this.nextSpriteCache = nextSpriteCache;
         this.boardConfig = boardConfig;
         this.klockominos = klockominos;
         this.colorPalette = colorPalette;
@@ -57,7 +59,7 @@ export class Renderer {
         this.boardCanvasRect = null;
 
         this.backgroundCanvas = document.createElement("canvas");
-        this.backgroundCtx = this.backgroundCanvas.getContext("2d", {colorSpace: "display-p3"});
+        this.backgroundCtx = this.backgroundCanvas.getContext("2d");
         this._bgVersion = -1;
         this._bgSize = 0;
         this._bgGrid = null;
@@ -67,7 +69,7 @@ export class Renderer {
         this._boardScaleX = 1;
 
         this._clearingStaticCanvas = document.createElement("canvas");
-        this._clearingStaticCtx = this._clearingStaticCanvas.getContext("2d", {colorSpace: "display-p3"});
+        this._clearingStaticCtx = this._clearingStaticCanvas.getContext("2d");
         this._clearingStaticVersion = -1;
         this._clearingStaticSize = 0;
         this._clearingStaticFromRow = -1;
@@ -120,13 +122,18 @@ export class Renderer {
      * Forces the block/grid/glow sprite atlas to be built for the current cell size right
      * now, instead of paying that cost inside the first drawBoard() call. Used during app
      * boot so a "building block cache" loading step does real, visible work rather than
-     * being a fake timer.
+     * being a fake timer. Also warms the dedicated next-piece-preview cache (fixed at
+     * nextPreviewCellSize) so its first drawNext() doesn't pay a one-time rebuild either.
      */
     warmSpriteCache() {
         const size = this.boardConfig.CELL_SIZE;
-        if (!size) return;
-        this.spriteCache.getGridCell(size);
-        this.spriteCache.warmGlow(size, this.heightSaturationEnabled);
+        if (size) {
+            this.spriteCache.getGridCell(size);
+            this.spriteCache.warmGlow(size, this.heightSaturationEnabled);
+        }
+        if (this.nextPreviewCellSize && this.nextSpriteCache !== this.spriteCache) {
+            this.nextSpriteCache.warmGlow(this.nextPreviewCellSize, this.heightSaturationEnabled);
+        }
     }
 
     rowSaturationFactor(y, rows) {
@@ -193,7 +200,7 @@ export class Renderer {
     }
 
     columnFromClientX(clientX) {
-        if (!this.boardCanvasRect) this.refreshBoardCanvasRect();
+        this.refreshBoardCanvasRect();
 
         const x = (clientX - this.boardCanvasRect.left) * this._boardScaleX;
         return Math.floor(x / this.boardConfig.CELL_SIZE);
@@ -203,12 +210,12 @@ export class Renderer {
         this.bodyEl.dataset.theme = theme || "none";
     }
 
-    drawCell(context, x, y, color, size, {glow = false, ghost = false, level = 0} = {}) {
+    drawCell(context, x, y, color, size, {glow = false, ghost = false, level = 0, cache = this.spriteCache} = {}) {
         glow = glow && this.glowEnabled;
 
         if (glow) {
-            const sprite = this.spriteCache.getGlow(color, size, level);
-            const offset = this.spriteCache.glowPad;
+            const sprite = cache.getGlow(color, size, level);
+            const offset = cache.glowPad;
             const drawSize = size + offset * 2;
             if (sprite) {
                 context.drawImage(sprite, x * size - offset, y * size - offset, drawSize, drawSize);
@@ -219,7 +226,7 @@ export class Renderer {
             return;
         }
 
-        const region = this.spriteCache.getRegion(color, size, level);
+        const region = cache.getRegion(color, size, level);
         if (!region) {
             context.fillStyle = color;
             context.fillRect(x * size, y * size, size, size);
@@ -247,14 +254,37 @@ export class Renderer {
         }
     }
 
-    updateBoardBackground(board, size) {
-        const dirty = this._bgVersion !== board.version
-            || this._bgSize !== size
-            || this._bgGrid !== this.gridEnabled
-            || this._bgRows !== board.rows
-            || this._bgCols !== board.cols
-            || this._bgSat !== this.heightSaturationEnabled;
+    /** Whether backgroundCanvas already reflects the current size/grid/rows/cols/
+     * saturation config - i.e. whether an incremental patch (notifyPieceLocked/
+     * notifyLinesCleared) is safe to apply, or a full updateBoardBackground()
+     * rebuild is required first (first draw, resize, or a settings toggle). */
+    _backgroundConfigCurrent(board, size) {
+        return this._bgSize === size
+            && this._bgGrid === this.gridEnabled
+            && this._bgRows === board.rows
+            && this._bgCols === board.cols
+            && this._bgSat === this.heightSaturationEnabled;
+    }
 
+    _stampBackgroundConfig(board, size) {
+        this._bgSize = size;
+        this._bgGrid = this.gridEnabled;
+        this._bgRows = board.rows;
+        this._bgCols = board.cols;
+        this._bgSat = this.heightSaturationEnabled;
+    }
+
+    /**
+     * Full rebuild fallback: redraws every cell of the locked board from scratch.
+     * O(rows*cols) - only meant to run on the rare events an incremental patch
+     * can't handle (first draw, resize, gridEnabled/heightSaturation toggles,
+     * board.reset(), addGarbageLines()). Ordinary piece locks and line clears are
+     * instead kept in sync cheaply via notifyPieceLocked()/notifyLinesCleared(),
+     * which is why this bails out immediately when the background is already
+     * current for board.version.
+     */
+    updateBoardBackground(board, size) {
+        const dirty = this._bgVersion !== board.version || !this._backgroundConfigCurrent(board, size);
         if (!dirty) return;
 
         this.spriteCache.warmGlow(size, this.heightSaturationEnabled);
@@ -276,11 +306,72 @@ export class Renderer {
         }
 
         this._bgVersion = board.version;
-        this._bgSize = size;
-        this._bgGrid = this.gridEnabled;
-        this._bgRows = board.rows;
-        this._bgCols = board.cols;
-        this._bgSat = this.heightSaturationEnabled;
+        this._stampBackgroundConfig(board, size);
+    }
+
+    /**
+     * Cheap incremental counterpart to updateBoardBackground(), called right after
+     * board.lockPiece(). Instead of redrawing the whole board, it stamps just the
+     * newly-locked piece's own cells (typically ≤4) onto the existing
+     * backgroundCanvas, then advances _bgVersion to match "board.version" so the
+     * next updateBoardBackground() call sees the cache as already current and
+     * does no work at all. Falls through to a no-op (letting the next
+     * updateBoardBackground() do a full rebuild) if the background isn't already
+     * in a known-good state for the current size/grid/rows/cols/saturation config.
+     */
+    notifyPieceLocked(piece, board) {
+        const size = this.boardConfig.CELL_SIZE;
+        if (!this._backgroundConfigCurrent(board, size)) return;
+
+        this.spriteCache.warmGlow(size, this.heightSaturationEnabled);
+
+        const color = this.colorPalette[piece.colorIndex];
+        const bgCtx = this.backgroundCtx;
+        forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
+            const y = piece.y + r;
+            if (y < 0) return;
+            const x = piece.x + c;
+            this.drawCell(bgCtx, x, y, color, size, {level: this.saturationLevelForRow(y, board.rows)});
+        });
+
+        this._bgVersion = board.version;
+    }
+
+    /**
+     * Cheap incremental counterpart to updateBoardBackground(), called right after
+     * board.clearFullLines(). Rows below the lowest-index cleared line never move
+     * or change color (clearFullLines() only compacts rows at/above the cleared
+     * batch), so only the [0, affectedMaxRow] slice needs to be redrawn from the
+     * post-clear board state - everything below is left untouched.
+     *
+     * @param {import("../game/board.js").Board} board - board AFTER clearFullLines() ran
+     * @param {number[]} clearedRowIndices - the full-row indices from BEFORE clearFullLines() ran
+     */
+    notifyLinesCleared(board, clearedRowIndices) {
+        const size = this.boardConfig.CELL_SIZE;
+        if (!this._backgroundConfigCurrent(board, size)) return;
+        if (!clearedRowIndices || clearedRowIndices.length === 0) {
+            this._bgVersion = board.version;
+            return;
+        }
+
+        this.spriteCache.warmGlow(size, this.heightSaturationEnabled);
+
+        const affectedMaxRow = Math.max(...clearedRowIndices);
+        const width = board.cols * size;
+        const bgCtx = this.backgroundCtx;
+
+        bgCtx.clearRect(0, 0, width, (affectedMaxRow + 1) * size);
+        if (this.gridEnabled) this.drawGrid(board, bgCtx, 0, affectedMaxRow);
+
+        for (let y = 0; y <= affectedMaxRow; y++) {
+            for (let x = 0; x < board.cols; x++) {
+                const colorIndex = board.colors[y * board.cols + x];
+                if (colorIndex) this.drawCell(bgCtx, x, y, this.colorPalette[colorIndex], size, {level: this.saturationLevelForRow(y, board.rows)});
+            }
+        }
+
+        this._bgVersion = board.version;
     }
 
     _ensureClearingStaticBackground(board, size, staticFromRow) {
@@ -327,18 +418,15 @@ export class Renderer {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx, boardCanvas} = this;
 
-        this.refreshBoardCanvasRect();
         this.updateBoardBackground(board, size);
 
-        ctx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
+        ctx.clearRect(0, 0, boardCanvas.width, boardCanvas.height); // required for fall-trail.
         ctx.drawImage(this.backgroundCanvas, 0, 0);
     }
 
     drawClearingFrame(board, lineIndices, dropRows, fragments, progress) {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx, boardCanvas} = this;
-
-        this.refreshBoardCanvasRect();
 
         const p = Math.min(1, progress);
         const flashEnd = LINE_CLEAR_FLASH_PHASE_FRACTION;
@@ -567,7 +655,7 @@ export class Renderer {
         const offsetY = (nextCanvas.height / nextPreviewCellSize - bounds.height) / 2 - bounds.minY;
 
         forEachShapeCell(mask, width, height, (r, c) => {
-            this.drawCell(nextCtx, offsetX + c, offsetY + r, color, nextPreviewCellSize);
+            this.drawCell(nextCtx, offsetX + c, offsetY + r, color, nextPreviewCellSize, {cache: this.nextSpriteCache});
         });
     }
 }

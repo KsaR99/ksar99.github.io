@@ -128,7 +128,16 @@
             "keyboardHint": "Kliknij klawisz, aby go zmienić",
             "keyboardResetButton": "Przywróć domyślne",
             "keyboardPressKey": "Naciśnij klawisz…",
-            "keyboardReset": "Resetuj klawisze"
+            "keyboardReset": "Resetuj klawisze",
+            "developerTitle": "Developerskie",
+            "benchmark": "Benchmark",
+            "benchmarkHint": "Symuluje szybką losową rozgrywkę i mierzy czas każdej części silnika, żeby znaleźć najwolniejszą.",
+            "benchmarkButton": "Uruchom benchmark",
+            "benchmarkRunning": "Trwa… ({percent}%)",
+            "benchmarkDone": "Zasymulowano {pieces} klocków w {ms} ms. Najwolniejsze: {label} ({percent}%).",
+            "benchmarkCopyButton": "Kopiuj wyniki",
+            "benchmarkCopied": "Skopiowano do schowka",
+            "benchmarkCopyFailed": "Nie udało się skopiować"
         },
         "calibration": {
             "gestures": {
@@ -299,6 +308,25 @@
     },
     "game": {
         "levelUpBanner": "POZIOM {level}"
+    },
+    "benchmark": {
+        "categories": {
+            "pieceGeneration": "Generowanie klocków",
+            "movement": "Sprawdzanie ruchu",
+            "rotation": "Rotacja i kicki",
+            "dropOffset": "Liczenie zrzutu (hard drop)",
+            "lockPiece": "Blokowanie klocka na planszy",
+            "lineClearDetect": "Wykrywanie pełnych linii",
+            "lineClearApply": "Usuwanie pełnych linii",
+            "scoring": "Punktacja",
+            "renderRefreshRect": "Render: odświeżenie prostokąta canvasu",
+            "renderBackgroundRebuild": "Render: przebudowa tła planszy",
+            "renderBlit": "Render: kopiowanie tła na canvas",
+            "renderDrawPiece": "Render: spadający klocek",
+            "renderDrawGhost": "Render: cień klocka",
+            "audioPlay": "Dźwięk: odtwarzanie",
+            "audioStop": "Dźwięk: zatrzymywanie"
+        }
     },
     "sounds": {
         "lineClear1": "linia",

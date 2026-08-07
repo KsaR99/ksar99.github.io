@@ -21,6 +21,7 @@ import {SensitivityCalibrationController} from "../controllers/sensitivity-calib
 import {KeyboardCalibrationController} from "../controllers/keyboard-calibration-controller.js";
 import {MusicDirector} from "../services/music-director.js";
 import {ShareService} from "../services/share-service.js";
+import {BenchmarkController} from "../controllers/benchmark-controller.js";
 
 /** Resolves after the browser has had a chance to paint the current frame. */
 function nextPaint() {
@@ -157,6 +158,7 @@ export class Game {
         this.keyboardCalibrationController = new KeyboardCalibrationController(this);
         this.musicDirector = new MusicDirector(this.soundManager);
         this.shareService = new ShareService(this);
+        this.benchmarkController = new BenchmarkController(this);
 
         this.settings = this.settingsController.defaultSettings();
     }

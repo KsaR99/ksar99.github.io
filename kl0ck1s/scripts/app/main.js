@@ -50,11 +50,11 @@ const boardDiv = boardStage.parentElement;
 
 /** @type {HTMLCanvasElement} */
 const boardCanvas = document.getElementById("klockis-board");
-const ctx = boardCanvas.getContext("2d", {colorSpace: "display-p3"});
+const ctx = boardCanvas.getContext("2d");
 
 /** @type {HTMLCanvasElement} */
 const nextCanvas = document.getElementById("next-piece-canvas");
-const nextCtx = nextCanvas.getContext("2d", {colorSpace: "display-p3"});
+const nextCtx = nextCanvas.getContext("2d");
 nextCtx.imageSmoothingEnabled = false;
 
 function getSidebarInlineFootprint() {
@@ -115,9 +115,10 @@ function resizeBoardCanvas() {
 }
 
 const themeCanvas = document.getElementById("filter-canvas");
-const themeCtx = themeCanvas.getContext("2d", {colorSpace: "display-p3", willReadFrequently: true});
+const themeCtx = themeCanvas.getContext("2d", {willReadFrequently: true});
 
 const spriteCache = new SpriteCache(KLOCKOMINOS, () => document.createElement("canvas"));
+const nextSpriteCache = new SpriteCache(KLOCKOMINOS, () => document.createElement("canvas"));
 
 const renderer = new Renderer({
     bodyEl,
@@ -127,6 +128,7 @@ const renderer = new Renderer({
     nextCtx,
     nextCanvas,
     spriteCache,
+    nextSpriteCache,
     boardConfig: BOARD_CONFIG,
     klockominos: KLOCKOMINOS,
     colorPalette: COLOR_PALETTE,

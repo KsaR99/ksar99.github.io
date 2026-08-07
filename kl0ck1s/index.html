@@ -431,6 +431,30 @@
                 </div>
             </details>
 
+            <details class="options" data-role="options-group-developer" hidden>
+                <summary class="options__title" data-i18n="screens.options.developerTitle">Developer</summary>
+                <p class="options__hint" data-i18n="screens.options.benchmarkHint">Simulates a fast random game and
+                    times each part of the engine to find the slowest one.</p>
+                <div class="options__row">
+                    <span data-i18n="screens.options.benchmark">Benchmark</span>
+                    <button class="options__preview-button options__preview-button--wide"
+                            data-i18n="screens.options.benchmarkButton"
+                            data-role="benchmark-run-button"
+                            type="button">Run benchmark
+                    </button>
+                </div>
+                <canvas class="options__benchmark-preview" data-role="benchmark-preview-canvas" hidden></canvas>
+                <p class="options__hint" data-role="benchmark-status" hidden></p>
+                <ul class="options__benchmark-results" data-role="benchmark-results" hidden></ul>
+                <div class="options__row">
+                    <button class="options__preview-button options__preview-button--wide"
+                            data-i18n="screens.options.benchmarkCopyButton"
+                            data-role="benchmark-copy-button"
+                            hidden type="button">Copy results
+                    </button>
+                </div>
+            </details>
+
             <details class="options" data-role="options-group-data">
                 <summary class="options__title" data-i18n="screens.options.dataTitle">Import / Export</summary>
                 <div class="options__row">
@@ -508,6 +532,13 @@
         </span>
         <input class="options__input options__input--checkbox" data-role="options-diff-checkbox" type="checkbox">
     </label>
+</template>
+
+<template id="tpl-benchmark-row">
+    <li class="options__benchmark-row" data-role="benchmark-row">
+        <span class="options__benchmark-label" data-field="label"></span>
+        <span class="options__benchmark-value" data-field="value"></span>
+    </li>
 </template>
 
 <template id="tpl-screen-gameover-entry">

@@ -1,5 +1,12 @@
 "use strict";
 
+/**
+ * Developer-only switch. Flip to `true` locally (never ship it on) to reveal
+ * the "Developer" group in Options, which exposes the internal benchmark
+ * tool. Not exposed as a normal user setting on purpose.
+ */
+export const DEV_MODE = false;
+
 export const BOARD_CONFIG = {
     COLS: 10,
     ROWS: 20,

@@ -1449,6 +1449,44 @@ details.options[open] {
     align-self: center;
 }
 
+.options__benchmark-preview {
+    display: block;
+    width: 100%;
+    max-width: 140px;
+    height: auto;
+    margin: 0.6em auto 0;
+    border-radius: var(--radius);
+    image-rendering: pixelated;
+    background: rgb(0 0 0 / 0.25);
+}
+
+.options__benchmark-results {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin: 0.5em 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.options__benchmark-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+
+.options__benchmark-row--top {
+    color: var(--accent-2);
+    font-weight: 600;
+}
+
+.options__benchmark-value {
+    font-variant-numeric: tabular-nums;
+}
+
 .options__preview-button--wide {
     flex: none;
     width: auto;
