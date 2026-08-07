@@ -1037,6 +1037,10 @@ body.perf-no-glow .board__filter--active[data-theme="vhs"]::after {
     text-align: center;
 }
 
+[data-field="leaderboard"] {
+    overflow: auto;
+}
+
 @media (width <= 30rem) {
     .leaderboard__cell--date, .leaderboard__heading--date {
         display: none;
