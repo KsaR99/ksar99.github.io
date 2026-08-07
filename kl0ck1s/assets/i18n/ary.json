@@ -32,7 +32,9 @@
         "touchRotateGesture": "دوز على اللوحة",
         "touchHardDropGesture": "امسح لتحت",
         "touchSoftDropGesture": "بقى ضاغط ▼",
-        "touchPauseGesture": "زر ❚❚"
+        "touchPauseGesture": "زر ❚❚",
+        "confirm": "أكّد",
+        "cancel": "إلغاء"
     },
     "screens": {
         "idle": {
@@ -83,12 +85,12 @@
             "glow": "توهج (تمويه)",
             "transparency": "الشفافية",
             "fallTrail": "أثر السقوط",
-            "effect": "فلتر الشاشة",
-            "effectNone": "بلا شي",
-            "effectVhs": "تشويش VHS",
-            "effectMatrix": "ماتريكس",
-            "effectRain": "شتا",
-            "effectSnow": "الثلج",
+            "theme": "الثيم",
+            "themeNone": "بلا شي",
+            "themeVHS": "تشويش VHS",
+            "themeMatrix": "ماتريكس",
+            "themeRain": "شتا",
+            "themeSnow": "الثلج",
             "close": "سد",
             "mouseSensitivity": "حساسية الماوس",
             "touchSensitivity": "حساسية اللمس",
@@ -115,7 +117,12 @@
             "valueOn": "مشعل",
             "valueOff": "مطفي",
             "autoValue": "أوتوماتيكي",
-            "soundVolumesLabel": "صوت كل حاجة بوحدها"
+            "soundVolumesLabel": "صوت كل حاجة بوحدها",
+            "keyboardTitle": "الكيبورد",
+            "keyboardHint": "ضغط على بوطون باش تبدلو",
+            "keyboardResetButton": "رجّع للإعدادات ديال الأصل",
+            "keyboardPressKey": "دوز على بوطون…",
+            "keyboardReset": "رجّع البوطونات"
         },
         "calibration": {
             "gestures": {

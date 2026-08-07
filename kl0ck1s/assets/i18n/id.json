@@ -32,7 +32,9 @@
         "touchRotateGesture": "Ketuk papan",
         "touchHardDropGesture": "Geser ke bawah",
         "touchSoftDropGesture": "Tahan ▼",
-        "touchPauseGesture": "Tombol ❚❚"
+        "touchPauseGesture": "Tombol ❚❚",
+        "confirm": "Konfirmasi",
+        "cancel": "Batal"
     },
     "screens": {
         "idle": {
@@ -83,12 +85,12 @@
             "glow": "Cahaya (blur)",
             "transparency": "Transparansi",
             "fallTrail": "Jejak jatuh",
-            "effect": "Filter layar",
-            "effectNone": "Tidak ada",
-            "effectVhs": "Noise VHS",
-            "effectMatrix": "Matrix",
-            "effectRain": "Hujan",
-            "effectSnow": "Salju",
+            "theme": "Tema",
+            "themeNone": "Tidak ada",
+            "themeVHS": "Noise VHS",
+            "themeMatrix": "Matrix",
+            "themeRain": "Hujan",
+            "themeSnow": "Salju",
             "close": "Tutup",
             "mouseSensitivity": "Sensitivitas mouse",
             "touchSensitivity": "Sensitivitas sentuh",
@@ -115,7 +117,12 @@
             "valueOn": "Aktif",
             "valueOff": "Nonaktif",
             "autoValue": "otomatis",
-            "soundVolumesLabel": "Volume suara masing-masing"
+            "soundVolumesLabel": "Volume suara masing-masing",
+            "keyboardTitle": "Papan ketik",
+            "keyboardHint": "Klik tombol untuk menetapkan ulang",
+            "keyboardResetButton": "Kembalikan default",
+            "keyboardPressKey": "Tekan tombol…",
+            "keyboardReset": "Atur ulang tombol"
         },
         "calibration": {
             "gestures": {

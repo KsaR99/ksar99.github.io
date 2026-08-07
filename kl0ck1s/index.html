@@ -9,9 +9,9 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+Mono:wght@100..900&display=swap"
         rel="stylesheet">
-    <link href="styles/main.css?v=28" rel="stylesheet">
-    <link href="styles/mobile.css?v=28" media="(width < 48rem)" rel="stylesheet">
-    <link href="styles/desktop.css?v=28" media="(width >= 48rem)" rel="stylesheet">
+    <link href="styles/main.css?v=29" rel="stylesheet">
+    <link href="styles/mobile.css?v=29" media="(width < 48rem)" rel="stylesheet">
+    <link href="styles/desktop.css?v=29" media="(width >= 48rem)" rel="stylesheet">
     <meta content="notranslate" name="google">
     <meta content="index, follow" name="robots">
     <meta content="https://github.com/KsaR99" name="author">
@@ -37,8 +37,13 @@
         <div class="card">
             <p class="brand__title" data-role="brand-title">Kl0ck1<span class="brand__title-flip"
                                                                         data-role="brand-title-flip">'s</span></p>
-            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.10-alpha</p>
+            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.11-alpha</p>
         </div>
+
+        <button aria-label="Options" class="settings-shortcut" data-i18n-title="controls.options"
+                data-role="settings-shortcut-menu" type="button">
+            <span aria-hidden="true">⚙️</span> <span data-i18n="controls.options">Options</span>
+        </button>
 
         <div class="card stats" data-role="stats-card">
             <p class="stats__status" data-i18n="sidebar.statusLast" data-role="stats-status">Last game</p>
@@ -88,104 +93,29 @@
             <h3 class="card__title" data-i18n="sidebar.nextPiece">Next piece</h3>
             <canvas class="next-piece__canvas" height="120" id="next-piece-canvas" width="120"></canvas>
         </div>
+
+        <button aria-label="Options" class="settings-shortcut card--hidden" data-i18n-title="controls.options"
+                data-role="settings-shortcut-game" type="button">
+            <span aria-hidden="true">⚙️</span> <span data-i18n="controls.options">Options</span>
+        </button>
     </div>
 
     <div class="app__board board" data-theme="none">
-        <canvas class="board__canvas" height="700" id="klockis-board" width="350"></canvas>
-        <div class="board__filter" data-effect="vhs" id="filter-overlay">
+        <canvas class="board__canvas" height="920" id="klockis-board" width="460"></canvas>
+        <div class="board__filter" data-theme="none" id="filter-overlay">
             <canvas class="board__filter-canvas" id="filter-canvas"></canvas>
         </div>
         <div class="board__overlay" id="overlay"></div>
         <div class="board__calibration" data-role="calibration-banner">
             <p class="board__calibration__instruction" data-field="instruction"></p>
             <p class="board__calibration__countdown" data-field="countdown"></p>
+            <div class="progress-bar progress-bar--countdown" data-role="calibration-countdown-progress">
+                <div class="progress-bar__fill" data-role="calibration-countdown-progress-bar"></div>
+            </div>
             <p class="board__calibration__progress" data-field="progress"></p>
         </div>
         <div aria-hidden="true" class="board__credits" data-role="credits">
             <div class="board__credits__scroll" data-role="credits-scroll"></div>
-        </div>
-    </div>
-
-    <div class="app__sidebar sidebar sidebar--controls">
-        <button aria-label="Close" class="drawer-close" data-role="drawer-close" type="button">✕</button>
-        <div class="card">
-            <h3 class="card__title controls__toggle" data-role="controls-toggle">
-                <span data-i18n="controls.toggle">Controls</span>
-                <kbd class="kbd kbd--hint">H</kbd>
-            </h3>
-
-            <ul class="controls__list controls__list--keys controls__list--collapsed" data-role="controls-list">
-                <li class="controls__item">
-                    <span data-i18n="controls.rotate">Rotate</span>
-                    <span><kbd class="kbd kbd--clickable" data-key-action="ArrowUp">▲</kbd>&nbsp;<kbd
-                        class="kbd kbd--clickable" data-key-action="KeyZ">Z</kbd></span>
-                </li>
-                <li class="controls__item">
-                    <span data-i18n="controls.rotate180">Rotate 180°</span>
-                    <kbd class="kbd kbd--clickable" data-key-action="KeyA">A</kbd>
-                </li>
-                <li class="controls__item">
-                    <span data-i18n="controls.moveLeftRight">Move left / right</span>
-                    <span><kbd class="kbd kbd--clickable" data-key-action="ArrowLeft">◄</kbd>&nbsp;<kbd
-                        class="kbd kbd--clickable" data-key-action="ArrowRight">►</kbd></span>
-                </li>
-                <li class="controls__item">
-                    <span data-i18n="controls.softDrop">Soft drop</span> <kbd class="kbd kbd--clickable"
-                                                                              data-key-action="ArrowDown">▼</kbd>
-                </li>
-                <li class="controls__item">
-                    <span data-i18n="controls.hardDrop">Hard drop</span>
-                    <kbd class="kbd kbd--clickable" data-i18n="controls.spaceKey" data-key-action="Space">Space</kbd>
-                </li>
-                <li class="controls__item">
-                    <span data-i18n="controls.pause">Pause</span>
-                    <span><kbd class="kbd kbd--clickable" data-key-action="KeyP">P</kbd> <kbd
-                        class="kbd kbd--clickable" data-key-action="Escape">ESC</kbd></span>
-                </li>
-                <li class="controls__item">
-                    <span data-i18n="controls.start">Start / new game</span> <kbd class="kbd kbd--clickable"
-                                                                                  data-key-action="Enter">Enter</kbd>
-                </li>
-                <li class="controls__item">
-                    <span data-i18n="controls.restart">Restart</span> <kbd class="kbd kbd--clickable"
-                                                                           data-key-action="KeyR">R</kbd>
-                </li>
-                <li class="controls__item">
-                    <span data-i18n="controls.exitToMenu">Exit to menu</span> <kbd class="kbd kbd--clickable"
-                                                                                   data-key-action="KeyX">X</kbd>
-                </li>
-                <li class="controls__item">
-                    <span data-i18n="controls.mute">Mute sound</span> <kbd class="kbd kbd--clickable"
-                                                                           data-key-action="KeyM">M</kbd>
-                </li>
-                <li class="controls__item">
-                    <span data-i18n="controls.options">Options</span> <kbd class="kbd kbd--clickable"
-                                                                           data-key-action="KeyO">O</kbd>
-                </li>
-            </ul>
-
-            <ul class="controls__list controls__list--touch controls__list--collapsed" data-role="controls-list">
-                <li class="controls__item">
-                    <span data-i18n="controls.rotate">Rotate</span>
-                    <span data-i18n="controls.touchRotateGesture">Tap board</span>
-                </li>
-                <li class="controls__item">
-                    <span data-i18n="controls.touchMove">Move</span>
-                    <span data-i18n="controls.touchMoveGesture">Drag on board</span>
-                </li>
-                <li class="controls__item">
-                    <span data-i18n="controls.softDrop">Soft drop</span>
-                    <span data-i18n="controls.touchSoftDropGesture">Hold ▼</span>
-                </li>
-                <li class="controls__item">
-                    <span data-i18n="controls.hardDrop">Hard drop</span>
-                    <span data-i18n="controls.touchHardDropGesture">Swipe down</span>
-                </li>
-                <li class="controls__item">
-                    <span data-i18n="controls.pause">Pause</span>
-                    <span data-i18n="controls.touchPauseGesture">❚❚ button</span>
-                </li>
-            </ul>
         </div>
     </div>
 
@@ -248,29 +178,15 @@
                 data-role="start-button" type="button">Start
         </button>
         <div class="leaderboard">
-            <h3 class="leaderboard__title" data-i18n="leaderboard.title">Leaderboard</h3>
+            <div class="leaderboard__header">
+                <h3 class="leaderboard__title" data-i18n="leaderboard.title">Leaderboard</h3>
+                <button aria-label="Share leaderboard" class="leaderboard__share-button"
+                        data-i18n-title="leaderboard.shareButton" data-role="leaderboard-share-button"
+                        type="button">📤
+                </button>
+            </div>
             <div data-field="leaderboard"></div>
         </div>
-    </div>
-</template>
-
-<template id="tpl-screen-paused">
-    <div class="screen">
-        <h2 class="screen__title" data-i18n="screens.paused.title">PAUSED</h2>
-        <p class="screen__hint">
-            <span data-i18n="screens.paused.resumeHintBefore">Press</span> <kbd class="kbd kbd--clickable"
-                                                                                data-role="resume-key">P</kbd> <span
-            data-i18n="screens.paused.resumeHintAfter">to resume</span>
-        </p>
-        <p class="screen__hint">
-            <span data-i18n="screens.paused.optionsHintBefore">Press</span> <kbd class="kbd kbd--clickable"
-                                                                                 data-role="options-open-key">O</kbd>
-            <span
-                data-i18n="screens.paused.optionsHintAfter">to open options</span>
-        </p>
-        <button class="options__resume button button--accent" data-i18n="screens.paused.resumeButton"
-                data-role="resume-button" type="button">Resume
-        </button>
     </div>
 </template>
 
@@ -306,13 +222,13 @@
                            type="checkbox">
                 </label>
                 <label class="options__row">
-                    <span data-i18n="screens.options.effect">Screen filter</span>
-                    <select class="options__input options__input--select" data-role="effect-select">
-                        <option data-i18n="screens.options.effectNone" value="none">None</option>
-                        <option data-i18n="screens.options.effectVhs" value="vhs">VHS noise</option>
-                        <option data-i18n="screens.options.effectMatrix" value="matrix">Matrix</option>
-                        <option data-i18n="screens.options.effectRain" value="rain">Rain</option>
-                        <option data-i18n="screens.options.effectSnow" value="snow">Snow</option>
+                    <span data-i18n="screens.options.theme">Screen filter</span>
+                    <select class="options__input options__input--select" data-role="theme-select">
+                        <option data-i18n="screens.options.themeNone" value="none">None</option>
+                        <option data-i18n="screens.options.themeVHS" value="vhs">VHS noise</option>
+                        <option data-i18n="screens.options.themeMatrix" value="matrix">Matrix</option>
+                        <option data-i18n="screens.options.themeRain" value="rain">Rain</option>
+                        <option data-i18n="screens.options.themeSnow" value="snow">Snow</option>
                     </select>
                 </label>
             </div>
@@ -341,6 +257,42 @@
                             data-role="calibrate-sensitivity-button" type="button">Calibrate
                     </button>
                 </div>
+
+                <details class="options__group" data-role="options-group-keyboard">
+                    <summary class="options__group-summary" data-i18n="screens.options.keyboardTitle">Keyboard
+                    </summary>
+                    <p class="options__hint" data-i18n="screens.options.keyboardHint">Click a key to reassign it</p>
+                    <ul class="controls__list controls__list--keys" data-role="keybind-list"></ul>
+                    <ul class="controls__list controls__list--touch">
+                        <li class="controls__item">
+                            <span data-i18n="controls.rotate">Rotate</span>
+                            <span data-i18n="controls.touchRotateGesture">Tap board</span>
+                        </li>
+                        <li class="controls__item">
+                            <span data-i18n="controls.touchMove">Move</span>
+                            <span data-i18n="controls.touchMoveGesture">Drag on board</span>
+                        </li>
+                        <li class="controls__item">
+                            <span data-i18n="controls.softDrop">Soft drop</span>
+                            <span data-i18n="controls.touchSoftDropGesture">Hold ▼</span>
+                        </li>
+                        <li class="controls__item">
+                            <span data-i18n="controls.hardDrop">Hard drop</span>
+                            <span data-i18n="controls.touchHardDropGesture">Swipe down</span>
+                        </li>
+                        <li class="controls__item">
+                            <span data-i18n="controls.pause">Pause</span>
+                            <span data-i18n="controls.touchPauseGesture">❚❚ button</span>
+                        </li>
+                    </ul>
+                    <div class="options__row">
+                        <span data-i18n="screens.options.keyboardReset">Reset keys</span>
+                        <button class="options__preview-button options__preview-button--wide"
+                                data-i18n="screens.options.keyboardResetButton"
+                                data-role="keybind-reset-button" type="button">Reset to defaults
+                        </button>
+                    </div>
+                </details>
             </details>
 
             <details class="options" data-role="options-group-gameplay">
@@ -548,9 +500,14 @@
             <span data-i18n="screens.gameOverEntry.todayBestBy">by</span>
             <strong class="screen__hint-highlight" data-field="todayBestName"></strong>
         </p>
-        <button class="button button--primary" data-i18n="screens.gameOverEntry.submit"
-                data-role="gameover-continue-button" type="button">Continue
-        </button>
+        <div class="screen__button-row">
+            <button class="button button--primary" data-i18n="screens.gameOverEntry.submit"
+                    data-role="gameover-continue-button" type="button">Continue
+            </button>
+            <button class="button" data-i18n="screens.gameOverEntry.shareButton"
+                    data-role="gameover-share-button" type="button">Share
+            </button>
+        </div>
         <div class="options" data-role="stats-detail">
             <h3 class="options__title" data-i18n="screens.gameOverEntry.statsTitle">Session stats</h3>
             <div class="options__row">
@@ -603,7 +560,13 @@
             </div>
         </div>
         <div class="leaderboard">
-            <h3 class="leaderboard__title" data-i18n="leaderboard.title">Leaderboard</h3>
+            <div class="leaderboard__header">
+                <h3 class="leaderboard__title" data-i18n="leaderboard.title">Leaderboard</h3>
+                <button aria-label="Share leaderboard" class="leaderboard__share-button"
+                        data-i18n-title="leaderboard.shareButton" data-role="leaderboard-share-button"
+                        type="button">📤
+                </button>
+            </div>
             <div data-field="leaderboard"></div>
         </div>
     </div>
@@ -642,7 +605,13 @@
                 data-role="start-button" type="button">Play again
         </button>
         <div class="leaderboard">
-            <h3 class="leaderboard__title" data-i18n="leaderboard.title">Leaderboard</h3>
+            <div class="leaderboard__header">
+                <h3 class="leaderboard__title" data-i18n="leaderboard.title">Leaderboard</h3>
+                <button aria-label="Share leaderboard" class="leaderboard__share-button"
+                        data-i18n-title="leaderboard.shareButton" data-role="leaderboard-share-button"
+                        type="button">📤
+                </button>
+            </div>
             <div data-field="leaderboard"></div>
         </div>
     </div>
@@ -667,6 +636,9 @@
     <div class="screen screen--countdown" data-role="countdown-screen">
         <p class="brand__title">Kl0ck1's</p>
         <div class="countdown__number" data-field="number"></div>
+        <div class="progress-bar progress-bar--countdown">
+            <div class="progress-bar__fill" data-role="countdown-progress-bar"></div>
+        </div>
     </div>
 </template>
 
@@ -772,10 +744,8 @@
         const scrim = document.querySelector('[data-role="drawer-scrim"]');
         const drawers = {
             stats: document.querySelector(".sidebar--stats"),
-            controls: document.querySelector(".sidebar--controls"),
         };
         const fabStats = document.querySelector('[data-role="fab-stats"]');
-        const fabControls = document.querySelector('[data-role="fab-controls"]');
         const fabFullscreen = document.querySelector('[data-role="fab-fullscreen"]');
 
         function notifyResize() {
@@ -785,7 +755,6 @@
         function closeDrawers() {
             Object.values(drawers).forEach((el) => el && el.classList.remove("app__sidebar--open"));
             if (fabStats) fabStats.setAttribute("aria-pressed", "false");
-            if (fabControls) fabControls.setAttribute("aria-pressed", "false");
             if (scrim) scrim.classList.remove("drawer-scrim--visible");
         }
 
@@ -803,7 +772,6 @@
         }
 
         if (fabStats) fabStats.addEventListener("click", () => toggleDrawer("stats", fabStats));
-        if (fabControls) fabControls.addEventListener("click", () => toggleDrawer("controls", fabControls));
         if (scrim) scrim.addEventListener("click", () => {
             closeDrawers();
             notifyResize();
@@ -850,6 +818,6 @@
         window.addEventListener("orientationchange", notifyResize);
     })();
 </script>
-<script src="scripts/app/main.js?v=28" type="module"></script>
+<script src="scripts/app/main.js?v=29" type="module"></script>
 </body>
 </html>

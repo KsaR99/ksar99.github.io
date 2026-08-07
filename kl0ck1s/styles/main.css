@@ -48,6 +48,7 @@ body {
         --app-bg: oklch(0.18 0.02 254.93 / 0.9);
         --board-bg: oklch(0.33 0 0);
         --board-accent: oklch(0.72 0 0 / 0.85);
+        --stats__status--live-color: oklch(0.6 0.09 235.86);
     }
 
     &[data-theme="matrix"] {
@@ -143,17 +144,6 @@ body {
     color-scheme: dark;
 }
 
-/* ============================================================
-   Layout — mobile-first.
-   Rules below target small/touch screens by default: the board is
-   the dominant element and both sidebars become off-canvas drawers
-   that slide in on demand instead of competing for width. desktop.css
-   (loaded instead of mobile.css above `48rem`, see index.html)
-   overrides these same selectors to restore the original
-   three-column row layout — it relies on this file's cascade order
-   (loaded first) rather than repeating these declarations.
-   ============================================================ */
-
 .app {
     position: relative;
     display: flex;
@@ -184,14 +174,12 @@ body {
     max-width: 85vw;
 }
 
-.app__sidebar.sidebar--stats,
-.app__sidebar.sidebar--controls {
+.app__sidebar.sidebar--stats {
     width: min(20rem, 85vw);
     flex: none;
 }
 
-.sidebar--stats,
-.sidebar--controls {
+.sidebar--stats {
     position: fixed;
     top: 0;
     bottom: 0;
@@ -200,32 +188,18 @@ body {
     overflow-y: auto;
     background: var(--bg);
     border: 1px solid var(--line);
-    /* left/right (not transform) on purpose: a transform here would make
-       this element a containing block for its position:fixed descendants
-       (the next-piece/difficulty mini readouts below), trapping them
-       inside the drawer's own off-screen position instead of letting them
-       sit fixed against the real viewport. */
     transition: left 0.25s ease, right 0.25s ease;
-}
-
-.sidebar--stats {
     left: -105%;
     padding-left: calc(var(--safe-l) + 0.75rem);
     border-radius: 0 var(--radius) var(--radius) 0;
-}
-
-.sidebar--controls {
-    right: -105%;
-    padding-right: calc(var(--safe-r) + 0.75rem);
-    border-radius: var(--radius) 0 0 var(--radius);
 }
 
 .sidebar--stats.app__sidebar--open {
     left: 0;
 }
 
-.sidebar--controls.app__sidebar--open {
-    right: 0;
+body.cursor-hidden {
+    cursor: none;
 }
 
 body.hud-right .sidebar--stats {
@@ -236,20 +210,8 @@ body.hud-right .sidebar--stats {
     border-radius: var(--radius) 0 0 var(--radius);
 }
 
-body.hud-right .sidebar--controls {
-    right: auto;
-    left: -105%;
-    padding-right: 0.75rem;
-    padding-left: calc(var(--safe-l) + 0.75rem);
-    border-radius: 0 var(--radius) var(--radius) 0;
-}
-
 body.hud-right .sidebar--stats.app__sidebar--open {
     right: 0;
-}
-
-body.hud-right .sidebar--controls.app__sidebar--open {
-    left: 0;
 }
 
 body.hud-right .card[data-role="next-piece-card"] {
@@ -441,11 +403,11 @@ body.perf-no-transparency .board__overlay--transparent {
     opacity: 1;
 }
 
-.board__filter--active[data-effect="vhs"] {
+.board__filter--active[data-theme="vhs"] {
     animation: vhs-flicker 5s infinite steps(40);
 }
 
-.board__filter--active[data-effect="vhs"]::after {
+.board__filter--active[data-theme="vhs"]::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -455,12 +417,12 @@ body.perf-no-transparency .board__overlay--transparent {
     animation: vhs-roll 7s linear infinite;
 }
 
-body.perf-no-glow .board__filter--active[data-effect="vhs"] {
+body.perf-no-glow .board__filter--active[data-theme="vhs"] {
     animation: none;
     opacity: 0.55;
 }
 
-body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
+body.perf-no-glow .board__filter--active[data-theme="vhs"]::after {
     animation: none;
 }
 
@@ -495,8 +457,8 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .board__filter--active[data-effect="vhs"],
-    .board__filter--active[data-effect="vhs"]::after {
+    .board__filter--active[data-theme="vhs"],
+    .board__filter--active[data-theme="vhs"]::after {
         animation: none !important;
     }
 }
@@ -617,10 +579,29 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     padding: 0.2rem 0.5rem;
     letter-spacing: 2px;
     line-height: 1.5;
+}
 
-    &:has(.controls__list--collapsed) .card__title {
-        margin: 0;
-    }
+.settings-shortcut {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4em;
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 0.35rem 0.5rem;
+    font: inherit;
+    letter-spacing: 2px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 0.15s ease, filter 0.15s ease;
+}
+
+.settings-shortcut:hover,
+.settings-shortcut:focus-visible {
+    color: var(--text);
+    filter: brightness(1.35);
 }
 
 .card__title {
@@ -726,22 +707,7 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     color: var(--stats__status--live-color);
 }
 
-/* !important is deliberate: this is a JS-toggled "hide this card"
-   utility class and must always win over any component-level display
-   rule that happens to target the same element (e.g. the compounded
-   .card[data-role="next-piece-card"] rule above), regardless of
-   selector specificity or source order. Without it, JS adding this
-   class to show the next-piece card only during play stops working
-   the moment some other rule for that element has equal-or-higher
-   specificity. */
-.card--hidden {
-    display: none !important;
-}
-
-/* Same rationale as .card--hidden above - JS toggles this on the
-   Objective row, which only exists for modes with a real objective
-   (Sprint/Ultra/Survival); Marathon has none. */
-.stats__row--hidden {
+.card--hidden, .stats__row--hidden {
     display: none !important;
 }
 
@@ -793,6 +759,19 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     color: oklch(0.15 0.02 90);
 }
 
+.progress-bar--countdown {
+    width: 12rem;
+    max-width: 60%;
+    height: 0.25rem;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress-bar--countdown .progress-bar__fill {
+    border-radius: inherit;
+    transition: none;
+}
+
 @keyframes objective-pulse {
     0%, 100% {
         opacity: 1;
@@ -816,18 +795,6 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     pointer-events: none;
 }
 
-.controls__toggle {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    user-select: none;
-
-    &:hover {
-        color: var(--text);
-    }
-}
-
 .controls__list {
     list-style: none;
     display: flex;
@@ -844,10 +811,6 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 
 .controls__list--touch {
     display: flex;
-}
-
-.controls__list--collapsed {
-    display: none !important;
 }
 
 .controls__item {
@@ -881,6 +844,21 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     color: var(--accent-2);
 }
 
+.kbd--listening {
+    border-color: var(--accent-2);
+    color: var(--accent-2);
+    animation: kbd-listening-pulse 1s ease-in-out infinite;
+}
+
+@keyframes kbd-listening-pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
 .button {
     border: none;
     border-radius: .4em;
@@ -906,6 +884,16 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     background: oklch(0.3 0 0 / 0.5);
     color: oklch(0.95 0 0);
     padding: 0.5em 1.25em;
+}
+
+.screen__button-row {
+    display: flex;
+    gap: 0.6rem;
+    width: 100%;
+
+    & > .button {
+        flex: 1;
+    }
 }
 
 .nickname-form {
@@ -944,15 +932,19 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 
 .leaderboard {
     width: 100%;
-    /* margin-top: auto (rather than justify-content on .screen) pins just
-       this item to the bottom of the flex column - everything above it
-       still stacks normally, so a short table (fewer than the full 10
-       entries) doesn't leave the leaderboard floating mid-screen. */
     margin-top: auto;
 }
 
-.leaderboard__title {
+.leaderboard__header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
     margin: 0 0 0.5rem;
+}
+
+.leaderboard__title {
+    margin: 0;
     font-size: 0.6875rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -960,10 +952,48 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     text-align: center;
 }
 
+.leaderboard__share-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--panel);
+    color: var(--muted);
+    font-size: 0.8rem;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s ease, filter 0.15s ease, transform 0.15s ease;
+}
+
+.leaderboard__share-button:hover,
+.leaderboard__share-button:focus-visible {
+    color: var(--text);
+    filter: brightness(1.35);
+}
+
+.leaderboard__share-button:active {
+    transform: scale(0.92);
+}
+
+.leaderboard__share-button:disabled {
+    opacity: 0.6;
+    cursor: default;
+    transform: none;
+}
+
 .leaderboard__table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.75rem;
+}
+
+.leaderboard__table tbody tr:nth-child(even) .leaderboard__cell {
+    background: color-mix(in oklch, var(--line) 30%, transparent);
 }
 
 .leaderboard__cell[data-field="rank"] {
@@ -974,6 +1004,7 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
 .leaderboard__heading, .leaderboard__cell {
     font-size: 0.85rem;
     text-align: left;
+    padding: 0.3rem 0.4rem;
     border-bottom: 1px solid var(--line);
 }
 
@@ -1047,9 +1078,6 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     transition: outline-color 0.15s ease;
 }
 
-/* Set by ScreenFlow.updateMenuSelectorFocus() - shows which group
-   ArrowLeft/ArrowRight will act on after ArrowDown/ArrowUp moved focus
-   between the difficulty and mode pickers. */
 .difficulty--focused {
     outline-color: var(--accent-2);
 }
@@ -1101,21 +1129,10 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     opacity: 0.75;
 }
 
-/* Mode picker reuses .difficulty/.difficulty__nav/.difficulty__current -
-   .difficulty--modes only exists to give it a slightly larger label size
-   for the longer mode names. */
 .difficulty--modes .difficulty__label {
     font-size: 1em;
 }
 
-/* Shared panel under the mode picker showing the selected mode's rules -
-   replaces the old per-button .difficulty__description, so there's only
-   ever one description on screen at a time (see Screens.idle()'s
-   modeDescription field). Content is prefixed with 💡 in JS, not here, so
-   it stays part of the translated/selectable text rather than a
-   decorative ::before a screen reader would skip. Capped with a max-height
-   + thin scrollbar (rather than growing the screen) since a mode's rules
-   text can run longer than one line on narrow screens. */
 .mode-description {
     display: block;
     width: 100%;
@@ -1183,10 +1200,6 @@ body.perf-no-glow .board__filter--active[data-effect="vhs"]::after {
     }
 }
 
-/* Language only has one row, so unlike the other <details> groups it's
-   rendered as a plain, always-visible div/h3 (see index.html) - this
-   just undoes the <summary>-flavored pointer cursor + hover tint above,
-   since there's nothing here to expand/collapse. */
 .options__title--static {
     cursor: default;
 
@@ -1268,6 +1281,16 @@ details.options[open] {
 }
 
 .options__group .options__row {
+    margin-top: 0.5em;
+}
+
+.options__hint {
+    margin: 0.4em 0 0;
+    font-size: 0.78rem;
+    color: var(--muted);
+}
+
+.options__group .controls__list {
     margin-top: 0.5em;
 }
 
@@ -1435,12 +1458,6 @@ details.options[open] {
     font-size: 0.85em;
 }
 
-/* Renders the same 3-2-1 countdown as .countdown__number, but inline inside
-   the small calibration banner instead of a full-screen overlay - the board
-   and falling piece stay visible/steerable underneath throughout (see
-   SensitivityCalibrationController._updateCountdownDisplay). min-height
-   keeps the banner from jumping in height between "showing a digit" and
-   "cleared" (see _clearCountdownDisplay). */
 .board__calibration__countdown {
     font-family: var(--font-display);
     font-size: 1.6rem;
@@ -1536,10 +1553,6 @@ details.options[open] {
     right: 0.6rem;
 }
 
-.sidebar--controls .drawer-close {
-    left: 0.6rem;
-}
-
 .mobile-fab[aria-pressed="true"] {
     color: oklch(0 0 0);
     background: var(--accent-2);
@@ -1619,7 +1632,6 @@ details.options[open] {
     letter-spacing: 0.04em;
 }
 
-/* Full-screen polish: reclaim the little chrome we still have. */
 .app:fullscreen,
 .app:-webkit-full-screen {
     background: var(--bg);
@@ -1634,8 +1646,6 @@ body:has(.app:fullscreen) {
     padding: 0;
 }
 
-/* Fallback for browsers without a usable Fullscreen API (older iOS Safari):
-   same "get out of the way" effect achieved with plain CSS instead. */
 body.faux-fullscreen {
     padding: 0;
 }

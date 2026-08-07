@@ -32,7 +32,9 @@
         "touchRotateGesture": "Toucher le plateau",
         "touchHardDropGesture": "Glisser vers le bas",
         "touchSoftDropGesture": "Maintenir ▼",
-        "touchPauseGesture": "Bouton ❚❚"
+        "touchPauseGesture": "Bouton ❚❚",
+        "confirm": "Confirmer",
+        "cancel": "Annuler"
     },
     "screens": {
         "idle": {
@@ -83,12 +85,12 @@
             "glow": "Lueur (flou)",
             "transparency": "Transparence",
             "fallTrail": "Traînée de chute",
-            "effect": "Filtre d'écran",
-            "effectNone": "Aucun",
-            "effectVhs": "Bruit VHS",
-            "effectMatrix": "Matrix",
-            "effectRain": "Pluie",
-            "effectSnow": "Neige",
+            "theme": "Thème",
+            "themeNone": "Aucun",
+            "themeVHS": "Bruit VHS",
+            "themeMatrix": "Matrix",
+            "themeRain": "Pluie",
+            "themeSnow": "Neige",
             "close": "Fermer",
             "mouseSensitivity": "Sensibilité de la souris",
             "touchSensitivity": "Sensibilité tactile",
@@ -115,7 +117,12 @@
             "valueOn": "Activé",
             "valueOff": "Désactivé",
             "autoValue": "auto",
-            "soundVolumesLabel": "Volumes individuels des sons"
+            "soundVolumesLabel": "Volumes individuels des sons",
+            "keyboardTitle": "Clavier",
+            "keyboardHint": "Cliquez sur une touche pour la réattribuer",
+            "keyboardResetButton": "Réinitialiser",
+            "keyboardPressKey": "Appuyez sur une touche…",
+            "keyboardReset": "Réinitialiser les touches"
         },
         "calibration": {
             "gestures": {

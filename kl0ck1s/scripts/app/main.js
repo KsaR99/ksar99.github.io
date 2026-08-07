@@ -103,11 +103,11 @@ function resizeBoardCanvas() {
     boardCanvas.width = BOARD_CONFIG.CELL_SIZE * BOARD_CONFIG.COLS;
     boardCanvas.height = BOARD_CONFIG.CELL_SIZE * BOARD_CONFIG.ROWS;
     ctx.imageSmoothingEnabled = false;
-    game.effectOverlay.resize(boardCanvas.width, boardCanvas.height);
+    game.themeOverlay.resize(boardCanvas.width, boardCanvas.height);
 }
 
-const effectCanvas = document.getElementById("filter-canvas");
-const effectCtx = effectCanvas.getContext("2d", {colorSpace: "display-p3", willReadFrequently: true});
+const themeCanvas = document.getElementById("filter-canvas");
+const themeCtx = themeCanvas.getContext("2d", {colorSpace: "display-p3", willReadFrequently: true});
 
 const spriteCache = new SpriteCache(KLOCKOMINOS, () => document.createElement("canvas"));
 
@@ -146,6 +146,8 @@ const hud = new HUD({
     objectiveRowEl: document.querySelector('[data-role="objective-stat"]'),
     objectiveBarEl: document.getElementById("objective-bar"),
     objectiveBarTrackEl: document.getElementById("objective-bar-track"),
+    settingsShortcutMenuEl: document.querySelector('[data-role="settings-shortcut-menu"]'),
+    settingsShortcutGameEl: document.querySelector('[data-role="settings-shortcut-game"]'),
 });
 
 const soundManager = new SoundManager(SOUND_FILES);
@@ -170,13 +172,26 @@ const game = new Game({
     levelUpBannerDuration: LEVEL_UP_BANNER_DURATION_MS,
     lineClearAnimationDuration: LINE_CLEAR_ANIMATION_DURATION_MS,
     settingsStore: store,
-    effectCanvas,
-    effectCtx,
+    themeCanvas,
+    themeCtx,
     i18n,
 });
 
 resizeBoardCanvas();
 void game.init().catch(console.error);
+
+const fabControlsBtn = document.querySelector('[data-role="fab-controls"]');
+if (fabControlsBtn) {
+    fabControlsBtn.addEventListener("click", () => {
+        game.screenFlow.toggleOptions();
+    });
+}
+
+document.querySelectorAll('[data-role="settings-shortcut-menu"], [data-role="settings-shortcut-game"]').forEach((btn) => {
+    btn.addEventListener("click", () => {
+        game.screenFlow.toggleOptions();
+    });
+});
 
 function handleViewportResize() {
     resizeBoardCanvas();

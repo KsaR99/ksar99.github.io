@@ -32,7 +32,9 @@
         "touchRotateGesture": "盤面をタップ",
         "touchHardDropGesture": "下にスワイプ",
         "touchSoftDropGesture": "▼を長押し",
-        "touchPauseGesture": "❚❚ボタン"
+        "touchPauseGesture": "❚❚ボタン",
+        "confirm": "確定",
+        "cancel": "キャンセル"
     },
     "screens": {
         "idle": {
@@ -83,12 +85,12 @@
             "glow": "発光（ぼかし）",
             "transparency": "透明度",
             "fallTrail": "落下の軌跡",
-            "effect": "画面エフェクト",
-            "effectNone": "なし",
-            "effectVhs": "VHSノイズ",
-            "effectMatrix": "マトリックス",
-            "effectRain": "雨",
-            "effectSnow": "雪",
+            "theme": "テーマ",
+            "themeNone": "なし",
+            "themeVHS": "VHSノイズ",
+            "themeMatrix": "マトリックス",
+            "themeRain": "雨",
+            "themeSnow": "雪",
             "close": "閉じる",
             "mouseSensitivity": "マウス感度",
             "touchSensitivity": "タッチ感度",
@@ -115,7 +117,12 @@
             "valueOn": "オン",
             "valueOff": "オフ",
             "autoValue": "自動",
-            "soundVolumesLabel": "個別の音量"
+            "soundVolumesLabel": "個別の音量",
+            "keyboardTitle": "キーボード",
+            "keyboardHint": "キーをクリックして割り当て直す",
+            "keyboardResetButton": "初期設定に戻す",
+            "keyboardPressKey": "キーを押してください…",
+            "keyboardReset": "キーをリセット"
         },
         "calibration": {
             "gestures": {

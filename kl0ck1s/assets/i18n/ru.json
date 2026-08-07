@@ -32,7 +32,9 @@
         "touchRotateGesture": "Коснитесь поля",
         "touchHardDropGesture": "Смахните вниз",
         "touchSoftDropGesture": "Удерживайте ▼",
-        "touchPauseGesture": "Кнопка ❚❚"
+        "touchPauseGesture": "Кнопка ❚❚",
+        "confirm": "Подтвердить",
+        "cancel": "Отмена"
     },
     "screens": {
         "idle": {
@@ -83,12 +85,12 @@
             "glow": "Свечение (размытие)",
             "transparency": "Прозрачность",
             "fallTrail": "След падения",
-            "effect": "Фильтр экрана",
-            "effectNone": "Нет",
-            "effectVhs": "Шум VHS",
-            "effectMatrix": "Матрица",
-            "effectRain": "Дождь",
-            "effectSnow": "Снег",
+            "theme": "Тема",
+            "themeNone": "Нет",
+            "themeVHS": "Шум VHS",
+            "themeMatrix": "Матрица",
+            "themeRain": "Дождь",
+            "themeSnow": "Снег",
             "close": "Закрыть",
             "mouseSensitivity": "Чувствительность мыши",
             "touchSensitivity": "Чувствительность сенсора",
@@ -115,7 +117,12 @@
             "valueOn": "Вкл.",
             "valueOff": "Выкл.",
             "autoValue": "авто",
-            "soundVolumesLabel": "Громкость отдельных звуков"
+            "soundVolumesLabel": "Громкость отдельных звуков",
+            "keyboardTitle": "Клавиатура",
+            "keyboardHint": "Нажмите клавишу, чтобы переназначить",
+            "keyboardResetButton": "Сбросить по умолчанию",
+            "keyboardPressKey": "Нажмите клавишу…",
+            "keyboardReset": "Сбросить клавиши"
         },
         "calibration": {
             "gestures": {

@@ -1,12 +1,14 @@
 "use strict";
 
 import {InputSource} from "./input-source.js";
+import {defaultKeyBindings} from "../../shared/key-bindings.js";
 
 const PREVENT_DEFAULT_KEYS = new Set([
     "ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Space", "Enter", "Escape"
 ]);
 
-const REPEATABLE_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowDown"]);
+const REPEATABLE_SLOTS = new Set(["moveLeft", "moveRight", "softDrop"]);
+const MOVEMENT_SLOTS = new Set(["moveLeft", "moveRight", "softDrop", "rotateUp", "rotateZ", "rotate180", "hardDrop"]);
 
 export const DEFAULT_DAS_MS = 125;
 export const DEFAULT_ARR_MS = 16;
@@ -22,73 +24,77 @@ export class KeyboardInput extends InputSource {
     /**
      * @param {object} game
      * @param {import("./steering-arbiter.js").SteeringArbiter} steeringArbiter
-     * @param {object} [callbacks]
-     * @param {() => void} [callbacks.onToggleControlsList] - UI concern owned by InputController, not this source
      */
-    constructor(game, steeringArbiter, {onToggleControlsList} = {}) {
+    constructor(game, steeringArbiter) {
         super(game, steeringArbiter);
-        this.onToggleControlsList = onToggleControlsList ?? (() => {
-        });
         this.heldTimers = new Map();
         this._keydownHandler = null;
         this._keyupHandler = null;
         this._blurHandler = null;
+        this._listening = false;
+        this._listenHandler = null;
     }
 
-    get keyActions() {
+    get actionHandlers() {
         const game = this.game;
         const isMenuScreen = () => game.state === "idle" || game.state === "gameOver-saved";
         return {
-            ArrowLeft: (isRepeat) => game.pieceController.handleHorizontalArrow(-1, isRepeat),
-            ArrowRight: (isRepeat) => game.pieceController.handleHorizontalArrow(1, isRepeat),
-            ArrowDown: () => isMenuScreen() ? game.screenFlow.moveMenuFocus(1) : game.pieceController.softDrop(),
-            ArrowUp: () => isMenuScreen() ? game.screenFlow.moveMenuFocus(-1) : game.pieceController.rotate(),
-            Space: () => game.pieceController.hardDrop(),
-            Enter: () => game.screenFlow.handleEnter(),
-            Escape: () => game.screenFlow.handleEscape(),
-            KeyH: () => this.onToggleControlsList(),
-            KeyM: () => game.settingsController.toggleSound(),
-            KeyO: () => game.screenFlow.toggleOptions(),
-            KeyP: () => game.screenFlow.togglePause(),
-            KeyZ: () => game.pieceController.rotate(),
-            KeyA: () => game.pieceController.rotate180(),
-            KeyR: () => game.screenFlow.restart(),
-            KeyX: () => game.screenFlow.exitToMenu(),
+            moveLeft: (isRepeat) => game.pieceController.handleHorizontalArrow(-1, isRepeat),
+            moveRight: (isRepeat) => game.pieceController.handleHorizontalArrow(1, isRepeat),
+            softDrop: () => isMenuScreen() ? game.screenFlow.moveMenuFocus(1) : game.pieceController.softDrop(),
+            rotateUp: () => isMenuScreen() ? game.screenFlow.moveMenuFocus(-1) : game.pieceController.rotate(),
+            rotateZ: () => game.pieceController.rotate(),
+            rotate180: () => game.pieceController.rotate180(),
+            hardDrop: () => game.pieceController.hardDrop(),
+            confirm: () => game.screenFlow.handleEnter(),
+            cancel: () => game.screenFlow.handleEscape(),
+            toggleSound: () => game.settingsController.toggleSound(),
+            toggleOptions: () => game.screenFlow.toggleOptions(),
+            togglePause: () => game.screenFlow.togglePause(),
+            restart: () => game.screenFlow.restart(),
+            exitToMenu: () => game.screenFlow.exitToMenu(),
         };
     }
 
-    bindKeyActionElements(root) {
-        if (!root) return;
-        const keyActions = this.keyActions;
-        root.querySelectorAll("[data-key-action]").forEach((el) => {
-            const code = el.dataset.keyAction;
-            const action = keyActions[code];
-            if (!action) return;
-            el.addEventListener("click", () => {
-                if (MOVEMENT_KEYS.has(code)) this.steeringArbiter.markKeyboardSteer();
-                action();
-            });
-        });
+    get touchActions() {
+        const handlers = this.actionHandlers;
+        return {
+            ArrowLeft: handlers.moveLeft,
+            ArrowRight: handlers.moveRight,
+            ArrowDown: handlers.softDrop,
+            ArrowUp: handlers.rotateUp,
+            Space: handlers.hardDrop,
+            KeyP: handlers.togglePause,
+        };
     }
 
-    stopRepeat(code) {
-        const timers = this.heldTimers.get(code);
+    dispatchMap() {
+        const bindings = {...defaultKeyBindings(), ...(this.game.settings?.keyBindings ?? {})};
+        const map = {};
+        Object.entries(bindings).forEach(([slotId, code]) => {
+            if (code) map[code] = slotId;
+        });
+        return map;
+    }
+
+    stopRepeat(slotId) {
+        const timers = this.heldTimers.get(slotId);
         if (!timers) return;
         if (timers.timeoutId !== undefined) clearTimeout(timers.timeoutId);
         if (timers.intervalId !== undefined) clearInterval(timers.intervalId);
-        this.heldTimers.delete(code);
+        this.heldTimers.delete(slotId);
     }
 
-    startRepeat(code, action) {
-        this.stopRepeat(code);
+    startRepeat(slotId, action) {
+        this.stopRepeat(slotId);
         const settings = this.game.settings;
         const dasMs = settings?.keyboardDAS ?? DEFAULT_DAS_MS;
         const arrMs = settings?.keyboardARR ?? DEFAULT_ARR_MS;
         const timeoutId = setTimeout(() => {
             const intervalId = setInterval(action, arrMs);
-            this.heldTimers.set(code, {intervalId});
+            this.heldTimers.set(slotId, {intervalId});
         }, dasMs);
-        this.heldTimers.set(code, {timeoutId});
+        this.heldTimers.set(slotId, {timeoutId});
     }
 
     stopAllRepeats() {
@@ -99,39 +105,93 @@ export class KeyboardInput extends InputSource {
         this.heldTimers.clear();
     }
 
+    listenForNextKey(callback) {
+        this.cancelListening();
+        if (!globalThis.window) {
+            callback(null);
+            return;
+        }
+
+        this._listening = true;
+        this._listenHandler = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const code = event.code === "Escape" ? null : event.code;
+            this.stopListening();
+            callback(code);
+        };
+
+        window.addEventListener("keydown", this._listenHandler, {capture: true});
+    }
+
+    stopListening() {
+        if (this._listenHandler && globalThis.window) {
+            window.removeEventListener("keydown", this._listenHandler, {capture: true});
+        }
+        this._listening = false;
+        this._listenHandler = null;
+    }
+
+    cancelListening() {
+        if (!this._listening) return;
+        this.stopListening();
+    }
+
     bind() {
         const game = this.game;
         if (!game.dom) return;
 
-        const keyActions = this.keyActions;
-
         this._keydownHandler = (event) => {
+            if (this._listening) return;
             if (isTypingInField(event) && event.code !== "Enter") return;
+
+            const isMenuScreen = game.state === "idle" || game.state === "gameOver-saved";
+            if (isMenuScreen && (event.code === "ArrowUp" || event.code === "ArrowDown")) {
+                event.preventDefault();
+                if (!event.repeat) game.screenFlow.moveMenuFocus(event.code === "ArrowDown" ? 1 : -1);
+                return;
+            }
+
+            let slotId = this.dispatchMap()[event.code];
+            if (isMenuScreen) {
+                if (event.code === "ArrowLeft") slotId = "moveLeft";
+                else if (event.code === "ArrowRight") slotId = "moveRight";
+            }
+            if (!slotId) return;
+
+            const baseAction = this.actionHandlers[slotId];
+            if (!baseAction) return;
 
             if (PREVENT_DEFAULT_KEYS.has(event.code)) event.preventDefault();
 
-            const baseAction = keyActions[event.code];
-            if (!baseAction) return;
-
-            const action = MOVEMENT_KEYS.has(event.code)
+            const action = MOVEMENT_SLOTS.has(slotId)
                 ? (isRepeat) => {
                     this.steeringArbiter.markKeyboardSteer();
                     baseAction(isRepeat);
                 }
                 : baseAction;
 
-            if (REPEATABLE_KEYS.has(event.code)) {
+            if (REPEATABLE_SLOTS.has(slotId)) {
                 if (event.repeat) return;
                 action(false);
-                this.startRepeat(event.code, () => action(true));
+                this.startRepeat(slotId, () => action(true));
                 return;
             }
 
-            if (event.repeat && event.code === "Space") return;
+            if (event.repeat && slotId === "hardDrop") return;
             action();
         };
 
-        this._keyupHandler = (event) => this.stopRepeat(event.code);
+        this._keyupHandler = (event) => {
+            if (this._listening) return;
+            const isMenuScreen = game.state === "idle" || game.state === "gameOver-saved";
+            let slotId = this.dispatchMap()[event.code];
+            if (isMenuScreen) {
+                if (event.code === "ArrowLeft") slotId = "moveLeft";
+                else if (event.code === "ArrowRight") slotId = "moveRight";
+            }
+            if (slotId) this.stopRepeat(slotId);
+        };
         this._blurHandler = () => this.stopAllRepeats();
 
         game.dom.addEventListener("keydown", this._keydownHandler);
@@ -142,6 +202,7 @@ export class KeyboardInput extends InputSource {
     unbind() {
         const game = this.game;
         this.stopAllRepeats();
+        this.cancelListening();
 
         if (game.dom) {
             if (this._keydownHandler) game.dom.removeEventListener("keydown", this._keydownHandler);

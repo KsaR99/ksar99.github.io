@@ -32,7 +32,9 @@
         "touchRotateGesture": "Spielfeld antippen",
         "touchHardDropGesture": "Nach unten wischen",
         "touchSoftDropGesture": "▼ gedrückt halten",
-        "touchPauseGesture": "❚❚-Taste"
+        "touchPauseGesture": "❚❚-Taste",
+        "confirm": "Bestätigen",
+        "cancel": "Abbrechen"
     },
     "screens": {
         "idle": {
@@ -83,12 +85,12 @@
             "glow": "Leuchten (Unschärfe)",
             "transparency": "Transparenz",
             "fallTrail": "Fallspur",
-            "effect": "Bildschirmfilter",
-            "effectNone": "Kein",
-            "effectVhs": "VHS-Rauschen",
-            "effectMatrix": "Matrix",
-            "effectRain": "Regen",
-            "effectSnow": "Schnee",
+            "theme": "Design",
+            "themeNone": "Kein",
+            "themeVHS": "VHS-Rauschen",
+            "themeMatrix": "Matrix",
+            "themeRain": "Regen",
+            "themeSnow": "Schnee",
             "close": "Schließen",
             "mouseSensitivity": "Mausempfindlichkeit",
             "touchSensitivity": "Touch-Empfindlichkeit",
@@ -115,7 +117,12 @@
             "valueOn": "An",
             "valueOff": "Aus",
             "autoValue": "auto",
-            "soundVolumesLabel": "Einzelne Klanglautstärken"
+            "soundVolumesLabel": "Einzelne Klanglautstärken",
+            "keyboardTitle": "Tastatur",
+            "keyboardHint": "Klicke eine Taste, um sie neu zuzuweisen",
+            "keyboardResetButton": "Zurücksetzen",
+            "keyboardPressKey": "Taste drücken…",
+            "keyboardReset": "Tasten zurücksetzen"
         },
         "calibration": {
             "gestures": {

@@ -32,7 +32,9 @@
         "touchRotateGesture": "Stuknij planszę",
         "touchHardDropGesture": "Przesuń w dół",
         "touchSoftDropGesture": "Przytrzymaj ▼",
-        "touchPauseGesture": "Przycisk ❚❚"
+        "touchPauseGesture": "Przycisk ❚❚",
+        "confirm": "Zatwierdź",
+        "cancel": "Anuluj"
     },
     "screens": {
         "idle": {
@@ -83,12 +85,12 @@
             "glow": "Poświata (blur)",
             "transparency": "Przezroczystość",
             "fallTrail": "Smuga spadku",
-            "effect": "Filtr ekranu",
-            "effectNone": "Brak",
-            "effectVhs": "Szum VHS",
-            "effectMatrix": "Matrix",
-            "effectRain": "Deszcz",
-            "effectSnow": "Śnieg",
+            "theme": "Motyw",
+            "themeNone": "Brak",
+            "themeVHS": "Szum VHS",
+            "themeMatrix": "Matrix",
+            "themeRain": "Deszcz",
+            "themeSnow": "Śnieg",
             "close": "Zamknij",
             "mouseSensitivity": "Czułość myszy",
             "touchSensitivity": "Czułość dotyku",
@@ -115,7 +117,12 @@
             "valueOn": "Wł.",
             "valueOff": "Wył.",
             "autoValue": "auto",
-            "soundVolumesLabel": "Głośności poszczególnych dźwięków"
+            "soundVolumesLabel": "Głośności poszczególnych dźwięków",
+            "keyboardTitle": "Klawiatura",
+            "keyboardHint": "Kliknij klawisz, aby go zmienić",
+            "keyboardResetButton": "Przywróć domyślne",
+            "keyboardPressKey": "Naciśnij klawisz…",
+            "keyboardReset": "Resetuj klawisze"
         },
         "calibration": {
             "gestures": {
@@ -161,6 +168,7 @@
             "todayBestLabel": "Dzisiejszy najlepszy wynik:",
             "todayBestBy": "przez",
             "submit": "Kontynuuj",
+            "shareButton": "Udostępnij",
             "statsTitle": "Statystyki sesji",
             "gameTimeLabel": "Czas gry",
             "droughtLabel": "D.MAX",
@@ -191,7 +199,8 @@
             "lines": "Linie",
             "date": "Data"
         },
-        "defaultName": "Gracz"
+        "defaultName": "Gracz",
+        "shareButton": "Udostępnij tabelę wyników"
     },
     "credits": {
         "roleDeveloper": "Inżynier oprogramowania",
@@ -297,5 +306,17 @@
         "grounded": "Klocek na dole",
         "falling": "Spadanie klocka",
         "pieceLock": "Osadzenie klocka"
+    },
+    "share": {
+        "text": "Zdobyłem {score} pkt w trybie {mode} w {app}! 🎮",
+        "textByName": "{name} zdobył(a) {score} pkt w trybie {mode} w {app}! 🎮",
+        "tableText": "Moja tabela wyników trybu {mode} w {app}! 🎮",
+        "status": {
+            "shared": "Udostępniono!",
+            "copied": "Skopiowano obraz!",
+            "downloaded": "Zapisano obraz!",
+            "error": "Nie udało się",
+            "empty": "Brak wyników"
+        }
     }
 }

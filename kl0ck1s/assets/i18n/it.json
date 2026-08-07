@@ -32,7 +32,9 @@
         "touchRotateGesture": "Tocca la griglia",
         "touchHardDropGesture": "Scorri verso il basso",
         "touchSoftDropGesture": "Tieni premuto ▼",
-        "touchPauseGesture": "Pulsante ❚❚"
+        "touchPauseGesture": "Pulsante ❚❚",
+        "confirm": "Conferma",
+        "cancel": "Annulla"
     },
     "screens": {
         "idle": {
@@ -83,12 +85,12 @@
             "glow": "Bagliore (sfocatura)",
             "transparency": "Trasparenza",
             "fallTrail": "Scia di caduta",
-            "effect": "Filtro schermo",
-            "effectNone": "Nessuno",
-            "effectVhs": "Rumore VHS",
-            "effectMatrix": "Matrix",
-            "effectRain": "Pioggia",
-            "effectSnow": "Neve",
+            "theme": "Tema",
+            "themeNone": "Nessuno",
+            "themeVHS": "Rumore VHS",
+            "themeMatrix": "Matrix",
+            "themeRain": "Pioggia",
+            "themeSnow": "Neve",
             "close": "Chiudi",
             "mouseSensitivity": "Sensibilità del mouse",
             "touchSensitivity": "Sensibilità tocco",
@@ -115,7 +117,12 @@
             "valueOn": "On",
             "valueOff": "Off",
             "autoValue": "auto",
-            "soundVolumesLabel": "Volumi dei singoli suoni"
+            "soundVolumesLabel": "Volumi dei singoli suoni",
+            "keyboardTitle": "Tastiera",
+            "keyboardHint": "Clicca un tasto per riassegnarlo",
+            "keyboardResetButton": "Ripristina predefiniti",
+            "keyboardPressKey": "Premi un tasto…",
+            "keyboardReset": "Ripristina tasti"
         },
         "calibration": {
             "gestures": {

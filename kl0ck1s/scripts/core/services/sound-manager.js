@@ -161,7 +161,6 @@ export class SoundManager {
         return id;
     }
 
-    /** Plays sound keys one after another, each starting once the previous one ends. */
     playSequence(keys, opts = {}) {
         const [first, ...rest] = keys;
         if (!first) return null;

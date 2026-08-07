@@ -32,7 +32,9 @@
         "touchRotateGesture": "Klepni na hraciu plochu",
         "touchHardDropGesture": "Prejdi prstom dole",
         "touchSoftDropGesture": "Podrž ▼",
-        "touchPauseGesture": "Tlačidlo ❚❚"
+        "touchPauseGesture": "Tlačidlo ❚❚",
+        "confirm": "Potvrdiť",
+        "cancel": "Zrušiť"
     },
     "screens": {
         "idle": {
@@ -83,12 +85,12 @@
             "glow": "Žiara (rozmazanie)",
             "transparency": "Priehľadnosť",
             "fallTrail": "Stopa pádu",
-            "effect": "Filter obrazovky",
-            "effectNone": "Žiadny",
-            "effectVhs": "VHS šum",
-            "effectMatrix": "Matrix",
-            "effectRain": "Dážď",
-            "effectSnow": "Sneh",
+            "theme": "Motív",
+            "themeNone": "Žiadny",
+            "themeVHS": "VHS šum",
+            "themeMatrix": "Matrix",
+            "themeRain": "Dážď",
+            "themeSnow": "Sneh",
             "close": "Zavrieť",
             "mouseSensitivity": "Citlivosť myši",
             "touchSensitivity": "Citlivosť dotyku",
@@ -115,7 +117,12 @@
             "valueOn": "Zap.",
             "valueOff": "Vyp.",
             "autoValue": "auto",
-            "soundVolumesLabel": "Hlasitosť jednotlivých zvukov"
+            "soundVolumesLabel": "Hlasitosť jednotlivých zvukov",
+            "keyboardTitle": "Klávesnica",
+            "keyboardHint": "Kliknutím na kláves ho znova priradíte",
+            "keyboardResetButton": "Obnoviť predvolené",
+            "keyboardPressKey": "Stlačte kláves…",
+            "keyboardReset": "Obnoviť klávesy"
         },
         "calibration": {
             "gestures": {

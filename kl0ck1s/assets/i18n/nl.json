@@ -32,7 +32,9 @@
         "touchRotateGesture": "Tik op het bord",
         "touchHardDropGesture": "Veeg omlaag",
         "touchSoftDropGesture": "Houd ▼ ingedrukt",
-        "touchPauseGesture": "❚❚-knop"
+        "touchPauseGesture": "❚❚-knop",
+        "confirm": "Bevestigen",
+        "cancel": "Annuleren"
     },
     "screens": {
         "idle": {
@@ -83,12 +85,12 @@
             "glow": "Gloed (vervaging)",
             "transparency": "Transparantie",
             "fallTrail": "Valspoor",
-            "effect": "Schermfilter",
-            "effectNone": "Geen",
-            "effectVhs": "VHS-ruis",
-            "effectMatrix": "Matrix",
-            "effectRain": "Regen",
-            "effectSnow": "Sneeuw",
+            "theme": "Thema",
+            "themeNone": "Geen",
+            "themeVHS": "VHS-ruis",
+            "themeMatrix": "Matrix",
+            "themeRain": "Regen",
+            "themeSnow": "Sneeuw",
             "close": "Sluiten",
             "mouseSensitivity": "Muisgevoeligheid",
             "touchSensitivity": "Aanraakgevoeligheid",
@@ -115,7 +117,12 @@
             "valueOn": "Aan",
             "valueOff": "Uit",
             "autoValue": "auto",
-            "soundVolumesLabel": "Individuele geluidsvolumes"
+            "soundVolumesLabel": "Individuele geluidsvolumes",
+            "keyboardTitle": "Toetsenbord",
+            "keyboardHint": "Klik op een toets om deze opnieuw toe te wijzen",
+            "keyboardResetButton": "Standaard herstellen",
+            "keyboardPressKey": "Druk op een toets…",
+            "keyboardReset": "Toetsen resetten"
         },
         "calibration": {
             "gestures": {

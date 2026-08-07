@@ -32,7 +32,9 @@
         "touchRotateGesture": "Tap board",
         "touchHardDropGesture": "Swipe down",
         "touchSoftDropGesture": "Hold ▼",
-        "touchPauseGesture": "❚❚ button"
+        "touchPauseGesture": "❚❚ button",
+        "confirm": "Confirm",
+        "cancel": "Cancel"
     },
     "screens": {
         "idle": {
@@ -83,12 +85,12 @@
             "glow": "Glow (blur)",
             "transparency": "Transparency",
             "fallTrail": "Fall trail",
-            "effect": "Screen filter",
-            "effectNone": "None",
-            "effectVhs": "VHS noise",
-            "effectMatrix": "Matrix",
-            "effectRain": "Rain",
-            "effectSnow": "Snow",
+            "theme": "Theme",
+            "themeNone": "None",
+            "themeVHS": "VHS noise",
+            "themeMatrix": "Matrix",
+            "themeRain": "Rain",
+            "themeSnow": "Snow",
             "close": "Close",
             "mouseSensitivity": "Mouse sensitivity",
             "touchSensitivity": "Touch sensitivity",
@@ -115,7 +117,12 @@
             "valueOn": "On",
             "valueOff": "Off",
             "autoValue": "auto",
-            "soundVolumesLabel": "Individual sound volumes"
+            "soundVolumesLabel": "Individual sound volumes",
+            "keyboardTitle": "Keyboard",
+            "keyboardHint": "Click a key to reassign it",
+            "keyboardResetButton": "Reset to defaults",
+            "keyboardPressKey": "Press a key…",
+            "keyboardReset": "Reset keys"
         },
         "calibration": {
             "gestures": {
@@ -161,6 +168,7 @@
             "todayBestLabel": "Today's best:",
             "todayBestBy": "by",
             "submit": "Continue",
+            "shareButton": "Share",
             "statsTitle": "Session stats",
             "gameTimeLabel": "Time",
             "droughtLabel": "D.MAX",
@@ -191,7 +199,8 @@
             "lines": "Lines",
             "date": "Date"
         },
-        "defaultName": "Player"
+        "defaultName": "Player",
+        "shareButton": "Share leaderboard"
     },
     "credits": {
         "roleDeveloper": "Software Engineer",
@@ -297,5 +306,17 @@
         "grounded": "Piece grounded",
         "falling": "Piece falling",
         "pieceLock": "Piece lock"
+    },
+    "share": {
+        "text": "I scored {score} points in {mode} on {app}! 🎮",
+        "textByName": "{name} scored {score} points in {mode} on {app}! 🎮",
+        "tableText": "My leaderboard for {mode} on {app}! 🎮",
+        "status": {
+            "shared": "Shared!",
+            "copied": "Image copied!",
+            "downloaded": "Image saved!",
+            "error": "Couldn't share",
+            "empty": "No scores yet"
+        }
     }
 }

@@ -17,6 +17,7 @@ import {
 } from "../game/game-constants.js";
 import {numberToVoiceKeys} from "../shared/utils.js";
 import {voiceCountingKey} from "../shared/config.js";
+import {defaultKeyBindings} from "../shared/key-bindings.js";
 
 function clampToStep(value, min, max, step) {
     const clamped = Math.max(min, Math.min(max, value));
@@ -68,8 +69,15 @@ export class ScreenFlow {
         game.modeController.bindModeButtons();
         this.bindNameInput();
         this.bindStartButton();
-        this.bindOverlayShortcuts();
+        this.bindLeaderboardShare();
         this.updateMenuSelectorFocus();
+    }
+
+    bindLeaderboardShare() {
+        const game = this.game;
+        if (!game.dom) return;
+        const button = game.dom.querySelector('[data-role="leaderboard-share-button"]');
+        game.shareService.bindIconButton(button, () => game.shareService.shareLeaderboard(game.mode));
     }
 
     moveMenuFocus(dir) {
@@ -96,13 +104,6 @@ export class ScreenFlow {
         if (nameInput && game.menuSelector === "nickname" && game.dom.activeElement !== nameInput) {
             nameInput.focus();
         }
-    }
-
-    bindOverlayShortcuts() {
-        const game = this.game;
-        if (!game.dom) return;
-        const overlay = game.dom.getElementById("overlay");
-        game.inputController.bindKeyActionElements(overlay);
     }
 
     bindStartButton() {
@@ -183,6 +184,24 @@ export class ScreenFlow {
             game.screens.countdown(number, tint, game.dom),
             {transparentOverlay: true}
         );
+        this.updateCountdownBar(true);
+    }
+
+    updateCountdownBar(reset = false) {
+        const game = this.game;
+        if (!game.dom) return;
+        const bar = game.dom.querySelector('[data-role="countdown-progress-bar"]');
+        if (!bar) return;
+
+        const targetPercent = ((game.countdownIndex + 1) / COUNTDOWN_STEPS.length) * 100;
+
+        if (reset) {
+            bar.style.transition = "none";
+            bar.style.width = "0%";
+            void bar.offsetWidth;
+        }
+        bar.style.transition = `width ${game.countdownStepDuration}ms linear`;
+        bar.style.width = `${targetPercent}%`;
     }
 
     advanceCountdownStep() {
@@ -192,6 +211,7 @@ export class ScreenFlow {
         if (!game.hud.updateCountdown(number, tint)) {
             this.renderCountdownStep();
         }
+        this.updateCountdownBar();
     }
 
     renderCountdownStep() {
@@ -201,6 +221,13 @@ export class ScreenFlow {
             game.screens.countdown(number, tint, game.dom),
             {transparentOverlay: true}
         );
+
+        const bar = game.dom?.querySelector('[data-role="countdown-progress-bar"]');
+        if (bar) {
+            bar.style.transition = "none";
+            bar.style.width = `${(game.countdownIndex / COUNTDOWN_STEPS.length) * 100}%`;
+            void bar.offsetWidth;
+        }
     }
 
     start() {
@@ -292,6 +319,15 @@ export class ScreenFlow {
             )
         );
         this.bindGameOverContinue();
+        this.bindGameOverShare();
+        this.bindLeaderboardShare();
+    }
+
+    bindGameOverShare() {
+        const game = this.game;
+        if (!game.dom) return;
+        const button = game.dom.querySelector('[data-role="gameover-share-button"]');
+        game.shareService.bindLabeledButton(button, () => game.shareService.shareRun());
     }
 
     bindGameOverContinue() {
@@ -328,7 +364,7 @@ export class ScreenFlow {
         game.modeController.bindModeButtons();
         this.bindNameInput();
         this.bindStartButton();
-        this.bindOverlayShortcuts();
+        this.bindLeaderboardShare();
         this.updateMenuSelectorFocus();
     }
 
@@ -373,26 +409,13 @@ export class ScreenFlow {
 
     renderPauseMenu() {
         const game = this.game;
-        game.hud.showScreen(game.screens.paused(game.dom, game.i18n));
-        this.bindPauseMenu();
+        game.hud.showScreen(game.screens.options(game.settings, game.dom, game.i18n, game.soundManager, "pause"));
+        this.bindOptionsMenu();
     }
 
-    bindPauseMenu() {
-        const game = this.game;
-        if (!game.dom) return;
-        const resumeButton = game.dom.querySelector('[data-role="resume-button"]');
-        const resumeKey = game.dom.querySelector('[data-role="resume-key"]');
-        const optionsKey = game.dom.querySelector('[data-role="options-open-key"]');
-
-        if (resumeButton) {
-            resumeButton.addEventListener("click", () => this.togglePause());
-        }
-        if (resumeKey) {
-            resumeKey.addEventListener("click", () => this.togglePause());
-        }
-        if (optionsKey) {
-            optionsKey.addEventListener("click", () => this.toggleOptions());
-        }
+    closeOptionsOrPause() {
+        if (this.game.state === "paused") this.togglePause();
+        else this.toggleOptions();
     }
 
     handleEnter() {
@@ -544,7 +567,7 @@ export class ScreenFlow {
         const glowCheckbox = game.dom.querySelector('[data-role="glow-checkbox"]');
         const transparencyCheckbox = game.dom.querySelector('[data-role="transparency-checkbox"]');
         const fallTrailCheckbox = game.dom.querySelector('[data-role="fall-trail-checkbox"]');
-        const effectSelect = game.dom.querySelector('[data-role="effect-select"]');
+        const themeSelect = game.dom.querySelector('[data-role="theme-select"]');
         const skipCountdownCheckbox = game.dom.querySelector('[data-role="skip-countdown-checkbox"]');
         const mouseControlCheckbox = game.dom.querySelector('[data-role="mouse-control-checkbox"]');
         const mouseSensitivityInput = game.dom.querySelector('[data-role="mouse-sensitivity-input"]');
@@ -637,9 +660,9 @@ export class ScreenFlow {
             });
         }
 
-        if (effectSelect) {
-            effectSelect.addEventListener("change", () => {
-                game.settings.effect = effectSelect.value;
+        if (themeSelect) {
+            themeSelect.addEventListener("change", () => {
+                game.settings.theme = themeSelect.value;
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
             });
@@ -785,15 +808,69 @@ export class ScreenFlow {
         });
 
         if (closeButton) {
-            closeButton.addEventListener("click", () => this.toggleOptions());
+            closeButton.addEventListener("click", () => this.closeOptionsOrPause());
         }
 
         if (closeKey) {
-            closeKey.addEventListener("click", () => this.toggleOptions());
+            closeKey.addEventListener("click", () => this.closeOptionsOrPause());
         }
 
         this.bindLangSelect();
         this.bindOptionsDataMenu();
+        this.bindKeybindList();
+    }
+
+    bindKeybindList() {
+        const game = this.game;
+        if (!game.dom) return;
+        const list = game.dom.querySelector('[data-role="keybind-list"]');
+        const resetButton = game.dom.querySelector('[data-role="keybind-reset-button"]');
+        if (!list) return;
+
+        const settingsController = game.settingsController;
+        const keyboard = game.inputController.keyboard;
+
+        const refreshList = () => {
+            game.screens.renderKeybindRows(game.dom, list, game.settings.keyBindings, game.i18n);
+        };
+
+        list.addEventListener("click", (event) => {
+            const kbd = event.target.closest("[data-keybind-slot]");
+            if (!kbd || kbd.classList.contains("kbd--listening")) return;
+
+            list.querySelectorAll(".kbd--listening").forEach((el) => el.classList.remove("kbd--listening"));
+            keyboard.cancelListening();
+
+            const slotId = kbd.dataset.keybindSlot;
+            const originalLabel = kbd.textContent;
+            kbd.classList.add("kbd--listening");
+            kbd.textContent = game.i18n.t("screens.options.keyboardPressKey");
+
+            keyboard.listenForNextKey((code) => {
+                kbd.classList.remove("kbd--listening");
+
+                if (!code) {
+                    kbd.textContent = originalLabel;
+                    return;
+                }
+
+                const bindings = {...game.settings.keyBindings, [slotId]: code};
+                Object.keys(bindings).forEach((otherId) => {
+                    if (otherId !== slotId && bindings[otherId] === code) bindings[otherId] = "";
+                });
+                game.settings.keyBindings = bindings;
+                settingsController.saveSettings();
+                refreshList();
+            });
+        });
+
+        if (resetButton) {
+            resetButton.addEventListener("click", () => {
+                game.settings.keyBindings = defaultKeyBindings();
+                settingsController.saveSettings();
+                refreshList();
+            });
+        }
     }
 
     setImportReviewVisible(visible) {

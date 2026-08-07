@@ -2,6 +2,7 @@
 
 import {formatNumber} from "../shared/utils.js";
 import {SOUND_FILES} from "../shared/config.js";
+import {defaultKeyBindings, formatKeyCode, KEY_BIND_SLOTS} from "../shared/key-bindings.js";
 
 function clone(dom, templateId) {
     return dom.getElementById(templateId).content.cloneNode(true);
@@ -42,12 +43,59 @@ function fillSoundRows(dom, container, keys, soundVolumes, i18n) {
     });
 }
 
+// Groups KEY_BIND_SLOTS by labelKey, preserving slot order, so rows like
+// "Rotate" (ArrowUp + Z) or "Pause" (P + Escape) show all their kbds together.
+function groupedKeyBindSlots() {
+    const groups = [];
+    const byLabel = new Map();
+    KEY_BIND_SLOTS.forEach((slot) => {
+        let group = byLabel.get(slot.labelKey);
+        if (!group) {
+            group = {labelKey: slot.labelKey, slots: []};
+            byLabel.set(slot.labelKey, group);
+            groups.push(group);
+        }
+        group.slots.push(slot);
+    });
+    return groups;
+}
+
+function renderKeybindRows(dom, container, keyBindings, i18n) {
+    container.innerHTML = "";
+    const bindings = keyBindings ?? {};
+
+    groupedKeyBindSlots().forEach((group) => {
+        const row = dom.createElement("li");
+        row.className = "controls__item";
+
+        const label = dom.createElement("span");
+        label.textContent = i18n.t(group.labelKey);
+        row.appendChild(label);
+
+        const kbdWrap = dom.createElement("span");
+        group.slots.forEach((slot, index) => {
+            if (index > 0) kbdWrap.appendChild(dom.createTextNode("\u00A0"));
+            const kbd = dom.createElement("kbd");
+            kbd.className = "kbd kbd--clickable kbd--rebind";
+            kbd.dataset.keybindSlot = slot.id;
+            kbd.setAttribute("role", "button");
+            kbd.tabIndex = 0;
+            const code = slot.id in bindings ? bindings[slot.id] : slot.defaultCode;
+            kbd.textContent = formatKeyCode(code);
+            kbdWrap.appendChild(kbd);
+        });
+        row.appendChild(kbdWrap);
+
+        container.appendChild(row);
+    });
+}
+
 const DIFF_LABEL_KEYS = {
     language: "screens.options.language",
     volume: "screens.options.volume",
     muted: "screens.options.mute",
     hudRight: "screens.options.hudRight",
-    effect: "screens.options.effect",
+    theme: "screens.options.theme",
     mouseControl: "screens.options.mouseControl",
     mouseSensitivity: "screens.options.mouseSensitivity",
     touchSensitivity: "screens.options.touchSensitivity",
@@ -64,25 +112,32 @@ const DIFF_LABEL_KEYS = {
     keyboardARR: "screens.options.keyboardArr",
     categoryVolumes: "screens.options.categoryVolume",
     soundVolumes: "screens.options.soundVolumesLabel",
+    keyBindings: "screens.options.keyboardTitle",
 };
 
-const EFFECT_LABEL_KEYS = {
-    none: "screens.options.effectNone",
-    vhs: "screens.options.effectVhs",
-    matrix: "screens.options.effectMatrix",
-    rain: "screens.options.effectRain",
-    snow: "screens.options.effectSnow",
+const THEME_LABEL_KEYS = {
+    none: "screens.options.themeNone",
+    vhs: "screens.options.themeVHS",
+    matrix: "screens.options.themeMatrix",
+    rain: "screens.options.themeRain",
+    snow: "screens.options.themeSnow",
 };
 
 function formatSettingValue(key, value, i18n) {
     if (key === "language") return i18n.languages[value] ?? value;
-    if (key === "effect") return i18n.t(EFFECT_LABEL_KEYS[value] ?? "screens.options.effectNone");
+    if (key === "theme") return i18n.t(THEME_LABEL_KEYS[value] ?? "screens.options.themeNone");
     if (key === "touchSensitivity") return value == null ? i18n.t("screens.options.autoValue") : `${Math.round(value * 100)}%`;
     if (key === "volume" || key === "mouseSensitivity") return `${Math.round(value * 100)}%`;
     if (key === "keyboardDAS" || key === "keyboardARR") return `${Math.round(value)} ms`;
     if (typeof value === "boolean") return i18n.t(value ? "screens.options.valueOn" : "screens.options.valueOff");
     if (key === "categoryVolumes" || key === "soundVolumes") {
         return Object.entries(value ?? {}).map(([k, v]) => `${k}: ${Math.round(v * 100)}%`).join(", ") || "—";
+    }
+    if (key === "keyBindings") {
+        const defaults = defaultKeyBindings();
+        return Object.entries(value ?? {})
+            .map(([k, v]) => `${k}: ${formatKeyCode(v)}`)
+            .join(", ") || Object.entries(defaults).map(([k, v]) => `${k}: ${formatKeyCode(v)}`).join(", ");
     }
     return String(value);
 }
@@ -97,6 +152,8 @@ function fillModeInfoRules(dom, container, mode, i18n) {
 }
 
 export const Screens = {
+    renderKeybindRows,
+
     loading(title, text, dom = document) {
         const screen = clone(dom, "tpl-screen-loading");
         screen.querySelector('[data-field="title"]').textContent = title;
@@ -115,13 +172,7 @@ export const Screens = {
         return screen;
     },
 
-    paused(dom = document, i18n) {
-        const screen = clone(dom, "tpl-screen-paused");
-        i18n.applyStatic(screen);
-        return screen;
-    },
-
-    options(settings, dom = document, i18n, soundManager = null) {
+    options(settings, dom = document, i18n, soundManager = null, context = "options") {
         const screen = clone(dom, "tpl-screen-options");
 
         if (soundManager) {
@@ -176,8 +227,11 @@ export const Screens = {
             mouseSensitivitySlider.disabled = !settings.mouseControl;
         }
 
-        const effectSelect = screen.querySelector('[data-role="effect-select"]');
-        if (effectSelect) effectSelect.value = settings.effect ?? "none";
+        const themeSelect = screen.querySelector('[data-role="theme-select"]');
+        if (themeSelect) themeSelect.value = settings.theme ?? "none";
+
+        const keybindList = screen.querySelector('[data-role="keybind-list"]');
+        if (keybindList) renderKeybindRows(dom, keybindList, settings.keyBindings, i18n);
 
         const langSelect = screen.querySelector('[data-role="lang-select"]');
         if (langSelect) {
@@ -191,6 +245,20 @@ export const Screens = {
         }
 
         i18n.applyStatic(screen);
+
+        if (context === "pause") {
+            const title = screen.querySelector(".screen__title");
+            if (title) title.textContent = i18n.t("screens.paused.title");
+            const closeBefore = screen.querySelector('[data-i18n="screens.options.closeHintBefore"]');
+            const closeKeyEl = screen.querySelector('[data-role="options-close-key"]');
+            const closeAfter = screen.querySelector('[data-i18n="screens.options.closeHintAfter"]');
+            const closeButton = screen.querySelector('[data-role="options-close-button"]');
+            if (closeBefore) closeBefore.textContent = i18n.t("screens.paused.resumeHintBefore");
+            if (closeKeyEl) closeKeyEl.textContent = "P";
+            if (closeAfter) closeAfter.textContent = i18n.t("screens.paused.resumeHintAfter");
+            if (closeButton) closeButton.textContent = i18n.t("screens.paused.resumeButton");
+        }
+
         return screen;
     },
 

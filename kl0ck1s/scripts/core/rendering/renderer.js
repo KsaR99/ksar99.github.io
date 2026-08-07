@@ -333,7 +333,7 @@ export class Renderer {
             for (let x = 0; x < board.cols; x++) {
                 const colorIndex = board.colors[y * board.cols + x];
                 if (!colorIndex) continue;
-                this.drawCell(ctx, x, yPos, this.colorForRow(this.colorPalette[colorIndex], y, board.rows), size);
+                this.drawCell(ctx, x, yPos, this.colorForRow(this.colorPalette[colorIndex], yPos, board.rows), size);
             }
         }
 
@@ -366,12 +366,13 @@ export class Renderer {
         }
     }
 
-    drawPiece(piece) {
+    drawPiece(piece, board) {
         const size = this.boardConfig.CELL_SIZE;
         forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
             const y = piece.y + r;
             if (y < 0) return;
-            this.drawCell(this.ctx, piece.x + c, y, piece.color, size, {glow: true});
+            const color = board ? this.colorForRow(piece.color, y, board.rows) : piece.color;
+            this.drawCell(this.ctx, piece.x + c, y, color, size, {glow: true});
         });
     }
 

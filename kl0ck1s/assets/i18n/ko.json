@@ -32,7 +32,9 @@
         "touchRotateGesture": "보드 탭",
         "touchHardDropGesture": "아래로 스와이프",
         "touchSoftDropGesture": "▼ 길게 누르기",
-        "touchPauseGesture": "❚❚ 버튼"
+        "touchPauseGesture": "❚❚ 버튼",
+        "confirm": "확인",
+        "cancel": "취소"
     },
     "screens": {
         "idle": {
@@ -83,12 +85,12 @@
             "glow": "발광 (흐림 효과)",
             "transparency": "투명도",
             "fallTrail": "낙하 궤적",
-            "effect": "화면 효과",
-            "effectNone": "없음",
-            "effectVhs": "VHS 노이즈",
-            "effectMatrix": "매트릭스",
-            "effectRain": "비",
-            "effectSnow": "눈",
+            "theme": "테마",
+            "themeNone": "없음",
+            "themeVHS": "VHS 노이즈",
+            "themeMatrix": "매트릭스",
+            "themeRain": "비",
+            "themeSnow": "눈",
             "close": "닫기",
             "mouseSensitivity": "마우스 감도",
             "touchSensitivity": "터치 감도",
@@ -115,7 +117,12 @@
             "valueOn": "켜짐",
             "valueOff": "꺼짐",
             "autoValue": "자동",
-            "soundVolumesLabel": "개별 소리 볼륨"
+            "soundVolumesLabel": "개별 소리 볼륨",
+            "keyboardTitle": "키보드",
+            "keyboardHint": "키를 클릭하여 다시 지정하세요",
+            "keyboardResetButton": "기본값으로 재설정",
+            "keyboardPressKey": "키를 누르세요…",
+            "keyboardReset": "키 재설정"
         },
         "calibration": {
             "gestures": {

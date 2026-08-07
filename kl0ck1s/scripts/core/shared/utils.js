@@ -20,7 +20,6 @@ export function numberToCountingParts(number) {
     return [];
 }
 
-/** Voice-sound keys (in SOUND_FILES) needed to say a number aloud. */
 export function numberToVoiceKeys(number) {
     return numberToCountingParts(number).map(voiceCountingKey);
 }

@@ -7,7 +7,7 @@ const HEAD_COLOR = "oklch(0.751 0.133 144.116)";
 const BODY_COLOR = "oklch(0.543 0.123 151.327)";
 const DIM_COLOR = "oklch(0.3 0.075 152.239)";
 
-export class MatrixEffect {
+export class Matrix {
     constructor(canvas, ctx = null) {
         this.canvas = canvas;
         this.ctx = ctx ?? canvas.getContext("2d");

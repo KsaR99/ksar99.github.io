@@ -12,7 +12,7 @@ import {InputController} from "../controllers/input-controller.js";
 import {PieceController} from "../controllers/piece-controller.js";
 import {StatsTracker} from "../controllers/stats-tracker.js";
 import {SettingsController} from "../controllers/settings-controller.js";
-import {EffectOverlay} from "../controllers/effect-overlay.js";
+import {ThemeOverlay} from "../controllers/theme-overlay.js";
 import {DifficultyController} from "../controllers/difficulty-controller.js";
 import {ModeController} from "../controllers/mode-controller.js";
 import {ScreenFlow} from "../controllers/screen-flow.js";
@@ -20,6 +20,7 @@ import {CreditsController} from "../controllers/credits-controller.js";
 import {SensitivityCalibrationController} from "../controllers/sensitivity-calibration-controller.js";
 import {KeyboardCalibrationController} from "../controllers/keyboard-calibration-controller.js";
 import {MusicDirector} from "../services/music-director.js";
+import {ShareService} from "../services/share-service.js";
 
 export class Game {
     constructor({
@@ -39,8 +40,8 @@ export class Game {
                     lineClearAnimationDuration,
                     countdownStepDuration = 500,
                     settingsStore = null,
-                    effectCanvas = null,
-                    effectCtx = null,
+                    themeCanvas = null,
+                    themeCtx = null,
                     dom = globalThis.document ?? null,
                     i18n,
                 }) {
@@ -64,7 +65,7 @@ export class Game {
         this.dom = dom;
         this.i18n = i18n;
         this.lastTime = 0;
-        this.activeEffect = "none";
+        this.activeTheme = "none";
         this.previousStateBeforeOptions = null;
         this.isPlayingSession = false;
 
@@ -137,7 +138,7 @@ export class Game {
         this.statsTracker = new StatsTracker(this);
         this.pieceController = new PieceController(this);
         this.settingsController = new SettingsController(this);
-        this.effectOverlay = new EffectOverlay(this, {canvas: effectCanvas, ctx: effectCtx});
+        this.themeOverlay = new ThemeOverlay(this, {canvas: themeCanvas, ctx: themeCtx});
         this.difficultyController = new DifficultyController(this);
         this.modeController = new ModeController(this);
         this.screenFlow = new ScreenFlow(this);
@@ -146,6 +147,7 @@ export class Game {
         this.sensitivityCalibrationController = new SensitivityCalibrationController(this);
         this.keyboardCalibrationController = new KeyboardCalibrationController(this);
         this.musicDirector = new MusicDirector(this.soundManager);
+        this.shareService = new ShareService(this);
 
         this.settings = this.settingsController.defaultSettings();
     }
@@ -176,7 +178,6 @@ export class Game {
         this.screenFlow.showIdleScreen().then();
         this.inputController.bindControls();
         this.inputController.bindTouchControls();
-        this.inputController.bindControlsToggle();
         this.inputController.bindMouseControls();
         this.creditsController.bind();
         requestAnimationFrame(this.loop.bind(this));
@@ -399,7 +400,12 @@ export class Game {
     }
 
     render() {
-        this.effectOverlay.update();
+        this.themeOverlay.update();
+
+        const body = this.dom?.body;
+        if (body) {
+            body.classList.toggle("cursor-hidden", ["running", "clearing"].includes(this.state) && !this.settings.mouseControl);
+        }
 
         const showPieceBehindOptions = this.state === "options"
             && ["running", "paused"].includes(this.previousStateBeforeOptions);
@@ -434,7 +440,7 @@ export class Game {
                 this.fallTrailCount = 0;
             }
 
-            this.renderer.drawPiece(renderedPiece);
+            this.renderer.drawPiece(renderedPiece, this.board);
         }
 
         if (this.levelUpTimer > 0) {

@@ -108,6 +108,7 @@ export class KeyboardCalibrationController {
         }
 
         this._updateCountdownDisplay();
+        this._updateCountdownBar();
     }
 
     _armCountdown() {
@@ -115,11 +116,37 @@ export class KeyboardCalibrationController {
         this.countdownIndex = 0;
         this.countdownTimer = 0;
         this._updateCountdownDisplay();
+        this._updateCountdownBar(true);
+    }
+
+    _updateCountdownBar(reset = false) {
+        const banner = this.game.dom?.querySelector('[data-role="calibration-banner"]');
+        const bar = banner?.querySelector('[data-role="calibration-countdown-progress-bar"]');
+        if (!bar) return;
+
+        const targetPercent = ((this.countdownIndex + 1) / COUNTDOWN_STEPS.length) * 100;
+
+        if (reset) {
+            bar.style.transition = "none";
+            bar.style.width = "0%";
+            void bar.offsetWidth;
+        }
+        bar.style.transition = `width ${this.game.countdownStepDuration}ms linear`;
+        bar.style.width = `${targetPercent}%`;
+    }
+
+    _clearCountdownBar() {
+        const banner = this.game.dom?.querySelector('[data-role="calibration-banner"]');
+        const bar = banner?.querySelector('[data-role="calibration-countdown-progress-bar"]');
+        if (!bar) return;
+        bar.style.transition = "none";
+        bar.style.width = "0%";
     }
 
     _armRound() {
         const game = this.game;
         this._clearCountdownDisplay();
+        this._clearCountdownBar();
 
         game.pieceController.moveToColumn(Math.floor(game.board.cols / 2));
 

@@ -1,6 +1,7 @@
 "use strict";
 
 import {SETTINGS_KEY} from "../game/game-constants.js";
+import {defaultKeyBindings} from "../shared/key-bindings.js";
 
 export class SettingsController {
     constructor(game) {
@@ -13,7 +14,7 @@ export class SettingsController {
             muted: false,
             glow: true,
             transparency: true,
-            effect: "none",
+            theme: "none",
             hudRight: false,
             ghost: true,
             gridLines: true,
@@ -27,8 +28,17 @@ export class SettingsController {
             keyboardDAS: 125,
             keyboardARR: 16,
             fallTrail: true,
-            categoryVolumes: {sfx: 1, music: 0.1, voices: 0.6},
-            soundVolumes: {},
+            categoryVolumes: {
+                sfx: 1,
+                music: 0.1,
+                voices: 0.5
+            },
+            soundVolumes: {
+                rotate: 0.75,
+                falling: 0.75,
+                drop: 0.9
+            },
+            keyBindings: defaultKeyBindings(),
         };
     }
 
@@ -48,6 +58,7 @@ export class SettingsController {
             if (storedRaw) {
                 settings = {...defaults, ...JSON.parse(storedRaw)};
                 settings.categoryVolumes = {...defaults.categoryVolumes, ...(settings.categoryVolumes ?? {})};
+                settings.keyBindings = {...defaults.keyBindings, ...(settings.keyBindings ?? {})};
                 hasStoredSettings = true;
             }
         } catch {
@@ -55,7 +66,7 @@ export class SettingsController {
         }
 
         if (!hasStoredSettings && this.prefersReducedMotion()) {
-            settings.effect = "none";
+            settings.theme = "none";
         }
 
         game.settings = settings;
@@ -89,7 +100,7 @@ export class SettingsController {
 
     applyPerformanceSettings() {
         const game = this.game;
-        const {glow, transparency, effect, ghost, gridLines, fallTrail, screenShake, heightSaturation} = game.settings;
+        const {glow, transparency, theme, ghost, gridLines, fallTrail, screenShake, heightSaturation} = game.settings;
         game.renderer.setGlowEnabled(glow);
         game.renderer.setTransparencyEnabled(transparency);
         game.renderer.setGhostEnabled(ghost);
@@ -109,7 +120,7 @@ export class SettingsController {
             body.classList.toggle("hud-right", Boolean(game.settings.hudRight));
         }
 
-        game.effectOverlay.setActive(effect);
+        game.themeOverlay.setActive(theme);
     }
 
     settingsKeys() {
@@ -181,6 +192,11 @@ export class SettingsController {
             } else if (change.key === "categoryVolumes") {
                 game.settings.categoryVolumes = {
                     ...this.defaultSettings().categoryVolumes,
+                    ...change.newValue,
+                };
+            } else if (change.key === "keyBindings") {
+                game.settings.keyBindings = {
+                    ...this.defaultSettings().keyBindings,
                     ...change.newValue,
                 };
             } else {
