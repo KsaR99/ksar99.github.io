@@ -1,5 +1,11 @@
 {
     "locale": "id-ID",
+    "boot": {
+        "settings": "Memuat pengaturan...",
+        "sprites": "Membuat cache balok...",
+        "audio": "Memuat audio...",
+        "finalize": "Memulai..."
+    },
     "sidebar": {
         "nextPiece": "Balok berikutnya",
         "score": "Skor",

@@ -4,6 +4,24 @@ export const SOUND_CATEGORIES = Object.freeze(["sfx", "music", "voices"]);
 
 let nextInstanceId = 1;
 
+const SOUND_LOAD_TIMEOUT_MS = 8000;
+
+function withTimeout(promise, ms) {
+    return new Promise((resolve) => {
+        const timer = setTimeout(() => resolve(null), ms);
+        promise.then(
+            (value) => {
+                clearTimeout(timer);
+                resolve(value);
+            },
+            () => {
+                clearTimeout(timer);
+                resolve(null);
+            }
+        );
+    });
+}
+
 export class SoundManager {
     /**
      * @param {Readonly<{[p: string]: any, lineClear1: Readonly<{src: string, category: string}>, lineClear2: Readonly<{src: string, category: string}>, lineClear3: Readonly<{src: string, category: string}>, lineClear4: Readonly<{src: string, category: string}>, drop: Readonly<{src: string, category: string}>, gameOver: Readonly<{src: string, category: string}>, levelUp: Readonly<{src: string, category: string}>, rotate: Readonly<{src: string, category: string}>, grounded: Readonly<{src: string, category: string}>, falling: Readonly<{src: string, category: string}>, pieceLock: Readonly<{src: string, category: string}>, voiceGameOver: Readonly<{src: string, category: string, label: string}>, voiceLetsGo: Readonly<{src: string, category: string, label: string}>, voiceLevel: Readonly<{src: string, category: string, label: string}>, tetrisowyShvt: Readonly<{src: string, category: string, label: string}>, tetrisowyShvt2: Readonly<{src: string, category: string, label: string}>, tetrisowyShvt3: Readonly<{src: string, category: string, label: string}>}>} soundFiles
@@ -76,33 +94,48 @@ export class SoundManager {
         return this.context;
     }
 
-    init() {
+    /**
+     * @param {(loaded: number, total: number) => void} [onProgress] - called once per sound
+     *   key as soon as it's fetched+decoded (or failed), so callers can drive a boot-time
+     *   progress bar. Safe to omit.
+     */
+    init(onProgress = null) {
         if (this._ready) return this._ready;
 
+        const keys = Object.keys(this.soundFiles);
+        const total = keys.length;
+
         if (!this.isSupported) {
+            onProgress?.(total, total);
             this._ready = Promise.resolve();
             return this._ready;
         }
 
         this.ensureContext();
 
-        this._ready = Promise.all(
-            Object.keys(this.soundFiles).map(async (key) => {
-                const sources = this.srcListFor(key);
-                if (sources.length === 0) return;
+        let loaded = 0;
+        const reportProgress = () => onProgress?.(++loaded, total);
 
-                const decoded = await Promise.all(sources.map(async (src) => {
-                    try {
+        this._ready = Promise.all(
+            keys.map(async (key) => {
+                const sources = this.srcListFor(key);
+                if (sources.length === 0) {
+                    reportProgress();
+                    return;
+                }
+
+                const decoded = await Promise.all(sources.map((src) => withTimeout(
+                    (async () => {
                         const response = await this.fetchImpl(src);
                         const arrayBuffer = await response.arrayBuffer();
                         return await this.context.decodeAudioData(arrayBuffer);
-                    } catch {
-                        return null;
-                    }
-                }));
+                    })().catch(() => null),
+                    SOUND_LOAD_TIMEOUT_MS
+                )));
 
                 const buffers = decoded.filter(Boolean);
                 if (buffers.length > 0) this.buffers[key] = buffers;
+                reportProgress();
             })
         ).then(() => undefined);
 

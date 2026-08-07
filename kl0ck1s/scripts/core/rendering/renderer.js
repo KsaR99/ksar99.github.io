@@ -116,6 +116,19 @@ export class Renderer {
         this.heightSaturationEnabled = enabled;
     }
 
+    /**
+     * Forces the block/grid/glow sprite atlas to be built for the current cell size right
+     * now, instead of paying that cost inside the first drawBoard() call. Used during app
+     * boot so a "building block cache" loading step does real, visible work rather than
+     * being a fake timer.
+     */
+    warmSpriteCache() {
+        const size = this.boardConfig.CELL_SIZE;
+        if (!size) return;
+        this.spriteCache.getGridCell(size);
+        this.spriteCache.warmGlow(size, this.heightSaturationEnabled);
+    }
+
     rowSaturationFactor(y, rows) {
         if (!this.heightSaturationEnabled) return 1;
         const distanceFromBottom = (rows - 1) - y;

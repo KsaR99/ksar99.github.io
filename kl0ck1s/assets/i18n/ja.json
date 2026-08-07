@@ -1,5 +1,11 @@
 {
     "locale": "ja-JP",
+    "boot": {
+        "settings": "設定を読み込んでいます...",
+        "sprites": "ブロックキャッシュを作成しています...",
+        "audio": "音声を読み込んでいます...",
+        "finalize": "起動しています..."
+    },
     "sidebar": {
         "nextPiece": "次のピース",
         "score": "スコア",

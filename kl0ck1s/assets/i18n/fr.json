@@ -1,5 +1,11 @@
 {
     "locale": "fr-FR",
+    "boot": {
+        "settings": "Chargement des paramètres...",
+        "sprites": "Création du cache des blocs...",
+        "audio": "Chargement de l'audio...",
+        "finalize": "Démarrage..."
+    },
     "sidebar": {
         "nextPiece": "Pièce suivante",
         "score": "Score",

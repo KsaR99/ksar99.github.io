@@ -22,6 +22,15 @@ import {KeyboardCalibrationController} from "../controllers/keyboard-calibration
 import {MusicDirector} from "../services/music-director.js";
 import {ShareService} from "../services/share-service.js";
 
+/** Resolves after the browser has had a chance to paint the current frame. */
+function nextPaint() {
+    return new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+}
+
+function wait(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export class Game {
     constructor({
                     board,
@@ -171,9 +180,33 @@ export class Game {
         return 1;
     }
 
-    async init() {
-        this.soundManager.init();
-        await this.settingsController.loadSettings();
+    /**
+     * @param {object} [boot]
+     * @param {(step: "settings"|"sprites"|"audio"|"finalize") => void} [boot.onStep] - fired
+     *   right before each boot phase starts, so a loading screen can update its status text.
+     * @param {(loaded: number, total: number) => void} [boot.onAudioProgress] - fired as each
+     *   sound finishes decoding, for a fine-grained progress bar during the audio phase.
+     * @param {number} [boot.minStepMs] - each phase is held visible for at least this long
+     *   (after letting the browser paint its status text) so fast phases like "settings" or
+     *   "sprites" don't flash by in under a frame and go unnoticed.
+     */
+    async init({onStep = null, onAudioProgress = null, minStepMs = 200} = {}) {
+        const runStep = async (name, work) => {
+            onStep?.(name);
+            await nextPaint();
+            const start = Date.now();
+            const result = await work();
+            const elapsed = Date.now() - start;
+            if (elapsed < minStepMs) await wait(minStepMs - elapsed);
+            return result;
+        };
+
+        await runStep("settings", () => this.settingsController.loadSettings());
+        await runStep("sprites", () => this.renderer.warmSpriteCache());
+        await runStep("audio", () => this.soundManager.init(onAudioProgress));
+
+        onStep?.("finalize");
+        await nextPaint();
         this.prepareNewRound();
         this.screenFlow.showIdleScreen().then();
         this.inputController.bindControls();
@@ -181,6 +214,7 @@ export class Game {
         this.inputController.bindMouseControls();
         this.creditsController.bind();
         requestAnimationFrame(this.loop.bind(this));
+        if (minStepMs > 0) await wait(minStepMs / 2);
     }
 
     prepareNewRound() {

@@ -1,5 +1,11 @@
 {
     "locale": "en-US",
+    "boot": {
+        "settings": "Loading settings...",
+        "sprites": "Building block cache...",
+        "audio": "Loading audio...",
+        "finalize": "Starting..."
+    },
     "sidebar": {
         "nextPiece": "Next piece",
         "score": "Score",

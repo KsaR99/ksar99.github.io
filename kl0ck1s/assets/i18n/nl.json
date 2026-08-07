@@ -1,5 +1,11 @@
 {
     "locale": "nl-NL",
+    "boot": {
+        "settings": "Instellingen laden...",
+        "sprites": "Blokcache aanmaken...",
+        "audio": "Audio laden...",
+        "finalize": "Starten..."
+    },
     "sidebar": {
         "nextPiece": "Volgend blok",
         "score": "Score",

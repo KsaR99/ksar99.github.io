@@ -1,5 +1,11 @@
 {
     "locale": "it-IT",
+    "boot": {
+        "settings": "Caricamento impostazioni...",
+        "sprites": "Creazione cache dei blocchi...",
+        "audio": "Caricamento audio...",
+        "finalize": "Avvio..."
+    },
     "sidebar": {
         "nextPiece": "Prossimo pezzo",
         "score": "Punteggio",

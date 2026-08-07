@@ -1,5 +1,11 @@
 {
     "locale": "cs-CZ",
+    "boot": {
+        "settings": "Načítání nastavení...",
+        "sprites": "Vytváření mezipaměti kostek...",
+        "audio": "Načítání zvuku...",
+        "finalize": "Spouštění..."
+    },
     "sidebar": {
         "nextPiece": "Další díl",
         "score": "Skóre",

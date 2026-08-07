@@ -28,10 +28,17 @@ import {Renderer} from "../core/rendering/renderer.js";
 import {HUD} from "../core/ui/hud.js";
 import {Game} from "../core/game/game.js";
 import {I18n} from "../core/services/i18n.js";
+import {BootLoader} from "./boot-loader.js";
 
 // Disable right click, for the mouse.
 const appEl = document.querySelector(".app");
 appEl.addEventListener('contextmenu', event => event.preventDefault());
+
+const boot = new BootLoader({
+    rootEl: document.getElementById("boot-screen"),
+    fillEl: document.getElementById("boot-bar-fill"),
+    statusEl: document.getElementById("boot-status"),
+});
 
 const i18n = new I18n();
 await i18n.init();
@@ -179,7 +186,27 @@ const game = new Game({
 });
 
 resizeBoardCanvas();
-void game.init().catch(console.error);
+
+const bootStepText = {
+    settings: i18n.t("boot.settings"),
+    sprites: i18n.t("boot.sprites"),
+    audio: i18n.t("boot.audio"),
+    finalize: i18n.t("boot.finalize"),
+};
+
+const BOOT_WATCHDOG_MS = 12000;
+const bootWatchdog = setTimeout(() => {
+    console.warn("Boot sequence took too long, revealing the app anyway.");
+    boot.finish();
+}, BOOT_WATCHDOG_MS);
+
+game.init({
+    onStep: (step) => boot.step(step, bootStepText[step]),
+    onAudioProgress: (loaded, total) => boot.audioProgress(loaded, total),
+}).then(() => boot.finish()).catch((err) => {
+    console.error(err);
+    boot.finish();
+}).finally(() => clearTimeout(bootWatchdog));
 
 const fabControlsBtn = document.querySelector('[data-role="fab-controls"]');
 if (fabControlsBtn) {

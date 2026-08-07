@@ -1,5 +1,11 @@
 {
     "locale": "de-DE",
+    "boot": {
+        "settings": "Einstellungen werden geladen...",
+        "sprites": "Blockcache wird erstellt...",
+        "audio": "Audio wird geladen...",
+        "finalize": "Wird gestartet..."
+    },
     "sidebar": {
         "nextPiece": "Nächster Stein",
         "score": "Punkte",

@@ -1,5 +1,11 @@
 {
     "locale": "ko-KR",
+    "boot": {
+        "settings": "설정을 불러오는 중...",
+        "sprites": "블록 캐시를 생성하는 중...",
+        "audio": "오디오를 불러오는 중...",
+        "finalize": "시작하는 중..."
+    },
     "sidebar": {
         "nextPiece": "다음 블록",
         "score": "점수",

@@ -6,19 +6,28 @@
     <title>Kl0ck1's</title>
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+Mono:wght@100..900&display=swap"
-          rel="stylesheet"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+Mono:wght@100..900&display=swap"
+        rel="stylesheet"
     >
-    <link href="styles/main.css?v=33" rel="stylesheet">
-    <link href="styles/mobile.css?v=33" media="(width < 48rem)" rel="stylesheet">
-    <link href="styles/desktop.css?v=33" media="(width >= 48rem)" rel="stylesheet">
+    <link href="styles/main.css?v=34" rel="stylesheet">
+    <link href="styles/mobile.css?v=34" media="(width < 48rem)" rel="stylesheet">
+    <link href="styles/desktop.css?v=34" media="(width >= 48rem)" rel="stylesheet">
     <meta content="notranslate" name="google">
     <meta content="https://github.com/KsaR99" name="author">
     <meta content="index, follow" name="robots">
     <meta content="Tetris-like game, with multiple themes & modes." name="description">
-
 </head>
 <body>
+<div class="boot-screen" id="boot-screen">
+    <div class="boot-screen__inner">
+        <p class="boot-screen__logo">Kl0ck1<span class="boot-screen__logo-flip">'s</span></p>
+        <div class="boot-screen__bar-track">
+            <div class="boot-screen__bar-fill" id="boot-bar-fill"></div>
+        </div>
+        <p class="boot-screen__status" id="boot-status">&nbsp;</p>
+    </div>
+</div>
 <div class="app" id="app-root">
     <div class="mobile-fabs">
         <div class="mobile-fabs__group">
@@ -38,7 +47,7 @@
         <div class="card">
             <p class="brand__title" data-role="brand-title">Kl0ck1<span class="brand__title-flip"
                                                                         data-role="brand-title-flip">'s</span></p>
-            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.11.4-alpha</p>
+            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.12-alpha</p>
         </div>
 
         <button aria-label="Options" class="settings-shortcut" data-i18n-title="controls.options"
@@ -174,7 +183,8 @@
             </button>
         </div>
         <div class="nickname-form">
-            <input class="nickname-form__input" data-i18n-placeholder="screens.idle.namePlaceholder" data-role="name-input" maxlength="16"
+            <input class="nickname-form__input" data-i18n-placeholder="screens.idle.namePlaceholder"
+                   data-role="name-input" maxlength="16"
                    name="nickname" pattern="[a-zA-Z\d_\-]{3,16}"
                    placeholder="Your nickname"
                    required type="text">
@@ -248,17 +258,20 @@
                 </label>
                 <label class="options__row">
                     <span data-i18n="screens.options.mouseSensitivity">Mouse sensitivity</span>
-                    <input class="options__input options__input--number" data-role="mouse-sensitivity-input" inputmode="decimal"
+                    <input class="options__input options__input--number" data-role="mouse-sensitivity-input"
+                           inputmode="decimal"
                            type="number">
                 </label>
                 <label class="options__row">
                     <span data-i18n="screens.options.touchSensitivity">Touch sensitivity</span>
-                    <input class="options__input options__input--number" data-role="touch-sensitivity-input" inputmode="decimal"
+                    <input class="options__input options__input--number" data-role="touch-sensitivity-input"
+                           inputmode="decimal"
                            placeholder="auto" type="number">
                 </label>
                 <div class="options__row">
                     <span data-i18n="screens.options.calibrateSensitivity">Calibrate sensitivity</span>
-                    <button class="options__preview-button options__preview-button--wide" data-i18n="screens.options.calibrateSensitivityButton"
+                    <button class="options__preview-button options__preview-button--wide"
+                            data-i18n="screens.options.calibrateSensitivityButton"
                             data-role="calibrate-sensitivity-button"
                             type="button">Calibrate
                     </button>
@@ -322,7 +335,8 @@
                     <summary class="options__group-summary" data-i18n="screens.options.sfxTitle">SFX</summary>
                     <label class="options__row">
                         <span data-i18n="screens.options.categoryVolume">Category volume</span>
-                        <input class="options__input options__input--range" data-category="sfx" data-role="category-volume-slider" max="100"
+                        <input class="options__input options__input--range" data-category="sfx"
+                               data-role="category-volume-slider" max="100"
                                min="0" type="range">
                     </label>
                     <div class="options__sound-list" data-role="sound-list"></div>
@@ -332,7 +346,8 @@
                     <summary class="options__group-summary" data-i18n="screens.options.musicTitle">Music</summary>
                     <label class="options__row">
                         <span data-i18n="screens.options.categoryVolume">Category volume</span>
-                        <input class="options__input options__input--range" data-category="music" data-role="category-volume-slider" max="100"
+                        <input class="options__input options__input--range" data-category="music"
+                               data-role="category-volume-slider" max="100"
                                min="0" type="range">
                     </label>
                     <div class="options__sound-list" data-role="sound-list"></div>
@@ -342,7 +357,8 @@
                     <summary class="options__group-summary" data-i18n="screens.options.voicesTitle">Voices</summary>
                     <label class="options__row">
                         <span data-i18n="screens.options.categoryVolume">Category volume</span>
-                        <input class="options__input options__input--range" data-category="voices" data-role="category-volume-slider" max="100"
+                        <input class="options__input options__input--range" data-category="voices"
+                               data-role="category-volume-slider" max="100"
                                min="0" type="range">
                     </label>
                     <div class="options__sound-list" data-role="sound-list"></div>
@@ -395,17 +411,20 @@
                 <summary class="options__title" data-i18n="screens.options.advancedTitle">Advanced</summary>
                 <label class="options__row">
                     <span data-i18n="screens.options.keyboardDas">Keyboard DAS (ms)</span>
-                    <input class="options__input options__input--number" data-role="keyboard-das-input" inputmode="numeric"
+                    <input class="options__input options__input--number" data-role="keyboard-das-input"
+                           inputmode="numeric"
                            type="number">
                 </label>
                 <label class="options__row">
                     <span data-i18n="screens.options.keyboardArr">Keyboard ARR (ms)</span>
-                    <input class="options__input options__input--number" data-role="keyboard-arr-input" inputmode="numeric"
+                    <input class="options__input options__input--number" data-role="keyboard-arr-input"
+                           inputmode="numeric"
                            type="number">
                 </label>
                 <div class="options__row">
                     <span data-i18n="screens.options.calibrateKeyboard">Calibrate keyboard</span>
-                    <button class="options__preview-button options__preview-button--wide" data-i18n="screens.options.calibrateKeyboardButton"
+                    <button class="options__preview-button options__preview-button--wide"
+                            data-i18n="screens.options.calibrateKeyboardButton"
                             data-role="calibrate-keyboard-button"
                             type="button">Calibrate
                     </button>
@@ -416,14 +435,16 @@
                 <summary class="options__title" data-i18n="screens.options.dataTitle">Import / Export</summary>
                 <div class="options__row">
                     <span data-i18n="screens.options.exportLabel">Export options to a file</span>
-                    <button class="options__preview-button options__preview-button--wide" data-i18n="screens.options.exportButton"
+                    <button class="options__preview-button options__preview-button--wide"
+                            data-i18n="screens.options.exportButton"
                             data-role="options-export-button"
                             type="button">Export
                     </button>
                 </div>
                 <div class="options__row">
                     <span data-i18n="screens.options.importLabel">Import options from a file</span>
-                    <button class="options__preview-button options__preview-button--wide" data-i18n="screens.options.importButton"
+                    <button class="options__preview-button options__preview-button--wide"
+                            data-i18n="screens.options.importButton"
                             data-role="options-import-button"
                             type="button">Import
                     </button>
@@ -458,17 +479,20 @@
                 <button class="button" data-i18n="screens.options.importCancel" data-role="options-import-cancel"
                         type="button">Cancel
                 </button>
-                <button class="button button--accent" data-i18n="screens.options.importApply" data-role="options-import-apply"
+                <button class="button button--accent" data-i18n="screens.options.importApply"
+                        data-role="options-import-apply"
                         type="button">Apply selected
                 </button>
             </div>
-            <button class="button button--accent" data-i18n="screens.options.importClose" data-role="options-import-close"
+            <button class="button button--accent" data-i18n="screens.options.importClose"
+                    data-role="options-import-close"
                     hidden
                     type="button">OK
             </button>
         </div>
 
-        <button class="options__resume button button--accent" data-i18n="screens.options.close" data-role="options-close-button"
+        <button class="options__resume button button--accent" data-i18n="screens.options.close"
+                data-role="options-close-button"
                 type="button">Close
         </button>
     </div>
@@ -507,7 +531,8 @@
             <strong class="screen__hint-highlight" data-field="todayBestName"></strong>
         </p>
         <div class="screen__button-row">
-            <button class="button button--primary" data-i18n="screens.gameOverEntry.submit" data-role="gameover-continue-button"
+            <button class="button button--primary" data-i18n="screens.gameOverEntry.submit"
+                    data-role="gameover-continue-button"
                     type="button">Continue
             </button>
             <button class="button" data-i18n="screens.gameOverEntry.shareButton" data-role="gameover-share-button"
@@ -603,7 +628,8 @@
             </button>
         </div>
         <div class="nickname-form">
-            <input class="nickname-form__input" data-i18n-placeholder="screens.idle.namePlaceholder" data-role="name-input" maxlength="16"
+            <input class="nickname-form__input" data-i18n-placeholder="screens.idle.namePlaceholder"
+                   data-role="name-input" maxlength="16"
                    name="nickname" pattern="[a-zA-Z\d_\-]{3,16}"
                    placeholder="Your nickname"
                    required
@@ -630,7 +656,8 @@
         <p class="brand__title">Kl0ck1's</p>
         <h2 class="screen__title mode-info__title" data-field="modeName"></h2>
         <ul class="mode-info__rules" data-field="rules"></ul>
-        <button class="button button--accent" data-i18n="screens.modeInfo.continueButton" data-role="mode-info-continue-button"
+        <button class="button button--accent" data-i18n="screens.modeInfo.continueButton"
+                data-role="mode-info-continue-button"
                 type="button">Continue
         </button>
     </div>
@@ -660,13 +687,16 @@
         <p class="screen__hint" data-i18n="screens.calibration.resultFailed" data-role="calibration-failed">
             Not enough data was captured - try again.
         </p>
-        <button class="options__resume button button--accent" data-i18n="screens.calibration.resultSave" data-role="calibration-result-save-button"
+        <button class="options__resume button button--accent" data-i18n="screens.calibration.resultSave"
+                data-role="calibration-result-save-button"
                 type="button">Save
         </button>
-        <button class="options__resume button" data-i18n="screens.calibration.resultRestart" data-role="calibration-result-restart-button"
+        <button class="options__resume button" data-i18n="screens.calibration.resultRestart"
+                data-role="calibration-result-restart-button"
                 type="button">Restart
         </button>
-        <button class="options__resume button" data-i18n="screens.calibration.resultDiscard" data-role="calibration-result-discard-button"
+        <button class="options__resume button" data-i18n="screens.calibration.resultDiscard"
+                data-role="calibration-result-discard-button"
                 type="button">Discard
         </button>
     </div>
@@ -689,10 +719,12 @@
                 data-role="keyboard-calibration-result-save-button" type="button"
         >Save
         </button>
-        <button class="options__resume button" data-i18n="screens.keyboardCalibration.resultRestart" data-role="keyboard-calibration-result-restart-button"
+        <button class="options__resume button" data-i18n="screens.keyboardCalibration.resultRestart"
+                data-role="keyboard-calibration-result-restart-button"
                 type="button">Restart
         </button>
-        <button class="options__resume button" data-i18n="screens.keyboardCalibration.resultDiscard" data-role="keyboard-calibration-result-discard-button"
+        <button class="options__resume button" data-i18n="screens.keyboardCalibration.resultDiscard"
+                data-role="keyboard-calibration-result-discard-button"
                 type="button">Discard
         </button>
     </div>
@@ -827,6 +859,6 @@
         window.addEventListener("orientationchange", notifyResize);
     })();
 </script>
-<script src="scripts/app/main.js?v=33" type="module"></script>
+<script src="scripts/app/main.js?v=34" type="module"></script>
 </body>
 </html>

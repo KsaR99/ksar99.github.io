@@ -1,5 +1,11 @@
 {
     "locale": "pl-PL",
+    "boot": {
+        "settings": "Wczytywanie ustawień...",
+        "sprites": "Tworzenie cache klocków...",
+        "audio": "Wczytywanie audio...",
+        "finalize": "Uruchamianie..."
+    },
     "sidebar": {
         "nextPiece": "Następny klocek",
         "score": "Wynik",

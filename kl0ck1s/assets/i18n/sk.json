@@ -1,5 +1,11 @@
 {
     "locale": "sk-SK",
+    "boot": {
+        "settings": "Načítavanie nastavení...",
+        "sprites": "Vytváranie vyrovnávacej pamäte kociek...",
+        "audio": "Načítavanie zvuku...",
+        "finalize": "Spúšťanie..."
+    },
     "sidebar": {
         "nextPiece": "Ďalší diel",
         "score": "Skóre",

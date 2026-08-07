@@ -156,6 +156,94 @@ body {
     overflow: hidden;
 }
 
+.boot-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    opacity: 1;
+    transition: opacity 0.35s ease;
+}
+
+.boot-screen--hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.boot-screen__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: min(18rem, 78vw);
+}
+
+.boot-screen__logo {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3vw + 1rem, 2.6rem);
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    text-align: center;
+    margin: 0 0 1.75rem;
+    user-select: none;
+    background: linear-gradient(350deg, oklch(0.905399 0.15455 194.76), oklch(0.5635 0.2408 260.82), oklch(0.772 0.1738 64.55), oklch(0.968 0.211 109.77), oklch(0.73558 0.22389 146.13), oklch(0.5812 0.2986 307.03), oklch(0.6489 0.237 26.97));
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: boot-screen-shimmer 3s ease-in-out infinite;
+}
+
+.boot-screen__logo-flip {
+    background: inherit;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+@keyframes boot-screen-shimmer {
+    0%, 100% {
+        background-position: 0 0;
+    }
+    50% {
+        background-position: 100% 0;
+    }
+}
+
+.boot-screen__bar-track {
+    width: 100%;
+    height: 0.4rem;
+    background: oklch(25.03% 0.027 271);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.boot-screen__bar-fill {
+    height: 100%;
+    width: 0;
+    background: oklch(0.4 0.1 155.9);
+    border-radius: inherit;
+    transition: width 0.2s ease;
+}
+
+.boot-screen__status {
+    margin-top: 0.75rem;
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    text-align: center;
+    user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .boot-screen__logo {
+        animation: none;
+    }
+}
+
 .app__board {
     order: 1;
     flex: 1 1 auto;
