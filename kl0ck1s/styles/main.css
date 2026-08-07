@@ -184,13 +184,12 @@ body {
     top: 0;
     bottom: 0;
     z-index: var(--z-drawer);
-    padding: calc(var(--safe-t) + 0.75rem) 0.75rem 0.75rem;
     overflow-y: auto;
     background: var(--bg);
     border: 1px solid var(--line);
     transition: left 0.25s ease, right 0.25s ease;
     left: -105%;
-    padding-left: calc(var(--safe-l) + 0.75rem);
+    padding: calc(var(--safe-t) + 0.75rem) 0.75rem 0.75rem calc(var(--safe-l) + 0.75rem);
     border-radius: 0 var(--radius) var(--radius) 0;
 }
 
@@ -267,6 +266,10 @@ body.hud-right .card[data-role="next-piece-card"] {
     border-radius: var(--radius);
     border: 1px solid var(--board-accent, var(--line));
     box-shadow: var(--board-accent, oklch(0.39 0 0)) 0 0 1.15rem 0.25rem;
+}
+
+.board__stage {
+    position: relative;
     will-change: transform;
 }
 
@@ -283,11 +286,12 @@ body.perf-no-glow .screen__title {
     position: relative;
     z-index: 2;
     border-radius: var(--radius);
-    border: 1px solid var(--board-accent, oklch(0.43 0.1 137.67 / 0.85));
     touch-action: none;
     width: 100%;
     height: 100%;
 }
+
+
 
 .board__overlay {
     position: absolute;
@@ -405,6 +409,10 @@ body.perf-no-transparency .board__overlay--transparent {
 
 .board__filter--active[data-theme="vhs"] {
     animation: vhs-flicker 5s infinite steps(40);
+}
+
+.board__stage:has(.board__filter--active[data-theme="vhs"]) .board__canvas {
+    z-index: unset;
 }
 
 .board__filter--active[data-theme="vhs"]::after {
@@ -596,6 +604,7 @@ body.perf-no-glow .board__filter--active[data-theme="vhs"]::after {
     color: var(--muted);
     cursor: pointer;
     transition: color 0.15s ease, filter 0.15s ease;
+    user-select: none;
 }
 
 .settings-shortcut:hover,
@@ -920,6 +929,11 @@ body.perf-no-glow .board__filter--active[data-theme="vhs"]::after {
     &:focus {
         outline: 2px solid var(--accent-2);
     }
+
+    &::selection {
+        color: var(--nickname-form__input--bg);
+        background: var(--text);
+    }
 }
 
 .nickname-form__input--invalid {
@@ -1061,7 +1075,7 @@ body.perf-no-glow .board__filter--active[data-theme="vhs"]::after {
     margin: 0.25rem 0 0.5rem;
     padding: 0.75rem 1rem;
     list-style: none;
-    background: oklch(22.054% 0.02402 273.436 / 0.6);
+    background: oklch(22.054% 0.02402 273.436 / 0.6); /** @todo ::selection for rule/s */
     border: 1px solid var(--line);
     border-radius: 0.5rem;
 }
@@ -1124,6 +1138,7 @@ body.perf-no-glow .board__filter--active[data-theme="vhs"]::after {
     font-size: 0.9rem;
     font-weight: 700;
     letter-spacing: 0.02em;
+    user-select: none;
 }
 
 .difficulty__level {
@@ -1131,6 +1146,7 @@ body.perf-no-glow .board__filter--active[data-theme="vhs"]::after {
     font-family: var(--font-display);
     font-size: 0.6875rem;
     opacity: 0.75;
+    user-select: none;
 }
 
 .difficulty--modes .difficulty__label {
@@ -1155,6 +1171,7 @@ body.perf-no-glow .board__filter--active[data-theme="vhs"]::after {
     text-align: left;
     scrollbar-width: thin;
     scrollbar-color: var(--accent) transparent;
+    user-select: none;
 }
 
 .mode-description::-webkit-scrollbar {

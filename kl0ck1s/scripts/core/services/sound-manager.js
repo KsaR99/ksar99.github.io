@@ -6,7 +6,7 @@ let nextInstanceId = 1;
 
 export class SoundManager {
     /**
-     * @param {Record<string, {src: string, category?: "sfx"|"music"}|string>} soundFiles
+     * @param {Readonly<{[p: string]: any, lineClear1: Readonly<{src: string, category: string}>, lineClear2: Readonly<{src: string, category: string}>, lineClear3: Readonly<{src: string, category: string}>, lineClear4: Readonly<{src: string, category: string}>, drop: Readonly<{src: string, category: string}>, gameOver: Readonly<{src: string, category: string}>, levelUp: Readonly<{src: string, category: string}>, rotate: Readonly<{src: string, category: string}>, grounded: Readonly<{src: string, category: string}>, falling: Readonly<{src: string, category: string}>, pieceLock: Readonly<{src: string, category: string}>, voiceGameOver: Readonly<{src: string, category: string, label: string}>, voiceLetsGo: Readonly<{src: string, category: string, label: string}>, voiceLevel: Readonly<{src: string, category: string, label: string}>, tetrisowyShvt: Readonly<{src: string, category: string, label: string}>, tetrisowyShvt2: Readonly<{src: string, category: string, label: string}>, tetrisowyShvt3: Readonly<{src: string, category: string, label: string}>}>} soundFiles
      */
     constructor(soundFiles, {
         AudioContextCtor = globalThis.AudioContext ?? globalThis.webkitAudioContext ?? null,

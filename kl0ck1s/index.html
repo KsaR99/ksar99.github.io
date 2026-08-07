@@ -100,22 +100,26 @@
         </button>
     </div>
 
-    <div class="app__board board" data-theme="none">
-        <canvas class="board__canvas" height="920" id="klockis-board" width="460"></canvas>
-        <div class="board__filter" data-theme="none" id="filter-overlay">
-            <canvas class="board__filter-canvas" id="filter-canvas"></canvas>
-        </div>
-        <div class="board__overlay" id="overlay"></div>
-        <div class="board__calibration" data-role="calibration-banner">
-            <p class="board__calibration__instruction" data-field="instruction"></p>
-            <p class="board__calibration__countdown" data-field="countdown"></p>
-            <div class="progress-bar progress-bar--countdown" data-role="calibration-countdown-progress">
-                <div class="progress-bar__fill" data-role="calibration-countdown-progress-bar"></div>
+    <div class="app__board" data-theme="none">
+        <div class="board">
+            <div class="board__stage">
+                <canvas class="board__canvas" height="920" id="klockis-board" width="460"></canvas>
+                <div class="board__filter" data-theme="none" id="filter-overlay">
+                    <canvas class="board__filter-canvas" id="filter-canvas"></canvas>
+                </div>
+                <div class="board__overlay" id="overlay"></div>
+                <div class="board__calibration" data-role="calibration-banner">
+                    <p class="board__calibration__instruction" data-field="instruction"></p>
+                    <p class="board__calibration__countdown" data-field="countdown"></p>
+                    <div class="progress-bar progress-bar--countdown" data-role="calibration-countdown-progress">
+                        <div class="progress-bar__fill" data-role="calibration-countdown-progress-bar"></div>
+                    </div>
+                    <p class="board__calibration__progress" data-field="progress"></p>
+                </div>
+                <div aria-hidden="true" class="board__credits" data-role="credits">
+                    <div class="board__credits__scroll" data-role="credits-scroll"></div>
+                </div>
             </div>
-            <p class="board__calibration__progress" data-field="progress"></p>
-        </div>
-        <div aria-hidden="true" class="board__credits" data-role="credits">
-            <div class="board__credits__scroll" data-role="credits-scroll"></div>
         </div>
     </div>
 

@@ -38,7 +38,8 @@ await i18n.init();
 i18n.applyStatic(document);
 
 const bodyEl = document.querySelector('body');
-const boardDiv = document.querySelector(".board");
+const boardStage = document.querySelector(".board__stage");
+const boardDiv = boardStage.parentElement;
 
 /** @type {HTMLCanvasElement} */
 const boardCanvas = document.getElementById("klockis-board");
@@ -64,7 +65,7 @@ function getSidebarInlineFootprint() {
 
 function getChrome() {
     const bodyStyle = getComputedStyle(document.body);
-    const boardWrapStyle = getComputedStyle(boardDiv.parentElement); // .app__board
+    const boardWrapStyle = getComputedStyle(boardDiv.parentElement);
     const boardStyle = getComputedStyle(boardDiv);
     const appStyle = getComputedStyle(appEl);
 
@@ -113,7 +114,7 @@ const spriteCache = new SpriteCache(KLOCKOMINOS, () => document.createElement("c
 
 const renderer = new Renderer({
     bodyEl,
-    boardEl: boardDiv,
+    boardEl: boardStage,
     ctx,
     boardCanvas,
     nextCtx,
