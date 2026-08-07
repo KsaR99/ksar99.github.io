@@ -42,11 +42,11 @@ const boardDiv = document.querySelector(".board");
 
 /** @type {HTMLCanvasElement} */
 const boardCanvas = document.getElementById("klockis-board");
-const ctx = boardCanvas.getContext("2d");
+const ctx = boardCanvas.getContext("2d", {colorSpace: "display-p3"});
 
 /** @type {HTMLCanvasElement} */
 const nextCanvas = document.getElementById("next-piece-canvas");
-const nextCtx = nextCanvas.getContext("2d");
+const nextCtx = nextCanvas.getContext("2d", {colorSpace: "display-p3"});
 nextCtx.imageSmoothingEnabled = false;
 
 function getSidebarInlineFootprint() {

@@ -91,9 +91,6 @@ export class ShareService {
         return this.game.dom ?? globalThis.document;
     }
 
-    // Reads a color from the active theme's CSS custom properties (set on
-    // <body data-theme="...">) so the card matches whatever the player has
-    // selected, instead of a fixed palette baked into this file.
     _themeColor(name) {
         const dom = this.dom;
         const fallback = THEME_COLOR_FALLBACKS[name] ?? "#ffffff";

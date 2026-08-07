@@ -3,6 +3,7 @@
 import {forEachShapeCell, getTightBounds, lightenOklch, withAlpha} from "../shared/utils.js";
 import {FALL_TRAIL_MAX_ALPHA, HARD_DROP_TRAIL_MAX_ALPHA} from "../game/game-constants.js";
 import {LINE_CLEAR_FLASH_PHASE_FRACTION} from "../shared/config.js";
+import {GHOST_ALPHA, SATURATION_LEVELS} from "./sprite-cache.js";
 
 export class Renderer {
     /**
@@ -127,6 +128,12 @@ export class Renderer {
         return `oklch(from ${color} l calc(c * ${factor}) h)`;
     }
 
+    saturationLevelForRow(y, rows) {
+        if (!this.heightSaturationEnabled) return 0;
+        const distanceFromBottom = (rows - 1) - y;
+        return Math.max(0, Math.min(SATURATION_LEVELS - 1, distanceFromBottom));
+    }
+
     resetBoardTransform() {
         clearTimeout(this._shakeTimer);
         clearTimeout(this._squashTimerA);
@@ -183,28 +190,36 @@ export class Renderer {
         this.bodyEl.dataset.theme = theme || "none";
     }
 
-    drawCell(context, x, y, color, size, {glow = false, ghost = false} = {}) {
+    drawCell(context, x, y, color, size, {glow = false, ghost = false, level = 0} = {}) {
         glow = glow && this.glowEnabled;
 
-        let sprite;
-        let drawSize = size;
-        let offset = 0;
-
-        if (ghost) {
-            sprite = this.spriteCache.getGhost(color, size);
-        } else if (glow) {
-            sprite = this.spriteCache.getGlow(color, size);
-            offset = this.spriteCache.glowPad;
-            drawSize = size + offset * 2;
-        } else {
-            sprite = this.spriteCache.get(color, size);
+        if (glow) {
+            const sprite = this.spriteCache.getGlow(color, size, level);
+            const offset = this.spriteCache.glowPad;
+            const drawSize = size + offset * 2;
+            if (sprite) {
+                context.drawImage(sprite, x * size - offset, y * size - offset, drawSize, drawSize);
+            } else {
+                context.fillStyle = color;
+                context.fillRect(x * size, y * size, size, size);
+            }
+            return;
         }
 
-        if (sprite) {
-            context.drawImage(sprite, x * size - offset, y * size - offset, drawSize, drawSize);
-        } else {
+        const region = this.spriteCache.getRegion(color, size, level);
+        if (!region) {
             context.fillStyle = color;
             context.fillRect(x * size, y * size, size, size);
+            return;
+        }
+
+        if (ghost) {
+            context.save();
+            context.globalAlpha *= GHOST_ALPHA;
+            context.drawImage(region.image, region.sx, region.sy, region.sw, region.sh, x * size, y * size, size, size);
+            context.restore();
+        } else {
+            context.drawImage(region.image, region.sx, region.sy, region.sw, region.sh, x * size, y * size, size, size);
         }
     }
 
@@ -241,7 +256,7 @@ export class Renderer {
         for (let y = 0; y < board.rows; y++) {
             for (let x = 0; x < board.cols; x++) {
                 const colorIndex = board.colors[y * board.cols + x];
-                if (colorIndex) this.drawCell(bgCtx, x, y, this.colorForRow(this.colorPalette[colorIndex], y, board.rows), size);
+                if (colorIndex) this.drawCell(bgCtx, x, y, this.colorPalette[colorIndex], size, {level: this.saturationLevelForRow(y, board.rows)});
             }
         }
 
@@ -282,7 +297,7 @@ export class Renderer {
             }
             for (let x = 0; x < board.cols; x++) {
                 const colorIndex = board.colors[y * board.cols + x];
-                if (colorIndex) this.drawCell(sCtx, x, localY, this.colorForRow(this.colorPalette[colorIndex], y, board.rows), size);
+                if (colorIndex) this.drawCell(sCtx, x, localY, this.colorPalette[colorIndex], size, {level: this.saturationLevelForRow(y, board.rows)});
             }
         }
 
@@ -333,7 +348,8 @@ export class Renderer {
             for (let x = 0; x < board.cols; x++) {
                 const colorIndex = board.colors[y * board.cols + x];
                 if (!colorIndex) continue;
-                this.drawCell(ctx, x, yPos, this.colorForRow(this.colorPalette[colorIndex], yPos, board.rows), size);
+                const level = this.saturationLevelForRow(Math.round(yPos), board.rows);
+                this.drawCell(ctx, x, yPos, this.colorPalette[colorIndex], size, {level});
             }
         }
 
@@ -371,8 +387,8 @@ export class Renderer {
         forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
             const y = piece.y + r;
             if (y < 0) return;
-            const color = board ? this.colorForRow(piece.color, y, board.rows) : piece.color;
-            this.drawCell(this.ctx, piece.x + c, y, color, size, {glow: true});
+            const level = board ? this.saturationLevelForRow(y, board.rows) : 0;
+            this.drawCell(this.ctx, piece.x + c, y, piece.color, size, {glow: true, level});
         });
     }
 

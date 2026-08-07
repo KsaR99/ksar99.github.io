@@ -1,7 +1,54 @@
 "use strict";
 
 const GLOW_BLUR_RATIO = 0.1;
-const GHOST_ALPHA = 0.3;
+export const GHOST_ALPHA = 0.3;
+
+export const SATURATION_STEP = 0.05;
+export const SATURATION_LEVELS = Math.round(1 / SATURATION_STEP) + 1; // 21
+
+const MAX_DYNAMIC_ATLAS_ROWS = 32;
+
+export function factorForLevel(level) {
+    return Math.max(0, 1 - level * SATURATION_STEP);
+}
+
+export function colorForLevel(color, level) {
+    if (level <= 0) return color;
+    return `oklch(from ${color} l calc(c * ${factorForLevel(level)}) h)`;
+}
+
+function paintBlock(spriteCtx, ox, oy, size, color) {
+    const bevel = Math.max(1.5, Math.round(size * 0.16));
+
+    spriteCtx.fillStyle = color;
+    spriteCtx.fillRect(ox, oy, size, size);
+
+    spriteCtx.fillStyle = "oklch(1 0 0 / 0.5)";
+    spriteCtx.beginPath();
+    spriteCtx.moveTo(ox, oy);
+    spriteCtx.lineTo(ox + size, oy);
+    spriteCtx.lineTo(ox + size - bevel, oy + bevel);
+    spriteCtx.lineTo(ox + bevel, oy + bevel);
+    spriteCtx.lineTo(ox + bevel, oy + size - bevel);
+    spriteCtx.lineTo(ox, oy + size);
+    spriteCtx.closePath();
+    spriteCtx.fill();
+
+    spriteCtx.fillStyle = "oklch(0 0 0 /  0.5)";
+    spriteCtx.beginPath();
+    spriteCtx.moveTo(ox + size, oy);
+    spriteCtx.lineTo(ox + size, oy + size);
+    spriteCtx.lineTo(ox, oy + size);
+    spriteCtx.lineTo(ox + bevel, oy + size - bevel);
+    spriteCtx.lineTo(ox + size - bevel, oy + size - bevel);
+    spriteCtx.lineTo(ox + size - bevel, oy + bevel);
+    spriteCtx.closePath();
+    spriteCtx.fill();
+
+    spriteCtx.strokeStyle = "oklch(0 0 0 / 0.6)";
+    spriteCtx.lineWidth = 1;
+    spriteCtx.strokeRect(ox + 0.5, oy + 0.5, size - 1, size - 1);
+}
 
 export function createBlockSprite(color, size, canvasFactory = () => document.createElement("canvas")) {
     const sprite = canvasFactory();
@@ -11,36 +58,7 @@ export function createBlockSprite(color, size, canvasFactory = () => document.cr
     const spriteCtx = sprite.getContext("2d", {colorSpace: "display-p3"});
     spriteCtx.imageSmoothingEnabled = false;
 
-    const bevel = Math.max(1.5, Math.round(size * 0.16));
-
-    spriteCtx.fillStyle = color;
-    spriteCtx.fillRect(0, 0, size, size);
-
-    spriteCtx.fillStyle = "oklch(1 0 0 / 0.5)";
-    spriteCtx.beginPath();
-    spriteCtx.moveTo(0, 0);
-    spriteCtx.lineTo(size, 0);
-    spriteCtx.lineTo(size - bevel, bevel);
-    spriteCtx.lineTo(bevel, bevel);
-    spriteCtx.lineTo(bevel, size - bevel);
-    spriteCtx.lineTo(0, size);
-    spriteCtx.closePath();
-    spriteCtx.fill();
-
-    spriteCtx.fillStyle = "oklch(0 0 0 /  0.5)";
-    spriteCtx.beginPath();
-    spriteCtx.moveTo(size, 0);
-    spriteCtx.lineTo(size, size);
-    spriteCtx.lineTo(0, size);
-    spriteCtx.lineTo(bevel, size - bevel);
-    spriteCtx.lineTo(size - bevel, size - bevel);
-    spriteCtx.lineTo(size - bevel, bevel);
-    spriteCtx.closePath();
-    spriteCtx.fill();
-
-    spriteCtx.strokeStyle = "oklch(0 0 0 / 0.6)";
-    spriteCtx.lineWidth = 1;
-    spriteCtx.strokeRect(0.5, 0.5, size - 1, size - 1);
+    paintBlock(spriteCtx, 0, 0, size, color);
 
     return sprite;
 }
@@ -107,47 +125,63 @@ export function createGlowSprite(color, size, canvasFactory = () => document.cre
     return sprite;
 }
 
-export function createGhostSprite(color, size, canvasFactory = () => document.createElement("canvas")) {
-    const base = createBlockSprite(color, size, canvasFactory);
-
-    const sprite = canvasFactory();
-    sprite.width = size;
-    sprite.height = size;
-
-    const spriteCtx = sprite.getContext("2d", {colorSpace: "display-p3"});
-    spriteCtx.imageSmoothingEnabled = false;
-    spriteCtx.globalAlpha = GHOST_ALPHA;
-    spriteCtx.drawImage(base, 0, 0);
-
-    return sprite;
-}
-
 export class SpriteCache {
     constructor(klockominos, canvasFactory) {
         this.klockominos = klockominos;
         this.canvasFactory = canvasFactory;
         this.size = 0;
         this.glowPad = 0;
-        this.sprites = new Map();
+        this.atlas = null;
+        this.atlasRows = new Map();
         this.glowSprites = new Map();
-        this.ghostSprites = new Map();
         this.gridCellSprite = null;
     }
 
     rebuild(size) {
         this.size = size;
         this.glowPad = Math.ceil(size * GLOW_BLUR_RATIO);
-        this.sprites.clear();
         this.glowSprites.clear();
-        this.ghostSprites.clear();
         this.gridCellSprite = createGridCellSprite(this.size, this.canvasFactory);
 
-        const colors = new Set(Object.values(this.klockominos).map(({color}) => color));
-        colors.forEach((color) => {
-            this.sprites.set(color, createBlockSprite(color, this.size, this.canvasFactory));
-            this.glowSprites.set(color, createGlowSprite(color, this.size, this.canvasFactory));
-            this.ghostSprites.set(color, createGhostSprite(color, this.size, this.canvasFactory));
-        });
+        const colors = [...new Set(Object.values(this.klockominos).map(({color}) => color))];
+        this.atlasRows = new Map(colors.map((color, row) => [color, row]));
+
+        this.atlas = this.canvasFactory();
+        this.atlas.width = size * SATURATION_LEVELS;
+        this.atlas.height = size * Math.max(1, colors.length);
+
+        const atlasCtx = this.atlas.getContext("2d", {colorSpace: "display-p3"});
+        atlasCtx.imageSmoothingEnabled = false;
+
+        colors.forEach((color, row) => this._paintRow(atlasCtx, row, color));
+    }
+
+    _paintRow(atlasCtx, row, color) {
+        for (let level = 0; level < SATURATION_LEVELS; level++) {
+            paintBlock(atlasCtx, level * this.size, row * this.size, this.size, colorForLevel(color, level));
+        }
+    }
+
+    _rowFor(color) {
+        let row = this.atlasRows.get(color);
+        if (row !== undefined) return row;
+
+        if (this.atlasRows.size >= MAX_DYNAMIC_ATLAS_ROWS) return null;
+
+        row = this.atlasRows.size;
+        const neededHeight = (row + 1) * this.size;
+        if (this.atlas.height < neededHeight) {
+            const grown = this.canvasFactory();
+            grown.width = this.atlas.width;
+            grown.height = neededHeight;
+            const growCtx = grown.getContext("2d", {colorSpace: "display-p3"});
+            growCtx.imageSmoothingEnabled = false;
+            growCtx.drawImage(this.atlas, 0, 0);
+            this.atlas = grown;
+        }
+        this.atlasRows.set(color, row);
+        this._paintRow(this.atlas.getContext("2d", {colorSpace: "display-p3"}), row, color);
+        return row;
     }
 
     getGridCell(currentSize) {
@@ -155,27 +189,21 @@ export class SpriteCache {
         return this.gridCellSprite;
     }
 
-    get(color, currentSize) {
+    getRegion(color, currentSize, level = 0) {
         if (this.size !== currentSize) this.rebuild(currentSize);
-        if (!this.sprites.has(color)) {
-            this.sprites.set(color, createBlockSprite(color, this.size, this.canvasFactory));
-        }
-        return this.sprites.get(color);
+        const row = this._rowFor(color);
+        if (row === null) return null;
+        const col = Math.min(SATURATION_LEVELS - 1, Math.max(0, level));
+        return {image: this.atlas, sx: col * this.size, sy: row * this.size, sw: this.size, sh: this.size};
     }
 
-    getGlow(color, currentSize) {
+    getGlow(color, currentSize, level = 0) {
         if (this.size !== currentSize) this.rebuild(currentSize);
-        if (!this.glowSprites.has(color)) {
-            this.glowSprites.set(color, createGlowSprite(color, this.size, this.canvasFactory));
+        const key = level ? `${color}|${level}` : color;
+        if (!this.glowSprites.has(key)) {
+            const resolvedColor = level ? colorForLevel(color, level) : color;
+            this.glowSprites.set(key, createGlowSprite(resolvedColor, this.size, this.canvasFactory));
         }
-        return this.glowSprites.get(color);
-    }
-
-    getGhost(color, currentSize) {
-        if (this.size !== currentSize) this.rebuild(currentSize);
-        if (!this.ghostSprites.has(color)) {
-            this.ghostSprites.set(color, createGhostSprite(color, this.size, this.canvasFactory));
-        }
-        return this.ghostSprites.get(color);
+        return this.glowSprites.get(key);
     }
 }
