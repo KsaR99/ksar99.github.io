@@ -19,7 +19,7 @@ export class SettingsController {
             ghost: true,
             gridLines: true,
             screenShake: true,
-            heightSaturation: true,
+            heightSaturation: false,
             skipCountdown: false,
             skipModeInfo: false,
             mouseControl: false,
