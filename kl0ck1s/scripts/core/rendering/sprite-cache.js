@@ -135,12 +135,14 @@ export class SpriteCache {
         this.atlasRows = new Map();
         this.glowSprites = new Map();
         this.gridCellSprite = null;
+        this._warmedGlowLevels = 0;
     }
 
     rebuild(size) {
         this.size = size;
         this.glowPad = Math.ceil(size * GLOW_BLUR_RATIO);
         this.glowSprites.clear();
+        this._warmedGlowLevels = 0;
         this.gridCellSprite = createGridCellSprite(this.size, this.canvasFactory);
 
         const colors = [...new Set(Object.values(this.klockominos).map(({color}) => color))];
@@ -182,6 +184,37 @@ export class SpriteCache {
         this.atlasRows.set(color, row);
         this._paintRow(this.atlas.getContext("2d", {colorSpace: "display-p3"}), row, color);
         return row;
+    }
+
+    /**
+     * Pre-paints glow sprites for every klockomino color, up front, instead of
+     * letting getGlow() build them one-by-one the first time each color+level
+     * combo is actually needed by a falling piece. Without this, the first
+     * synchronous createGlowSprite() (canvas + shadowBlur) for a never-seen
+     * combo happens mid-frame during real gameplay - cheap to absorb when
+     * pieces fall slowly, but visible as a stutter on fast difficulties like
+     * "pro" (20G), where new color/height combos keep showing up while the
+     * game itself is already running flat out.
+     *
+     * Idempotent and incremental: only fills in whatever hasn't been warmed
+     * yet for the requested size/level range, so it's cheap to call again
+     * after a resize or after height-saturation gets toggled on.
+     */
+    warmGlow(size, saturationEnabled) {
+        if (this.size !== size) this.rebuild(size);
+
+        const levels = saturationEnabled ? SATURATION_LEVELS : 1;
+        if (levels <= this._warmedGlowLevels) return;
+
+        for (const color of this.atlasRows.keys()) {
+            for (let level = this._warmedGlowLevels; level < levels; level++) {
+                const key = level ? `${color}|${level}` : color;
+                if (this.glowSprites.has(key)) continue;
+                const resolvedColor = level ? colorForLevel(color, level) : color;
+                this.glowSprites.set(key, createGlowSprite(resolvedColor, this.size, this.canvasFactory));
+            }
+        }
+        this._warmedGlowLevels = levels;
     }
 
     getGridCell(currentSize) {

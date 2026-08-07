@@ -244,6 +244,8 @@ export class Renderer {
 
         if (!dirty) return;
 
+        this.spriteCache.warmGlow(size, this.heightSaturationEnabled);
+
         const width = board.cols * size;
         const height = board.rows * size;
         if (this.backgroundCanvas.width !== width) this.backgroundCanvas.width = width;
