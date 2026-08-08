@@ -47,7 +47,12 @@
             "hint": "Moeilijkheidsgraad",
             "modeHint": "Modus",
             "startButton": "Start",
-            "namePlaceholder": "Jouw bijnaam"
+            "namePlaceholder": "Jouw bijnaam",
+            "newProfileOption": "+ Nieuw profiel",
+            "profileSelectLabel": "Profiel wisselen",
+            "deleteProfileButton": "Profiel verwijderen",
+            "deleteProfileConfirm": "Profiel {name} verwijderen? Je kunt het 7 dagen lang herstellen.",
+            "restoreProfileGroup": "Profiel herstellen"
         },
         "modeInfo": {
             "subtitle": "Modus: {mode}",

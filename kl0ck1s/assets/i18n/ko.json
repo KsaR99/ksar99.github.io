@@ -47,7 +47,12 @@
             "hint": "난이도",
             "modeHint": "모드",
             "startButton": "시작",
-            "namePlaceholder": "닉네임"
+            "namePlaceholder": "닉네임",
+            "newProfileOption": "+ 새 프로필",
+            "profileSelectLabel": "프로필 전환",
+            "deleteProfileButton": "프로필 삭제",
+            "deleteProfileConfirm": "{name} 프로필을 삭제할까요? 7일 동안 복구할 수 있어요.",
+            "restoreProfileGroup": "프로필 복구"
         },
         "modeInfo": {
             "subtitle": "모드: {mode}",

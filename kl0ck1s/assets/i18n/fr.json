@@ -47,7 +47,12 @@
             "hint": "Difficulté",
             "modeHint": "Mode",
             "startButton": "Démarrer",
-            "namePlaceholder": "Ton pseudo"
+            "namePlaceholder": "Ton pseudo",
+            "newProfileOption": "+ Nouveau profil",
+            "profileSelectLabel": "Changer de profil",
+            "deleteProfileButton": "Supprimer le profil",
+            "deleteProfileConfirm": "Supprimer le profil {name} ? Tu pourras le restaurer pendant 7 jours.",
+            "restoreProfileGroup": "Restaurer un profil"
         },
         "modeInfo": {
             "subtitle": "Mode : {mode}",

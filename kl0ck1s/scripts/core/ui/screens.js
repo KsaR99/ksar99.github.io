@@ -25,6 +25,40 @@ function fillModeDescription(container, selectedMode, i18n) {
     container.textContent = `💡 ${i18n.t(`modes.${selectedMode}.description`)}`;
 }
 
+function fillProfileSelect(dom, select, profiles, current, i18n, trash = []) {
+    if (!select) return;
+    select.innerHTML = "";
+
+    const names = [...profiles];
+    if (current && !names.includes(current)) names.unshift(current);
+
+    names.forEach((name) => {
+        const option = dom.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+    });
+
+    const newOption = dom.createElement("option");
+    newOption.value = "";
+    newOption.textContent = i18n.t("screens.idle.newProfileOption");
+    select.appendChild(newOption);
+
+    if (trash.length) {
+        const group = dom.createElement("optgroup");
+        group.label = i18n.t("screens.idle.restoreProfileGroup");
+        trash.forEach((entry) => {
+            const option = dom.createElement("option");
+            option.value = `restore:${entry.name}`;
+            option.textContent = entry.name;
+            group.appendChild(option);
+        });
+        select.appendChild(group);
+    }
+
+    select.value = current && names.includes(current) ? current : "";
+}
+
 function fillSoundRows(dom, container, keys, soundVolumes, i18n) {
     keys.forEach((key) => {
         const row = clone(dom, "tpl-options-sound-row").querySelector('[data-role="sound-row"]');
@@ -178,12 +212,14 @@ export const Screens = {
         return screen;
     },
 
-    idle(list, selectedDifficulty, difficulties, selectedMode, gameModes, renderLeaderboard, dom = document, i18n, playerName = "") {
+    idle(list, selectedDifficulty, difficulties, selectedMode, gameModes, renderLeaderboard, dom = document, i18n, playerName = "", profiles = [], trash = []) {
         const screen = clone(dom, "tpl-screen-idle");
         fillDifficultyCarousel(screen.querySelector('[data-role="difficulty-select"]'), selectedDifficulty, difficulties, i18n);
         fillModeCarousel(screen.querySelector('[data-role="mode-select"]'), selectedMode, i18n);
         fillModeDescription(screen.querySelector('[data-field="modeDescription"]'), selectedMode, i18n);
         screen.querySelector('[data-role="name-input"]').value = playerName;
+        fillProfileSelect(dom, screen.querySelector('[data-role="profile-select"]'), profiles, playerName, i18n, trash);
+        screen.querySelector('[data-role="delete-profile-button"]').disabled = !playerName;
         screen.querySelector('[data-field="leaderboard"]').appendChild(renderLeaderboard(list));
         i18n.applyStatic(screen);
         return screen;
@@ -457,12 +493,14 @@ export const Screens = {
         return screen;
     },
 
-    gameOverSaved(list, highlightEntry, renderLeaderboard, selectedDifficulty, difficulties, selectedMode, gameModes, dom = document, i18n, playerName = "") {
+    gameOverSaved(list, highlightEntry, renderLeaderboard, selectedDifficulty, difficulties, selectedMode, gameModes, dom = document, i18n, playerName = "", profiles = [], trash = []) {
         const screen = clone(dom, "tpl-screen-gameover-saved");
         fillDifficultyCarousel(screen.querySelector('[data-role="difficulty-select"]'), selectedDifficulty, difficulties, i18n);
         fillModeCarousel(screen.querySelector('[data-role="mode-select"]'), selectedMode, i18n);
         fillModeDescription(screen.querySelector('[data-field="modeDescription"]'), selectedMode, i18n);
         screen.querySelector('[data-role="name-input"]').value = playerName;
+        fillProfileSelect(dom, screen.querySelector('[data-role="profile-select"]'), profiles, playerName, i18n, trash);
+        screen.querySelector('[data-role="delete-profile-button"]').disabled = !playerName;
         screen.querySelector('[data-field="leaderboard"]').appendChild(renderLeaderboard(list, highlightEntry));
         i18n.applyStatic(screen);
         return screen;

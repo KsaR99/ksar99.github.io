@@ -6,7 +6,12 @@ export class Leaderboard {
     static SCORES_KEY = "klockis-scores";
     static NAME_KEY = "klockis-last-name";
     static TODAY_BEST_KEY = "klockis-today-best";
+    static PROFILES_KEY = "klockis-profiles";
+    static PROFILE_SETTINGS_KEY = "klockis-profile-settings";
+    static PROFILE_TRASH_KEY = "klockis-profile-trash";
     static MAX_ENTRIES = 10;
+    static MAX_PROFILES = 12;
+    static PROFILE_TRASH_RETENTION_MS = 7 * 24 * 60 * 60 * 1000;
 
     constructor(store, dom = globalThis.document ?? null, i18n = null) {
         this.store = store;
@@ -15,6 +20,163 @@ export class Leaderboard {
         this.cache = [];
         this.lastNameCache = "";
         this.todayBestCache = null;
+        this.profile = "";
+        this.profiles = [];
+        this.trash = [];
+    }
+
+    scoresKey() {
+        return this.profile ? `${Leaderboard.SCORES_KEY}::${this.profile}` : Leaderboard.SCORES_KEY;
+    }
+
+    profileSettingsKey(name) {
+        return `${Leaderboard.PROFILE_SETTINGS_KEY}::${name}`;
+    }
+
+    async migrateLegacyScores() {
+        if (!this.profile) return;
+        const existing = await this.store.get(this.scoresKey());
+        if (existing) return;
+
+        const legacy = await this.store.get(Leaderboard.SCORES_KEY);
+        if (!legacy) return;
+
+        await this.store.set(this.scoresKey(), legacy);
+        await this.store.delete(Leaderboard.SCORES_KEY);
+    }
+
+    async loadProfiles() {
+        try {
+            const raw = await this.store.get(Leaderboard.PROFILES_KEY);
+            const parsed = raw ? JSON.parse(raw) : [];
+            this.profiles = Array.isArray(parsed) ? parsed : [];
+        } catch {
+            this.profiles = [];
+        }
+        return this.profiles;
+    }
+
+    async rememberProfile(name) {
+        if (!name) return this.profiles;
+        const others = this.profiles.filter((n) => n !== name);
+        this.profiles = [name, ...others].slice(0, Leaderboard.MAX_PROFILES);
+        await this.store.set(Leaderboard.PROFILES_KEY, JSON.stringify(this.profiles));
+        return this.profiles;
+    }
+
+    async switchProfile(name) {
+        this.profile = name;
+        await this.setLastName(name);
+        if (this.trash.some((entry) => entry.name === name)) {
+            this.trash = this.trash.filter((entry) => entry.name !== name);
+            await this.store.set(Leaderboard.PROFILE_TRASH_KEY, JSON.stringify(this.trash));
+        }
+        await this.rememberProfile(name);
+        await this.load();
+        return this.cache;
+    }
+
+    async renameProfile(oldName, newName) {
+        const trimmed = (newName || "").trim();
+        if (!trimmed || trimmed === oldName) return this.profile;
+
+        if (this.profiles.includes(trimmed)) {
+            return this.switchProfile(trimmed);
+        }
+
+        const oldScoresKey = oldName ? `${Leaderboard.SCORES_KEY}::${oldName}` : Leaderboard.SCORES_KEY;
+        const scores = await this.store.get(oldScoresKey);
+        if (scores) {
+            await this.store.set(`${Leaderboard.SCORES_KEY}::${trimmed}`, scores);
+            await this.store.delete(oldScoresKey);
+        }
+
+        const settings = await this.store.get(this.profileSettingsKey(oldName));
+        if (settings) {
+            await this.store.set(this.profileSettingsKey(trimmed), settings);
+            await this.store.delete(this.profileSettingsKey(oldName));
+        }
+
+        this.profiles = this.profiles.map((n) => (n === oldName ? trimmed : n));
+        await this.store.set(Leaderboard.PROFILES_KEY, JSON.stringify(this.profiles));
+
+        this.profile = trimmed;
+        await this.setLastName(trimmed);
+        await this.load();
+        return trimmed;
+    }
+
+    async loadProfileSettings(name) {
+        try {
+            const raw = await this.store.get(this.profileSettingsKey(name));
+            return raw ? JSON.parse(raw) : null;
+        } catch {
+            return null;
+        }
+    }
+
+    async saveProfileSettings(name, data) {
+        if (!name) return;
+        await this.store.set(this.profileSettingsKey(name), JSON.stringify(data));
+    }
+
+    async loadTrash() {
+        let entries = [];
+        try {
+            const raw = await this.store.get(Leaderboard.PROFILE_TRASH_KEY);
+            const parsed = raw ? JSON.parse(raw) : [];
+            entries = Array.isArray(parsed) ? parsed : [];
+        } catch {
+            entries = [];
+        }
+
+        const now = Date.now();
+        const active = [];
+        const expired = [];
+        entries.forEach((entry) => {
+            if (!entry || typeof entry.name !== "string") return;
+            if (now - entry.deletedAt < Leaderboard.PROFILE_TRASH_RETENTION_MS) {
+                active.push(entry);
+            } else {
+                expired.push(entry);
+            }
+        });
+
+        if (expired.length) {
+            await Promise.all(expired.map((entry) => this.purgeProfileData(entry.name)));
+            await this.store.set(Leaderboard.PROFILE_TRASH_KEY, JSON.stringify(active));
+        }
+
+        this.trash = active;
+        return this.trash;
+    }
+
+    async purgeProfileData(name) {
+        await this.store.delete(`${Leaderboard.SCORES_KEY}::${name}`);
+        await this.store.delete(this.profileSettingsKey(name));
+    }
+
+    async deleteProfile(name) {
+        if (!name) return;
+
+        this.profiles = this.profiles.filter((n) => n !== name);
+        await this.store.set(Leaderboard.PROFILES_KEY, JSON.stringify(this.profiles));
+
+        this.trash = [{name, deletedAt: Date.now()}, ...this.trash.filter((entry) => entry.name !== name)];
+        await this.store.set(Leaderboard.PROFILE_TRASH_KEY, JSON.stringify(this.trash));
+
+        if (this.profile === name) {
+            this.profile = "";
+            this.cache = [];
+            await this.setLastName("");
+        }
+    }
+
+    async restoreProfile(name) {
+        if (!name) return;
+        this.trash = this.trash.filter((entry) => entry.name !== name);
+        await this.store.set(Leaderboard.PROFILE_TRASH_KEY, JSON.stringify(this.trash));
+        await this.rememberProfile(name);
     }
 
     isToday(iso) {
@@ -68,7 +230,7 @@ export class Leaderboard {
 
     async load() {
         try {
-            const raw = await this.store.get(Leaderboard.SCORES_KEY);
+            const raw = await this.store.get(this.scoresKey());
             const parsed = raw ? JSON.parse(raw) : [];
             this.cache = Array.isArray(parsed) ? parsed : [];
         } catch {
@@ -95,13 +257,14 @@ export class Leaderboard {
         });
 
         this.cache = trimmed;
-        await this.store.set(Leaderboard.SCORES_KEY, JSON.stringify(this.cache));
+        await this.store.set(this.scoresKey(), JSON.stringify(this.cache));
 
         return this.forMode(this.entryMode(entry));
     }
 
     async loadLastName() {
         this.lastNameCache = (await this.store.get(Leaderboard.NAME_KEY)) || "";
+        this.profile = this.lastNameCache;
         return this.lastNameCache;
     }
 

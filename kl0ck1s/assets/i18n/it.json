@@ -47,7 +47,12 @@
             "hint": "Difficoltà",
             "modeHint": "Modalità",
             "startButton": "Avvia",
-            "namePlaceholder": "Il tuo nickname"
+            "namePlaceholder": "Il tuo nickname",
+            "newProfileOption": "+ Nuovo profilo",
+            "profileSelectLabel": "Cambia profilo",
+            "deleteProfileButton": "Elimina profilo",
+            "deleteProfileConfirm": "Eliminare il profilo {name}? Potrai ripristinarlo entro 7 giorni.",
+            "restoreProfileGroup": "Ripristina profilo"
         },
         "modeInfo": {
             "subtitle": "Modalità: {mode}",

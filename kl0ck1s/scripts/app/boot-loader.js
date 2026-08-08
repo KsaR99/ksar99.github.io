@@ -68,7 +68,7 @@ export class BootLoader {
             rootEl.classList.add("boot-screen--hidden");
             rootEl.addEventListener("transitionend", () => rootEl.remove(), {once: true});
             // Fallback in case transitionend doesn't fire (e.g. reduced motion, display:none races).
-            setTimeout(() => rootEl.remove(), 700);
+            setTimeout(() => rootEl.remove(), 350);
         });
     }
 }

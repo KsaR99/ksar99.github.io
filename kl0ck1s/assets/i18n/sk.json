@@ -47,7 +47,12 @@
             "hint": "Obtiažnosť",
             "modeHint": "Režim",
             "startButton": "Štart",
-            "namePlaceholder": "Tvoja prezývka"
+            "namePlaceholder": "Tvoja prezývka",
+            "newProfileOption": "+ Nový profil",
+            "profileSelectLabel": "Prepnúť profil",
+            "deleteProfileButton": "Odstrániť profil",
+            "deleteProfileConfirm": "Odstrániť profil {name}? Bude možné ho obnoviť počas 7 dní.",
+            "restoreProfileGroup": "Obnoviť profil"
         },
         "modeInfo": {
             "subtitle": "Režim: {mode}",

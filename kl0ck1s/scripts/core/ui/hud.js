@@ -22,8 +22,6 @@ export class HUD {
      * @param {HTMLElement} [elements.objectiveRowEl]
      * @param {HTMLElement} [elements.objectiveBarEl]
      * @param {HTMLElement} [elements.objectiveBarTrackEl]
-     * @param {HTMLElement} [elements.settingsShortcutMenuEl]
-     * @param {HTMLElement} [elements.settingsShortcutGameEl]
      */
     constructor({
                     scoreEl, linesEl, bestEl, overlayEl,
@@ -32,7 +30,6 @@ export class HUD {
                     timeEl = null, droughtEl = null, tetrisRateEl = null, ppsEl = null,
                     objectiveEl = null, objectiveRowEl = null,
                     objectiveBarEl = null, objectiveBarTrackEl = null, linesRowEl = null,
-                    settingsShortcutMenuEl = null, settingsShortcutGameEl = null,
                 }) {
         this.scoreEl = scoreEl;
         this.linesEl = linesEl;
@@ -53,8 +50,6 @@ export class HUD {
         this.objectiveRowEl = objectiveRowEl;
         this.objectiveBarEl = objectiveBarEl;
         this.objectiveBarTrackEl = objectiveBarTrackEl;
-        this.settingsShortcutMenuEl = settingsShortcutMenuEl;
-        this.settingsShortcutGameEl = settingsShortcutGameEl;
 
         this._cache = {
             score: undefined,
@@ -99,12 +94,6 @@ export class HUD {
 
         if (this.nextPieceCardEl) {
             this.nextPieceCardEl.classList.toggle("card--hidden", !isPlaying);
-        }
-        if (this.settingsShortcutMenuEl) {
-            this.settingsShortcutMenuEl.classList.toggle("card--hidden", isPlaying);
-        }
-        if (this.settingsShortcutGameEl) {
-            this.settingsShortcutGameEl.classList.toggle("card--hidden", !isPlaying);
         }
         if (this.statsStatusEl) {
             const text = this.i18n

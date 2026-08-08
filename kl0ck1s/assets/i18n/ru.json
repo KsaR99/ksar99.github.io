@@ -47,7 +47,12 @@
             "hint": "Сложность",
             "modeHint": "Режим",
             "startButton": "Старт",
-            "namePlaceholder": "Ваш ник"
+            "namePlaceholder": "Ваш ник",
+            "newProfileOption": "+ Новый профиль",
+            "profileSelectLabel": "Сменить профиль",
+            "deleteProfileButton": "Удалить профиль",
+            "deleteProfileConfirm": "Удалить профиль {name}? Его можно будет восстановить в течение 7 дней.",
+            "restoreProfileGroup": "Восстановить профиль"
         },
         "modeInfo": {
             "subtitle": "Режим: {mode}",

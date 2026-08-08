@@ -22,6 +22,7 @@ import {SensitivityCalibrationController} from "../controllers/sensitivity-calib
 import {KeyboardCalibrationController} from "../controllers/keyboard-calibration-controller.js";
 import {MusicDirector} from "../services/music-director.js";
 import {ShareService} from "../services/share-service.js";
+import {ConfirmDialog} from "../services/confirm-dialog.js";
 import {BenchmarkController} from "../controllers/benchmark-controller.js";
 
 /** Resolves after the browser has had a chance to paint the current frame. */
@@ -159,6 +160,8 @@ export class Game {
         this.keyboardCalibrationController = new KeyboardCalibrationController(this);
         this.musicDirector = new MusicDirector(this.soundManager);
         this.shareService = new ShareService(this);
+        this.confirmDialog = new ConfirmDialog(this.dom);
+        this.confirmDialog.bind();
         this.benchmarkController = new BenchmarkController(this);
 
         this.settings = this.settingsController.defaultSettings();

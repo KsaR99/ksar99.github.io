@@ -47,7 +47,12 @@
             "hint": "Dificultad",
             "modeHint": "Modo",
             "startButton": "Iniciar",
-            "namePlaceholder": "Tu apodo"
+            "namePlaceholder": "Tu apodo",
+            "newProfileOption": "+ Nuevo perfil",
+            "profileSelectLabel": "Cambiar de perfil",
+            "deleteProfileButton": "Eliminar perfil",
+            "deleteProfileConfirm": "¿Eliminar el perfil {name}? Podrás restaurarlo durante 7 días.",
+            "restoreProfileGroup": "Restaurar perfil"
         },
         "modeInfo": {
             "subtitle": "Modo: {mode}",

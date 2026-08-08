@@ -10,9 +10,9 @@
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+Mono:wght@100..900&display=swap"
         rel="stylesheet"
     >
-    <link href="styles/main.css?v=37" rel="stylesheet">
-    <link href="styles/mobile.css?v=37" media="(width < 48rem)" rel="stylesheet">
-    <link href="styles/desktop.css?v=37" media="(width >= 48rem)" rel="stylesheet">
+    <link href="styles/main.css?v=38" rel="stylesheet">
+    <link href="styles/mobile.css?v=38" media="(width < 48rem)" rel="stylesheet">
+    <link href="styles/desktop.css?v=38" media="(width >= 48rem)" rel="stylesheet">
     <meta content="notranslate" name="google">
     <meta content="https://github.com/KsaR99" name="author">
     <meta content="index, follow" name="robots">
@@ -26,6 +26,19 @@
             <div class="boot-screen__bar-fill" id="boot-bar-fill"></div>
         </div>
         <p class="boot-screen__status" id="boot-status">&nbsp;</p>
+    </div>
+</div>
+<div class="confirm-overlay" data-role="confirm-overlay" hidden>
+    <div aria-modal="true" class="confirm-dialog" data-role="confirm-dialog" role="alertdialog">
+        <p class="confirm-dialog__message" data-field="confirm-message"></p>
+        <div class="confirm-dialog__actions screen__button-row">
+            <button class="button button--primary" data-i18n="controls.cancel" data-role="confirm-cancel-button"
+                    type="button">Cancel
+            </button>
+            <button class="button button--accent" data-i18n="controls.confirm" data-role="confirm-ok-button"
+                    type="button">Confirm
+            </button>
+        </div>
     </div>
 </div>
 <div class="app" id="app-root">
@@ -47,13 +60,22 @@
         <div class="card">
             <p class="brand__title" data-role="brand-title">Kl0ck1<span class="brand__title-flip"
                                                                         data-role="brand-title-flip">'s</span></p>
-            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.13.2-alpha</p>
+            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.14-alpha</p>
+            <div class="settings-shortcut-row">
+                <button aria-label="Mute sound" aria-pressed="false" class="settings-shortcut-icon"
+                        data-role="mute-toggle" type="button">
+                    <span aria-hidden="true" data-role="mute-toggle-icon">🔊</span>
+                </button>
+                <button aria-label="Fullscreen" aria-pressed="false" class="settings-shortcut-icon"
+                        data-role="fullscreen-toggle" type="button">
+                    <span aria-hidden="true">⛶</span>
+                </button>
+                <button aria-label="Options" class="settings-shortcut-icon" data-role="settings-shortcut"
+                        type="button">
+                    <span aria-hidden="true">⚙️</span>
+                </button>
+            </div>
         </div>
-
-        <button aria-label="Options" class="settings-shortcut" data-i18n-title="controls.options"
-                data-role="settings-shortcut-menu" type="button">
-            <span aria-hidden="true">⚙️</span> <span data-i18n="controls.options">Options</span>
-        </button>
 
         <div class="card stats" data-role="stats-card">
             <p class="stats__status" data-i18n="sidebar.statusLast" data-role="stats-status">Last game</p>
@@ -103,11 +125,6 @@
             <h3 class="card__title" data-i18n="sidebar.nextPiece">Next piece</h3>
             <canvas class="next-piece__canvas" height="120" id="next-piece-canvas" width="120"></canvas>
         </div>
-
-        <button aria-label="Options" class="settings-shortcut card--hidden" data-i18n-title="controls.options"
-                data-role="settings-shortcut-game" type="button">
-            <span aria-hidden="true">⚙️</span> <span data-i18n="controls.options">Options</span>
-        </button>
     </div>
 
     <div class="app__board" data-theme="none">
@@ -183,11 +200,17 @@
             </button>
         </div>
         <div class="nickname-form">
+            <select aria-label="Profile" class="nickname-form__select" data-i18n-title="screens.idle.profileSelectLabel"
+                    data-role="profile-select"></select>
             <input class="nickname-form__input" data-i18n-placeholder="screens.idle.namePlaceholder"
                    data-role="name-input" maxlength="16"
                    name="nickname" pattern="[a-zA-Z\d_\-]{3,16}"
                    placeholder="Your nickname"
                    required type="text">
+            <button aria-label="Delete profile" class="nickname-form__delete-button"
+                    data-i18n-title="screens.idle.deleteProfileButton" data-role="delete-profile-button"
+                    type="button">🗑
+            </button>
         </div>
 
         <button class="button button--accent" data-i18n="screens.idle.startButton"
@@ -659,12 +682,18 @@
             </button>
         </div>
         <div class="nickname-form">
+            <select aria-label="Profile" class="nickname-form__select" data-i18n-title="screens.idle.profileSelectLabel"
+                    data-role="profile-select"></select>
             <input class="nickname-form__input" data-i18n-placeholder="screens.idle.namePlaceholder"
                    data-role="name-input" maxlength="16"
                    name="nickname" pattern="[a-zA-Z\d_\-]{3,16}"
                    placeholder="Your nickname"
                    required
                    type="text">
+            <button aria-label="Delete profile" class="nickname-form__delete-button"
+                    data-i18n-title="screens.idle.deleteProfileButton" data-role="delete-profile-button"
+                    type="button">🗑
+            </button>
         </div>
         <button class="button button--accent" data-i18n="screens.gameOverSaved.playAgainButton" data-role="start-button"
                 type="button">Play again
@@ -818,7 +847,6 @@
             stats: document.querySelector(".sidebar--stats"),
         };
         const fabStats = document.querySelector('[data-role="fab-stats"]');
-        const fabFullscreen = document.querySelector('[data-role="fab-fullscreen"]');
 
         function notifyResize() {
             requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
@@ -855,41 +883,48 @@
             });
         });
 
-        function isFullscreen() {
+        function isNativeFullscreen() {
             return Boolean(document.fullscreenElement || document.webkitFullscreenElement);
         }
 
-        function setFullscreenPressed(pressed) {
-            if (fabFullscreen) fabFullscreen.setAttribute("aria-pressed", String(pressed));
+        function isFullscreen() {
+            const fillsScreen = window.innerWidth >= screen.width && window.innerHeight >= screen.height;
+            return isNativeFullscreen() || fillsScreen;
         }
 
-        if (fabFullscreen && appRoot) {
-            fabFullscreen.addEventListener("click", async () => {
+        const fullscreenButtons = document.querySelectorAll(
+            '[data-role="fab-fullscreen"], [data-role="fullscreen-toggle"]'
+        );
+
+        function setFullscreenPressed(pressed) {
+            fullscreenButtons.forEach((btn) => btn.setAttribute("aria-pressed", String(pressed)));
+        }
+
+        if (fullscreenButtons.length && appRoot) {
+            fullscreenButtons.forEach((btn) => btn.addEventListener("click", async () => {
                 try {
-                    if (!isFullscreen()) {
+                    if (isNativeFullscreen()) {
+                        if (document.exitFullscreen) await document.exitFullscreen();
+                        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                    } else if (!isFullscreen()) {
                         if (appRoot.requestFullscreen) await appRoot.requestFullscreen();
                         else if (appRoot?.webkitRequestFullscreen) appRoot.webkitRequestFullscreen();
                         else document.body.classList.toggle("faux-fullscreen");
-                    } else if (document.exitFullscreen) {
-                        await document.exitFullscreen();
-                    } else if (document.webkitExitFullscreen) {
-                        document.webkitExitFullscreen();
-                    } else {
-                        document.body.classList.toggle("faux-fullscreen");
                     }
                 } catch (err) {
                     document.body.classList.toggle("faux-fullscreen");
                 }
                 notifyResize();
-            });
+            }));
 
             document.addEventListener("fullscreenchange", () => setFullscreenPressed(isFullscreen()));
             document.addEventListener("webkitfullscreenchange", () => setFullscreenPressed(isFullscreen()));
+            window.addEventListener("resize", () => setFullscreenPressed(isFullscreen()));
         }
 
         window.addEventListener("orientationchange", notifyResize);
     })();
 </script>
-<script src="scripts/app/main.js?v=37" type="module"></script>
+<script src="scripts/app/main.js?v=38" type="module"></script>
 </body>
 </html>

@@ -47,7 +47,12 @@
             "hint": "الصعوبة",
             "modeHint": "الوضعية",
             "startButton": "بدا",
-            "namePlaceholder": "لقب ديالك"
+            "namePlaceholder": "لقب ديالك",
+            "newProfileOption": "+ بروفيل جديد",
+            "profileSelectLabel": "بدل البروفيل",
+            "deleteProfileButton": "حيد البروفيل",
+            "deleteProfileConfirm": "بغيتي تحيد البروفيل {name}؟ غادي تقدر ترجعو فـ 7 ايام.",
+            "restoreProfileGroup": "رجع بروفيل"
         },
         "modeInfo": {
             "subtitle": "الوضعية: {mode}",

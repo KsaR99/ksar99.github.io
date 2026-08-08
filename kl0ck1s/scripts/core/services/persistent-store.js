@@ -36,4 +36,17 @@ export class PersistentStore {
 
         this.fallback?.setItem(key, value);
     }
+
+    async delete(key) {
+        if (this.hasStorage) {
+            try {
+                await this.storage.delete(key, false);
+                return;
+            } catch {
+                // fallback
+            }
+        }
+
+        this.fallback?.removeItem(key);
+    }
 }

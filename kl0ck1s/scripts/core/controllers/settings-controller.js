@@ -49,25 +49,39 @@ export class SettingsController {
 
     async loadSettings() {
         const game = this.game;
-        const defaults = this.defaultSettings();
-        let settings = defaults;
+        let stored = null;
         let hasStoredSettings = false;
 
         try {
             const storedRaw = await game.settingsStore.get(SETTINGS_KEY);
             if (storedRaw) {
-                settings = {...defaults, ...JSON.parse(storedRaw)};
-                settings.categoryVolumes = {...defaults.categoryVolumes, ...(settings.categoryVolumes ?? {})};
-                settings.keyBindings = {...defaults.keyBindings, ...(settings.keyBindings ?? {})};
+                stored = JSON.parse(storedRaw);
                 hasStoredSettings = true;
             }
         } catch {
-            settings = defaults;
+            stored = null;
         }
 
+        this.applyStoredSettings(stored ?? {});
+
         if (!hasStoredSettings && this.prefersReducedMotion()) {
-            settings.theme = "none";
+            game.settings.theme = "none";
         }
+    }
+
+    /**
+     * Applies a (possibly partial) settings object on top of the defaults,
+     * updating game.settings, game.difficulty/mode, and live audio/render
+     * state. Used both for the initial load and when switching to a profile
+     * that has its own saved settings.
+     */
+    applyStoredSettings(stored) {
+        const game = this.game;
+        const defaults = this.defaultSettings();
+        const settings = {...defaults, ...stored};
+        settings.categoryVolumes = {...defaults.categoryVolumes, ...(stored.categoryVolumes ?? {})};
+        settings.soundVolumes = {...defaults.soundVolumes, ...(stored.soundVolumes ?? {})};
+        settings.keyBindings = {...defaults.keyBindings, ...(stored.keyBindings ?? {})};
 
         game.settings = settings;
         if (settings.difficulty && game.difficulties[settings.difficulty]) {
@@ -76,10 +90,12 @@ export class SettingsController {
         if (settings.mode && game.gameModes[settings.mode]) {
             game.mode = settings.mode;
         }
+
         game.soundManager.setVolume(settings.volume);
         game.soundManager.setMuted(settings.muted);
         this.applyAudioSettings();
         this.applyPerformanceSettings();
+        this.syncMuteToggle();
     }
 
     applyAudioSettings() {
@@ -95,6 +111,10 @@ export class SettingsController {
 
     saveSettings() {
         const game = this.game;
+        const profile = game.leaderboard.profile;
+        if (profile) {
+            game.leaderboard.saveProfileSettings(profile, game.settings);
+        }
         return game.settingsStore.set(SETTINGS_KEY, JSON.stringify(game.settings));
     }
 
@@ -210,6 +230,7 @@ export class SettingsController {
             this.applyAudioSettings();
             this.applyPerformanceSettings();
             this.saveSettings();
+            this.syncMuteToggle();
         }
 
         if (languageChange) {
@@ -228,5 +249,17 @@ export class SettingsController {
         const volumeSlider = game.dom.querySelector('[data-role="volume-slider"]');
         if (muteCheckbox) muteCheckbox.checked = game.settings.muted;
         if (volumeSlider) volumeSlider.disabled = game.settings.muted;
+        this.syncMuteToggle();
+    }
+
+    syncMuteToggle() {
+        const game = this.game;
+        if (!game.dom) return;
+        const button = game.dom.querySelector('[data-role="mute-toggle"]');
+        if (!button) return;
+        const muted = Boolean(game.settings.muted);
+        button.setAttribute("aria-pressed", String(muted));
+        const icon = button.querySelector('[data-role="mute-toggle-icon"]');
+        if (icon) icon.textContent = muted ? "🔇" : "🔊";
     }
 }

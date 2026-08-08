@@ -47,7 +47,12 @@
             "hint": "Difficulty",
             "modeHint": "Mode",
             "startButton": "Start",
-            "namePlaceholder": "Your nickname"
+            "namePlaceholder": "Your nickname",
+            "newProfileOption": "+ New profile",
+            "profileSelectLabel": "Switch profile",
+            "deleteProfileButton": "Delete profile",
+            "deleteProfileConfirm": "Delete profile {name}? You'll be able to restore it for 7 days.",
+            "restoreProfileGroup": "Restore profile"
         },
         "modeInfo": {
             "subtitle": "Mode: {mode}",

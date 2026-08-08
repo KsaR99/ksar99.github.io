@@ -47,7 +47,12 @@
             "hint": "Schwierigkeitsgrad",
             "modeHint": "Modus",
             "startButton": "Start",
-            "namePlaceholder": "Dein Spitzname"
+            "namePlaceholder": "Dein Spitzname",
+            "newProfileOption": "+ Neues Profil",
+            "profileSelectLabel": "Profil wechseln",
+            "deleteProfileButton": "Profil löschen",
+            "deleteProfileConfirm": "Profil {name} löschen? Du kannst es 7 Tage lang wiederherstellen.",
+            "restoreProfileGroup": "Profil wiederherstellen"
         },
         "modeInfo": {
             "subtitle": "Modus: {mode}",

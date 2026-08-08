@@ -47,7 +47,12 @@
             "hint": "Kesulitan",
             "modeHint": "Mode",
             "startButton": "Mulai",
-            "namePlaceholder": "Nama panggilanmu"
+            "namePlaceholder": "Nama panggilanmu",
+            "newProfileOption": "+ Profil baru",
+            "profileSelectLabel": "Ganti profil",
+            "deleteProfileButton": "Hapus profil",
+            "deleteProfileConfirm": "Hapus profil {name}? Kamu masih bisa memulihkannya selama 7 hari.",
+            "restoreProfileGroup": "Pulihkan profil"
         },
         "modeInfo": {
             "subtitle": "Mode: {mode}",

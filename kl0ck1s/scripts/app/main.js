@@ -156,8 +156,6 @@ const hud = new HUD({
     objectiveRowEl: document.querySelector('[data-role="objective-stat"]'),
     objectiveBarEl: document.getElementById("objective-bar"),
     objectiveBarTrackEl: document.getElementById("objective-bar-track"),
-    settingsShortcutMenuEl: document.querySelector('[data-role="settings-shortcut-menu"]'),
-    settingsShortcutGameEl: document.querySelector('[data-role="settings-shortcut-game"]'),
 });
 
 const soundManager = new SoundManager(SOUND_FILES);
@@ -217,11 +215,19 @@ if (fabControlsBtn) {
     });
 }
 
-document.querySelectorAll('[data-role="settings-shortcut-menu"], [data-role="settings-shortcut-game"]').forEach((btn) => {
-    btn.addEventListener("click", () => {
+const settingsShortcutBtn = document.querySelector('[data-role="settings-shortcut"]');
+if (settingsShortcutBtn) {
+    settingsShortcutBtn.addEventListener("click", () => {
         game.screenFlow.toggleOptions();
     });
-});
+}
+
+const muteToggleBtn = document.querySelector('[data-role="mute-toggle"]');
+if (muteToggleBtn) {
+    muteToggleBtn.addEventListener("click", () => {
+        game.settingsController.toggleSound();
+    });
+}
 
 function handleViewportResize() {
     resizeBoardCanvas();

@@ -47,7 +47,12 @@
             "hint": "難易度",
             "modeHint": "モード",
             "startButton": "スタート",
-            "namePlaceholder": "ニックネーム"
+            "namePlaceholder": "ニックネーム",
+            "newProfileOption": "+ 新しいプロフィール",
+            "profileSelectLabel": "プロフィールを切り替え",
+            "deleteProfileButton": "プロフィールを削除",
+            "deleteProfileConfirm": "プロフィール「{name}」を削除しますか?7日間は復元できます。",
+            "restoreProfileGroup": "プロフィールを復元"
         },
         "modeInfo": {
             "subtitle": "モード：{mode}",

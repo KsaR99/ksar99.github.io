@@ -47,7 +47,12 @@
             "hint": "Poziom trudności",
             "modeHint": "Tryb",
             "startButton": "Start",
-            "namePlaceholder": "Twój nick"
+            "namePlaceholder": "Twój nick",
+            "newProfileOption": "+ Nowy profil",
+            "profileSelectLabel": "Przełącz profil",
+            "deleteProfileButton": "Usuń profil",
+            "deleteProfileConfirm": "Usunąć profil {name}? Będziesz mógł go przywrócić przez 7 dni.",
+            "restoreProfileGroup": "Przywróć profil"
         },
         "modeInfo": {
             "subtitle": "Tryb: {mode}",
@@ -261,10 +266,10 @@
         },
         "survival": {
             "name": "Przetrwanie",
-            "description": "Uważaj na rosnące linie",
+            "description": "Uważaj na rosnące śmieciowe linie",
             "rules": [
-                "🧱 Linie śmieci rosną od dołu przez cały czas",
-                "🕳️ Znajdź i wykorzystaj przerwy w śmieciach",
+                "🧱 Śmieciowe linie rosną od dołu przez cały czas",
+                "🕳️ Znajdź i wykorzystaj przerwy w śmieciowych liniach",
                 "☠️ Gra kończy się, gdy plansza się przepełni"
             ]
         },
@@ -272,16 +277,16 @@
             "name": "Wyścig z serem",
             "description": "Wykop wcześniej ułożony stos jak najszybciej",
             "rules": [
-                "🧀 Plansza startuje z 10 rzędami sera (śmieci) z dziurą",
+                "🧀 Plansza startuje z 10 rzędami sera (śmieciowych linii) z dziurą",
                 "⏱️ Wykop wszystko najszybciej jak się da",
                 "🚫 Nieukończony bieg nie trafia na tablicę wyników"
             ]
         },
         "digSurvival": {
             "name": "Kopanie na przetrwanie",
-            "description": "Kop bez końca — śmieci odrastają za każdym razem, gdy je wykopiesz. Przetrwaj i wykop ich 100.",
+            "description": "Kop bez końca — śmieciowe linie odrastają za każdym razem, gdy je wykopiesz. Przetrwaj i wykop ich 100.",
             "rules": [
-                "🧀 Start z niewielkim stosem śmieci u dołu planszy",
+                "🧀 Start z niewielkim stosem śmieciowych linii u dołu planszy",
                 "♻️ Każda wykopana linia natychmiast odrasta od dołu — stos nigdy się nie kończy",
                 "🎯 Wykop w sumie 100 linii, by wygrać",
                 "☠️ Gra kończy się, gdy plansza się przepełni"
