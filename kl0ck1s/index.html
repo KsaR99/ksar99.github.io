@@ -892,6 +892,12 @@
             return isNativeFullscreen() || fillsScreen;
         }
 
+        const desktopLayoutQuery = window.matchMedia("(width >= 48rem)");
+
+        function getFullscreenTarget() {
+            return desktopLayoutQuery.matches ? document.documentElement : appRoot;
+        }
+
         const fullscreenButtons = document.querySelectorAll(
             '[data-role="fab-fullscreen"], [data-role="fullscreen-toggle"]'
         );
@@ -907,8 +913,9 @@
                         if (document.exitFullscreen) await document.exitFullscreen();
                         else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
                     } else if (!isFullscreen()) {
-                        if (appRoot.requestFullscreen) await appRoot.requestFullscreen();
-                        else if (appRoot?.webkitRequestFullscreen) appRoot.webkitRequestFullscreen();
+                        const target = getFullscreenTarget();
+                        if (target.requestFullscreen) await target.requestFullscreen();
+                        else if (target?.webkitRequestFullscreen) target.webkitRequestFullscreen();
                         else document.body.classList.toggle("faux-fullscreen");
                     }
                 } catch (err) {
