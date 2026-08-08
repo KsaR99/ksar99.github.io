@@ -19,6 +19,7 @@
     --kbd-border-color: oklch(0.15 0 0 / 1);
     --mode-description--bg: oklch(22.054% 0.02402 273.436 / 0.6);
     --mode-description--text: oklch(0.75 0.08 263.55);
+    --progress-bar__fill-bg: oklch(0.34 0.07 168.39);
 
     --font-display: "Noto Sans Mono", monospace;
     --font-body: "Inter", system-ui, -apple-system, sans-serif;
@@ -48,7 +49,7 @@ body {
         --app-bg: oklch(0.18 0.02 254.93 / 0.9);
         --board-bg: oklch(0.33 0 0);
         --board-accent: oklch(0.72 0 0 / 0.85);
-        --stats__status--live-color: oklch(0.6 0.09 235.86);
+        --stats__status--live-color: oklch(0.84 0.11 151.71);
     }
 
     &[data-theme="matrix"] {
@@ -65,29 +66,33 @@ body {
         --board-accent: oklch(0.43 0.1 137.67 / 0.85);
         --panel: oklch(0.17 0.02 154.44);
         --accent-2: oklch(0.68 0.1 149.21);
+        --progress-bar__fill-bg: oklch(0.4 0.1 155.9);
     }
 
 
     &[data-theme="rain"] {
         --app-bg: oklch(0.13 0.04 233.93 / 0.9);
-        --body-bg: radial-gradient(circle at 50% 100%, oklch(0.78 0.15 233.86) 0, var(--bg) 60%);
+        --body-bg: radial-gradient(circle at 50% 100%, oklch(0.39 0.16 269.55) 0, var(--bg) 50%);
         --line: oklch(0.4 0.08 212.68);
+        --stats__status--live-color: oklch(0.68 0.15 266.73);
         --nickname-form__input--bg: oklch(0.27 0.09 248.21);
         --kbd-border-color: oklch(0.56 0.09 225.83);
         --board-bg: linear-gradient(180deg, oklch(0.185 0.045 250), oklch(0.13 0.04 254), oklch(0.185 0.045 250));
         --board-accent: oklch(0.4 0.09 250.08 / 0.85);
         --panel: oklch(0.17 0.03 253.5);
         --accent: oklch(0.48 0.31 263.31 / 0.39);
-        --accent-2: oklch(0.7 0.12 210.91);
+        --accent-2: oklch(0.75 0.12 267.78);
         --muted: oklch(0.71 0.03 264.33);
         --screen__title-color: oklch(1 0 0);
         --screen__title-shadow: oklch(1 0 0);
+        --progress-bar__fill-bg: oklch(0.31 0.08 268.33);
     }
 
     &[data-theme="snow"] {
         --app-bg: oklch(0.18 0.03 265.27 / 0.9);;
-        --body-bg: radial-gradient(circle at 50% 100%, oklch(0.81 0.11 282.14) 0, oklch(0.11 0.03 261.36) 50%);
+        --body-bg: radial-gradient(circle at 50% 100%, oklch(0.89 0.07 227.94) 0, oklch(0.11 0.03 261.36) 50%);
         --line: oklch(0.4 0.08 212.68);
+        --stats__status--live-color: oklch(0.76 0.14 206.96);
         --nickname-form__input--bg: oklch(0.27 0.09 248.21);
         --kbd-border-color: oklch(0.56 0.09 225.83);
         --mode-description--text: oklch(0.74 0.04 264.2);
@@ -99,6 +104,7 @@ body {
         --muted: oklch(0.71 0.05 211.73);
         --screen__title-color: oklch(1 0 0);
         --screen__title-shadow: oklch(1 0 0);
+        --progress-bar__fill-bg: oklch(0.38 0.06 215.86);
     }
 
     &[data-theme="vhs"] {
@@ -118,6 +124,7 @@ body {
         --accent-2: oklch(0.75 0.16 330.03);
         --screen__title-color: oklch(0.7 0.34 338.65);
         --screen__title-shadow: oklch(0.7 0.35 328.6);
+        --progress-bar__fill-bg: oklch(0.35 0.15 332.28);
     }
 }
 
@@ -222,7 +229,7 @@ body {
 .boot-screen__bar-fill {
     height: 100%;
     width: 0;
-    background: oklch(0.4 0.1 155.9);
+    background: var(--progress-bar__fill-bg);
     border-radius: inherit;
     transition: width 0.2s ease;
 }
@@ -869,7 +876,7 @@ body.perf-no-glow .board__filter--active[data-theme="vhs"]::after {
 .progress-bar__fill {
     height: 100%;
     width: 0;
-    background: oklch(0.4 0.1 155.9);
+    background: var(--progress-bar__fill-bg);
     border-radius: inherit;
     transition: width 0.1s ease;
 }
