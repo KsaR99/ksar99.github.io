@@ -122,15 +122,17 @@ export class Renderer {
         if (size) {
             this.spriteCache.warmGlow(size, enabled);
             this.spriteCache.warmHardDropTrail(size, enabled);
+            this.spriteCache.warmParticleColors(size, enabled);
         }
     }
 
     /**
-     * Forces the block/grid/glow sprite atlas to be built for the current cell size right
-     * now, instead of paying that cost inside the first drawBoard() call. Used during app
-     * boot so a "building block cache" loading step does real, visible work rather than
-     * being a fake timer. Also warms the dedicated next-piece-preview cache (fixed at
-     * nextPreviewCellSize) so its first drawNext() doesn't pay a one-time rebuild either.
+     * Forces the block/grid/glow sprite atlas, plus the line-clear particle color cache,
+     * to be built for the current cell size right now, instead of paying that cost inside
+     * the first drawBoard() / line clear. Used during app boot so a "building block cache"
+     * loading step does real, visible work rather than being a fake timer. Also warms the
+     * dedicated next-piece-preview cache (fixed at nextPreviewCellSize) so its first
+     * drawNext() doesn't pay a one-time rebuild either.
      */
     warmSpriteCache() {
         const size = this.boardConfig.CELL_SIZE;
@@ -139,28 +141,28 @@ export class Renderer {
             this.spriteCache.warmGlow(size, this.heightSaturationEnabled);
             this.spriteCache.warmHardDropTrail(size, this.heightSaturationEnabled);
             this.spriteCache.warmFallTrail(size);
+            this.spriteCache.warmParticleColors(size, this.heightSaturationEnabled);
         }
         if (this.nextPreviewCellSize && this.nextSpriteCache !== this.spriteCache) {
             this.nextSpriteCache.warmGlow(this.nextPreviewCellSize, this.heightSaturationEnabled);
         }
     }
 
-    rowSaturationFactor(y, rows) {
-        if (!this.heightSaturationEnabled) return 1;
-        const distanceFromBottom = (rows - 1) - y;
-        return Math.max(0, 1 - distanceFromBottom * 0.05);
-    }
-
-    colorForRow(color, y, rows) {
-        const factor = this.rowSaturationFactor(y, rows);
-        if (factor >= 1) return color;
-        return `oklch(from ${color} l calc(c * ${factor}) h)`;
-    }
-
     saturationLevelForRow(y, rows) {
         if (!this.heightSaturationEnabled) return 0;
         const distanceFromBottom = (rows - 1) - y;
         return Math.max(0, Math.min(SATURATION_LEVELS - 1, distanceFromBottom));
+    }
+
+    /**
+     * Translucent particle color for a cell at row y, for line-clear fragments.
+     * Keyed off the same discrete saturation level the rest of the renderer
+     * uses (saturationLevelForRow), so it can be served from spriteCache's
+     * cache - warmed up front in warmSpriteCache() - instead of building a
+     * fresh `oklch(from ...)` string per fragment during buildClearFragments().
+     */
+    particleColorForRow(color, y, rows) {
+        return this.spriteCache.getParticleColor(color, this.saturationLevelForRow(y, rows));
     }
 
     resetBoardTransform() {
@@ -580,6 +582,7 @@ export class Renderer {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx} = this;
         const strokeColor = withAlpha(piece.color, 0.6);
+        const lightColor = lightenOklch(piece.color);
 
         if (this.transparencyEnabled) {
             ctx.save();
@@ -587,14 +590,16 @@ export class Renderer {
             forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
                 const y = piece.y + r + offset;
                 if (y < 0) return;
-                this.drawCell(ctx, piece.x + c, y, piece.color, size);
+                const level = this.saturationLevelForRow(y, board.rows);
+                this.drawCell(ctx, piece.x + c, y, piece.color, size, {level});
             });
             ctx.restore();
         } else {
             forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
                 const y = piece.y + r + offset;
                 if (y < 0) return;
-                this.drawCell(ctx, piece.x + c, y, lightenOklch(piece.color), size);
+                const level = this.saturationLevelForRow(y, board.rows);
+                this.drawCell(ctx, piece.x + c, y, lightColor, size, {level});
             });
         }
 

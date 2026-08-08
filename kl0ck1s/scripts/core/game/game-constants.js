@@ -78,11 +78,13 @@ export const ARR_MAX = 80;
 export const ARR_STEP = 2;
 
 export const FALL_TRAIL_SLOW_INTERVAL_MS = 500;
-export const FALL_TRAIL_FAST_INTERVAL_MS = 40;
-export const FALL_TRAIL_MAX_LENGTH = 15;
-export const FALL_TRAIL_MAX_ALPHA = 0.15;
-export const HARD_DROP_TRAIL_MAX_ALPHA = 0.25;
-export const HARD_DROP_TRAIL_DURATION_MS = 230;
+export const FALL_TRAIL_FAST_INTERVAL_MS = 16;
+export const FALL_TRAIL_MAX_LENGTH = 10;
+export const FALL_TRAIL_MAX_ALPHA = 0.30;
+export const HARD_DROP_TRAIL_MAX_ALPHA = 0.30;
+export const HARD_DROP_TRAIL_DURATION_MS = 170;
+/** Row-distance between consecutive hard-drop trail layers - 1 = one layer per cell dropped, 0.5 = twice as many, half as far apart. */
+export const HARD_DROP_TRAIL_STEP = 0.75;
 
 export function fallTrailLengthForInterval(dropIntervalMs) {
     if (!(dropIntervalMs < FALL_TRAIL_SLOW_INTERVAL_MS)) return 0;

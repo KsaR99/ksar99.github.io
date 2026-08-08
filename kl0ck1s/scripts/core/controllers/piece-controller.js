@@ -400,9 +400,7 @@ export class PieceController {
             for (let x = 0; x < cols; x++) {
                 const colorIndex = board.colors[y * cols + x];
                 if (!colorIndex) continue;
-                const color = renderer.colorForRow(renderer.colorPalette[colorIndex], y, board.rows);
-
-                const fragmentColor = `oklch(from ${color} l c h / 0.55)`;
+                const fragmentColor = renderer.particleColorForRow(renderer.colorPalette[colorIndex], y, board.rows);
 
                 for (let fy = 0; fy < fragmentsPerAxis; fy++) {
                     for (let fx = 0; fx < fragmentsPerAxis; fx++) {

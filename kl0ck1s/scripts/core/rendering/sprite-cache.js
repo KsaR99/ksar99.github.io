@@ -74,6 +74,12 @@ export function fallTrailColor(color) {
     return `oklch(from ${color} calc(l + 0.75) c h / 0.35)`;
 }
 
+/** Translucent variant of a (possibly height-desaturated) color, used for line-clear particle fragments. */
+export function particleColor(color, level = 0) {
+    const resolvedColor = level ? colorForLevel(color, level) : color;
+    return `oklch(from ${resolvedColor} l c h / 0.55)`;
+}
+
 export function createGridCellSprite(size, canvasFactory = () => document.createElement("canvas")) {
     const sprite = canvasFactory();
     sprite.width = size;
@@ -147,10 +153,12 @@ export class SpriteCache {
         this.glowSprites = new Map();
         this.hardDropTrailSprites = new Map();
         this.fallTrailSprites = new Map();
+        this.particleColors = new Map();
         this.gridCellSprite = null;
         this._warmedGlowLevels = 0;
         this._warmedHardDropTrailLevels = 0;
         this._warmedFallTrail = false;
+        this._warmedParticleColorLevels = 0;
     }
 
     rebuild(size) {
@@ -276,6 +284,43 @@ export class SpriteCache {
             this.fallTrailSprites.set(color, createBlockSprite(fallTrailColor(color), this.size, this.canvasFactory));
         }
         this._warmedFallTrail = true;
+    }
+
+    /**
+     * Pre-computes the translucent particle color string for every klockomino
+     * color (and, when height saturation is on, every saturation level), same
+     * rationale as warmGlow()/warmHardDropTrail() above. Line-clear fragments
+     * are plain fillRect()s, not sprites, but building their `oklch(from ...)`
+     * color string still isn't free - and buildClearFragments() calls it once
+     * per fragment, not once per cleared cell, so the cost multiplies with the
+     * fragment count. Warming it up front keeps that fixed per-color/level
+     * cost from growing if the fragment count itself grows later. Unlike the
+     * sprite caches above, colors don't depend on cell size, so this doesn't
+     * get cleared by rebuild() and only needs to be (re)warmed when height
+     * saturation is toggled on.
+     */
+    warmParticleColors(size, saturationEnabled) {
+        if (this.size !== size) this.rebuild(size);
+
+        const levels = saturationEnabled ? SATURATION_LEVELS : 1;
+        if (levels <= this._warmedParticleColorLevels) return;
+
+        for (const color of this.atlasRows.keys()) {
+            for (let level = this._warmedParticleColorLevels; level < levels; level++) {
+                const key = level ? `${color}|${level}` : color;
+                if (this.particleColors.has(key)) continue;
+                this.particleColors.set(key, particleColor(color, level));
+            }
+        }
+        this._warmedParticleColorLevels = levels;
+    }
+
+    getParticleColor(color, level = 0) {
+        const key = level ? `${color}|${level}` : color;
+        if (!this.particleColors.has(key)) {
+            this.particleColors.set(key, particleColor(color, level));
+        }
+        return this.particleColors.get(key);
     }
 
     getGridCell(currentSize) {

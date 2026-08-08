@@ -7,7 +7,8 @@ import {
     FALL_TRAIL_FRAME_MS,
     FALL_TRAIL_MAX_LENGTH,
     fallTrailLengthForInterval,
-    HARD_DROP_TRAIL_DURATION_MS
+    HARD_DROP_TRAIL_DURATION_MS,
+    HARD_DROP_TRAIL_STEP
 } from "./game-constants.js";
 import {InputController} from "../controllers/input-controller.js";
 import {PieceController} from "../controllers/piece-controller.js";
@@ -257,7 +258,7 @@ export class Game {
         }
 
         const entries = [];
-        for (let step = 0; step <= cellsDropped; step++) {
+        for (let step = 0; step <= cellsDropped; step += HARD_DROP_TRAIL_STEP) {
             const y = piece.y - step;
             entries.push({
                 x: piece.x,
@@ -266,7 +267,7 @@ export class Game {
                 width: piece.width,
                 height: piece.height,
                 color: piece.color,
-                level: this.renderer.saturationLevelForRow(y, this.board.rows),
+                level: this.renderer.saturationLevelForRow(Math.round(y), this.board.rows),
             });
         }
 
