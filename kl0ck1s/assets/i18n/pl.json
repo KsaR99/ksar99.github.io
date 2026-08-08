@@ -132,6 +132,7 @@
             "keyboardTitle": "Klawiatura",
             "keyboardHint": "Kliknij klawisz, aby go zmienić",
             "keyboardResetButton": "Przywróć domyślne",
+            "resetDefaults": "Przywróć domyślne",
             "keyboardPressKey": "Naciśnij klawisz…",
             "keyboardReset": "Resetuj klawisze",
             "developerTitle": "Developerskie",

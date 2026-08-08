@@ -132,6 +132,7 @@
             "keyboardTitle": "Teclado",
             "keyboardHint": "Haz clic en una tecla para reasignarla",
             "keyboardResetButton": "Restablecer",
+            "resetDefaults": "Restablecer",
             "keyboardPressKey": "Pulsa una tecla…",
             "keyboardReset": "Restablecer teclas",
             "developerTitle": "Developer",

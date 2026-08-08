@@ -132,6 +132,7 @@
             "keyboardTitle": "Tastatur",
             "keyboardHint": "Klicke eine Taste, um sie neu zuzuweisen",
             "keyboardResetButton": "Zurücksetzen",
+            "resetDefaults": "Zurücksetzen",
             "keyboardPressKey": "Taste drücken…",
             "keyboardReset": "Tasten zurücksetzen",
             "developerTitle": "Developer",

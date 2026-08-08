@@ -132,6 +132,7 @@
             "keyboardTitle": "Klávesnica",
             "keyboardHint": "Kliknutím na kláves ho znova priradíte",
             "keyboardResetButton": "Obnoviť predvolené",
+            "resetDefaults": "Obnoviť predvolené",
             "keyboardPressKey": "Stlačte kláves…",
             "keyboardReset": "Obnoviť klávesy",
             "developerTitle": "Developer",

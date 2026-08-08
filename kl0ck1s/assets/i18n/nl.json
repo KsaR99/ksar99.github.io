@@ -132,6 +132,7 @@
             "keyboardTitle": "Toetsenbord",
             "keyboardHint": "Klik op een toets om deze opnieuw toe te wijzen",
             "keyboardResetButton": "Standaard herstellen",
+            "resetDefaults": "Standaard herstellen",
             "keyboardPressKey": "Druk op een toets…",
             "keyboardReset": "Toetsen resetten",
             "developerTitle": "Developer",

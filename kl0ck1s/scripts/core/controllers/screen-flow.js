@@ -664,8 +664,17 @@ export class ScreenFlow {
 
     renderOptionsMenu() {
         const game = this.game;
+        const openRoles = new Set();
+        game.dom?.querySelectorAll("details[data-role][open]").forEach((el) => {
+            openRoles.add(el.dataset.role);
+        });
+
         game.hud.showScreen(game.screens.options(game.settings, game.dom, game.i18n, game.soundManager));
         this.bindOptionsMenu();
+
+        game.dom?.querySelectorAll("details[data-role]").forEach((el) => {
+            if (openRoles.has(el.dataset.role)) el.open = true;
+        });
     }
 
     togglePreviewButton(button, list) {
@@ -929,6 +938,7 @@ export class ScreenFlow {
                 game.settings.categoryVolumes = {...game.settings.categoryVolumes, [category]: volume};
                 game.soundManager.setCategoryVolume(category, volume);
                 settingsController.saveSettings();
+                this.syncSoundCategoryResetButtons();
             });
         });
 
@@ -941,6 +951,7 @@ export class ScreenFlow {
                 game.settings.soundVolumes = {...game.settings.soundVolumes, [key]: volume};
                 game.soundManager.setSoundVolume(key, volume);
                 settingsController.saveSettings();
+                this.syncSoundCategoryResetButtons();
             });
 
             list.addEventListener("click", (event) => {
@@ -961,6 +972,61 @@ export class ScreenFlow {
         this.bindLangSelect();
         this.bindOptionsDataMenu();
         this.bindKeybindList();
+        this.bindCategoryResetButtons();
+        this.bindSoundCategoryResetButtons();
+        this.syncSoundCategoryResetButtons();
+    }
+
+    bindCategoryResetButtons() {
+        const game = this.game;
+        const settingsController = game.settingsController;
+
+        const groups = {
+            "reset-general-button": ["volume", "muted", "hudRight", "theme"],
+            "reset-controls-button": ["mouseControl", "mouseSensitivity", "touchSensitivity"],
+            "reset-gameplay-button": ["skipCountdown", "skipModeInfo"],
+            "reset-graphics-button": [
+                "ghost", "gridLines", "screenShake", "heightSaturation", "glow", "transparency", "fallTrail"
+            ],
+            "reset-advanced-button": ["keyboardDAS", "keyboardARR"],
+        };
+
+        Object.entries(groups).forEach(([role, keys]) => {
+            const button = game.dom.querySelector(`[data-role="${role}"]`);
+            if (!button) return;
+            button.addEventListener("click", () => {
+                settingsController.resetSettingsForKeys(keys);
+                this.renderOptionsMenu();
+            });
+        });
+    }
+
+    bindSoundCategoryResetButtons() {
+        const game = this.game;
+        const settingsController = game.settingsController;
+
+        ["sfx", "music", "voices"].forEach((category) => {
+            const button = game.dom.querySelector(`[data-role="reset-${category}-button"]`);
+            if (!button) return;
+            button.addEventListener("click", () => {
+                const keys = game.soundManager.keysInCategory(category);
+                settingsController.resetSoundCategory(category, keys);
+                this.renderOptionsMenu();
+            });
+        });
+    }
+
+    syncSoundCategoryResetButtons() {
+        const game = this.game;
+        if (!game.dom) return;
+        const settingsController = game.settingsController;
+
+        ["sfx", "music", "voices"].forEach((category) => {
+            const button = game.dom.querySelector(`[data-role="reset-${category}-button"]`);
+            if (!button) return;
+            const keys = game.soundManager.keysInCategory(category);
+            button.hidden = !settingsController.isSoundCategoryModified(category, keys);
+        });
     }
 
     bindBenchmark() {

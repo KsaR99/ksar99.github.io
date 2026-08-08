@@ -132,6 +132,7 @@
             "keyboardTitle": "Clavier",
             "keyboardHint": "Cliquez sur une touche pour la réattribuer",
             "keyboardResetButton": "Réinitialiser",
+            "resetDefaults": "Réinitialiser",
             "keyboardPressKey": "Appuyez sur une touche…",
             "keyboardReset": "Réinitialiser les touches",
             "developerTitle": "Developer",

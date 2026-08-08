@@ -368,9 +368,8 @@ body.hud-right .card[data-role="next-piece-card"] {
     height: 3rem;
     padding: 0;
     justify-content: space-between;
-    background: transparent;
+    background: oklch(from var(--bg-2) l c h / 0.7);
     border-radius: var(--radius);
-    backdrop-filter: blur(4px);
 }
 
 [data-role="next-piece-card"] .card__title {
@@ -394,8 +393,7 @@ body.hud-right .card[data-role="next-piece-card"] {
 
 [data-role="difficulty-stat"] .progress-bar--difficulty {
     height: 100%;
-    background: oklch(from var(--bg-2) l c h / 0.6);
-    backdrop-filter: blur(4px);
+    background: oklch(from var(--bg-2) l c h / 0.75);
 }
 
 .board {
@@ -472,8 +470,7 @@ body.perf-no-transparency .board__overlay--transparent {
     pointer-events: none;
     overflow: hidden;
     border-radius: var(--radius);
-    background: oklch(from var(--bg-2) l c h / 0.85);
-    backdrop-filter: blur(6px);
+    background: oklch(from var(--bg-2) l c h / 0.94);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -481,6 +478,7 @@ body.perf-no-transparency .board__overlay--transparent {
 .board__credits--visible {
     opacity: 1;
     pointer-events: auto;
+    backdrop-filter: blur(6px);
 }
 
 .board__credits__scroll {
@@ -1548,6 +1546,10 @@ details.options[open] {
     cursor: pointer;
     user-select: none;
 
+    &[hidden] {
+        display: none;
+    }
+
     &:hover {
         border-color: var(--accent-2);
     }
@@ -1656,6 +1658,10 @@ details.options[open] {
 
 .options__row--diff {
     gap: 0.5rem;
+}
+
+.options__row--end {
+    justify-content: flex-end;
 }
 
 .options__diff-label {
@@ -1776,11 +1782,10 @@ details.options[open] {
     justify-content: center;
     border: 1px solid var(--line);
     border-radius: 999px;
-    background: oklch(from var(--bg-2) l c h / 0.72);
+    background: oklch(from var(--bg-2) l c h / 0.85);
     color: var(--text);
     font-size: 1.15rem;
     line-height: 1;
-    backdrop-filter: blur(4px);
     cursor: pointer;
     user-select: none;
 }

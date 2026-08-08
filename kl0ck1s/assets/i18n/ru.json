@@ -132,6 +132,7 @@
             "keyboardTitle": "Клавиатура",
             "keyboardHint": "Нажмите клавишу, чтобы переназначить",
             "keyboardResetButton": "Сбросить по умолчанию",
+            "resetDefaults": "Сбросить по умолчанию",
             "keyboardPressKey": "Нажмите клавишу…",
             "keyboardReset": "Сбросить клавиши",
             "developerTitle": "Developer",

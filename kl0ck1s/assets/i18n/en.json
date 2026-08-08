@@ -132,6 +132,7 @@
             "keyboardTitle": "Keyboard",
             "keyboardHint": "Click a key to reassign it",
             "keyboardResetButton": "Reset to defaults",
+            "resetDefaults": "Reset to defaults",
             "keyboardPressKey": "Press a key…",
             "keyboardReset": "Reset keys",
             "developerTitle": "Developer",

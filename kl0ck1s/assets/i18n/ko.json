@@ -132,6 +132,7 @@
             "keyboardTitle": "키보드",
             "keyboardHint": "키를 클릭하여 다시 지정하세요",
             "keyboardResetButton": "기본값으로 재설정",
+            "resetDefaults": "기본값으로 재설정",
             "keyboardPressKey": "키를 누르세요…",
             "keyboardReset": "키 재설정",
             "developerTitle": "Developer",

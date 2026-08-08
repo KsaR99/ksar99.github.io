@@ -132,6 +132,7 @@
             "keyboardTitle": "Tastiera",
             "keyboardHint": "Clicca un tasto per riassegnarlo",
             "keyboardResetButton": "Ripristina predefiniti",
+            "resetDefaults": "Ripristina predefiniti",
             "keyboardPressKey": "Premi un tasto…",
             "keyboardReset": "Ripristina tasti",
             "developerTitle": "Developer",

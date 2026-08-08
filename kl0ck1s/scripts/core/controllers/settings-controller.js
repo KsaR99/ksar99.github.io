@@ -147,6 +147,56 @@ export class SettingsController {
         return Object.keys(this.defaultSettings());
     }
 
+    resetSettingsForKeys(keys) {
+        const game = this.game;
+        const defaults = this.defaultSettings();
+        keys.forEach((key) => {
+            game.settings[key] = defaults[key];
+        });
+
+        game.soundManager.setVolume(game.settings.volume);
+        game.soundManager.setMuted(game.settings.muted);
+        this.applyAudioSettings();
+        this.applyPerformanceSettings();
+        this.saveSettings();
+        this.syncMuteToggle();
+    }
+
+    isSoundCategoryModified(category, keys) {
+        const game = this.game;
+        const defaults = this.defaultSettings();
+        const settings = game.settings;
+
+        const defaultCategoryVolume = defaults.categoryVolumes[category] ?? 1;
+        const currentCategoryVolume = settings.categoryVolumes?.[category] ?? 1;
+        if (currentCategoryVolume !== defaultCategoryVolume) return true;
+
+        return keys.some((key) => {
+            const defaultVolume = defaults.soundVolumes[key] ?? 1;
+            const currentVolume = settings.soundVolumes?.[key] ?? 1;
+            return currentVolume !== defaultVolume;
+        });
+    }
+
+    resetSoundCategory(category, keys) {
+        const game = this.game;
+        const defaults = this.defaultSettings();
+
+        const categoryVolumes = {...game.settings.categoryVolumes};
+        categoryVolumes[category] = defaults.categoryVolumes[category] ?? 1;
+        game.settings.categoryVolumes = categoryVolumes;
+
+        const soundVolumes = {...game.settings.soundVolumes};
+        keys.forEach((key) => {
+            if (key in defaults.soundVolumes) soundVolumes[key] = defaults.soundVolumes[key];
+            else delete soundVolumes[key];
+        });
+        game.settings.soundVolumes = soundVolumes;
+
+        this.applyAudioSettings();
+        this.saveSettings();
+    }
+
     exportSettings() {
         const game = this.game;
         const {difficulty, mode, ...settings} = game.settings;

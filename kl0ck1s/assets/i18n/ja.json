@@ -132,6 +132,7 @@
             "keyboardTitle": "キーボード",
             "keyboardHint": "キーをクリックして割り当て直す",
             "keyboardResetButton": "初期設定に戻す",
+            "resetDefaults": "初期設定に戻す",
             "keyboardPressKey": "キーを押してください…",
             "keyboardReset": "キーをリセット",
             "developerTitle": "Developer",

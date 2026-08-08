@@ -10,9 +10,9 @@
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+Mono:wght@100..900&display=swap"
         rel="stylesheet"
     >
-    <link href="styles/main.css?v=40" rel="stylesheet">
-    <link href="styles/mobile.css?v=40" media="(width < 48rem)" rel="stylesheet">
-    <link href="styles/desktop.css?v=40" media="(width >= 48rem)" rel="stylesheet">
+    <link href="styles/main.css?v=41" rel="stylesheet">
+    <link href="styles/mobile.css?v=41" media="(width < 48rem)" rel="stylesheet">
+    <link href="styles/desktop.css?v=41" media="(width >= 48rem)" rel="stylesheet">
     <meta content="notranslate" name="google">
     <meta content="https://github.com/KsaR99" name="author">
     <meta content="index, follow" name="robots">
@@ -60,7 +60,7 @@
         <div class="card">
             <p class="brand__title" data-role="brand-title">Kl0ck1<span class="brand__title-flip"
                                                                         data-role="brand-title-flip">'s</span></p>
-            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.14.2-alpha</p>
+            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.14.3-alpha</p>
             <div class="settings-shortcut-row">
                 <button aria-label="Mute sound" aria-pressed="false" class="settings-shortcut-icon"
                         data-role="mute-toggle" type="button">
@@ -270,6 +270,12 @@
                         <option data-i18n="screens.options.themeSnow" value="snow">Snow</option>
                     </select>
                 </label>
+                <div class="options__row options__row--end">
+                    <button class="options__preview-button options__preview-button--wide"
+                            data-i18n="screens.options.resetDefaults"
+                            data-role="reset-general-button" type="button">Reset to defaults
+                    </button>
+                </div>
             </div>
 
             <details class="options" data-role="options-group-controls">
@@ -297,6 +303,12 @@
                             data-i18n="screens.options.calibrateSensitivityButton"
                             data-role="calibrate-sensitivity-button"
                             type="button">Calibrate
+                    </button>
+                </div>
+                <div class="options__row options__row--end">
+                    <button class="options__preview-button options__preview-button--wide"
+                            data-i18n="screens.options.resetDefaults"
+                            data-role="reset-controls-button" type="button">Reset to defaults
                     </button>
                 </div>
 
@@ -349,6 +361,12 @@
                     <input class="options__input options__input--checkbox" data-role="skip-mode-info-checkbox"
                            type="checkbox">
                 </label>
+                <div class="options__row options__row--end">
+                    <button class="options__preview-button options__preview-button--wide"
+                            data-i18n="screens.options.resetDefaults"
+                            data-role="reset-gameplay-button" type="button">Reset to defaults
+                    </button>
+                </div>
             </details>
 
             <details class="options" data-role="options-group-sound">
@@ -363,6 +381,12 @@
                                min="0" type="range">
                     </label>
                     <div class="options__sound-list" data-role="sound-list"></div>
+                    <div class="options__row options__row--end">
+                        <button class="options__preview-button options__preview-button--wide"
+                                data-i18n="screens.options.resetDefaults"
+                                data-role="reset-sfx-button" hidden type="button">Reset to defaults
+                        </button>
+                    </div>
                 </details>
 
                 <details class="options__group" data-role="sound-group-music">
@@ -374,6 +398,12 @@
                                min="0" type="range">
                     </label>
                     <div class="options__sound-list" data-role="sound-list"></div>
+                    <div class="options__row options__row--end">
+                        <button class="options__preview-button options__preview-button--wide"
+                                data-i18n="screens.options.resetDefaults"
+                                data-role="reset-music-button" hidden type="button">Reset to defaults
+                        </button>
+                    </div>
                 </details>
 
                 <details class="options__group" data-role="sound-group-voices">
@@ -385,8 +415,15 @@
                                min="0" type="range">
                     </label>
                     <div class="options__sound-list" data-role="sound-list"></div>
+                    <div class="options__row options__row--end">
+                        <button class="options__preview-button options__preview-button--wide"
+                                data-i18n="screens.options.resetDefaults"
+                                data-role="reset-voices-button" hidden type="button">Reset to defaults
+                        </button>
+                    </div>
                 </details>
             </details>
+
 
             <details class="options" data-role="options-group-graphics">
                 <summary class="options__title" data-i18n="screens.options.graphicsTitle">Graphics</summary>
@@ -428,6 +465,12 @@
                                type="checkbox">
                     </label>
                 </details>
+                <div class="options__row options__row--end">
+                    <button class="options__preview-button options__preview-button--wide"
+                            data-i18n="screens.options.resetDefaults"
+                            data-role="reset-graphics-button" type="button">Reset to defaults
+                    </button>
+                </div>
             </details>
 
             <details class="options" data-role="options-group-advanced">
@@ -447,9 +490,13 @@
                 <div class="options__row">
                     <span data-i18n="screens.options.calibrateKeyboard">Calibrate keyboard</span>
                     <button class="options__preview-button options__preview-button--wide"
-                            data-i18n="screens.options.calibrateKeyboardButton"
-                            data-role="calibrate-keyboard-button"
-                            type="button">Calibrate
+                            data-i18n="screens.options.calibrateKeyboardButton">
+                    </button>
+                </div>
+                <div class="options__row options__row--end">
+                    <button class="options__preview-button options__preview-button--wide"
+                            data-i18n="screens.options.resetDefaults"
+                            data-role="reset-advanced-button" type="button">Reset to defaults
                     </button>
                 </div>
             </details>
@@ -932,6 +979,6 @@
         window.addEventListener("orientationchange", notifyResize);
     })();
 </script>
-<script src="scripts/app/main.js?v=40" type="module"></script>
+<script src="scripts/app/main.js?v=41" type="module"></script>
 </body>
 </html>

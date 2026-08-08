@@ -132,6 +132,7 @@
             "keyboardTitle": "Papan ketik",
             "keyboardHint": "Klik tombol untuk menetapkan ulang",
             "keyboardResetButton": "Kembalikan default",
+            "resetDefaults": "Kembalikan default",
             "keyboardPressKey": "Tekan tombol…",
             "keyboardReset": "Atur ulang tombol",
             "developerTitle": "Developer",
