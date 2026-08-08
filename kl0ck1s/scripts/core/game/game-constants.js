@@ -93,3 +93,31 @@ export function fallTrailLengthForInterval(dropIntervalMs) {
 
     return Math.round(clamped * FALL_TRAIL_MAX_LENGTH);
 }
+
+/**
+ * Per-segment alpha values for the fall trail, indexed by trail length
+ * (0..FALL_TRAIL_MAX_LENGTH, one "bucket" per possible speed/level). Built
+ * once as a module-level constant - i.e. once when the game loads - instead
+ * of recomputing the `1 - i / count` falloff every render frame for every
+ * trail segment.
+ */
+function buildFallTrailAlphaCache() {
+    const cache = [];
+    for (let count = 0; count <= FALL_TRAIL_MAX_LENGTH; count++) {
+        const alphas = new Array(count);
+        for (let i = 0; i < count; i++) {
+            alphas[i] = FALL_TRAIL_MAX_ALPHA * (1 - i / count);
+        }
+        cache.push(alphas);
+    }
+    return cache;
+}
+
+export const FALL_TRAIL_ALPHA_CACHE = buildFallTrailAlphaCache();
+
+/**
+ * Assumed ms-per-frame used only to synthesize a plausible "pre-history" for
+ * a freshly spawned piece's fall trail (see Game#_primeFallTrail) - i.e. how
+ * far apart consecutive trail samples would normally land in time.
+ */
+export const FALL_TRAIL_FRAME_MS = 1000 / 60;

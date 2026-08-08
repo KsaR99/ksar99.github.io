@@ -1,7 +1,7 @@
 "use strict";
 
 import {forEachShapeCell, getTightBounds, lightenOklch, withAlpha} from "../shared/utils.js";
-import {FALL_TRAIL_MAX_ALPHA, HARD_DROP_TRAIL_MAX_ALPHA} from "../game/game-constants.js";
+import {FALL_TRAIL_ALPHA_CACHE, HARD_DROP_TRAIL_MAX_ALPHA} from "../game/game-constants.js";
 import {LINE_CLEAR_FLASH_PHASE_FRACTION} from "../shared/config.js";
 import {GHOST_ALPHA, SATURATION_LEVELS} from "./sprite-cache.js";
 
@@ -501,10 +501,11 @@ export class Renderer {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx} = this;
         const capacity = trail.length;
+        const alphas = FALL_TRAIL_ALPHA_CACHE[count];
 
         ctx.save();
         for (let i = 0; i < count; i++) {
-            const alpha = FALL_TRAIL_MAX_ALPHA * (1 - i / count);
+            const alpha = alphas[i];
             if (alpha <= 0.02) continue;
 
             const idx = (headIndex - 1 - i + capacity * 2) % capacity;

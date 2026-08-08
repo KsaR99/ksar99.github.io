@@ -4,6 +4,7 @@ import {dropIntervalForLevel, nowMs, smoothedInterval, tierForLevel} from "../sh
 import {LINE_CLEAR_SOUND_PLAYBACK_RATE} from "../shared/config.js";
 import {
     COUNTDOWN_STEPS,
+    FALL_TRAIL_FRAME_MS,
     FALL_TRAIL_MAX_LENGTH,
     fallTrailLengthForInterval,
     HARD_DROP_TRAIL_DURATION_MS
@@ -241,7 +242,13 @@ export class Game {
         this.fallTrailHead = 0;
         this._trailPieceRef = null;
         this.lastRowStepTime = 0;
-        this.effectiveDropIntervalMs = Infinity;
+        // Seed with the piece's actual configured gravity speed instead of
+        // Infinity: effectiveDropIntervalMs is normally only known once it's
+        // been *measured* across two real gravity steps (see noteRowStep()/
+        // smoothedInterval()), which meant a freshly spawned piece had no
+        // trail at all for up to ~2 drop intervals. Starting from the real
+        // interval means a fast piece shows its trail immediately on spawn.
+        this.effectiveDropIntervalMs = this.dropInterval || Infinity;
         this.lastColStepTime = 0;
         this.effectiveShiftIntervalMs = Infinity;
     }
@@ -419,8 +426,9 @@ export class Game {
         }
 
         if (this._trailPieceRef !== this.current) {
-            this.fallTrailCount = 0;
             this._trailPieceRef = this.current;
+            this._primeFallTrail(renderedPiece, trailLength, moveIntervalMs);
+            return;
         }
 
         const slot = this.fallTrail[this.fallTrailHead];
@@ -433,6 +441,38 @@ export class Game {
 
         this.fallTrailHead = (this.fallTrailHead + 1) % FALL_TRAIL_MAX_LENGTH;
         this.fallTrailCount = Math.min(trailLength, this.fallTrailCount + 1);
+    }
+
+    /**
+     * Backfills the whole ring buffer with a synthetic "pre-history" so the
+     * trail is already at its full, speed-appropriate length - and actually
+     * visible - on the very first frame the piece is falling.
+     *
+     * The trail is drawn *behind* the piece, so simply duplicating the spawn
+     * position into every slot (the old approach) was invisible: every entry
+     * sat exactly under the opaque piece until real per-frame writes slowly
+     * pushed offset positions into the ring, which is what caused the trail
+     * to visibly "fade in" a moment after spawn. Instead, each slot is seeded
+     * with a position further back in time/space, scaled by the piece's
+     * current speed, so the streak is already spread out above the piece.
+     */
+    _primeFallTrail(renderedPiece, trailLength, moveIntervalMs) {
+        const stepPerFrame = Number.isFinite(moveIntervalMs) && moveIntervalMs > 0
+            ? FALL_TRAIL_FRAME_MS / moveIntervalMs
+            : 0;
+
+        for (let i = 0; i < trailLength; i++) {
+            const framesAgo = trailLength - i;
+            const slot = this.fallTrail[i];
+            slot.x = renderedPiece.x;
+            slot.y = renderedPiece.y - framesAgo * stepPerFrame;
+            slot.mask = renderedPiece.mask;
+            slot.width = renderedPiece.width;
+            slot.height = renderedPiece.height;
+            slot.color = renderedPiece.color;
+        }
+        this.fallTrailHead = trailLength % FALL_TRAIL_MAX_LENGTH;
+        this.fallTrailCount = trailLength;
     }
 
     render() {
