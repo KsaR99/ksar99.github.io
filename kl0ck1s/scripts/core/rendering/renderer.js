@@ -3,7 +3,7 @@
 import {forEachShapeCell, getTightBounds, lightenOklch, withAlpha} from "../shared/utils.js";
 import {FALL_TRAIL_ALPHA_CACHE, HARD_DROP_TRAIL_MAX_ALPHA} from "../game/game-constants.js";
 import {LINE_CLEAR_FLASH_PHASE_FRACTION} from "../shared/config.js";
-import {GHOST_ALPHA, SATURATION_LEVELS} from "./sprite-cache.js";
+import {GHOST_ALPHA, hardDropTrailColor, SATURATION_LEVELS} from "./sprite-cache.js";
 
 export class Renderer {
     /**
@@ -115,7 +115,17 @@ export class Renderer {
     }
 
     setHeightSaturationEnabled(enabled) {
+        if (this.heightSaturationEnabled === enabled) return;
         this.heightSaturationEnabled = enabled;
+
+        // Re-warm (extend, never shrink) the level-dependent caches so the
+        // gray-to-full-color height falloff is ready immediately instead of
+        // building sprites lazily mid-frame the next time this setting is on.
+        const size = this.boardConfig.CELL_SIZE;
+        if (size) {
+            this.spriteCache.warmGlow(size, enabled);
+            this.spriteCache.warmHardDropTrail(size, enabled);
+        }
     }
 
     /**
@@ -130,6 +140,7 @@ export class Renderer {
         if (size) {
             this.spriteCache.getGridCell(size);
             this.spriteCache.warmGlow(size, this.heightSaturationEnabled);
+            this.spriteCache.warmHardDropTrail(size, this.heightSaturationEnabled);
         }
         if (this.nextPreviewCellSize && this.nextSpriteCache !== this.spriteCache) {
             this.nextSpriteCache.warmGlow(this.nextPreviewCellSize, this.heightSaturationEnabled);
@@ -540,11 +551,17 @@ export class Renderer {
             if (alpha <= 0.02) continue;
 
             ctx.globalAlpha = alpha;
+            const sprite = this.spriteCache.getHardDropTrail(entry.color, size, entry.level ?? 0);
             forEachShapeCell(entry.mask, entry.width, entry.height, (r, c) => {
                 const x = entry.x + c;
                 const y = entry.y + r;
                 if (y < 0) return;
-                this.drawCell(ctx, x, y, `oklch(from ${entry.color} calc(l + 0.3) c h / 0.7)`, size);
+                if (sprite) {
+                    ctx.drawImage(sprite, x * size, y * size, size, size);
+                } else {
+                    ctx.fillStyle = hardDropTrailColor(entry.color, entry.level ?? 0);
+                    ctx.fillRect(x * size, y * size, size, size);
+                }
             });
         }
         ctx.restore();

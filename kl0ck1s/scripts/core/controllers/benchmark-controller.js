@@ -119,9 +119,11 @@ class BenchmarkShadowGame {
 
         const entries = [];
         for (let step = 0; step <= cellsDropped; step++) {
+            const y = piece.y - step;
             entries.push({
-                x: piece.x, y: piece.y - step, mask: piece.mask,
+                x: piece.x, y, mask: piece.mask,
                 width: piece.width, height: piece.height, color: piece.color,
+                level: this.renderer.saturationLevelForRow(y, this.board.rows),
             });
         }
 

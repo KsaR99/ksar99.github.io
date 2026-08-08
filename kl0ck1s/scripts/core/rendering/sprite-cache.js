@@ -63,6 +63,12 @@ export function createBlockSprite(color, size, canvasFactory = () => document.cr
     return sprite;
 }
 
+/** Lightened/translucent variant of a (possibly height-desaturated) color, used for the hard-drop fall trail streak. */
+export function hardDropTrailColor(color, level = 0) {
+    const resolvedColor = level ? colorForLevel(color, level) : color;
+    return `oklch(from ${resolvedColor} calc(l + 0.3) c h / 0.7)`;
+}
+
 export function createGridCellSprite(size, canvasFactory = () => document.createElement("canvas")) {
     const sprite = canvasFactory();
     sprite.width = size;
@@ -134,15 +140,19 @@ export class SpriteCache {
         this.atlas = null;
         this.atlasRows = new Map();
         this.glowSprites = new Map();
+        this.hardDropTrailSprites = new Map();
         this.gridCellSprite = null;
         this._warmedGlowLevels = 0;
+        this._warmedHardDropTrailLevels = 0;
     }
 
     rebuild(size) {
         this.size = size;
         this.glowPad = Math.ceil(size * GLOW_BLUR_RATIO);
         this.glowSprites.clear();
+        this.hardDropTrailSprites.clear();
         this._warmedGlowLevels = 0;
+        this._warmedHardDropTrailLevels = 0;
         this.gridCellSprite = createGridCellSprite(this.size, this.canvasFactory);
 
         const colors = [...new Set(Object.values(this.klockominos).map(({color}) => color))];
@@ -217,6 +227,31 @@ export class SpriteCache {
         this._warmedGlowLevels = levels;
     }
 
+    /**
+     * Pre-paints hard-drop fall-trail sprites for every klockomino color, up
+     * front, same rationale as warmGlow() above. Keyed by color+level so the
+     * trail can reflect height saturation (fading from gray near the top of
+     * the board to full color near the bottom) instead of always using the
+     * piece's plain color regardless of how far it fell.
+     */
+    warmHardDropTrail(size, saturationEnabled) {
+        if (this.size !== size) this.rebuild(size);
+
+        const levels = saturationEnabled ? SATURATION_LEVELS : 1;
+        if (levels <= this._warmedHardDropTrailLevels) return;
+
+        for (const color of this.atlasRows.keys()) {
+            for (let level = this._warmedHardDropTrailLevels; level < levels; level++) {
+                const key = level ? `${color}|${level}` : color;
+                if (this.hardDropTrailSprites.has(key)) continue;
+                this.hardDropTrailSprites.set(
+                    key, createBlockSprite(hardDropTrailColor(color, level), this.size, this.canvasFactory)
+                );
+            }
+        }
+        this._warmedHardDropTrailLevels = levels;
+    }
+
     getGridCell(currentSize) {
         if (this.size !== currentSize) this.rebuild(currentSize);
         return this.gridCellSprite;
@@ -238,5 +273,16 @@ export class SpriteCache {
             this.glowSprites.set(key, createGlowSprite(resolvedColor, this.size, this.canvasFactory));
         }
         return this.glowSprites.get(key);
+    }
+
+    getHardDropTrail(color, currentSize, level = 0) {
+        if (this.size !== currentSize) this.rebuild(currentSize);
+        const key = level ? `${color}|${level}` : color;
+        if (!this.hardDropTrailSprites.has(key)) {
+            this.hardDropTrailSprites.set(
+                key, createBlockSprite(hardDropTrailColor(color, level), this.size, this.canvasFactory)
+            );
+        }
+        return this.hardDropTrailSprites.get(key);
     }
 }

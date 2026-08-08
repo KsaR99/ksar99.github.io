@@ -261,13 +261,19 @@ export class Game {
 
         const entries = [];
         for (let step = 0; step <= cellsDropped; step++) {
+            const y = piece.y - step;
             entries.push({
                 x: piece.x,
-                y: piece.y - step,
+                y,
                 mask: piece.mask,
                 width: piece.width,
                 height: piece.height,
                 color: piece.color,
+                // Row-based height-saturation level (0 = bottom/full color, higher
+                // = further up/grayer), matching how the rest of the board fades
+                // with height - so the trail visibly goes from gray to full color
+                // as it streaks down toward where the piece landed.
+                level: this.renderer.saturationLevelForRow(y, this.board.rows),
             });
         }
 
