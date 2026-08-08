@@ -33,6 +33,11 @@ export class SettingsController {
                 music: 0.1,
                 voices: 0.5
             },
+            categoryMuted: {
+                sfx: false,
+                music: false,
+                voices: false
+            },
             soundVolumes: {
                 rotate: 0.75,
                 falling: 0.75,
@@ -80,6 +85,7 @@ export class SettingsController {
         const defaults = this.defaultSettings();
         const settings = {...defaults, ...stored};
         settings.categoryVolumes = {...defaults.categoryVolumes, ...(stored.categoryVolumes ?? {})};
+        settings.categoryMuted = {...defaults.categoryMuted, ...(stored.categoryMuted ?? {})};
         settings.soundVolumes = {...defaults.soundVolumes, ...(stored.soundVolumes ?? {})};
         settings.keyBindings = {...defaults.keyBindings, ...(stored.keyBindings ?? {})};
 
@@ -100,9 +106,12 @@ export class SettingsController {
 
     applyAudioSettings() {
         const game = this.game;
-        const {categoryVolumes, soundVolumes} = game.settings;
+        const {categoryVolumes, categoryMuted, soundVolumes} = game.settings;
         Object.entries(categoryVolumes ?? {}).forEach(([category, volume]) => {
             game.soundManager.setCategoryVolume(category, volume);
+        });
+        Object.entries(categoryMuted ?? {}).forEach(([category, muted]) => {
+            game.soundManager.setCategoryMuted(category, muted);
         });
         Object.entries(soundVolumes ?? {}).forEach(([key, volume]) => {
             game.soundManager.setSoundVolume(key, volume);
@@ -162,6 +171,12 @@ export class SettingsController {
         this.syncMuteToggle();
     }
 
+    isSettingsGroupModified(keys) {
+        const game = this.game;
+        const defaults = this.defaultSettings();
+        return keys.some((key) => JSON.stringify(game.settings[key]) !== JSON.stringify(defaults[key]));
+    }
+
     isSoundCategoryModified(category, keys) {
         const game = this.game;
         const defaults = this.defaultSettings();
@@ -170,6 +185,10 @@ export class SettingsController {
         const defaultCategoryVolume = defaults.categoryVolumes[category] ?? 1;
         const currentCategoryVolume = settings.categoryVolumes?.[category] ?? 1;
         if (currentCategoryVolume !== defaultCategoryVolume) return true;
+
+        const defaultCategoryMuted = defaults.categoryMuted[category] ?? false;
+        const currentCategoryMuted = settings.categoryMuted?.[category] ?? false;
+        if (currentCategoryMuted !== defaultCategoryMuted) return true;
 
         return keys.some((key) => {
             const defaultVolume = defaults.soundVolumes[key] ?? 1;
@@ -186,6 +205,10 @@ export class SettingsController {
         categoryVolumes[category] = defaults.categoryVolumes[category] ?? 1;
         game.settings.categoryVolumes = categoryVolumes;
 
+        const categoryMuted = {...game.settings.categoryMuted};
+        categoryMuted[category] = defaults.categoryMuted[category] ?? false;
+        game.settings.categoryMuted = categoryMuted;
+
         const soundVolumes = {...game.settings.soundVolumes};
         keys.forEach((key) => {
             if (key in defaults.soundVolumes) soundVolumes[key] = defaults.soundVolumes[key];
@@ -195,6 +218,16 @@ export class SettingsController {
 
         this.applyAudioSettings();
         this.saveSettings();
+    }
+
+    toggleCategoryMuted(category) {
+        const game = this.game;
+        const categoryMuted = {...game.settings.categoryMuted};
+        categoryMuted[category] = !categoryMuted[category];
+        game.settings.categoryMuted = categoryMuted;
+        game.soundManager.setCategoryMuted(category, categoryMuted[category]);
+        this.saveSettings();
+        return categoryMuted[category];
     }
 
     exportSettings() {
@@ -264,6 +297,11 @@ export class SettingsController {
                     ...this.defaultSettings().categoryVolumes,
                     ...change.newValue,
                 };
+            } else if (change.key === "categoryMuted") {
+                game.settings.categoryMuted = {
+                    ...this.defaultSettings().categoryMuted,
+                    ...change.newValue,
+                };
             } else if (change.key === "keyBindings") {
                 game.settings.keyBindings = {
                     ...this.defaultSettings().keyBindings,
@@ -293,23 +331,50 @@ export class SettingsController {
         game.settings.muted = !game.settings.muted;
         game.soundManager.setMuted(game.settings.muted);
         this.saveSettings();
-
-        if (!game.dom) return;
-        const muteCheckbox = game.dom.querySelector('[data-role="mute-checkbox"]');
-        const volumeSlider = game.dom.querySelector('[data-role="volume-slider"]');
-        if (muteCheckbox) muteCheckbox.checked = game.settings.muted;
-        if (volumeSlider) volumeSlider.disabled = game.settings.muted;
         this.syncMuteToggle();
     }
 
     syncMuteToggle() {
         const game = this.game;
         if (!game.dom) return;
-        const button = game.dom.querySelector('[data-role="mute-toggle"]');
-        if (!button) return;
         const muted = Boolean(game.settings.muted);
+        const effectiveMuted = muted || game.settings.volume === 0;
+
+        const hudButton = game.dom.querySelector('[data-role="mute-toggle"]');
+        if (hudButton) {
+            hudButton.setAttribute("aria-pressed", String(muted));
+            const icon = hudButton.querySelector('[data-role="mute-toggle-icon"]');
+            if (icon) icon.textContent = effectiveMuted ? "🔇" : "🔊";
+        }
+
+        const optionsButton = game.dom.querySelector('[data-role="options-mute-toggle"]');
+        if (optionsButton) {
+            optionsButton.setAttribute("aria-pressed", String(muted));
+            optionsButton.setAttribute("aria-label", game.i18n.t(muted ? "screens.options.unmute" : "screens.options.mute"));
+            const icon = optionsButton.querySelector('[data-role="options-mute-toggle-icon"]');
+            if (icon) icon.textContent = effectiveMuted ? "🔇" : "🔊";
+        }
+
+        const volumeSlider = game.dom.querySelector('[data-role="volume-slider"]');
+        if (volumeSlider) volumeSlider.disabled = muted;
+    }
+
+    syncCategoryMuteToggle(category) {
+        const game = this.game;
+        if (!game.dom) return;
+        const button = game.dom.querySelector(`[data-role="category-mute-toggle"][data-category="${category}"]`);
+        if (!button) return;
+
+        const muted = Boolean(game.settings.categoryMuted?.[category]);
+        const volume = game.settings.categoryVolumes?.[category] ?? 1;
+        const effectiveMuted = muted || volume === 0;
+
         button.setAttribute("aria-pressed", String(muted));
-        const icon = button.querySelector('[data-role="mute-toggle-icon"]');
-        if (icon) icon.textContent = muted ? "🔇" : "🔊";
+        button.setAttribute("aria-label", game.i18n.t(muted ? "screens.options.unmute" : "screens.options.mute"));
+        const icon = button.querySelector('[data-role="category-mute-toggle-icon"]');
+        if (icon) icon.textContent = effectiveMuted ? "🔇" : "🔊";
+
+        const slider = game.dom.querySelector(`[data-role="category-volume-slider"][data-category="${category}"]`);
+        if (slider) slider.disabled = muted;
     }
 }

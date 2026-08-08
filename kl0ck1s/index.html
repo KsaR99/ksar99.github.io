@@ -10,9 +10,9 @@
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+Mono:wght@100..900&display=swap"
         rel="stylesheet"
     >
-    <link href="styles/main.css?v=41" rel="stylesheet">
-    <link href="styles/mobile.css?v=41" media="(width < 48rem)" rel="stylesheet">
-    <link href="styles/desktop.css?v=41" media="(width >= 48rem)" rel="stylesheet">
+    <link href="styles/main.css?v=42" rel="stylesheet">
+    <link href="styles/mobile.css?v=42" media="(width < 48rem)" rel="stylesheet">
+    <link href="styles/desktop.css?v=42" media="(width >= 48rem)" rel="stylesheet">
     <meta content="notranslate" name="google">
     <meta content="https://github.com/KsaR99" name="author">
     <meta content="index, follow" name="robots">
@@ -60,7 +60,7 @@
         <div class="card">
             <p class="brand__title" data-role="brand-title">Kl0ck1<span class="brand__title-flip"
                                                                         data-role="brand-title-flip">'s</span></p>
-            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.14.3-alpha</p>
+            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.14.4-alpha</p>
             <div class="settings-shortcut-row">
                 <button aria-label="Mute sound" aria-pressed="false" class="settings-shortcut-icon"
                         data-role="mute-toggle" type="button">
@@ -246,15 +246,17 @@
                     <span data-i18n="screens.options.language">Language</span>
                     <select class="options__input options__input--select" data-role="lang-select"></select>
                 </label>
-                <label class="options__row">
+                <div class="options__row">
                     <span data-i18n="screens.options.volume">Volume</span>
-                    <input class="options__input options__input--range" data-role="volume-slider" max="100" min="0"
-                           type="range">
-                </label>
-                <label class="options__row">
-                    <span data-i18n="screens.options.mute">Mute</span>
-                    <input class="options__input options__input--checkbox" data-role="mute-checkbox" type="checkbox">
-                </label>
+                    <div class="options__volume-control">
+                        <button aria-pressed="false" class="options__preview-button"
+                                data-role="options-mute-toggle" type="button">
+                            <span aria-hidden="true" data-role="options-mute-toggle-icon">🔊</span>
+                        </button>
+                        <input class="options__input options__input--range" data-role="volume-slider" max="100"
+                               min="0" type="range">
+                    </div>
+                </div>
                 <label class="options__row">
                     <span data-i18n="screens.options.hudRight">HUD on the right</span>
                     <input class="options__input options__input--checkbox" data-role="hud-right-checkbox"
@@ -273,7 +275,7 @@
                 <div class="options__row options__row--end">
                     <button class="options__preview-button options__preview-button--wide"
                             data-i18n="screens.options.resetDefaults"
-                            data-role="reset-general-button" type="button">Reset to defaults
+                            data-role="reset-general-button" hidden type="button">Reset to defaults
                     </button>
                 </div>
             </div>
@@ -308,7 +310,7 @@
                 <div class="options__row options__row--end">
                     <button class="options__preview-button options__preview-button--wide"
                             data-i18n="screens.options.resetDefaults"
-                            data-role="reset-controls-button" type="button">Reset to defaults
+                            data-role="reset-controls-button" hidden type="button">Reset to defaults
                     </button>
                 </div>
 
@@ -364,7 +366,7 @@
                 <div class="options__row options__row--end">
                     <button class="options__preview-button options__preview-button--wide"
                             data-i18n="screens.options.resetDefaults"
-                            data-role="reset-gameplay-button" type="button">Reset to defaults
+                            data-role="reset-gameplay-button" hidden type="button">Reset to defaults
                     </button>
                 </div>
             </details>
@@ -374,12 +376,18 @@
 
                 <details class="options__group" data-role="sound-group-sfx">
                     <summary class="options__group-summary" data-i18n="screens.options.sfxTitle">SFX</summary>
-                    <label class="options__row">
+                    <div class="options__row">
                         <span data-i18n="screens.options.categoryVolume">Category volume</span>
-                        <input class="options__input options__input--range" data-category="sfx"
-                               data-role="category-volume-slider" max="100"
-                               min="0" type="range">
-                    </label>
+                        <div class="options__volume-control">
+                            <button aria-pressed="false" class="options__preview-button" data-category="sfx"
+                                    data-role="category-mute-toggle" type="button">
+                                <span aria-hidden="true" data-role="category-mute-toggle-icon">🔊</span>
+                            </button>
+                            <input class="options__input options__input--range" data-category="sfx"
+                                   data-role="category-volume-slider" max="100"
+                                   min="0" type="range">
+                        </div>
+                    </div>
                     <div class="options__sound-list" data-role="sound-list"></div>
                     <div class="options__row options__row--end">
                         <button class="options__preview-button options__preview-button--wide"
@@ -391,12 +399,18 @@
 
                 <details class="options__group" data-role="sound-group-music">
                     <summary class="options__group-summary" data-i18n="screens.options.musicTitle">Music</summary>
-                    <label class="options__row">
+                    <div class="options__row">
                         <span data-i18n="screens.options.categoryVolume">Category volume</span>
-                        <input class="options__input options__input--range" data-category="music"
-                               data-role="category-volume-slider" max="100"
-                               min="0" type="range">
-                    </label>
+                        <div class="options__volume-control">
+                            <button aria-pressed="false" class="options__preview-button" data-category="music"
+                                    data-role="category-mute-toggle" type="button">
+                                <span aria-hidden="true" data-role="category-mute-toggle-icon">🔊</span>
+                            </button>
+                            <input class="options__input options__input--range" data-category="music"
+                                   data-role="category-volume-slider" max="100"
+                                   min="0" type="range">
+                        </div>
+                    </div>
                     <div class="options__sound-list" data-role="sound-list"></div>
                     <div class="options__row options__row--end">
                         <button class="options__preview-button options__preview-button--wide"
@@ -408,12 +422,18 @@
 
                 <details class="options__group" data-role="sound-group-voices">
                     <summary class="options__group-summary" data-i18n="screens.options.voicesTitle">Voices</summary>
-                    <label class="options__row">
+                    <div class="options__row">
                         <span data-i18n="screens.options.categoryVolume">Category volume</span>
-                        <input class="options__input options__input--range" data-category="voices"
-                               data-role="category-volume-slider" max="100"
-                               min="0" type="range">
-                    </label>
+                        <div class="options__volume-control">
+                            <button aria-pressed="false" class="options__preview-button" data-category="voices"
+                                    data-role="category-mute-toggle" type="button">
+                                <span aria-hidden="true" data-role="category-mute-toggle-icon">🔊</span>
+                            </button>
+                            <input class="options__input options__input--range" data-category="voices"
+                                   data-role="category-volume-slider" max="100"
+                                   min="0" type="range">
+                        </div>
+                    </div>
                     <div class="options__sound-list" data-role="sound-list"></div>
                     <div class="options__row options__row--end">
                         <button class="options__preview-button options__preview-button--wide"
@@ -468,7 +488,7 @@
                 <div class="options__row options__row--end">
                     <button class="options__preview-button options__preview-button--wide"
                             data-i18n="screens.options.resetDefaults"
-                            data-role="reset-graphics-button" type="button">Reset to defaults
+                            data-role="reset-graphics-button" hidden type="button">Reset to defaults
                     </button>
                 </div>
             </details>
@@ -496,7 +516,7 @@
                 <div class="options__row options__row--end">
                     <button class="options__preview-button options__preview-button--wide"
                             data-i18n="screens.options.resetDefaults"
-                            data-role="reset-advanced-button" type="button">Reset to defaults
+                            data-role="reset-advanced-button" hidden type="button">Reset to defaults
                     </button>
                 </div>
             </details>
@@ -979,6 +999,6 @@
         window.addEventListener("orientationchange", notifyResize);
     })();
 </script>
-<script src="scripts/app/main.js?v=41" type="module"></script>
+<script src="scripts/app/main.js?v=42" type="module"></script>
 </body>
 </html>

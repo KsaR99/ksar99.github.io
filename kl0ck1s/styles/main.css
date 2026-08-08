@@ -1559,6 +1559,25 @@ details.options[open] {
     }
 }
 
+.options__preview-button[aria-pressed="true"] {
+    color: oklch(0 0 0);
+    background: var(--accent-2);
+    border-color: var(--accent-2);
+}
+
+.options__volume-control {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex: 1;
+    max-width: 9rem;
+}
+
+.options__volume-control .options__input--range {
+    flex: 1;
+    max-width: none;
+}
+
 .options__resume {
     align-self: center;
 }

@@ -440,7 +440,7 @@ export class ScreenFlow {
 
     exitToMenu() {
         const game = this.game;
-        if (!["running", "paused", "countdown", "clearing"].includes(game.state)) return;
+        if (!["running", "paused", "countdown", "clearing", "modeInfo"].includes(game.state)) return;
         game.pieceController.stopAllGameplaySounds();
         game.musicDirector.stop(0);
         this.showIdleScreen().then();
@@ -706,7 +706,7 @@ export class ScreenFlow {
         if (!game.dom) return;
         const settingsController = game.settingsController;
 
-        const muteCheckbox = game.dom.querySelector('[data-role="mute-checkbox"]');
+        const optionsMuteToggle = game.dom.querySelector('[data-role="options-mute-toggle"]');
         const volumeSlider = game.dom.querySelector('[data-role="volume-slider"]');
         const hudRightCheckbox = game.dom.querySelector('[data-role="hud-right-checkbox"]');
         const ghostCheckbox = game.dom.querySelector('[data-role="ghost-checkbox"]');
@@ -728,13 +728,10 @@ export class ScreenFlow {
         const closeButton = game.dom.querySelector('[data-role="options-close-button"]');
         const closeKey = game.dom.querySelector('[data-role="options-close-key"]');
 
-        if (muteCheckbox) {
-            muteCheckbox.addEventListener("change", () => {
-                game.settings.muted = muteCheckbox.checked;
-                game.soundManager.setMuted(game.settings.muted);
-                if (volumeSlider) volumeSlider.disabled = game.settings.muted;
-                settingsController.saveSettings();
-                settingsController.syncMuteToggle();
+        if (optionsMuteToggle) {
+            optionsMuteToggle.addEventListener("click", () => {
+                settingsController.toggleSound();
+                this.syncCategoryResetButtons();
             });
         }
 
@@ -743,6 +740,8 @@ export class ScreenFlow {
                 game.settings.volume = volumeSlider.value / 100;
                 game.soundManager.setVolume(game.settings.volume);
                 settingsController.saveSettings();
+                settingsController.syncMuteToggle();
+                this.syncCategoryResetButtons();
             });
         }
 
@@ -751,6 +750,7 @@ export class ScreenFlow {
                 game.settings.hudRight = hudRightCheckbox.checked;
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
+                this.syncCategoryResetButtons();
             });
         }
 
@@ -761,6 +761,7 @@ export class ScreenFlow {
                 game.settings.ghost = ghostCheckbox.checked;
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
+                this.syncCategoryResetButtons();
             });
         }
 
@@ -769,6 +770,7 @@ export class ScreenFlow {
                 game.settings.gridLines = gridCheckbox.checked;
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
+                this.syncCategoryResetButtons();
             });
         }
 
@@ -777,6 +779,7 @@ export class ScreenFlow {
                 game.settings.screenShake = screenShakeCheckbox.checked;
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
+                this.syncCategoryResetButtons();
             });
         }
 
@@ -785,6 +788,7 @@ export class ScreenFlow {
                 game.settings.heightSaturation = heightSaturationCheckbox.checked;
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
+                this.syncCategoryResetButtons();
             });
         }
 
@@ -793,6 +797,7 @@ export class ScreenFlow {
                 game.settings.glow = glowCheckbox.checked;
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
+                this.syncCategoryResetButtons();
             });
         }
 
@@ -801,6 +806,7 @@ export class ScreenFlow {
                 game.settings.transparency = transparencyCheckbox.checked;
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
+                this.syncCategoryResetButtons();
             });
         }
 
@@ -809,6 +815,7 @@ export class ScreenFlow {
                 game.settings.fallTrail = fallTrailCheckbox.checked;
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
+                this.syncCategoryResetButtons();
             });
         }
 
@@ -817,6 +824,7 @@ export class ScreenFlow {
                 game.settings.theme = themeSelect.value;
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
+                this.syncCategoryResetButtons();
             });
         }
 
@@ -824,6 +832,7 @@ export class ScreenFlow {
             skipCountdownCheckbox.addEventListener("change", () => {
                 game.settings.skipCountdown = skipCountdownCheckbox.checked;
                 settingsController.saveSettings();
+                this.syncCategoryResetButtons();
             });
         }
 
@@ -832,6 +841,7 @@ export class ScreenFlow {
             skipModeInfoCheckbox.addEventListener("change", () => {
                 game.settings.skipModeInfo = skipModeInfoCheckbox.checked;
                 settingsController.saveSettings();
+                this.syncCategoryResetButtons();
             });
         }
 
@@ -840,6 +850,7 @@ export class ScreenFlow {
                 game.settings.mouseControl = mouseControlCheckbox.checked;
                 if (mouseSensitivityInput) mouseSensitivityInput.disabled = !mouseControlCheckbox.checked;
                 settingsController.saveSettings();
+                this.syncCategoryResetButtons();
             });
         }
 
@@ -858,6 +869,7 @@ export class ScreenFlow {
                 mouseSensitivityInput.value = value;
                 game.settings.mouseSensitivity = value;
                 settingsController.saveSettings();
+                this.syncCategoryResetButtons();
             });
         }
 
@@ -871,6 +883,7 @@ export class ScreenFlow {
                 if (touchSensitivityInput.value === "") {
                     delete game.settings.touchSensitivity;
                     settingsController.saveSettings();
+                    this.syncCategoryResetButtons();
                     return;
                 }
                 const parsed = parseFloat(touchSensitivityInput.value);
@@ -882,6 +895,7 @@ export class ScreenFlow {
                 touchSensitivityInput.value = value;
                 game.settings.touchSensitivity = value;
                 settingsController.saveSettings();
+                this.syncCategoryResetButtons();
             });
         }
 
@@ -899,6 +913,7 @@ export class ScreenFlow {
                 keyboardDasInput.value = value;
                 game.settings.keyboardDAS = value;
                 settingsController.saveSettings();
+                this.syncCategoryResetButtons();
             });
         }
 
@@ -916,6 +931,7 @@ export class ScreenFlow {
                 keyboardArrInput.value = value;
                 game.settings.keyboardARR = value;
                 settingsController.saveSettings();
+                this.syncCategoryResetButtons();
             });
         }
 
@@ -938,6 +954,16 @@ export class ScreenFlow {
                 game.settings.categoryVolumes = {...game.settings.categoryVolumes, [category]: volume};
                 game.soundManager.setCategoryVolume(category, volume);
                 settingsController.saveSettings();
+                settingsController.syncCategoryMuteToggle(category);
+                this.syncSoundCategoryResetButtons();
+            });
+        });
+
+        game.dom.querySelectorAll('[data-role="category-mute-toggle"]').forEach((button) => {
+            button.addEventListener("click", () => {
+                const category = button.dataset.category;
+                settingsController.toggleCategoryMuted(category);
+                settingsController.syncCategoryMuteToggle(category);
                 this.syncSoundCategoryResetButtons();
             });
         });
@@ -975,13 +1001,11 @@ export class ScreenFlow {
         this.bindCategoryResetButtons();
         this.bindSoundCategoryResetButtons();
         this.syncSoundCategoryResetButtons();
+        this.syncCategoryResetButtons();
     }
 
-    bindCategoryResetButtons() {
-        const game = this.game;
-        const settingsController = game.settingsController;
-
-        const groups = {
+    categoryResetGroups() {
+        return {
             "reset-general-button": ["volume", "muted", "hudRight", "theme"],
             "reset-controls-button": ["mouseControl", "mouseSensitivity", "touchSensitivity"],
             "reset-gameplay-button": ["skipCountdown", "skipModeInfo"],
@@ -990,14 +1014,31 @@ export class ScreenFlow {
             ],
             "reset-advanced-button": ["keyboardDAS", "keyboardARR"],
         };
+    }
 
-        Object.entries(groups).forEach(([role, keys]) => {
+    bindCategoryResetButtons() {
+        const game = this.game;
+        const settingsController = game.settingsController;
+
+        Object.entries(this.categoryResetGroups()).forEach(([role, keys]) => {
             const button = game.dom.querySelector(`[data-role="${role}"]`);
             if (!button) return;
             button.addEventListener("click", () => {
                 settingsController.resetSettingsForKeys(keys);
                 this.renderOptionsMenu();
             });
+        });
+    }
+
+    syncCategoryResetButtons() {
+        const game = this.game;
+        if (!game.dom) return;
+        const settingsController = game.settingsController;
+
+        Object.entries(this.categoryResetGroups()).forEach(([role, keys]) => {
+            const button = game.dom.querySelector(`[data-role="${role}"]`);
+            if (!button) return;
+            button.hidden = !settingsController.isSettingsGroupModified(keys);
         });
     }
 

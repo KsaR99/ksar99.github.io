@@ -4,6 +4,14 @@ import {formatNumber} from "../shared/utils.js";
 import {DEV_MODE, SOUND_FILES} from "../shared/config.js";
 import {defaultKeyBindings, formatKeyCode, KEY_BIND_SLOTS} from "../shared/key-bindings.js";
 
+function setMuteToggleState(button, muted, i18n, effectiveMuted = muted) {
+    if (!button) return;
+    button.setAttribute("aria-pressed", String(muted));
+    button.setAttribute("aria-label", i18n.t(muted ? "screens.options.unmute" : "screens.options.mute"));
+    const icon = button.querySelector("[data-role$=\"mute-toggle-icon\"]");
+    if (icon) icon.textContent = effectiveMuted ? "🔇" : "🔊";
+}
+
 function clone(dom, templateId) {
     return dom.getElementById(templateId).content.cloneNode(true);
 }
@@ -145,6 +153,7 @@ const DIFF_LABEL_KEYS = {
     keyboardDAS: "screens.options.keyboardDas",
     keyboardARR: "screens.options.keyboardArr",
     categoryVolumes: "screens.options.categoryVolume",
+    categoryMuted: "screens.options.mute",
     soundVolumes: "screens.options.soundVolumesLabel",
     keyBindings: "screens.options.keyboardTitle",
 };
@@ -183,6 +192,11 @@ function formatSettingValue(key, value, i18n) {
     if (typeof value === "boolean") return i18n.t(value ? "screens.options.valueOn" : "screens.options.valueOff");
     if (key === "categoryVolumes" || key === "soundVolumes") {
         return Object.entries(value ?? {}).map(([k, v]) => `${k}: ${Math.round(v * 100)}%`).join(", ") || "—";
+    }
+    if (key === "categoryMuted") {
+        return Object.entries(value ?? {})
+            .map(([k, v]) => `${k}: ${i18n.t(v ? "screens.options.valueOn" : "screens.options.valueOff")}`)
+            .join(", ") || "—";
     }
     if (key === "keyBindings") {
         const defaults = defaultKeyBindings();
@@ -230,6 +244,7 @@ export const Screens = {
 
         if (soundManager) {
             const categoryVolumes = settings.categoryVolumes ?? {};
+            const categoryMuted = settings.categoryMuted ?? {};
             const soundVolumes = settings.soundVolumes ?? {};
 
             ["sfx", "music", "voices"].forEach((category) => {
@@ -243,18 +258,29 @@ export const Screens = {
                 }
 
                 const categorySlider = group.querySelector('[data-role="category-volume-slider"]');
-                if (categorySlider) categorySlider.value = Math.round((categoryVolumes[category] ?? 1) * 100);
+                const categoryIsMuted = Boolean(categoryMuted[category]);
+                if (categorySlider) {
+                    categorySlider.value = Math.round((categoryVolumes[category] ?? 1) * 100);
+                    categorySlider.disabled = categoryIsMuted;
+                }
+                const categoryMuteToggle = group.querySelector('[data-role="category-mute-toggle"]');
+                setMuteToggleState(
+                    categoryMuteToggle, categoryIsMuted, i18n,
+                    categoryIsMuted || (categoryVolumes[category] ?? 1) === 0
+                );
 
                 const list = group.querySelector('[data-role="sound-list"]');
                 if (list) fillSoundRows(dom, list, keys, soundVolumes, i18n);
             });
         }
 
-        const muteCheckbox = screen.querySelector('[data-role="mute-checkbox"]');
+        const optionsMuteToggle = screen.querySelector('[data-role="options-mute-toggle"]');
         const volumeSlider = screen.querySelector('[data-role="volume-slider"]');
-        muteCheckbox.checked = settings.muted;
+        setMuteToggleState(
+            optionsMuteToggle, Boolean(settings.muted), i18n, Boolean(settings.muted) || settings.volume === 0
+        );
         volumeSlider.value = Math.round(settings.volume * 100);
-        volumeSlider.disabled = settings.muted;
+        volumeSlider.disabled = Boolean(settings.muted);
         screen.querySelector('[data-role="hud-right-checkbox"]').checked = settings.hudRight;
         const developerGroup = screen.querySelector('[data-role="options-group-developer"]');
         if (developerGroup) developerGroup.hidden = !DEV_MODE;

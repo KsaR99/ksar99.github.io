@@ -74,6 +74,7 @@
             "language": "Sprache",
             "soundTitle": "Ton",
             "mute": "Stumm",
+            "unmute": "Stummschaltung aufheben",
             "volume": "Lautstärke",
             "sfxTitle": "Soundeffekte",
             "musicTitle": "Musik",

@@ -74,6 +74,7 @@
             "language": "Langue",
             "soundTitle": "Son",
             "mute": "Muet",
+            "unmute": "Réactiver le son",
             "volume": "Volume",
             "sfxTitle": "Effets sonores",
             "musicTitle": "Musique",

@@ -74,6 +74,7 @@
             "language": "Taal",
             "soundTitle": "Geluid",
             "mute": "Dempen",
+            "unmute": "Dempen opheffen",
             "volume": "Volume",
             "sfxTitle": "Geluidseffecten",
             "musicTitle": "Muziek",

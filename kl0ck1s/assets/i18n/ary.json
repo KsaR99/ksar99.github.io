@@ -74,6 +74,7 @@
             "language": "اللغة",
             "soundTitle": "الصوت",
             "mute": "سكوت",
+            "unmute": "إلغاء الكتم",
             "volume": "شدة الصوت",
             "sfxTitle": "المؤثرات الصوتية",
             "musicTitle": "الموسيقى",

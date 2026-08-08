@@ -74,6 +74,7 @@
             "language": "Jazyk",
             "soundTitle": "Zvuk",
             "mute": "Ztlumit",
+            "unmute": "Zrušit ztlumení",
             "volume": "Hlasitost",
             "sfxTitle": "Zvukové efekty",
             "musicTitle": "Hudba",

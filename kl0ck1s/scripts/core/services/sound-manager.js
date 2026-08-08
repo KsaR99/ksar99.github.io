@@ -45,6 +45,7 @@ export class SoundManager {
         this.muted = false;
         this.masterVolume = 1;
         this.categoryVolumes = {sfx: 1, music: 1};
+        this.categoryMuted = {};
         this.soundVolumes = {};
 
         this._previewInstance = null;
@@ -86,7 +87,7 @@ export class SoundManager {
 
         SOUND_CATEGORIES.forEach((category) => {
             const gain = this.context.createGain();
-            gain.gain.value = this.categoryVolumes[category] ?? 1;
+            gain.gain.value = this.categoryMuted[category] ? 0 : (this.categoryVolumes[category] ?? 1);
             gain.connect(this.masterGain);
             this.categoryGains[category] = gain;
         });
@@ -372,7 +373,17 @@ export class SoundManager {
         const clamped = Math.min(1, Math.max(0, volume));
         this.categoryVolumes[category] = clamped;
         this.ensureContext();
-        if (this.categoryGains[category]) this.categoryGains[category].gain.value = clamped;
+        if (this.categoryGains[category] && !this.categoryMuted[category]) {
+            this.categoryGains[category].gain.value = clamped;
+        }
+    }
+
+    setCategoryMuted(category, muted) {
+        this.categoryMuted[category] = muted;
+        this.ensureContext();
+        if (this.categoryGains[category]) {
+            this.categoryGains[category].gain.value = muted ? 0 : (this.categoryVolumes[category] ?? 1);
+        }
     }
 
     /** @todo: unused? */
