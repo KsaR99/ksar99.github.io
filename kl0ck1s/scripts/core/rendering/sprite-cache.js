@@ -69,6 +69,11 @@ export function hardDropTrailColor(color, level = 0) {
     return `oklch(from ${resolvedColor} calc(l + 0.3) c h / 0.7)`;
 }
 
+/** Lightened/translucent variant of a color, used for the slow-fall trail streak. */
+export function fallTrailColor(color) {
+    return `oklch(from ${color} calc(l + 0.75) c h / 0.35)`;
+}
+
 export function createGridCellSprite(size, canvasFactory = () => document.createElement("canvas")) {
     const sprite = canvasFactory();
     sprite.width = size;
@@ -141,9 +146,11 @@ export class SpriteCache {
         this.atlasRows = new Map();
         this.glowSprites = new Map();
         this.hardDropTrailSprites = new Map();
+        this.fallTrailSprites = new Map();
         this.gridCellSprite = null;
         this._warmedGlowLevels = 0;
         this._warmedHardDropTrailLevels = 0;
+        this._warmedFallTrail = false;
     }
 
     rebuild(size) {
@@ -151,8 +158,10 @@ export class SpriteCache {
         this.glowPad = Math.ceil(size * GLOW_BLUR_RATIO);
         this.glowSprites.clear();
         this.hardDropTrailSprites.clear();
+        this.fallTrailSprites.clear();
         this._warmedGlowLevels = 0;
         this._warmedHardDropTrailLevels = 0;
+        this._warmedFallTrail = false;
         this.gridCellSprite = createGridCellSprite(this.size, this.canvasFactory);
 
         const colors = [...new Set(Object.values(this.klockominos).map(({color}) => color))];
@@ -252,6 +261,23 @@ export class SpriteCache {
         this._warmedHardDropTrailLevels = levels;
     }
 
+    /**
+     * Pre-paints slow-fall trail sprites for every klockomino color, up front,
+     * same rationale as warmGlow()/warmHardDropTrail() above. Unlike those two,
+     * the fall trail never reflects height saturation (it's always drawn at
+     * level 0), so there's just one sprite per color to warm.
+     */
+    warmFallTrail(size) {
+        if (this.size !== size) this.rebuild(size);
+        if (this._warmedFallTrail) return;
+
+        for (const color of this.atlasRows.keys()) {
+            if (this.fallTrailSprites.has(color)) continue;
+            this.fallTrailSprites.set(color, createBlockSprite(fallTrailColor(color), this.size, this.canvasFactory));
+        }
+        this._warmedFallTrail = true;
+    }
+
     getGridCell(currentSize) {
         if (this.size !== currentSize) this.rebuild(currentSize);
         return this.gridCellSprite;
@@ -284,5 +310,13 @@ export class SpriteCache {
             );
         }
         return this.hardDropTrailSprites.get(key);
+    }
+
+    getFallTrail(color, currentSize) {
+        if (this.size !== currentSize) this.rebuild(currentSize);
+        if (!this.fallTrailSprites.has(color)) {
+            this.fallTrailSprites.set(color, createBlockSprite(fallTrailColor(color), this.size, this.canvasFactory));
+        }
+        return this.fallTrailSprites.get(color);
     }
 }

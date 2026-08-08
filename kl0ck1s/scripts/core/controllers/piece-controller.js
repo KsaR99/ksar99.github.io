@@ -402,6 +402,8 @@ export class PieceController {
                 if (!colorIndex) continue;
                 const color = renderer.colorForRow(renderer.colorPalette[colorIndex], y, board.rows);
 
+                const fragmentColor = `oklch(from ${color} l c h / 0.55)`;
+
                 for (let fy = 0; fy < fragmentsPerAxis; fy++) {
                     for (let fx = 0; fx < fragmentsPerAxis; fx++) {
                         const startX = x * size + (fx + 0.5) * fragSize;
@@ -419,7 +421,7 @@ export class PieceController {
                             dRotation: (Math.random() - 0.5) * Math.PI * 6,
                             size: fragSize,
                             halfSize: fragSize / 2,
-                            color: `oklch(from ${color} l c h / 0.55)`
+                            color: fragmentColor
                         });
                     }
                 }

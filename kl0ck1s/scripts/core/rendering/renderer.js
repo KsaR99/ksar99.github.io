@@ -3,7 +3,7 @@
 import {forEachShapeCell, getTightBounds, lightenOklch, withAlpha} from "../shared/utils.js";
 import {FALL_TRAIL_ALPHA_CACHE, HARD_DROP_TRAIL_MAX_ALPHA} from "../game/game-constants.js";
 import {LINE_CLEAR_FLASH_PHASE_FRACTION} from "../shared/config.js";
-import {GHOST_ALPHA, hardDropTrailColor, SATURATION_LEVELS} from "./sprite-cache.js";
+import {fallTrailColor, GHOST_ALPHA, hardDropTrailColor, SATURATION_LEVELS} from "./sprite-cache.js";
 
 export class Renderer {
     /**
@@ -118,9 +118,6 @@ export class Renderer {
         if (this.heightSaturationEnabled === enabled) return;
         this.heightSaturationEnabled = enabled;
 
-        // Re-warm (extend, never shrink) the level-dependent caches so the
-        // gray-to-full-color height falloff is ready immediately instead of
-        // building sprites lazily mid-frame the next time this setting is on.
         const size = this.boardConfig.CELL_SIZE;
         if (size) {
             this.spriteCache.warmGlow(size, enabled);
@@ -141,6 +138,7 @@ export class Renderer {
             this.spriteCache.getGridCell(size);
             this.spriteCache.warmGlow(size, this.heightSaturationEnabled);
             this.spriteCache.warmHardDropTrail(size, this.heightSaturationEnabled);
+            this.spriteCache.warmFallTrail(size);
         }
         if (this.nextPreviewCellSize && this.nextSpriteCache !== this.spriteCache) {
             this.nextSpriteCache.warmGlow(this.nextPreviewCellSize, this.heightSaturationEnabled);
@@ -427,11 +425,11 @@ export class Renderer {
 
     drawBoard(board) {
         const size = this.boardConfig.CELL_SIZE;
-        const {ctx, boardCanvas} = this;
+        const {ctx} = this;
 
         this.updateBoardBackground(board, size);
 
-        ctx.clearRect(0, 0, boardCanvas.width, boardCanvas.height); // required for fall-trail.
+        ctx.clearRect(0, 0, this.boardCanvas.width, this.boardCanvas.height); // required for fall-trail.
         ctx.drawImage(this.backgroundCanvas, 0, 0);
     }
 
@@ -524,11 +522,17 @@ export class Renderer {
             if (!snap.mask) continue;
 
             ctx.globalAlpha = alpha;
+            const sprite = this.spriteCache.getFallTrail(snap.color, size);
             forEachShapeCell(snap.mask, snap.width, snap.height, (r, c) => {
                 const x = snap.x + c;
                 const y = snap.y + r;
                 if (y < 0) return;
-                this.drawCell(ctx, x, y, `oklch(from ${snap.color} calc(l + 0.75) c h / 0.35)`, size);
+                if (sprite) {
+                    ctx.drawImage(sprite, x * size, y * size, size, size);
+                } else {
+                    ctx.fillStyle = fallTrailColor(snap.color);
+                    ctx.fillRect(x * size, y * size, size, size);
+                }
             });
         }
         ctx.restore();
@@ -577,15 +581,22 @@ export class Renderer {
         const {ctx} = this;
         const strokeColor = withAlpha(piece.color, 0.6);
 
-        forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
-            const y = piece.y + r + offset;
-            if (y < 0) return;
-            if (this.transparencyEnabled) {
-                this.drawCell(ctx, piece.x + c, y, piece.color, size, {ghost: true});
-            } else {
+        if (this.transparencyEnabled) {
+            ctx.save();
+            ctx.globalAlpha *= GHOST_ALPHA;
+            forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
+                const y = piece.y + r + offset;
+                if (y < 0) return;
+                this.drawCell(ctx, piece.x + c, y, piece.color, size);
+            });
+            ctx.restore();
+        } else {
+            forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
+                const y = piece.y + r + offset;
+                if (y < 0) return;
                 this.drawCell(ctx, piece.x + c, y, lightenOklch(piece.color), size);
-            }
-        });
+            });
+        }
 
         ctx.strokeStyle = strokeColor;
         ctx.lineWidth = 1;

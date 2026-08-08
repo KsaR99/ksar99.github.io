@@ -345,8 +345,9 @@ export class ScreenFlow {
         game.state = "gameOver-saved";
         game.menuSelector = "mode";
         game.level = game.difficulties[game.difficulty].startLevel;
-        game.lines = 0;
         game.modeController.restoreSelectedMode();
+        game.statsTracker.reset();
+        game.modeController.reset();
         game.hud.update(game.stats);
         this.renderGameOverSaved(list, entry);
     }
@@ -828,6 +829,9 @@ export class ScreenFlow {
         const statusEl = game.dom.querySelector('[data-role="benchmark-status"]');
         const resultsEl = game.dom.querySelector('[data-role="benchmark-results"]');
         const copyButton = game.dom.querySelector('[data-role="benchmark-copy-button"]');
+
+        game.benchmarkController.ensurePreviewCanvasSized();
+
         if (!button) return;
 
         let lastRun = null;
@@ -846,7 +850,7 @@ export class ScreenFlow {
 
             try {
                 const {results, totalMs, pieceCount} = await game.benchmarkController.run({
-                    pieceCount: 500,
+                    pieceCount: 10000,
                     onProgress: (done, total) => {
                         if (!statusEl) return;
                         const percent = Math.round((done / total) * 100);

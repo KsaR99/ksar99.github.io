@@ -149,20 +149,37 @@ export class BenchmarkController {
         this._offscreenRenderer = null;
     }
 
-    /** Builds (once) a Renderer that draws to the benchmark's preview canvas (or a
-     * detached one if that markup isn't present), reusing the real, already-warmed
-     * sprite cache and the real board's cell size so render timings stay realistic. */
+    /** Builds a Renderer that draws to the benchmark's preview canvas (or a detached
+     * one if that markup isn't present), reusing the real, already-warmed sprite cache
+     * and the real board's cell size so render timings stay realistic.
+     *
+     * The options screen is a <template> that gets re-cloned into a fresh DOM node
+     * every time the dev-tools panel opens, so the previously-found canvas element
+     * goes stale (detached, still default-sized) as soon as options are closed and
+     * reopened. Rebuilding whenever the live DOM node differs from the one this
+     * renderer was last bound to keeps draws landing on the canvas actually on
+     * screen. Even when the node is unchanged, its resolution is re-synced on every
+     * call (cheap) so it reflects the live board's current cell size/dimensions
+     * right away instead of only whenever this renderer next happens to be rebuilt. */
     _getOffscreenRenderer() {
-        if (this._offscreenRenderer) return this._offscreenRenderer;
-
         const game = this.game;
         const liveRenderer = game.renderer;
         const size = liveRenderer.boardConfig.CELL_SIZE;
+        const width = game.board.cols * size;
+        const height = game.board.rows * size;
 
         const boardCanvas = game.dom?.querySelector('[data-role="benchmark-preview-canvas"]')
+            ?? this._offscreenRenderer?.boardCanvas
             ?? document.createElement("canvas");
-        boardCanvas.width = game.board.cols * size;
-        boardCanvas.height = game.board.rows * size;
+
+        if (this._offscreenRenderer && this._offscreenRenderer.boardCanvas === boardCanvas) {
+            if (boardCanvas.width !== width) boardCanvas.width = width;
+            if (boardCanvas.height !== height) boardCanvas.height = height;
+            return this._offscreenRenderer;
+        }
+
+        boardCanvas.width = width;
+        boardCanvas.height = height;
         const ctx = boardCanvas.getContext("2d");
 
         const nextCanvas = document.createElement("canvas");
@@ -190,6 +207,13 @@ export class BenchmarkController {
         this._offscreenRenderer.setHeightSaturationEnabled(liveRenderer.heightSaturationEnabled);
 
         return this._offscreenRenderer;
+    }
+
+    /** Sizes/rebinds the preview canvas as soon as the dev-tools panel becomes
+     * visible, instead of leaving it at the browser's default 300x150 canvas
+     * resolution until the user presses "run" for the first time. */
+    ensurePreviewCanvasSized() {
+        this._getOffscreenRenderer();
     }
 
     /** Inert stand-in for SoundManager used as `shadow.soundManager` inside the
@@ -223,11 +247,11 @@ export class BenchmarkController {
 
     /**
      * @param {object} [opts]
-     * @param {number} [opts.pieceCount=500]
+     * @param {number} [opts.pieceCount=10000]
      * @param {(done: number, total: number) => void} [opts.onProgress]
      * @returns {Promise<{results: Array<{key: string, totalMs: number, avgMs: number, opsCount: number, percent: number}>, totalMs: number, pieceCount: number}>}
      */
-    async run({pieceCount = 500, onProgress = null} = {}) {
+    async run({pieceCount = 10000, onProgress = null} = {}) {
         const liveGame = this.game;
         const cols = liveGame.board.cols;
         const rows = liveGame.board.rows;
@@ -305,6 +329,8 @@ export class BenchmarkController {
 
         const previewCanvas = liveGame.dom?.querySelector('[data-role="benchmark-preview-canvas"]');
         if (previewCanvas) previewCanvas.hidden = false;
+
+        const yieldEvery = Math.max(5, Math.round(pieceCount / 100));
 
         try {
             for (let i = 0; i < pieceCount; i++) {
@@ -421,9 +447,7 @@ export class BenchmarkController {
 
                 onProgress?.(i + 1, pieceCount);
 
-                // Yield often enough that the preview canvas actually paints, giving a
-                // visible (silent, fast-forwarded) sped-up round while the benchmark runs.
-                if (i % 5 === 4) {
+                if (i % yieldEvery === yieldEvery - 1) {
                     await new Promise((resolve) => requestAnimationFrame(resolve));
                 }
             }

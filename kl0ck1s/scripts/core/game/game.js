@@ -242,12 +242,6 @@ export class Game {
         this.fallTrailHead = 0;
         this._trailPieceRef = null;
         this.lastRowStepTime = 0;
-        // Seed with the piece's actual configured gravity speed instead of
-        // Infinity: effectiveDropIntervalMs is normally only known once it's
-        // been *measured* across two real gravity steps (see noteRowStep()/
-        // smoothedInterval()), which meant a freshly spawned piece had no
-        // trail at all for up to ~2 drop intervals. Starting from the real
-        // interval means a fast piece shows its trail immediately on spawn.
         this.effectiveDropIntervalMs = this.dropInterval || Infinity;
         this.lastColStepTime = 0;
         this.effectiveShiftIntervalMs = Infinity;
@@ -269,10 +263,6 @@ export class Game {
                 width: piece.width,
                 height: piece.height,
                 color: piece.color,
-                // Row-based height-saturation level (0 = bottom/full color, higher
-                // = further up/grayer), matching how the rest of the board fades
-                // with height - so the trail visibly goes from gray to full color
-                // as it streaks down toward where the piece landed.
                 level: this.renderer.saturationLevelForRow(y, this.board.rows),
             });
         }

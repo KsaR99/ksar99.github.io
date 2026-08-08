@@ -22,6 +22,7 @@ export class ModeController {
         game.mode = mode;
         game.settings.mode = mode;
         game.settingsController.saveSettings();
+        this.reset();
         game.hud.update(game.stats);
     }
 
