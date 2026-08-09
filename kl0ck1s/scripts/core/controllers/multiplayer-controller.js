@@ -7,6 +7,8 @@ const SCORE_POLL_MS = 200;
 const RUNNING_STATES = new Set(["countdown", "running", "clearing", "paused"]);
 const FINISHED_STATES = new Set(["gameOver-entry", "gameOver-saved"]);
 
+// Which of the 3 numbered steps is "current" for a given panel, and which
+// i18n key describes it in the caption line under the dots.
 const STEP_BY_PANEL = {
     role: {step: 1, labelKey: "multiplayer.step1Label"},
     host: {step: 2, labelKey: "multiplayer.step2Label"},
@@ -41,6 +43,7 @@ export class MultiplayerController {
         this._onKeydown = this._onKeydown.bind(this);
     }
 
+    // --- element getters (queried live: the overlay itself is static, but game screens rerender) ---
     get overlayEl() {
         return this.dom?.querySelector('[data-role="mp-overlay"]') ?? null;
     }
@@ -57,6 +60,9 @@ export class MultiplayerController {
     init() {
         if (!this.dom) return;
 
+        // The multiplayer button lives inside screen templates that get
+        // re-rendered on every idle/game-over-saved screen, so delegate
+        // from a node that's never replaced instead of rebinding per render.
         this.dom.addEventListener("click", (event) => {
             if (event.target.closest('[data-role="multiplayer-button"]')) this.open();
         });
@@ -95,13 +101,16 @@ export class MultiplayerController {
         this.overlayEl.classList.remove("mp-overlay--visible");
         this.overlayEl.hidden = true;
         this.dom.removeEventListener("keydown", this._onKeydown);
-
+        // Only tear down an unfinished handshake; a connected session survives
+        // closing the dialog so score sync / rematches keep working.
         if (this.session && !this.session.isConnected) this._resetSession();
     }
 
     _onKeydown(event) {
         if (event.key === "Escape") this.close();
     }
+
+    // --- role/host/join flow ---
 
     _showPanel(name) {
         const panels = this.panels;
@@ -135,14 +144,23 @@ export class MultiplayerController {
 
         const codeEl = this.dom.querySelector('[data-role="mp-host-code"]');
         const copyButton = this.dom.querySelector('[data-role="mp-host-copy-button"]');
-
+        const answerWrap = this.dom.querySelector('[data-role="mp-host-answer-wrap"]');
+        // The code isn't ready yet (ICE gathering can take a few seconds) - clear
+        // the field so its "please wait, generating…" placeholder shows through,
+        // disable copying until there's an actual code to copy, and keep the
+        // "paste the guest's answer" section hidden until there's a code for
+        // the guest to actually answer to.
         if (codeEl) codeEl.value = "";
         if (copyButton) copyButton.disabled = true;
+        if (answerWrap) answerWrap.hidden = true;
 
         try {
             const code = await this.session.createRoom();
             if (codeEl) codeEl.value = code;
             if (copyButton) copyButton.disabled = false;
+            // Only now can the host actually accept an answer, so this is the
+            // first point it makes sense to show the paste field.
+            if (answerWrap) answerWrap.hidden = false;
         } catch (err) {
             this._showError(err);
         }
@@ -172,6 +190,8 @@ export class MultiplayerController {
         const answerEl = this.dom.querySelector('[data-role="mp-join-answer-code"]');
         const copyButton = this.dom.querySelector('[data-role="mp-join-copy-button"]');
 
+        // Same "please wait" treatment as the host's code while the answer is
+        // being generated.
         if (answerEl) answerEl.value = "";
         if (copyButton) copyButton.disabled = true;
         if (answerWrap) answerWrap.hidden = false;
@@ -196,6 +216,8 @@ export class MultiplayerController {
             setTimeout(() => (button.textContent = original), 1200);
         });
     }
+
+    // --- ready / start handshake ---
 
     _bindSessionEvents() {
         const session = this.session;
@@ -261,6 +283,8 @@ export class MultiplayerController {
         this._startScoreSync();
     }
 
+    // --- in-match score sync ---
+
     _startScoreSync() {
         this._stopScoreSync();
         this._pollTimer = setInterval(() => this._pollMatchState(), SCORE_POLL_MS);
@@ -276,6 +300,9 @@ export class MultiplayerController {
         const inMatch = RUNNING_STATES.has(game.state);
 
         if (inMatch) {
+            // A rematch (e.g. "Play again" from the game-over screen) re-enters
+            // a running state after a finished one — clear the previous result
+            // so the new match's outcome isn't shadowed by the old one.
             if (this._localFinalScore !== null || this._remoteFinalScore !== null) {
                 this._localFinalScore = null;
                 this._remoteFinalScore = null;
@@ -299,6 +326,7 @@ export class MultiplayerController {
 
         if (!this._wasInMatch) return;
         if (!RUNNING_STATES.has(game.state) && !FINISHED_STATES.has(game.state)) {
+            // Left the match entirely (e.g. back to idle) without a game-over — stop polling.
             this._stopScoreSync();
             this._wasInMatch = false;
             this._hideOpponentBadge();
@@ -369,6 +397,8 @@ export class MultiplayerController {
             // "disconnected" event (already bound) will handle cleanup.
         }
     }
+
+    // --- helpers ---
 
     _t(key, vars = {}) {
         return this.i18n ? this.i18n.t(key, vars) : key;
