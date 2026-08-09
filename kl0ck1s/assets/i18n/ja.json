@@ -376,15 +376,17 @@
         "statusError": "接続エラーが発生しました。",
         "youReady": "自分: 準備完了",
         "youNotReady": "自分: 未準備",
-        "opponentReady": "相手: 準備完了",
-        "opponentNotReady": "相手: 未準備",
+        "opponentFallback": "相手",
+        "opponentReady": "{name}: 準備完了",
+        "opponentNotReady": "{name}: 未準備",
         "readyButton": "準備完了",
         "startButton": "ゲーム開始",
         "won": "🏆 勝利しました！",
         "lost": "敗北しました。",
         "draw": "引き分け！",
-        "resultScore": "{result}（自分: {local} / 相手: {remote}）",
-        "opponentScore": "相手: {score}",
-        "genericError": "接続を確立できませんでした。"
+        "resultScore": "{result}（自分: {local} / {name}: {remote}）",
+        "opponentScore": "{name}: {score}",
+        "genericError": "接続を確立できませんでした。",
+        "pauseBlocked": "マルチプレイヤーの対戦中は一時停止できません。"
     }
 }

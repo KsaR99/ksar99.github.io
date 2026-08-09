@@ -376,15 +376,17 @@
         "statusError": "Nastala chyba pripojenia.",
         "youReady": "Ty: pripravený",
         "youNotReady": "Ty: nepripravený",
-        "opponentReady": "Protihráč: pripravený",
-        "opponentNotReady": "Protihráč: nepripravený",
+        "opponentFallback": "Protihráč",
+        "opponentReady": "{name}: pripravený",
+        "opponentNotReady": "{name}: nepripravený",
         "readyButton": "Pripravený",
         "startButton": "Spustiť hru",
         "won": "🏆 Vyhral si!",
         "lost": "Prehral si.",
         "draw": "Remíza!",
-        "resultScore": "{result} (Ty: {local} / Protihráč: {remote})",
-        "opponentScore": "Protihráč: {score}",
-        "genericError": "Nepodarilo sa nadviazať spojenie."
+        "resultScore": "{result} (Ty: {local} / {name}: {remote})",
+        "opponentScore": "{name}: {score}",
+        "genericError": "Nepodarilo sa nadviazať spojenie.",
+        "pauseBlocked": "Pauza je počas multiplayerového zápasu vypnutá."
     }
 }

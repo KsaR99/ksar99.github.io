@@ -376,15 +376,17 @@
         "statusError": "وقع خطأ فالاتصال.",
         "youReady": "نتا: واجد",
         "youNotReady": "نتا: ماشي واجد",
-        "opponentReady": "الخصم: واجد",
-        "opponentNotReady": "الخصم: ماشي واجد",
+        "opponentFallback": "الخصم",
+        "opponentReady": "{name}: واجد",
+        "opponentNotReady": "{name}: ماشي واجد",
         "readyButton": "واجد",
         "startButton": "بدا اللعبة",
         "won": "🏆 ربحتي!",
         "lost": "خسرتي.",
         "draw": "تعادل!",
-        "resultScore": "{result} (نتا: {local} / الخصم: {remote})",
-        "opponentScore": "الخصم: {score}",
-        "genericError": "ما قدرناش نديرو الاتصال."
+        "resultScore": "{result} (نتا: {local} / {name}: {remote})",
+        "opponentScore": "{name}: {score}",
+        "genericError": "ما قدرناش نديرو الاتصال.",
+        "pauseBlocked": "التوقف ماشي متاح فالماتش ديال ملتيبلاير."
     }
 }

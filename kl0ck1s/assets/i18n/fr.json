@@ -376,15 +376,17 @@
         "statusError": "Une erreur de connexion est survenue.",
         "youReady": "Toi : prêt",
         "youNotReady": "Toi : pas prêt",
-        "opponentReady": "Adversaire : prêt",
-        "opponentNotReady": "Adversaire : pas prêt",
+        "opponentFallback": "Adversaire",
+        "opponentReady": "{name}: prêt",
+        "opponentNotReady": "{name}: pas prêt",
         "readyButton": "Prêt",
         "startButton": "Lancer la partie",
         "won": "🏆 Tu as gagné !",
         "lost": "Tu as perdu.",
         "draw": "Égalité !",
-        "resultScore": "{result} (Toi : {local} / Adversaire : {remote})",
-        "opponentScore": "Adversaire : {score}",
-        "genericError": "Impossible d'établir la connexion."
+        "resultScore": "{result} (Toi : {local} / {name}: {remote})",
+        "opponentScore": "{name}: {score}",
+        "genericError": "Impossible d'établir la connexion.",
+        "pauseBlocked": "La pause est désactivée pendant une partie multijoueur."
     }
 }

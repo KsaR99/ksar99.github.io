@@ -27,6 +27,7 @@ function clampToStep(value, min, max, step) {
 export class ScreenFlow {
     constructor(game) {
         this.game = game;
+        this._pauseBlockedTimer = null;
     }
 
     renderLeaderboard(list, highlightEntry = null) {
@@ -278,7 +279,11 @@ export class ScreenFlow {
 
     showModeInfo() {
         const game = this.game;
-        if (game.settings.skipModeInfo) {
+        // While paired with a multiplayer opponent, the two peers' matches
+        // (including rematches) must start together — an extra "tap to
+        // continue" tip screen would leave one side waiting on it while the
+        // other's countdown/race has already begun.
+        if (game.settings.skipModeInfo || game.multiplayerConnected) {
             this.startCountdown();
             return;
         }
@@ -511,6 +516,10 @@ export class ScreenFlow {
     togglePause() {
         const game = this.game;
         if (game.state === "running") {
+            if (game.multiplayerConnected) {
+                this._showPauseBlockedHint();
+                return;
+            }
             game.state = "paused";
             game.pieceController.stopAllGameplaySounds();
             game.musicDirector.pause();
@@ -520,6 +529,27 @@ export class ScreenFlow {
             game.hud.hideOverlay();
             game.musicDirector.resume();
         }
+    }
+
+    _showPauseBlockedHint() {
+        const game = this.game;
+        if (!game.dom) return;
+
+        let toast = game.dom.querySelector('[data-role="mp-pause-blocked-toast"]');
+        if (!toast) {
+            toast = game.dom.createElement("div");
+            toast.className = "mp-pause-blocked-toast";
+            toast.dataset.role = "mp-pause-blocked-toast";
+            (game.dom.body ?? game.dom.documentElement)?.appendChild(toast);
+        }
+
+        toast.textContent = game.i18n.t("multiplayer.pauseBlocked");
+        toast.classList.add("mp-pause-blocked-toast--visible");
+
+        clearTimeout(this._pauseBlockedTimer);
+        this._pauseBlockedTimer = setTimeout(() => {
+            toast.classList.remove("mp-pause-blocked-toast--visible");
+        }, 1800);
     }
 
     restart() {

@@ -376,15 +376,17 @@
         "statusError": "Si è verificato un errore di connessione.",
         "youReady": "Tu: pronto",
         "youNotReady": "Tu: non pronto",
-        "opponentReady": "Avversario: pronto",
-        "opponentNotReady": "Avversario: non pronto",
+        "opponentFallback": "Avversario",
+        "opponentReady": "{name}: pronto",
+        "opponentNotReady": "{name}: non pronto",
         "readyButton": "Pronto",
         "startButton": "Inizia partita",
         "won": "🏆 Hai vinto!",
         "lost": "Hai perso.",
         "draw": "Pareggio!",
-        "resultScore": "{result} (Tu: {local} / Avversario: {remote})",
-        "opponentScore": "Avversario: {score}",
-        "genericError": "Impossibile stabilire la connessione."
+        "resultScore": "{result} (Tu: {local} / {name}: {remote})",
+        "opponentScore": "{name}: {score}",
+        "genericError": "Impossibile stabilire la connessione.",
+        "pauseBlocked": "La pausa è disattivata durante una partita multiplayer."
     }
 }

@@ -103,6 +103,10 @@
     flex: 0 1 13.75rem;
 }
 
+.mp-opponent-panel__canvas {
+    display: block;
+}
+
 .sidebar--stats {
     position: static;
     z-index: auto;

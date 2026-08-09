@@ -2,10 +2,14 @@
 
 import {MultiplayerSession} from "../net/multiplayer-session.js";
 import {copyTextToClipboard, formatNumber} from "../shared/utils.js";
+import {BOARD_CONFIG, COLOR_PALETTE} from "../shared/config.js";
 
 const SCORE_POLL_MS = 200;
 const RUNNING_STATES = new Set(["countdown", "running", "clearing", "paused"]);
 const FINISHED_STATES = new Set(["gameOver-entry", "gameOver-saved"]);
+
+// Pixel size of one cell in the opponent's mini board preview (desktop only).
+const OPPONENT_BOARD_CELL_PX = 10;
 
 // Which of the 3 numbered steps is "current" for a given panel, and which
 // i18n key describes it in the caption line under the dots.
@@ -21,8 +25,9 @@ const STEP_BY_PANEL = {
  * existing single-player screen flow, without touching it: it opens its own
  * overlay (mirrors ConfirmDialog's pattern), then on match start simply
  * clicks the real start-button so the untouched single-player Game runs
- * locally on both peers. While running it exchanges score updates over the
- * MultiplayerSession data channel and shows a live opponent score + a
+ * locally on both peers. While running it exchanges score/name/board updates
+ * over the MultiplayerSession data channel and shows a live opponent panel
+ * (nickname, score, and — on desktop — a mini render of their board) plus a
  * win/lose result once both sides finish.
  */
 export class MultiplayerController {
@@ -35,10 +40,18 @@ export class MultiplayerController {
 
         this._pollTimer = null;
         this._lastSentScore = -1;
+        this._lastSentBoardVersion = -1;
         this._localFinalScore = null;
         this._remoteFinalScore = null;
         this._wasInMatch = false;
+        this._remoteName = null;
+        this._lastRemoteScore = 0;
         this._opponentBadgeEl = null;
+        this._opponentNameEl = null;
+        this._opponentScoreEl = null;
+        this._opponentPanelEl = null;
+        this._opponentCanvasEl = null;
+        this._opponentCanvasCtx = null;
 
         this._onKeydown = this._onKeydown.bind(this);
     }
@@ -225,6 +238,11 @@ export class MultiplayerController {
             this._showPanel("ready");
             this._updateReadyBadges();
             this._setStatus(this._t("multiplayer.statusConnected"));
+            this.game.multiplayerConnected = true;
+            // Let the peer know our nickname so it can show it instead of the
+            // generic "Opponent" label, on its ready badges, score badge and
+            // final result line.
+            this._sendToPeer({kind: "name", name: this.game.playerName || ""});
         });
         session.addEventListener("ready", () => this._updateReadyBadges());
         session.addEventListener("bothready", () => {
@@ -240,6 +258,7 @@ export class MultiplayerController {
             this._setStatus(this._t("multiplayer.statusDisconnected"));
             this._stopScoreSync();
             this._hideOpponentBadge();
+            this.game.multiplayerConnected = false;
         });
         session.addEventListener("error", () => this._setStatus(this._t("multiplayer.statusError")));
     }
@@ -252,7 +271,11 @@ export class MultiplayerController {
             local.classList.toggle("mp-ready-badge--on", this.session.localReady);
         }
         if (remote) {
-            remote.textContent = this._t(this.session.remoteReady ? "multiplayer.opponentReady" : "multiplayer.opponentNotReady");
+            const name = this._remoteDisplayName();
+            remote.textContent = this._t(
+                this.session.remoteReady ? "multiplayer.opponentReady" : "multiplayer.opponentNotReady",
+                {name}
+            );
             remote.classList.toggle("mp-ready-badge--on", this.session.remoteReady);
         }
     }
@@ -275,6 +298,7 @@ export class MultiplayerController {
         this._localFinalScore = null;
         this._remoteFinalScore = null;
         this._lastSentScore = -1;
+        this._lastSentBoardVersion = -1;
         this._wasInMatch = false;
         this._showOpponentBadge();
 
@@ -307,6 +331,7 @@ export class MultiplayerController {
                 this._localFinalScore = null;
                 this._remoteFinalScore = null;
                 this._lastSentScore = -1;
+                this._lastSentBoardVersion = -1;
                 this._showOpponentBadge();
             }
 
@@ -314,6 +339,12 @@ export class MultiplayerController {
             if (game.score !== this._lastSentScore) {
                 this._lastSentScore = game.score;
                 this._sendToPeer({kind: "score", score: game.score});
+            }
+            // The board's `version` only bumps on a lock/clear/garbage change
+            // (see Board), so this stays cheap: most polls send nothing.
+            if (game.board && game.board.version !== this._lastSentBoardVersion) {
+                this._lastSentBoardVersion = game.board.version;
+                this._sendToPeer({kind: "board", cells: Array.from(game.board.colors)});
             }
             return;
         }
@@ -342,6 +373,12 @@ export class MultiplayerController {
             this._remoteFinalScore = payload.score;
             this._setOpponentBadgeScore(payload.score);
             this._maybeShowResult();
+        } else if (payload.kind === "name") {
+            this._remoteName = (payload.name || "").trim() || null;
+            this._updateReadyBadges();
+            this._setOpponentBadgeScore(this._lastRemoteScore);
+        } else if (payload.kind === "board") {
+            this._drawOpponentBoard(payload.cells);
         }
     }
 
@@ -357,6 +394,7 @@ export class MultiplayerController {
             result: this._t(resultKey),
             local: formatNumber(this._localFinalScore),
             remote: formatNumber(this._remoteFinalScore),
+            name: this._remoteDisplayName(),
         }));
         this._stopScoreSync();
         this.session?.setReady(false);
@@ -367,16 +405,41 @@ export class MultiplayerController {
         const host = this.dom.querySelector('[data-role="stats-card"]') ?? this.dom.querySelector(".app__sidebar");
         if (!host) return;
 
+        const panel = this.dom.createElement("div");
+        panel.className = "mp-opponent-panel";
+        panel.dataset.role = "mp-opponent-panel";
+
+        // Mini render of the opponent's board — CSS only shows this on
+        // desktop (see multiplayer.css / desktop.css); it's cheap enough to
+        // always build and keep updated regardless.
+        const canvas = this.dom.createElement("canvas");
+        canvas.className = "mp-opponent-panel__canvas";
+        canvas.dataset.role = "mp-opponent-canvas";
+        canvas.width = BOARD_CONFIG.COLS * OPPONENT_BOARD_CELL_PX;
+        canvas.height = BOARD_CONFIG.ROWS * OPPONENT_BOARD_CELL_PX;
+        panel.appendChild(canvas);
+        this._opponentCanvasEl = canvas;
+        this._opponentCanvasCtx = canvas.getContext("2d");
+
         const badge = this.dom.createElement("div");
         badge.className = "mp-opponent-badge";
         badge.dataset.role = "mp-opponent-badge";
-        badge.textContent = this._t("multiplayer.opponentScore", {score: 0});
-        host.prepend(badge);
+        badge.textContent = this._t("multiplayer.opponentScore", {score: 0, name: this._remoteDisplayName()});
+        panel.appendChild(badge);
+
+        host.prepend(panel);
+        this._opponentPanelEl = panel;
         this._opponentBadgeEl = badge;
+        this._lastRemoteScore = 0;
+        this._drawOpponentBoard(null);
     }
 
     _setOpponentBadgeScore(score) {
-        this._setOpponentBadgeText(this._t("multiplayer.opponentScore", {score: formatNumber(score)}));
+        this._lastRemoteScore = score;
+        this._setOpponentBadgeText(this._t("multiplayer.opponentScore", {
+            score: formatNumber(score),
+            name: this._remoteDisplayName(),
+        }));
     }
 
     _setOpponentBadgeText(text) {
@@ -384,8 +447,53 @@ export class MultiplayerController {
     }
 
     _hideOpponentBadge() {
-        this._opponentBadgeEl?.remove();
+        this._opponentPanelEl?.remove();
+        this._opponentPanelEl = null;
         this._opponentBadgeEl = null;
+        this._opponentNameEl = null;
+        this._opponentCanvasEl = null;
+        this._opponentCanvasCtx = null;
+    }
+
+    /** The opponent's nickname once known over the data channel, else a generic fallback label. */
+    _remoteDisplayName() {
+        return this._remoteName || this._t("multiplayer.opponentFallback");
+    }
+
+    /**
+     * Draws a compact preview of the opponent's locked board onto the mini
+     * canvas. `cells` is the flat colorIndex array from Board#colors (row-major,
+     * 0 = empty); null/undefined clears the board (e.g. right after a rematch).
+     */
+    _drawOpponentBoard(cells) {
+        const ctx = this._opponentCanvasCtx;
+        const canvas = this._opponentCanvasEl;
+        if (!ctx || !canvas) return;
+
+        const {COLS, ROWS} = BOARD_CONFIG;
+        const size = OPPONENT_BOARD_CELL_PX;
+        const styles = getComputedStyle(canvas);
+        const emptyColor = styles.getPropertyValue("--bg-2").trim() || "#000";
+        const lineColor = styles.getPropertyValue("--line").trim() || "#444";
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = emptyColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        if (cells) {
+            for (let y = 0; y < ROWS; y++) {
+                for (let x = 0; x < COLS; x++) {
+                    const colorIndex = cells[y * COLS + x];
+                    if (!colorIndex) continue;
+                    ctx.fillStyle = COLOR_PALETTE[colorIndex] ?? emptyColor;
+                    ctx.fillRect(x * size, y * size, size, size);
+                }
+            }
+        }
+
+        ctx.strokeStyle = lineColor;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(0.5, 0.5, canvas.width - 1, canvas.height - 1);
     }
 
     _sendToPeer(payload) {
@@ -427,5 +535,9 @@ export class MultiplayerController {
         this.session?.close();
         this.session = null;
         this.role = null;
+        this.game.multiplayerConnected = false;
+        this._remoteName = null;
+        this._lastRemoteScore = 0;
+        this._lastSentBoardVersion = -1;
     }
 }

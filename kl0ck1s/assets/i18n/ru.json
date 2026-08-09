@@ -376,15 +376,17 @@
         "statusError": "Произошла ошибка подключения.",
         "youReady": "Вы: готовы",
         "youNotReady": "Вы: не готовы",
-        "opponentReady": "Соперник: готов",
-        "opponentNotReady": "Соперник: не готов",
+        "opponentFallback": "Соперник",
+        "opponentReady": "{name}: готов",
+        "opponentNotReady": "{name}: не готов",
         "readyButton": "Готов",
         "startButton": "Начать игру",
         "won": "🏆 Вы победили!",
         "lost": "Вы проиграли.",
         "draw": "Ничья!",
-        "resultScore": "{result} (Вы: {local} / Соперник: {remote})",
-        "opponentScore": "Соперник: {score}",
-        "genericError": "Не удалось установить соединение."
+        "resultScore": "{result} (Вы: {local} / {name}: {remote})",
+        "opponentScore": "{name}: {score}",
+        "genericError": "Не удалось установить соединение.",
+        "pauseBlocked": "Пауза недоступна во время мультиплеерного матча."
     }
 }

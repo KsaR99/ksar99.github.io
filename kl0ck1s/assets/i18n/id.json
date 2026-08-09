@@ -376,15 +376,17 @@
         "statusError": "Terjadi kesalahan koneksi.",
         "youReady": "Kamu: siap",
         "youNotReady": "Kamu: belum siap",
-        "opponentReady": "Lawan: siap",
-        "opponentNotReady": "Lawan: belum siap",
+        "opponentFallback": "Lawan",
+        "opponentReady": "{name}: siap",
+        "opponentNotReady": "{name}: belum siap",
         "readyButton": "Siap",
         "startButton": "Mulai permainan",
         "won": "🏆 Kamu menang!",
         "lost": "Kamu kalah.",
         "draw": "Seri!",
-        "resultScore": "{result} (Kamu: {local} / Lawan: {remote})",
-        "opponentScore": "Lawan: {score}",
-        "genericError": "Gagal membuat koneksi."
+        "resultScore": "{result} (Kamu: {local} / {name}: {remote})",
+        "opponentScore": "{name}: {score}",
+        "genericError": "Gagal membuat koneksi.",
+        "pauseBlocked": "Jeda dinonaktifkan selama pertandingan multiplayer."
     }
 }

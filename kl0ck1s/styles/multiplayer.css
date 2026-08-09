@@ -176,7 +176,26 @@
     text-align: center;
 }
 
+.mp-opponent-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.mp-opponent-panel__canvas {
+    /* Mini render of the opponent's board — only worth the space on desktop,
+       where the sidebar has room; see desktop.css for the override. */
+    display: none;
+    width: 100%;
+    max-width: 6.5rem;
+    aspect-ratio: 1 / 2;
+    border-radius: 0.5rem;
+    image-rendering: pixelated;
+}
+
 .mp-opponent-badge {
+    width: 100%;
     margin-bottom: 0.75rem;
     padding: 0.5em 0.75em;
     border-radius: 0.5rem;
@@ -187,4 +206,30 @@
     font-size: 0.8125rem;
     font-weight: 700;
     text-align: center;
+    box-sizing: border-box;
+}
+
+.mp-pause-blocked-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 1.5rem;
+    transform: translate(-50%, 0.4rem);
+    z-index: 1100;
+    padding: 0.6em 1em;
+    border-radius: 0.5rem;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    box-shadow: 0 0.5rem 1.5rem oklch(0 0 0 / 35%);
+    color: var(--text);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.mp-pause-blocked-toast--visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
 }

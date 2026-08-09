@@ -376,15 +376,17 @@
         "statusError": "연결 오류가 발생했습니다.",
         "youReady": "나: 준비됨",
         "youNotReady": "나: 준비 안 됨",
-        "opponentReady": "상대: 준비됨",
-        "opponentNotReady": "상대: 준비 안 됨",
+        "opponentFallback": "상대",
+        "opponentReady": "{name}: 준비됨",
+        "opponentNotReady": "{name}: 준비 안 됨",
         "readyButton": "준비",
         "startButton": "게임 시작",
         "won": "🏆 승리했습니다!",
         "lost": "패배했습니다.",
         "draw": "무승부!",
-        "resultScore": "{result} (나: {local} / 상대: {remote})",
-        "opponentScore": "상대: {score}",
-        "genericError": "연결을 설정하지 못했습니다."
+        "resultScore": "{result} (나: {local} / {name}: {remote})",
+        "opponentScore": "{name}: {score}",
+        "genericError": "연결을 설정하지 못했습니다.",
+        "pauseBlocked": "멀티플레이어 대전 중에는 일시정지를 사용할 수 없습니다."
     }
 }

@@ -376,15 +376,17 @@
         "statusError": "Es ist ein Verbindungsfehler aufgetreten.",
         "youReady": "Du: bereit",
         "youNotReady": "Du: nicht bereit",
-        "opponentReady": "Gegner: bereit",
-        "opponentNotReady": "Gegner: nicht bereit",
+        "opponentFallback": "Gegner",
+        "opponentReady": "{name}: bereit",
+        "opponentNotReady": "{name}: nicht bereit",
         "readyButton": "Bereit",
         "startButton": "Spiel starten",
         "won": "🏆 Du hast gewonnen!",
         "lost": "Du hast verloren.",
         "draw": "Unentschieden!",
-        "resultScore": "{result} (Du: {local} / Gegner: {remote})",
-        "opponentScore": "Gegner: {score}",
-        "genericError": "Verbindung konnte nicht hergestellt werden."
+        "resultScore": "{result} (Du: {local} / {name}: {remote})",
+        "opponentScore": "{name}: {score}",
+        "genericError": "Verbindung konnte nicht hergestellt werden.",
+        "pauseBlocked": "Pause ist während eines Mehrspieler-Matches deaktiviert."
     }
 }

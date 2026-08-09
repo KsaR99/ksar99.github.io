@@ -390,15 +390,17 @@
         "statusError": "A connection error occurred.",
         "youReady": "You: ready",
         "youNotReady": "You: not ready",
-        "opponentReady": "Opponent: ready",
-        "opponentNotReady": "Opponent: not ready",
+        "opponentFallback": "Opponent",
+        "opponentReady": "{name}: ready",
+        "opponentNotReady": "{name}: not ready",
         "readyButton": "Ready",
         "startButton": "Start game",
         "won": "🏆 You won!",
         "lost": "You lost.",
         "draw": "Draw!",
-        "resultScore": "{result} (You: {local} / Opponent: {remote})",
-        "opponentScore": "Opponent: {score}",
-        "genericError": "Failed to establish a connection."
+        "resultScore": "{result} (You: {local} / {name}: {remote})",
+        "opponentScore": "{name}: {score}",
+        "genericError": "Failed to establish a connection.",
+        "pauseBlocked": "Pause is disabled during a multiplayer match."
     }
 }

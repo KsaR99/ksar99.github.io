@@ -390,15 +390,17 @@
         "statusError": "Wystąpił błąd połączenia.",
         "youReady": "Ty: gotowy",
         "youNotReady": "Ty: nie gotowy",
-        "opponentReady": "Przeciwnik: gotowy",
-        "opponentNotReady": "Przeciwnik: nie gotowy",
+        "opponentFallback": "Przeciwnik",
+        "opponentReady": "{name}: gotowy",
+        "opponentNotReady": "{name}: nie gotowy",
         "readyButton": "Gotowy",
         "startButton": "Rozpocznij grę",
         "won": "🏆 Wygrałeś!",
         "lost": "Przegrałeś.",
         "draw": "Remis!",
-        "resultScore": "{result} (Ty: {local} / Przeciwnik: {remote})",
-        "opponentScore": "Przeciwnik: {score}",
-        "genericError": "Nie udało się nawiązać połączenia."
+        "resultScore": "{result} (Ty: {local} / {name}: {remote})",
+        "opponentScore": "{name}: {score}",
+        "genericError": "Nie udało się nawiązać połączenia.",
+        "pauseBlocked": "Pauza niedostępna w meczu multiplayer."
     }
 }
