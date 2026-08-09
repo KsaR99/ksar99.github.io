@@ -72,6 +72,28 @@
                         type="button">Join room
                 </button>
             </div>
+            <div class="screen__button-row">
+                <button class="button button--primary mp-bot-button" data-i18n="multiplayer.botButton"
+                        data-role="mp-bot-button" type="button">Play vs bot
+                </button>
+            </div>
+        </div>
+
+        <div class="mp-panel" data-role="mp-panel-bot" hidden>
+            <p class="screen__hint" data-i18n="multiplayer.chooseBotDifficulty">Choose a difficulty</p>
+            <p class="mp-bot-hint" data-i18n="multiplayer.botHint">Practice on your own — the bot draws the exact
+                same pieces as you, in the same order.</p>
+            <div class="screen__button-row screen__button-row--stack">
+                <button class="button button--primary" data-difficulty="easy" data-i18n="difficulty.easy"
+                        data-role="mp-bot-difficulty-button" type="button">Rookie
+                </button>
+                <button class="button button--primary" data-difficulty="medium" data-i18n="difficulty.medium"
+                        data-role="mp-bot-difficulty-button" type="button">Amateur
+                </button>
+                <button class="button button--accent" data-difficulty="hard" data-i18n="difficulty.hard"
+                        data-role="mp-bot-difficulty-button" type="button">Veteran
+                </button>
+            </div>
         </div>
 
         <div class="mp-panel" data-role="mp-panel-host" hidden>

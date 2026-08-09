@@ -1,406 +1,411 @@
 {
-    "locale": "en-US",
-    "boot": {
-        "settings": "Loading settings...",
-        "sprites": "Building block cache...",
-        "audio": "Loading audio...",
-        "finalize": "Starting..."
+  "locale": "en-US",
+  "boot": {
+    "settings": "Loading settings...",
+    "sprites": "Building block cache...",
+    "audio": "Loading audio...",
+    "finalize": "Starting..."
+  },
+  "sidebar": {
+    "nextPiece": "Next piece",
+    "score": "Score",
+    "time": "Time",
+    "lines": "Lines",
+    "best": "Best",
+    "drought": "Drought",
+    "tetrisRate": "4LR",
+    "pps": "PPS",
+    "objective": "Objective",
+    "statusLive": "Current game",
+    "statusLast": "Last game"
+  },
+  "controls": {
+    "toggle": "Controls",
+    "rotate": "Rotate",
+    "rotate180": "Rotate 180°",
+    "moveLeftRight": "Move left / right",
+    "softDrop": "Soft drop",
+    "hardDrop": "Hard drop",
+    "pause": "Pause",
+    "start": "Start / new game",
+    "mute": "Mute sound",
+    "options": "Options",
+    "spaceKey": "Space",
+    "restart": "Restart",
+    "exitToMenu": "Exit to menu",
+    "touchMove": "Move",
+    "touchMoveGesture": "Drag on board",
+    "touchRotateGesture": "Tap board",
+    "touchHardDropGesture": "Swipe down",
+    "touchSoftDropGesture": "Hold ▼",
+    "touchPauseGesture": "❚❚ button",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  },
+  "screens": {
+    "idle": {
+      "hint": "Difficulty",
+      "modeHint": "Mode",
+      "startButton": "Start",
+      "namePlaceholder": "Your nickname",
+      "newProfileOption": "+ New profile",
+      "profileSelectLabel": "Switch profile",
+      "deleteProfileButton": "Delete profile",
+      "deleteProfileConfirm": "Delete profile {name}? You'll be able to restore it for 7 days.",
+      "restoreProfileGroup": "Restore profile"
     },
-    "sidebar": {
-        "nextPiece": "Next piece",
-        "score": "Score",
-        "time": "Time",
-        "lines": "Lines",
-        "best": "Best",
-        "drought": "Drought",
-        "tetrisRate": "4LR",
-        "pps": "PPS",
-        "objective": "Objective",
-        "statusLive": "Current game",
-        "statusLast": "Last game"
+    "modeInfo": {
+      "subtitle": "Mode: {mode}",
+      "continueButton": "Continue"
     },
-    "controls": {
-        "toggle": "Controls",
-        "rotate": "Rotate",
-        "rotate180": "Rotate 180°",
-        "moveLeftRight": "Move left / right",
-        "softDrop": "Soft drop",
-        "hardDrop": "Hard drop",
-        "pause": "Pause",
-        "start": "Start / new game",
-        "mute": "Mute sound",
-        "options": "Options",
-        "spaceKey": "Space",
-        "restart": "Restart",
-        "exitToMenu": "Exit to menu",
-        "touchMove": "Move",
-        "touchMoveGesture": "Drag on board",
-        "touchRotateGesture": "Tap board",
-        "touchHardDropGesture": "Swipe down",
-        "touchSoftDropGesture": "Hold ▼",
-        "touchPauseGesture": "❚❚ button",
-        "confirm": "Confirm",
-        "cancel": "Cancel"
+    "paused": {
+      "title": "PAUSED",
+      "resumeHintBefore": "Press",
+      "resumeHintAfter": "to resume",
+      "optionsHintBefore": "Press",
+      "optionsHintAfter": "to open options",
+      "resumeButton": "Resume"
     },
-    "screens": {
-        "idle": {
-            "hint": "Difficulty",
-            "modeHint": "Mode",
-            "startButton": "Start",
-            "namePlaceholder": "Your nickname",
-            "newProfileOption": "+ New profile",
-            "profileSelectLabel": "Switch profile",
-            "deleteProfileButton": "Delete profile",
-            "deleteProfileConfirm": "Delete profile {name}? You'll be able to restore it for 7 days.",
-            "restoreProfileGroup": "Restore profile"
-        },
-        "modeInfo": {
-            "subtitle": "Mode: {mode}",
-            "continueButton": "Continue"
-        },
-        "paused": {
-            "title": "PAUSED",
-            "resumeHintBefore": "Press",
-            "resumeHintAfter": "to resume",
-            "optionsHintBefore": "Press",
-            "optionsHintAfter": "to open options",
-            "resumeButton": "Resume"
-        },
-        "options": {
-            "title": "OPTIONS",
-            "closeHintBefore": "Press",
-            "closeHintAfter": "to close",
-            "generalTitle": "General",
-            "searchPlaceholder": "Search options…",
-            "searchNoResults": "No matching options",
-            "language": "Language",
-            "soundTitle": "Sound",
-            "mute": "Mute",
-            "unmute": "Unmute",
-            "volume": "Volume",
-            "sfxTitle": "SFX",
-            "musicTitle": "Music",
-            "voicesTitle": "Voices",
-            "countdownTitle": "Countdown",
-            "categoryVolume": "Category volume",
-            "preview": "Preview",
-            "pause": "Pause",
-            "hudRight": "HUD on the right",
-            "gameplayTitle": "Gameplay",
-            "skipCountdown": "Skip countdown",
-            "skipModeInfo": "Skip mode info screen",
-            "controlsTitle": "Controls",
-            "mouseTitle": "Mouse",
-            "mouseControl": "Mouse control",
-            "graphicsTitle": "Graphics",
-            "ghost": "Ghost piece",
-            "gridLines": "Grid lines",
-            "screenShake": "Screen shake",
-            "heightSaturation": "Height saturation",
-            "performanceTitle": "Performance",
-            "glow": "Glow (blur)",
-            "transparency": "Transparency",
-            "fallTrail": "Fall trail",
-            "theme": "Theme",
-            "themeNone": "None",
-            "themeVHS": "VHS noise",
-            "themeMatrix": "Matrix",
-            "themeRain": "Rain",
-            "themeSnow": "Snow",
-            "close": "Close",
-            "mouseSensitivity": "Mouse sensitivity",
-            "touchSensitivity": "Touch sensitivity",
-            "calibrateSensitivity": "Sensitivity calibration",
-            "calibrateSensitivityButton": "Calibrate",
-            "advancedTitle": "Advanced",
-            "keyboardDas": "Keyboard DAS (ms)",
-            "keyboardArr": "Keyboard ARR (ms)",
-            "calibrateKeyboard": "Calibrate keyboard",
-            "calibrateKeyboardButton": "Calibrate",
-            "dataTitle": "Import / Export",
-            "exportLabel": "Export options to a file",
-            "exportButton": "Export",
-            "importLabel": "Import options from a file",
-            "importButton": "Import",
-            "importDiffTitle": "Import options",
-            "importDiffSubtitle": "{count} option(s) differ from your current settings",
-            "importSelectAll": "Select all",
-            "importApply": "Apply selected",
-            "importCancel": "Cancel",
-            "importClose": "OK",
-            "importNoChanges": "The imported file matches your current options — nothing to change.",
-            "importInvalid": "This file doesn't look like a valid options export.",
-            "valueOn": "On",
-            "valueOff": "Off",
-            "autoValue": "auto",
-            "soundVolumesLabel": "Individual sound volumes",
-            "keyboardTitle": "Keyboard",
-            "keyboardHint": "Click a key to reassign it",
-            "keyboardResetButton": "Reset to defaults",
-            "resetDefaults": "Reset to defaults",
-            "keyboardPressKey": "Press a key…",
-            "keyboardReset": "Reset keys",
-            "developerTitle": "Developer",
-            "benchmark": "Benchmark",
-            "benchmarkHint": "Simulates a fast random game and times each part of the engine to find the slowest one.",
-            "benchmarkButton": "Run benchmark",
-            "benchmarkRunning": "Running… ({percent}%)",
-            "benchmarkDone": "Simulated {pieces} pieces in {ms} ms. Slowest: {label} ({percent}%).",
-            "benchmarkCopyButton": "Copy results",
-            "benchmarkCopied": "Copied to clipboard",
-            "benchmarkCopyFailed": "Copy failed"
-        },
-        "calibration": {
-            "gestures": {
-                "sideToCenter": "Drag the piece to the center column",
-                "sideToEdge": "Drag the piece to the edge column",
-                "toWall": "Drag to the wall {kbd}",
-                "click": "Click once {kbd}",
-                "hardDrop": "Hard drop the piece",
-                "softDropOne": "Soft drop the piece",
-                "rotate": "Rotate the piece",
-                "hold": "Hold {kbd}, then release"
-            },
-            "progress": "Round {pass}/{totalPasses} · Step {step}/{steps}",
-            "resultTitle": "SENSITIVITY CALIBRATION",
-            "resultSuccessBefore": "Your sensitivity is now set to",
-            "resultFailed": "Couldn't calculate a sensitivity value — try again using a mouse drag or touch swipe.",
-            "resultClose": "Close",
-            "resultSave": "Save",
-            "resultDiscard": "Discard",
-            "resultRestart": "Restart"
-        },
-        "keyboardCalibration": {
-            "resultTitle": "KEYBOARD CALIBRATION",
-            "resultDas": "DAS:",
-            "resultArr": "ARR:",
-            "resultFailed": "Not enough data was captured — try holding a direction key for at least one round.",
-            "resultSave": "Save",
-            "resultDiscard": "Discard",
-            "resultRestart": "Restart"
-        },
-        "loading": {
-            "leaderboardHint": "Loading leaderboard..."
-        },
-        "gameOverEntry": {
-            "title": "GAME OVER",
-            "titleSprintComplete": "SPRINT COMPLETE",
-            "titleTimeUp": "TIME'S UP",
-            "titleCheeseClear": "CHEESE CLEARED",
-            "titleDigComplete": "DIG COMPLETE",
-            "scoreLabel": "Score:",
-            "levelLabel": "level",
-            "linesLabel": "lines",
-            "todayBestLabel": "Today's best:",
-            "todayBestBy": "by",
-            "submit": "Continue",
-            "shareButton": "Share",
-            "statsTitle": "Session stats",
-            "gameTimeLabel": "Time",
-            "droughtLabel": "D.MAX",
-            "droughtTotalLabel": "D.TOTAL",
-            "droughtAvgLabel": "D.AVG",
-            "burnLabel": "BRN",
-            "transitionLabel": "TRNS",
-            "tetrisRateLabel": "4-line rate (4LR)",
-            "clearsLabel": "Clears (1/2/3/4 lines)",
-            "ppsLabel": "PPS",
-            "spinsLabel": "Spins (T / T-mini / other)",
-            "maxComboLabel": "Longest combo",
-            "efficiencyLabel": "Efficiency (pts/line)"
-        },
-        "gameOverSaved": {
-            "title": "SCORE SAVED",
-            "playAgainButton": "Play again"
-        }
+    "options": {
+      "title": "OPTIONS",
+      "closeHintBefore": "Press",
+      "closeHintAfter": "to close",
+      "generalTitle": "General",
+      "searchPlaceholder": "Search options…",
+      "searchNoResults": "No matching options",
+      "language": "Language",
+      "soundTitle": "Sound",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "volume": "Volume",
+      "sfxTitle": "SFX",
+      "musicTitle": "Music",
+      "voicesTitle": "Voices",
+      "countdownTitle": "Countdown",
+      "categoryVolume": "Category volume",
+      "preview": "Preview",
+      "pause": "Pause",
+      "hudRight": "HUD on the right",
+      "gameplayTitle": "Gameplay",
+      "skipCountdown": "Skip countdown",
+      "skipModeInfo": "Skip mode info screen",
+      "controlsTitle": "Controls",
+      "mouseTitle": "Mouse",
+      "mouseControl": "Mouse control",
+      "graphicsTitle": "Graphics",
+      "ghost": "Ghost piece",
+      "gridLines": "Grid lines",
+      "screenShake": "Screen shake",
+      "heightSaturation": "Height saturation",
+      "performanceTitle": "Performance",
+      "glow": "Glow (blur)",
+      "transparency": "Transparency",
+      "fallTrail": "Fall trail",
+      "theme": "Theme",
+      "themeNone": "None",
+      "themeVHS": "VHS noise",
+      "themeMatrix": "Matrix",
+      "themeRain": "Rain",
+      "themeSnow": "Snow",
+      "close": "Close",
+      "mouseSensitivity": "Mouse sensitivity",
+      "touchSensitivity": "Touch sensitivity",
+      "calibrateSensitivity": "Sensitivity calibration",
+      "calibrateSensitivityButton": "Calibrate",
+      "advancedTitle": "Advanced",
+      "keyboardDas": "Keyboard DAS (ms)",
+      "keyboardArr": "Keyboard ARR (ms)",
+      "calibrateKeyboard": "Calibrate keyboard",
+      "calibrateKeyboardButton": "Calibrate",
+      "dataTitle": "Import / Export",
+      "exportLabel": "Export options to a file",
+      "exportButton": "Export",
+      "importLabel": "Import options from a file",
+      "importButton": "Import",
+      "importDiffTitle": "Import options",
+      "importDiffSubtitle": "{count} option(s) differ from your current settings",
+      "importSelectAll": "Select all",
+      "importApply": "Apply selected",
+      "importCancel": "Cancel",
+      "importClose": "OK",
+      "importNoChanges": "The imported file matches your current options — nothing to change.",
+      "importInvalid": "This file doesn't look like a valid options export.",
+      "valueOn": "On",
+      "valueOff": "Off",
+      "autoValue": "auto",
+      "soundVolumesLabel": "Individual sound volumes",
+      "keyboardTitle": "Keyboard",
+      "keyboardHint": "Click a key to reassign it",
+      "keyboardResetButton": "Reset to defaults",
+      "resetDefaults": "Reset to defaults",
+      "keyboardPressKey": "Press a key…",
+      "keyboardReset": "Reset keys",
+      "developerTitle": "Developer",
+      "benchmark": "Benchmark",
+      "benchmarkHint": "Simulates a fast random game and times each part of the engine to find the slowest one.",
+      "benchmarkButton": "Run benchmark",
+      "benchmarkRunning": "Running… ({percent}%)",
+      "benchmarkDone": "Simulated {pieces} pieces in {ms} ms. Slowest: {label} ({percent}%).",
+      "benchmarkCopyButton": "Copy results",
+      "benchmarkCopied": "Copied to clipboard",
+      "benchmarkCopyFailed": "Copy failed"
     },
-    "leaderboard": {
-        "title": "Leaderboard",
-        "empty": "No scores yet — be the first to play!",
-        "headers": {
-            "name": "Name",
-            "score": "Score",
-            "time": "Time",
-            "level": "Lvl",
-            "lines": "Lines",
-            "date": "Date"
-        },
-        "defaultName": "Player",
-        "shareButton": "Share leaderboard"
+    "calibration": {
+      "gestures": {
+        "sideToCenter": "Drag the piece to the center column",
+        "sideToEdge": "Drag the piece to the edge column",
+        "toWall": "Drag to the wall {kbd}",
+        "click": "Click once {kbd}",
+        "hardDrop": "Hard drop the piece",
+        "softDropOne": "Soft drop the piece",
+        "rotate": "Rotate the piece",
+        "hold": "Hold {kbd}, then release"
+      },
+      "progress": "Round {pass}/{totalPasses} · Step {step}/{steps}",
+      "resultTitle": "SENSITIVITY CALIBRATION",
+      "resultSuccessBefore": "Your sensitivity is now set to",
+      "resultFailed": "Couldn't calculate a sensitivity value — try again using a mouse drag or touch swipe.",
+      "resultClose": "Close",
+      "resultSave": "Save",
+      "resultDiscard": "Discard",
+      "resultRestart": "Restart"
     },
-    "credits": {
-        "roleDeveloper": "Software Engineer",
-        "roleTester": "Tester",
-        "roleMusic": "Music",
-        "roleSfx": "SFX"
+    "keyboardCalibration": {
+      "resultTitle": "KEYBOARD CALIBRATION",
+      "resultDas": "DAS:",
+      "resultArr": "ARR:",
+      "resultFailed": "Not enough data was captured — try holding a direction key for at least one round.",
+      "resultSave": "Save",
+      "resultDiscard": "Discard",
+      "resultRestart": "Restart"
     },
-    "difficulty": {
-        "easy": "Rookie",
-        "medium": "Amateur",
-        "hard": "Veteran",
-        "expert": "Expert",
-        "pro": "PRO",
-        "levelPrefix": "level {level}"
+    "loading": {
+      "leaderboardHint": "Loading leaderboard..."
     },
-    "modes": {
-        "marathon": {
-            "name": "Marathon",
-            "description": "Classic endless play",
-            "rules": [
-                "♾️ Endless game — clear lines and climb levels",
-                "📈 Drop speed increases with every level",
-                "🏆 Score and highest level reached both count"
-            ]
-        },
-        "sprint": {
-            "name": "Sprint",
-            "description": "Clear 40 lines as fast as you can",
-            "rules": [
-                "🎯 Goal: clear 40 lines",
-                "⏱️ Your finish time is what counts — go fast",
-                "🚫 An unfinished run won't be saved to the leaderboard"
-            ]
-        },
-        "ultra": {
-            "name": "Ultra",
-            "description": "Highest score in 3 minutes",
-            "rules": [
-                "⏱️ You get exactly 3 minutes",
-                "💯 Score as high as you can before time runs out",
-                "📊 Only your final score counts"
-            ]
-        },
-        "survival": {
-            "name": "Survival",
-            "description": "Watch out for rising lines",
-            "rules": [
-                "🧱 Garbage lines keep rising from the bottom",
-                "🕳️ Find and use the gaps in the garbage",
-                "☠️ The game ends when the board fills up"
-            ]
-        },
-        "cheeseRace": {
-            "name": "Cheese Race",
-            "description": "Dig out a pre-built stack as fast as you can",
-            "rules": [
-                "🧀 The board starts with 10 rows of garbage with a gap",
-                "⏱️ Dig it all out as fast as you can",
-                "🚫 An unfinished run won't be saved to the leaderboard"
-            ]
-        },
-        "digSurvival": {
-            "name": "Dig Survival",
-            "description": "Dig forever - the garbage grows right back every time you clear it. Survive and dig 100 lines total.",
-            "rules": [
-                "🧀 Starts with a small garbage stack at the bottom",
-                "♻️ Every line you dig out instantly regrows from below - the stack never runs out",
-                "🎯 Dig a total of 100 lines to win",
-                "☠️ The game ends when the board fills up"
-            ]
-        },
-        "countdown": {
-            "name": "Countdown",
-            "description": "Clear lines to keep the clock from hitting zero",
-            "rules": [
-                "⏱️ Starts with 60 seconds on the clock",
-                "➕ Every line clear adds time back (more for 4 lines)",
-                "⏳ The game ends when the clock hits zero"
-            ]
-        },
-        "random": {
-            "name": "Random",
-            "description": "Picks one of the other modes for you when you press Start",
-            "rules": [
-                "🎲 Picks one of the other modes at random",
-                "▶️ The round then plays exactly like that mode",
-                "🔁 Pick Random again for another surprise"
-            ]
-        }
+    "gameOverEntry": {
+      "title": "GAME OVER",
+      "titleSprintComplete": "SPRINT COMPLETE",
+      "titleTimeUp": "TIME'S UP",
+      "titleCheeseClear": "CHEESE CLEARED",
+      "titleDigComplete": "DIG COMPLETE",
+      "scoreLabel": "Score:",
+      "levelLabel": "level",
+      "linesLabel": "lines",
+      "todayBestLabel": "Today's best:",
+      "todayBestBy": "by",
+      "submit": "Continue",
+      "shareButton": "Share",
+      "statsTitle": "Session stats",
+      "gameTimeLabel": "Time",
+      "droughtLabel": "D.MAX",
+      "droughtTotalLabel": "D.TOTAL",
+      "droughtAvgLabel": "D.AVG",
+      "burnLabel": "BRN",
+      "transitionLabel": "TRNS",
+      "tetrisRateLabel": "4-line rate (4LR)",
+      "clearsLabel": "Clears (1/2/3/4 lines)",
+      "ppsLabel": "PPS",
+      "spinsLabel": "Spins (T / T-mini / other)",
+      "maxComboLabel": "Longest combo",
+      "efficiencyLabel": "Efficiency (pts/line)"
     },
-    "game": {
-        "levelUpBanner": "LEVEL {level}"
-    },
-    "benchmark": {
-        "categories": {
-            "pieceGeneration": "Piece generation",
-            "movement": "Movement checks",
-            "rotation": "Rotation & kicks",
-            "dropOffset": "Hard-drop offset calc",
-            "lockPiece": "Locking piece to board",
-            "lineClearDetect": "Detecting full lines",
-            "lineClearApply": "Clearing full lines",
-            "scoring": "Scoring",
-            "renderRefreshRect": "Render: canvas rect refresh",
-            "renderBackgroundRebuild": "Render: board background rebuild",
-            "renderBlit": "Render: board blit",
-            "renderDrawPiece": "Render: falling piece",
-            "renderDrawGhost": "Render: ghost piece",
-            "audioPlay": "Audio: play trigger",
-            "audioStop": "Audio: stop trigger"
-        }
-    },
-    "sounds": {
-        "lineClear1": "line",
-        "lineClear2": "II: line",
-        "lineClear3": "III: line",
-        "lineClear4": "IV: line",
-        "drop": "Piece drop",
-        "gameOver": "Game over",
-        "levelUp": "Level up",
-        "rotate": "Rotate",
-        "grounded": "Piece grounded",
-        "falling": "Piece falling",
-        "pieceLock": "Piece lock"
-    },
-    "share": {
-        "text": "I scored {score} points in {mode} on {app}! 🎮",
-        "textByName": "{name} scored {score} points in {mode} on {app}! 🎮",
-        "tableText": "My leaderboard for {mode} on {app}! 🎮",
-        "status": {
-            "shared": "Shared!",
-            "copied": "Image copied!",
-            "downloaded": "Image saved!",
-            "error": "Couldn't share",
-            "empty": "No scores yet"
-        }
-    },
-    "multiplayer": {
-        "title": "Multiplayer",
-        "step1Label": "Connection type",
-        "step2Label": "Exchange codes",
-        "step3Label": "Ready check",
-        "button": "Multiplayer",
-        "chooseConnection": "Choose how to connect",
-        "hostButton": "Create room",
-        "joinButton": "Join room",
-        "sendCodeHint": "Send this code to the player you want to play with",
-        "copyButton": "Copy code",
-        "generatingCode": "Please wait, generating code…",
-        "pasteAnswerHint": "Paste the answer code from the other player",
-        "codePlaceholder": "Paste code here…",
-        "connectButton": "Connect",
-        "pasteHostHint": "Paste the room code you got from the host",
-        "joinConnectButton": "Join",
-        "sendBackHint": "Send this code back to the host",
-        "statusConnecting": "Connecting…",
-        "statusConnected": "Connected. Click “Ready” when you're ready to play.",
-        "statusBothReadyHost": "Both players ready — you can start the game.",
-        "statusBothReadyGuest": "Both players ready — wait for the host to start.",
-        "statusDisconnected": "Connection with the opponent was lost.",
-        "statusError": "A connection error occurred.",
-        "youReady": "You: ready",
-        "youNotReady": "You: not ready",
-        "opponentFallback": "Opponent",
-        "opponentReady": "{name}: ready",
-        "opponentNotReady": "{name}: not ready",
-        "readyButton": "Ready",
-        "startButton": "Start game",
-        "won": "🏆 You won!",
-        "lost": "You lost.",
-        "draw": "Draw!",
-        "resultScore": "{result} (You: {local} / {name}: {remote})",
-        "opponentScore": "{name}: {score}",
-        "genericError": "Failed to establish a connection.",
-        "pauseBlocked": "Pause is disabled during a multiplayer match."
+    "gameOverSaved": {
+      "title": "SCORE SAVED",
+      "playAgainButton": "Play again"
     }
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "empty": "No scores yet — be the first to play!",
+    "headers": {
+      "name": "Name",
+      "score": "Score",
+      "time": "Time",
+      "level": "Lvl",
+      "lines": "Lines",
+      "date": "Date"
+    },
+    "defaultName": "Player",
+    "shareButton": "Share leaderboard"
+  },
+  "credits": {
+    "roleDeveloper": "Software Engineer",
+    "roleTester": "Tester",
+    "roleMusic": "Music",
+    "roleSfx": "SFX"
+  },
+  "difficulty": {
+    "easy": "Rookie",
+    "medium": "Amateur",
+    "hard": "Veteran",
+    "expert": "Expert",
+    "pro": "PRO",
+    "levelPrefix": "level {level}"
+  },
+  "modes": {
+    "marathon": {
+      "name": "Marathon",
+      "description": "Classic endless play",
+      "rules": [
+        "♾️ Endless game — clear lines and climb levels",
+        "📈 Drop speed increases with every level",
+        "🏆 Score and highest level reached both count"
+      ]
+    },
+    "sprint": {
+      "name": "Sprint",
+      "description": "Clear 40 lines as fast as you can",
+      "rules": [
+        "🎯 Goal: clear 40 lines",
+        "⏱️ Your finish time is what counts — go fast",
+        "🚫 An unfinished run won't be saved to the leaderboard"
+      ]
+    },
+    "ultra": {
+      "name": "Ultra",
+      "description": "Highest score in 3 minutes",
+      "rules": [
+        "⏱️ You get exactly 3 minutes",
+        "💯 Score as high as you can before time runs out",
+        "📊 Only your final score counts"
+      ]
+    },
+    "survival": {
+      "name": "Survival",
+      "description": "Watch out for rising lines",
+      "rules": [
+        "🧱 Garbage lines keep rising from the bottom",
+        "🕳️ Find and use the gaps in the garbage",
+        "☠️ The game ends when the board fills up"
+      ]
+    },
+    "cheeseRace": {
+      "name": "Cheese Race",
+      "description": "Dig out a pre-built stack as fast as you can",
+      "rules": [
+        "🧀 The board starts with 10 rows of garbage with a gap",
+        "⏱️ Dig it all out as fast as you can",
+        "🚫 An unfinished run won't be saved to the leaderboard"
+      ]
+    },
+    "digSurvival": {
+      "name": "Dig Survival",
+      "description": "Dig forever - the garbage grows right back every time you clear it. Survive and dig 100 lines total.",
+      "rules": [
+        "🧀 Starts with a small garbage stack at the bottom",
+        "♻️ Every line you dig out instantly regrows from below - the stack never runs out",
+        "🎯 Dig a total of 100 lines to win",
+        "☠️ The game ends when the board fills up"
+      ]
+    },
+    "countdown": {
+      "name": "Countdown",
+      "description": "Clear lines to keep the clock from hitting zero",
+      "rules": [
+        "⏱️ Starts with 60 seconds on the clock",
+        "➕ Every line clear adds time back (more for 4 lines)",
+        "⏳ The game ends when the clock hits zero"
+      ]
+    },
+    "random": {
+      "name": "Random",
+      "description": "Picks one of the other modes for you when you press Start",
+      "rules": [
+        "🎲 Picks one of the other modes at random",
+        "▶️ The round then plays exactly like that mode",
+        "🔁 Pick Random again for another surprise"
+      ]
+    }
+  },
+  "game": {
+    "levelUpBanner": "LEVEL {level}"
+  },
+  "benchmark": {
+    "categories": {
+      "pieceGeneration": "Piece generation",
+      "movement": "Movement checks",
+      "rotation": "Rotation & kicks",
+      "dropOffset": "Hard-drop offset calc",
+      "lockPiece": "Locking piece to board",
+      "lineClearDetect": "Detecting full lines",
+      "lineClearApply": "Clearing full lines",
+      "scoring": "Scoring",
+      "renderRefreshRect": "Render: canvas rect refresh",
+      "renderBackgroundRebuild": "Render: board background rebuild",
+      "renderBlit": "Render: board blit",
+      "renderDrawPiece": "Render: falling piece",
+      "renderDrawGhost": "Render: ghost piece",
+      "audioPlay": "Audio: play trigger",
+      "audioStop": "Audio: stop trigger"
+    }
+  },
+  "sounds": {
+    "lineClear1": "line",
+    "lineClear2": "II: line",
+    "lineClear3": "III: line",
+    "lineClear4": "IV: line",
+    "drop": "Piece drop",
+    "gameOver": "Game over",
+    "levelUp": "Level up",
+    "rotate": "Rotate",
+    "grounded": "Piece grounded",
+    "falling": "Piece falling",
+    "pieceLock": "Piece lock"
+  },
+  "share": {
+    "text": "I scored {score} points in {mode} on {app}! 🎮",
+    "textByName": "{name} scored {score} points in {mode} on {app}! 🎮",
+    "tableText": "My leaderboard for {mode} on {app}! 🎮",
+    "status": {
+      "shared": "Shared!",
+      "copied": "Image copied!",
+      "downloaded": "Image saved!",
+      "error": "Couldn't share",
+      "empty": "No scores yet"
+    }
+  },
+  "multiplayer": {
+    "title": "Multiplayer",
+    "step1Label": "Connection type",
+    "step2Label": "Exchange codes",
+    "step2LabelBot": "Difficulty",
+    "step3Label": "Ready check",
+    "button": "Multiplayer",
+    "chooseConnection": "Choose how to connect",
+    "chooseBotDifficulty": "Choose a difficulty",
+    "botHint": "Practice on your own — the bot draws the exact same pieces as you, in the same order.",
+    "hostButton": "Create room",
+    "joinButton": "Join room",
+    "botButton": "Play vs bot",
+    "sendCodeHint": "Send this code to the player you want to play with",
+    "copyButton": "Copy code",
+    "generatingCode": "Please wait, generating code…",
+    "pasteAnswerHint": "Paste the answer code from the other player",
+    "codePlaceholder": "Paste code here…",
+    "connectButton": "Connect",
+    "pasteHostHint": "Paste the room code you got from the host",
+    "joinConnectButton": "Join",
+    "sendBackHint": "Send this code back to the host",
+    "statusConnecting": "Connecting…",
+    "statusConnected": "Connected. Click “Ready” when you're ready to play.",
+    "statusBothReadyHost": "Both players ready — you can start the game.",
+    "statusBothReadyGuest": "Both players ready — wait for the host to start.",
+    "statusDisconnected": "Connection with the opponent was lost.",
+    "statusError": "A connection error occurred.",
+    "youReady": "You: ready",
+    "youNotReady": "You: not ready",
+    "opponentFallback": "Opponent",
+    "botName": "Bot ({difficulty})",
+    "opponentReady": "{name}: ready",
+    "opponentNotReady": "{name}: not ready",
+    "readyButton": "Ready",
+    "startButton": "Start game",
+    "won": "🏆 You won!",
+    "lost": "You lost.",
+    "draw": "Draw!",
+    "resultScore": "{result} (You: {local} / {name}: {remote})",
+    "opponentScore": "{name}: {score}",
+    "genericError": "Failed to establish a connection.",
+    "pauseBlocked": "Pause is disabled during a multiplayer match."
+  }
 }

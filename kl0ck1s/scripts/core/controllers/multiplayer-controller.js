@@ -1,8 +1,11 @@
 "use strict";
 
 import {MultiplayerSession} from "../net/multiplayer-session.js";
+import {BotOpponent, BOT_DIFFICULTIES} from "../ai/bot-opponent.js";
+import {PieceBag} from "../game/piece-bag.js";
+import {mulberry32, randomSeed} from "../shared/seeded-random.js";
 import {copyTextToClipboard, formatNumber} from "../shared/utils.js";
-import {BOARD_CONFIG, COLOR_PALETTE} from "../shared/config.js";
+import {BOARD_CONFIG, COLOR_PALETTE, KLOCKOMINO_TYPES} from "../shared/config.js";
 
 const SCORE_POLL_MS = 200;
 const RUNNING_STATES = new Set(["countdown", "running", "clearing", "paused"]);
@@ -19,6 +22,7 @@ const STEP_BY_PANEL = {
     role: {step: 1, labelKey: "multiplayer.step1Label"},
     host: {step: 2, labelKey: "multiplayer.step2Label"},
     join: {step: 2, labelKey: "multiplayer.step2Label"},
+    bot: {step: 2, labelKey: "multiplayer.step2LabelBot"},
     ready: {step: 3, labelKey: "multiplayer.step3Label"},
 };
 
@@ -32,6 +36,15 @@ const STEP_BY_PANEL = {
  * a compact nickname+score badge everywhere, plus, on desktop, a full-size
  * board rendered right next to the local one (same cell size, same `.board`
  * markup) — followed by a win/lose result once both sides finish.
+ *
+ * The same overlay also offers a "practice vs bot" option: a local,
+ * headless BotOpponent stands in for the peer, so there's no handshake and
+ * no `MultiplayerSession` at all - the bot just fires the same
+ * `{kind: "score"|"board"|"final"}` "message" shape a real peer would, so
+ * every opponent-panel/result code path below runs unmodified for both.
+ * For that single match the player's own piece bag is swapped for a seeded
+ * one shared with the bot, so both boards draw the exact same sequence of
+ * pieces - restored to plain randomness once the match ends.
  */
 export class MultiplayerController {
     constructor(game, dom = globalThis.document ?? null, i18n = null) {
@@ -40,6 +53,11 @@ export class MultiplayerController {
         this.i18n = i18n;
         this.session = null;
         this.role = null;
+
+        // The player's real bag, saved once so it can be restored after a
+        // bot match swaps in a seeded one (see _beginBot/_teardownBotMode).
+        this._defaultBag = game.bag;
+        this.botOpponent = null;
 
         this._pollTimer = null;
         this._lastSentScore = -1;
@@ -69,6 +87,7 @@ export class MultiplayerController {
             role: this.dom?.querySelector('[data-role="mp-panel-role"]') ?? null,
             host: this.dom?.querySelector('[data-role="mp-panel-host"]') ?? null,
             join: this.dom?.querySelector('[data-role="mp-panel-join"]') ?? null,
+            bot: this.dom?.querySelector('[data-role="mp-panel-bot"]') ?? null,
             ready: this.dom?.querySelector('[data-role="mp-panel-ready"]') ?? null,
         };
     }
@@ -90,6 +109,11 @@ export class MultiplayerController {
 
         this.dom.querySelector('[data-role="mp-host-button"]')?.addEventListener("click", () => this._beginHost());
         this.dom.querySelector('[data-role="mp-join-button"]')?.addEventListener("click", () => this._showPanel("join"));
+        this.dom.querySelector('[data-role="mp-bot-button"]')?.addEventListener("click", () => this._showPanel("bot"));
+
+        this.dom.querySelectorAll('[data-role="mp-bot-difficulty-button"]').forEach((button) => {
+            button.addEventListener("click", () => this._beginBot(button.dataset.difficulty));
+        });
 
         this.dom.querySelector('[data-role="mp-host-copy-button"]')?.addEventListener("click", (event) =>
             this._copyFrom('[data-role="mp-host-code"]', event.currentTarget));
@@ -220,6 +244,45 @@ export class MultiplayerController {
             if (answerWrap) answerWrap.hidden = true;
             this._showError(err);
         }
+    }
+
+    // --- practice vs bot ---
+
+    /** Starts a local bot match: no session, no handshake - straight into the game. */
+    _beginBot(difficultyKey) {
+        if (!BOT_DIFFICULTIES[difficultyKey]) return;
+        this._clearError();
+        this._resetSession();
+        this.role = "bot";
+
+        const seed = randomSeed();
+        // Same seed, two independent bags: the player's real game and the
+        // bot's headless one now draw pieces in the exact same order.
+        this.game.bag = new PieceBag(KLOCKOMINO_TYPES, mulberry32(seed));
+        this.botOpponent = new BotOpponent({
+            types: KLOCKOMINO_TYPES,
+            cols: BOARD_CONFIG.COLS,
+            rows: BOARD_CONFIG.ROWS,
+            seed,
+            difficultyKey,
+        });
+        this.botOpponent.addEventListener("message", (event) => this._onPeerMessage(event.detail));
+        this._remoteName = this._t("multiplayer.botName", {difficulty: this._t(`difficulty.${difficultyKey}`)});
+        this.game.multiplayerConnected = true;
+
+        this._launchMatch();
+        this.botOpponent.start();
+    }
+
+    _teardownBotMode() {
+        if (!this.botOpponent && this.role !== "bot") return;
+        this.botOpponent?.stop();
+        this.botOpponent = null;
+        // Restore true randomness now that no bot match is using the seeded
+        // bag - a fresh instance rather than mutating game.bag's private
+        // state, since PieceBag exposes no reset/reseed hook.
+        this.game.bag = this._defaultBag;
+        this.role = null;
     }
 
     _copyFrom(selector, button) {
@@ -355,6 +418,10 @@ export class MultiplayerController {
         if (this._wasInMatch && FINISHED_STATES.has(game.state) && this._localFinalScore === null) {
             this._localFinalScore = game.score;
             this._sendToPeer({kind: "final", score: game.score});
+            // A bot may never top out on its own (a good one can run
+            // indefinitely) - once the player's round is over, lock in
+            // whatever score it has right now instead of waiting on it.
+            this.botOpponent?.finish();
             this._maybeShowResult();
         }
 
@@ -364,6 +431,7 @@ export class MultiplayerController {
             this._stopScoreSync();
             this._wasInMatch = false;
             this._hideOpponentUI();
+            this._teardownBotMode();
         }
     }
 
@@ -608,6 +676,7 @@ export class MultiplayerController {
     _resetSession() {
         this._stopScoreSync();
         this._hideOpponentUI();
+        this._teardownBotMode();
         this.session?.close();
         this.session = null;
         this.role = null;

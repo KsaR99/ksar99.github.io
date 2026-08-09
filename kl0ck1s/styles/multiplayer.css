@@ -169,6 +169,21 @@
     border-color: var(--accent-2);
 }
 
+.mp-bot-button {
+    width: 100%;
+}
+
+.mp-bot-hint {
+    margin: -0.2rem 0 0;
+    font-size: 0.8125rem;
+    color: var(--muted);
+    text-align: center;
+}
+
+.screen__button-row--stack {
+    flex-direction: column;
+}
+
 .mp-error {
     margin: 0;
     font-size: 0.8125rem;
