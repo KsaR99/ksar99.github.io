@@ -2,11 +2,6 @@
 
 import {SCORING, VOICE_COUNTING_NUMBERS, voiceCountingKey} from "./config.js";
 
-/**
- * Splits a number into the counting-voice numbers needed to say it aloud,
- * e.g. 3 -> [3], 20 -> [20], 21 -> [20, 1], 100 -> [100].
- * Only covers what the counting voice pack has (1-19, tens up to 90, 100).
- */
 export function numberToCountingParts(number) {
     if (!Number.isInteger(number) || number <= 0) return [];
     if (VOICE_COUNTING_NUMBERS.includes(number)) return [number];
@@ -24,7 +19,6 @@ export function numberToVoiceKeys(number) {
     return numberToCountingParts(number).map(voiceCountingKey);
 }
 
-/** Iterates filled cells of a packed shape mask, calling cb(row, col) for each. */
 export function forEachShapeCell(mask, width, height, cb) {
     for (let r = 0; r < height; r++) {
         for (let c = 0; c < width; c++) {
@@ -33,7 +27,6 @@ export function forEachShapeCell(mask, width, height, cb) {
     }
 }
 
-/** Tight bounding box of the actually-filled cells within a shape's bounding box. */
 export function getTightBounds(mask, width, height) {
     let minX = width, maxX = -1, minY = height, maxY = -1;
 
@@ -117,7 +110,6 @@ export function formatNumber(number, decimals = 1) {
     return String(number);
 }
 
-/** Formats a duration in milliseconds as "MM:SS" (or "H:MM:SS" past an hour). */
 export function formatDuration(ms) {
     const totalSeconds = Math.floor(Math.max(0, ms) / 1000);
     const hours = Math.floor(totalSeconds / 3600);
@@ -130,13 +122,6 @@ export function formatDuration(ms) {
     return hours > 0 ? `${hours}:${mm}:${ss}` : `${mm}:${ss}`;
 }
 
-/**
- * Same as formatDuration() but keeps two extra digits of sub-second
- * precision ("MM:SS.CC", or "H:MM:SS.CC" past an hour) - used wherever a
- * result is actually timed against the clock (Sprint/Cheese Race finishes,
- * their leaderboard entries and best-time display), where whole seconds
- * alone aren't enough to tell two close runs apart.
- */
 export function formatDurationPrecise(ms) {
     const clamped = Math.max(0, ms);
     const totalCentiseconds = Math.floor(clamped / 10);
@@ -153,6 +138,10 @@ export function formatDurationPrecise(ms) {
     return hours > 0 ? `${hours}:${mm}:${ss}.${cc}` : `${mm}:${ss}.${cc}`;
 }
 
+export function isMobileViewport() {
+    return typeof globalThis.matchMedia === "function" ? globalThis.matchMedia("(width < 48rem)").matches : false;
+}
+
 export async function copyTextToClipboard(text) {
     try {
         await globalThis.navigator?.clipboard?.writeText(text);
@@ -161,3 +150,12 @@ export async function copyTextToClipboard(text) {
         return false;
     }
 }
+
+export function debounce(fn, delayMs = 200) {
+    let timer = null;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn(...args), delayMs);
+    };
+}
+

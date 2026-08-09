@@ -1,0 +1,92 @@
+<template id="tpl-screen-gameover-entry">
+    <div class="screen">
+        <h2 class="screen__title" data-field="title" data-i18n="screens.gameOverEntry.title">GAME OVER</h2>
+        <p class="screen__hint">
+            <strong class="screen__hint-highlight" data-field="playerName"></strong>
+            &middot; <span data-i18n="screens.gameOverEntry.scoreLabel">Score:</span>
+            <strong class="screen__hint-highlight" data-field="score"></strong>
+            &middot; <span data-i18n="screens.gameOverEntry.levelLabel">level</span> <span data-field="level"></span>
+            &middot; <span data-field="lines"></span> <span data-i18n="screens.gameOverEntry.linesLabel">lines</span>
+            <span data-role="gameover-header-time">
+                &middot; <span data-i18n="screens.gameOverEntry.gameTimeLabel">Time</span>
+                <strong class="screen__hint-highlight" data-field="headerTime"></strong>
+            </span>
+        </p>
+        <p class="screen__hint" data-role="today-best-row">
+            <span data-i18n="screens.gameOverEntry.todayBestLabel">Today's best:</span>
+            <strong class="screen__hint-highlight" data-field="todayBest"></strong>
+            <span data-i18n="screens.gameOverEntry.todayBestBy">by</span>
+            <strong class="screen__hint-highlight" data-field="todayBestName"></strong>
+        </p>
+        <div class="screen__button-row">
+            <button class="button button--primary" data-i18n="screens.gameOverEntry.submit"
+                    data-role="gameover-continue-button"
+                    type="button">Continue
+            </button>
+            <button class="button" data-i18n="screens.gameOverEntry.shareButton" data-role="gameover-share-button"
+                    type="button">Share
+            </button>
+        </div>
+        <div class="options" data-role="stats-detail">
+            <h3 class="options__title" data-i18n="screens.gameOverEntry.statsTitle">Session stats</h3>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.gameTimeLabel">Time</span>
+                <strong data-field="gameTime"></strong>
+            </div>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.ppsLabel">PPS</span>
+                <strong data-field="pps"></strong>
+            </div>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.efficiencyLabel">Efficiency (pts/line)</span>
+                <strong data-field="efficiency"></strong>
+            </div>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.transitionLabel">TRNS</span>
+                <strong data-field="transitionScore"></strong>
+            </div>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.clearsLabel">Clears (1/2/3/4 lines)</span>
+                <strong data-field="clearBreakdown"></strong>
+            </div>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.tetrisRateLabel">Tetris rate (TRT)</span>
+                <strong data-field="tetrisRate"></strong>
+            </div>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.burnLabel">BRN</span>
+                <strong data-field="burn"></strong>
+            </div>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.maxComboLabel">Longest combo</span>
+                <strong data-field="maxCombo"></strong>
+            </div>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.spinsLabel">Spins (T / T-mini / other)</span>
+                <strong data-field="spinsBreakdown"></strong>
+            </div>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.droughtLabel">D.MAX</span>
+                <strong data-field="maxDrought"></strong>
+            </div>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.droughtTotalLabel">D.TOTAL</span>
+                <strong data-field="droughtTotal"></strong>
+            </div>
+            <div class="options__row">
+                <span data-i18n="screens.gameOverEntry.droughtAvgLabel">D.AVG</span>
+                <strong data-field="droughtAvg"></strong>
+            </div>
+        </div>
+        <div class="leaderboard">
+            <div class="leaderboard__header">
+                <h3 class="leaderboard__title" data-i18n="leaderboard.title">Leaderboard</h3>
+                <button aria-label="Share leaderboard" class="leaderboard__share-button"
+                        data-i18n-title="leaderboard.shareButton" data-role="leaderboard-share-button"
+                        type="button">📤
+                </button>
+            </div>
+            <div data-field="leaderboard"></div>
+        </div>
+    </div>
+</template>

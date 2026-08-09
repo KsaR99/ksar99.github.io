@@ -1,10 +1,5 @@
 "use strict";
 
-/**
- * Developer-only switch. Flip to `true` locally (never ship it on) to reveal
- * the "Developer" group in Options, which exposes the internal benchmark
- * tool. Not exposed as a normal user setting on purpose.
- */
 export const DEV_MODE = false;
 
 export const BOARD_CONFIG = {
@@ -20,7 +15,6 @@ export const SCORING = Object.freeze({
     SOFT_DROP_POINT: 1,
     HARD_DROP_POINT: 2,
     // Official Tetris Guideline curve: time(level) = (0.8 - (level-1)*0.007)^(level-1) seconds.
-    // See dropIntervalForLevel() in shared/utils.js for the formula itself.
     GUIDELINE_DROP_BASE: 0.8,
     GUIDELINE_DROP_STEP: 0.007,
     // Floor so the drop timer stays meaningful once the curve goes sub-frame (~level 20+),
@@ -43,12 +37,6 @@ export const LINE_CLEAR_ANIMATION_DURATION_MS = 260;
 export const LINE_CLEAR_SOUND_PLAYBACK_RATE = 0.6;
 export const LINE_CLEAR_FLASH_PHASE_FRACTION = 0.3;
 
-// Start levels are picked against the guideline drop curve (see dropIntervalForLevel):
-// gravity stops getting any faster once the curve dips below MIN_DROP_INTERVAL
-// (~level 13-14), so pushing a startLevel past that only changes lock/sound feel,
-// not fall speed. easy/medium/hard/expert sit below that point so each tier is
-// still perceptibly faster than the last; pro starts past it on purpose, as the
-// "true 20G, instant drop from piece one" tier.
 export const DIFFICULTIES = Object.freeze({
     easy: {startLevel: 1, fallingSoundRate: 0.40}, // ~1000ms/row
     medium: {startLevel: 5, groundedTime: 2500, fallingSoundRate: 0.50}, // ~355ms/row
@@ -214,16 +202,6 @@ export const MUSIC_TENSION = Object.freeze({
     HYSTERESIS: 0.05,
     FADE_DURATION_MS: 10000,
     STOP_FADE_DURATION_MS: 800,
-    // On top of the tier crossfade above, MusicDirector also nudges the
-    // playing track's pitch based on which way tension is trending - see
-    // MusicDirector._updatePitch(). Every PITCH_STEP_INTERVAL_MS, pitch moves
-    // by PITCH_STEP_SEMITONES toward +/-PITCH_MAX_SEMITONES while tension is
-    // rising/falling; once tension holds steady, it glides back down to 0
-    // instead - over PITCH_RETURN_MS, deliberately the same span as
-    // FADE_DURATION_MS so the pitch settles on the same timescale as a tier
-    // crossfade. Step size is set so PITCH_MAX_SEMITONES is reached in
-    // exactly PITCH_RETURN_MS / PITCH_STEP_INTERVAL_MS steps (10s / 1s = 10
-    // steps of 0.25), keeping the ramp-up and the glide-back-down symmetric.
     PITCH_STEP_SEMITONES: 0.1,
     PITCH_MAX_SEMITONES: 1.5,
     PITCH_STEP_INTERVAL_MS: 300,

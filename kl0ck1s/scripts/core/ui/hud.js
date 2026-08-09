@@ -1,28 +1,6 @@
 "use strict";
 
 export class HUD {
-    /**
-     * @param {object} elements
-     * @param {HTMLElement} elements.scoreEl
-     * @param {HTMLElement} elements.linesEl
-     * @param {HTMLElement} [elements.linesRowEl]
-     * @param {HTMLElement} elements.bestEl
-     * @param {HTMLElement} elements.overlayEl
-     * @param {HTMLElement} [elements.nextPieceCardEl]
-     * @param {HTMLElement} [elements.statsStatusEl]
-     * @param {HTMLElement} [elements.difficultyEl]
-     * @param {HTMLElement} [elements.difficultyBarEl]
-     * @param {HTMLElement} [elements.statsCardEl]
-     * @param {import("../services/i18n.js").I18n} [elements.i18n]
-     * @param {HTMLElement} [elements.timeEl]
-     * @param {HTMLElement} [elements.droughtEl]
-     * @param {HTMLElement} [elements.tetrisRateEl]
-     * @param {HTMLElement} [elements.ppsEl]
-     * @param {HTMLElement} [elements.objectiveEl]
-     * @param {HTMLElement} [elements.objectiveRowEl]
-     * @param {HTMLElement} [elements.objectiveBarEl]
-     * @param {HTMLElement} [elements.objectiveBarTrackEl]
-     */
     constructor({
                     scoreEl, linesEl, bestEl, overlayEl,
                     nextPieceCardEl = null, statsStatusEl = null, difficultyEl = null,

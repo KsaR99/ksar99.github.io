@@ -34,26 +34,36 @@ import {BootLoader} from "./boot-loader.js";
 const appEl = document.querySelector(".app");
 appEl.addEventListener('contextmenu', event => event.preventDefault());
 
+const bootScreenEl = document.getElementById("boot-screen");
 const boot = new BootLoader({
-    rootEl: document.getElementById("boot-screen"),
-    fillEl: document.getElementById("boot-bar-fill"),
-    statusEl: document.getElementById("boot-status"),
+    rootEl: bootScreenEl,
+    fillEl: bootScreenEl.querySelector("#boot-bar-fill"),
+    statusEl: bootScreenEl.querySelector("#boot-status"),
 });
 
 const i18n = new I18n();
+const partials = Promise.all(
+    ["options", "menu", "gameover", "leaderboard"].map((name) =>
+        fetch(`partials/${name}.html`).then((response) => response.text())
+    )
+);
 await i18n.init();
 i18n.applyStatic(document);
+(await partials).forEach((html) => document.body.insertAdjacentHTML("beforeend", html));
 
 const bodyEl = document.querySelector('body');
 const boardStage = document.querySelector(".board__stage");
 const boardDiv = boardStage.parentElement;
+const sidebarStatsEl = document.querySelector(".sidebar--stats");
+const statsCardEl = sidebarStatsEl.querySelector('[data-role="stats-card"]');
+const nextPieceCardEl = sidebarStatsEl.querySelector('[data-role="next-piece-card"]');
 
 /** @type {HTMLCanvasElement} */
-const boardCanvas = document.getElementById("klockis-board");
+const boardCanvas = boardStage.querySelector("#klockis-board");
 const ctx = boardCanvas.getContext("2d");
 
 /** @type {HTMLCanvasElement} */
-const nextCanvas = document.getElementById("next-piece-canvas");
+const nextCanvas = nextPieceCardEl.querySelector("#next-piece-canvas");
 const nextCtx = nextCanvas.getContext("2d");
 nextCtx.imageSmoothingEnabled = false;
 
@@ -71,7 +81,7 @@ function getSidebarInlineFootprint() {
 }
 
 function getChrome() {
-    const bodyStyle = getComputedStyle(document.body);
+    const bodyStyle = getComputedStyle(bodyEl);
     const boardWrapStyle = getComputedStyle(boardDiv.parentElement);
     const boardStyle = getComputedStyle(boardDiv);
     const appStyle = getComputedStyle(appEl);
@@ -114,7 +124,7 @@ function resizeBoardCanvas() {
     game.themeOverlay.resize(boardCanvas.width, boardCanvas.height);
 }
 
-const themeCanvas = document.getElementById("filter-canvas");
+const themeCanvas = boardStage.querySelector("#filter-canvas");
 const themeCtx = themeCanvas.getContext("2d", {willReadFrequently: true});
 
 const spriteCache = new SpriteCache(KLOCKOMINOS, () => document.createElement("canvas"));
@@ -137,25 +147,25 @@ const renderer = new Renderer({
 });
 
 const hud = new HUD({
-    scoreEl: document.getElementById("score-value"),
-    linesEl: document.getElementById("lines-value"),
-    linesRowEl: document.querySelector('[data-role="lines-stat"]'),
-    bestEl: document.getElementById("best-value"),
-    overlayEl: document.getElementById("overlay"),
-    nextPieceCardEl: document.querySelector('[data-role="next-piece-card"]'),
-    statsStatusEl: document.querySelector('[data-role="stats-status"]'),
-    difficultyEl: document.getElementById("difficulty-value"),
-    difficultyBarEl: document.getElementById("difficulty-bar"),
-    statsCardEl: document.querySelector('[data-role="stats-card"]'),
+    scoreEl: statsCardEl.querySelector("#score-value"),
+    linesEl: statsCardEl.querySelector("#lines-value"),
+    linesRowEl: statsCardEl.querySelector('[data-role="lines-stat"]'),
+    bestEl: statsCardEl.querySelector("#best-value"),
+    overlayEl: boardStage.querySelector("#overlay"),
+    nextPieceCardEl,
+    statsStatusEl: statsCardEl.querySelector('[data-role="stats-status"]'),
+    difficultyEl: statsCardEl.querySelector("#difficulty-value"),
+    difficultyBarEl: statsCardEl.querySelector("#difficulty-bar"),
+    statsCardEl,
     i18n,
-    timeEl: document.getElementById("time-value"),
-    droughtEl: document.getElementById("drought-value"),
-    tetrisRateEl: document.getElementById("trt-value"),
-    ppsEl: document.getElementById("pps-value"),
-    objectiveEl: document.getElementById("objective-value"),
-    objectiveRowEl: document.querySelector('[data-role="objective-stat"]'),
-    objectiveBarEl: document.getElementById("objective-bar"),
-    objectiveBarTrackEl: document.getElementById("objective-bar-track"),
+    timeEl: statsCardEl.querySelector("#time-value"),
+    droughtEl: statsCardEl.querySelector("#drought-value"),
+    tetrisRateEl: statsCardEl.querySelector("#trt-value"),
+    ppsEl: statsCardEl.querySelector("#pps-value"),
+    objectiveEl: statsCardEl.querySelector("#objective-value"),
+    objectiveRowEl: statsCardEl.querySelector('[data-role="objective-stat"]'),
+    objectiveBarEl: statsCardEl.querySelector("#objective-bar"),
+    objectiveBarTrackEl: statsCardEl.querySelector("#objective-bar-track"),
 });
 
 const soundManager = new SoundManager(SOUND_FILES);
@@ -215,14 +225,14 @@ if (fabControlsBtn) {
     });
 }
 
-const settingsShortcutBtn = document.querySelector('[data-role="settings-shortcut"]');
+const settingsShortcutBtn = sidebarStatsEl.querySelector('[data-role="settings-shortcut"]');
 if (settingsShortcutBtn) {
     settingsShortcutBtn.addEventListener("click", () => {
         game.screenFlow.toggleOptions();
     });
 }
 
-const muteToggleBtn = document.querySelector('[data-role="mute-toggle"]');
+const muteToggleBtn = sidebarStatsEl.querySelector('[data-role="mute-toggle"]');
 if (muteToggleBtn) {
     muteToggleBtn.addEventListener("click", () => {
         game.settingsController.toggleSound();

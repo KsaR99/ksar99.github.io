@@ -12,12 +12,6 @@ const GROUNDED_GRACE_MS = 100;
 /** Fallback duration (ms) for groundedSoundPlaybackRate() before the "grounded" clip has finished decoding - see SoundManager.getDuration(). */
 const GROUNDED_SOUND_REFERENCE_DURATION_MS = 1500;
 
-
-/**
- * Owns everything about the currently falling piece: movement, rotation (with
- * kicks), soft/hard drop, lock delay, spin detection and locking/line-clear
- * hand-off. Reads/writes the shared piece-related fields on the Game instance.
- */
 export class PieceController {
     constructor(game) {
         this.game = game;

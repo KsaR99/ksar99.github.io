@@ -22,13 +22,6 @@ const STORAGE_KEY = "klockis-lang";
 const LOCALE_STORAGE_KEY = "klockis-locale";
 
 export class I18n {
-    /**
-     * @param {object} [options]
-     * @param {string} [options.basePath] - path to the folder containing "<lang>.json" files
-     * @param {Storage|null} [options.storage]
-     * @param {Navigator|null} [options.navigatorRef]
-     * @param {Document|null} [options.documentRef]
-     */
     constructor({
                     basePath = "assets/i18n/",
                     storage = globalThis.localStorage ?? null,
@@ -96,15 +89,6 @@ export class I18n {
         return this;
     }
 
-    /**
-     * Loads and activates a language, updating <html lang> and (optionally) localStorage.
-     * @param {string} lang
-     * @param {object} [opts]
-     * @param {boolean} [opts.persist] - whether to remember this choice in localStorage
-     * @param {string|null} [opts.browserLocale] - the full regional tag (e.g. "en-GB") this language was
-     *   detected from, used for date/number formatting. Omit when the language was chosen manually, so
-     *   formatting falls back to the language's default region.
-     */
     async setLanguage(lang, {persist = true, browserLocale = null} = {}) {
         const resolved = SUPPORTED_LANGUAGES.includes(lang) ? lang : DEFAULT_LANGUAGE;
 
@@ -131,10 +115,6 @@ export class I18n {
         return this;
     }
 
-    /**
-     * Looks up a dot-path key (e.g. "screens.paused.title") and substitutes {placeholders}.
-     * Returns the key itself if nothing is found, so missing translations are easy to spot.
-     */
     t(key, vars = {}) {
         const value = key
             .split(".")
@@ -145,22 +125,12 @@ export class I18n {
         return value.replace(/\{(\w+)}/g, (match, name) => (name in vars ? String(vars[name]) : match));
     }
 
-    /**
-     * Looks up a dot-path key like t(), but returns whatever's actually stored
-     * there (array, object, ...) instead of coercing to a string - for values
-     * like `modes.<mode>.rules` that t() can't return since it only accepts
-     * string leaves. Returns undefined if nothing is found.
-     */
     raw(key) {
         return key
             .split(".")
             .reduce((node, part) => node?.[part], this.dict);
     }
 
-    /**
-     * Translates every [data-i18n] / [data-i18n-placeholder] element under root.
-     * Safe to call repeatedly (e.g. after cloning a <template> or switching language).
-     */
     applyStatic(root) {
         if (!root) return;
 

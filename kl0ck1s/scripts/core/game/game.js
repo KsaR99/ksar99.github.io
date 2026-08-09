@@ -26,7 +26,6 @@ import {ShareService} from "../services/share-service.js";
 import {ConfirmDialog} from "../services/confirm-dialog.js";
 import {BenchmarkController} from "../controllers/benchmark-controller.js";
 
-/** Resolves after the browser has had a chance to paint the current frame. */
 function nextPaint() {
     return new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 }
@@ -443,19 +442,6 @@ export class Game {
         this.fallTrailCount = Math.min(trailLength, this.fallTrailCount + 1);
     }
 
-    /**
-     * Backfills the whole ring buffer with a synthetic "pre-history" so the
-     * trail is already at its full, speed-appropriate length - and actually
-     * visible - on the very first frame the piece is falling.
-     *
-     * The trail is drawn *behind* the piece, so simply duplicating the spawn
-     * position into every slot (the old approach) was invisible: every entry
-     * sat exactly under the opaque piece until real per-frame writes slowly
-     * pushed offset positions into the ring, which is what caused the trail
-     * to visibly "fade in" a moment after spawn. Instead, each slot is seeded
-     * with a position further back in time/space, scaled by the piece's
-     * current speed, so the streak is already spread out above the piece.
-     */
     _primeFallTrail(renderedPiece, trailLength, moveIntervalMs) {
         const stepPerFrame = Number.isFinite(moveIntervalMs) && moveIntervalMs > 0
             ? FALL_TRAIL_FRAME_MS / moveIntervalMs

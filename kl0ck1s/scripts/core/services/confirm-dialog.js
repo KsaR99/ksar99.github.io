@@ -1,12 +1,5 @@
 "use strict";
 
-/**
- * In-page replacement for the browser's blocking window.confirm(), shown as an
- * HTML modal with a blurred backdrop instead of a native alert. bind() wires
- * up the static markup once at startup; ask() can then be called any number
- * of times and resolves to true/false once the user picks an option (OK,
- * Cancel, backdrop click, or Escape).
- */
 export class ConfirmDialog {
     constructor(dom = globalThis.document ?? null) {
         this.dom = dom;
@@ -32,7 +25,6 @@ export class ConfirmDialog {
         return this.dom?.querySelector('[data-role="confirm-cancel-button"]') ?? null;
     }
 
-    /** Wires the static markup's buttons/backdrop. Safe to call once at startup. */
     bind() {
         this.okButton?.addEventListener("click", () => this._settle(true));
         this.cancelButton?.addEventListener("click", () => this._settle(false));
@@ -53,13 +45,6 @@ export class ConfirmDialog {
         }
     }
 
-    /**
-     * Shows the modal with the given message and resolves once the user
-     * answers. Falls back to the native confirm() if the modal markup isn't
-     * present in the DOM.
-     * @param {string} message
-     * @returns {Promise<boolean>}
-     */
     ask(message) {
         const overlay = this.overlayEl;
         if (!overlay) {

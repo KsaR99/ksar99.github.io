@@ -1,8 +1,10 @@
 "use strict";
 
 import {formatNumber} from "../shared/utils.js";
-import {DEV_MODE, SOUND_FILES} from "../shared/config.js";
+import {DEV_MODE, SOUND_FILES, VOICE_COUNTING_NUMBERS, voiceCountingKey} from "../shared/config.js";
 import {defaultKeyBindings, formatKeyCode, KEY_BIND_SLOTS} from "../shared/key-bindings.js";
+
+const VOICE_COUNTING_KEYS = new Set(VOICE_COUNTING_NUMBERS.map(voiceCountingKey));
 
 function setMuteToggleState(button, muted, i18n, effectiveMuted = muted) {
     if (!button) return;
@@ -67,15 +69,23 @@ function fillProfileSelect(dom, select, profiles, current, i18n, trash = []) {
     select.value = current && names.includes(current) ? current : "";
 }
 
-function fillSoundRows(dom, container, keys, soundVolumes, i18n) {
+function fillSoundRows(dom, container, keys, soundVolumes, soundMuted, i18n) {
     keys.forEach((key) => {
         const row = clone(dom, "tpl-options-sound-row").querySelector('[data-role="sound-row"]');
         const label = SOUND_FILES[key]?.label ?? i18n.t(`sounds.${key}`);
         row.querySelector('[data-field="name"]').textContent = label;
 
+        const isMuted = Boolean(soundMuted[key]);
+        const volume = soundVolumes[key] ?? 1;
+
         const slider = row.querySelector('[data-role="sound-volume-slider"]');
         slider.dataset.soundKey = key;
-        slider.value = Math.round((soundVolumes[key] ?? 1) * 100);
+        slider.value = Math.round(volume * 100);
+        slider.disabled = isMuted;
+
+        const muteToggle = row.querySelector('[data-role="sound-mute-toggle"]');
+        muteToggle.dataset.soundKey = key;
+        setMuteToggleState(muteToggle, isMuted, i18n, isMuted || volume === 0);
 
         const previewButton = row.querySelector('[data-role="sound-preview-button"]');
         previewButton.dataset.soundKey = key;
@@ -85,8 +95,6 @@ function fillSoundRows(dom, container, keys, soundVolumes, i18n) {
     });
 }
 
-// Groups KEY_BIND_SLOTS by labelKey, preserving slot order, so rows like
-// "Rotate" (ArrowUp + Z) or "Pause" (P + Escape) show all their kbds together.
 function groupedKeyBindSlots() {
     const groups = [];
     const byLabel = new Map();
@@ -246,6 +254,7 @@ export const Screens = {
             const categoryVolumes = settings.categoryVolumes ?? {};
             const categoryMuted = settings.categoryMuted ?? {};
             const soundVolumes = settings.soundVolumes ?? {};
+            const soundMuted = settings.soundMuted ?? {};
 
             ["sfx", "music", "voices"].forEach((category) => {
                 const keys = soundManager.keysInCategory(category);
@@ -269,8 +278,24 @@ export const Screens = {
                     categoryIsMuted || (categoryVolumes[category] ?? 1) === 0
                 );
 
-                const list = group.querySelector('[data-role="sound-list"]');
-                if (list) fillSoundRows(dom, list, keys, soundVolumes, i18n);
+                if (category === "voices") {
+                    const countdownKeys = keys.filter((key) => VOICE_COUNTING_KEYS.has(key));
+                    const otherKeys = keys.filter((key) => !VOICE_COUNTING_KEYS.has(key));
+
+                    const list = group.querySelector('[data-role="sound-list"]');
+                    if (list) fillSoundRows(dom, list, otherKeys, soundVolumes, soundMuted, i18n);
+
+                    const countdownGroup = group.querySelector('[data-role="sound-group-voices-countdown"]');
+                    const countdownList = group.querySelector('[data-role="sound-list-countdown"]');
+                    if (countdownKeys.length === 0) {
+                        countdownGroup?.remove();
+                    } else if (countdownList) {
+                        fillSoundRows(dom, countdownList, countdownKeys, soundVolumes, soundMuted, i18n);
+                    }
+                } else {
+                    const list = group.querySelector('[data-role="sound-list"]');
+                    if (list) fillSoundRows(dom, list, keys, soundVolumes, soundMuted, i18n);
+                }
             });
         }
 
@@ -371,11 +396,6 @@ export const Screens = {
         });
     },
 
-    /**
-     * Same data as renderBenchmarkResults(), as one plain-text block instead of DOM
-     * rows - for the "copy results" button, so the whole run can be pasted as text
-     * (bug reports, chat, etc.) instead of having to screenshot or retype the list.
-     */
     formatBenchmarkResultsText(results, i18n, {pieceCount, totalMs} = {}) {
         const lines = [];
 

@@ -23,9 +23,6 @@ function withTimeout(promise, ms) {
 }
 
 export class SoundManager {
-    /**
-     * @param {Readonly<{[p: string]: any, lineClear1: Readonly<{src: string, category: string}>, lineClear2: Readonly<{src: string, category: string}>, lineClear3: Readonly<{src: string, category: string}>, lineClear4: Readonly<{src: string, category: string}>, drop: Readonly<{src: string, category: string}>, gameOver: Readonly<{src: string, category: string}>, levelUp: Readonly<{src: string, category: string}>, rotate: Readonly<{src: string, category: string}>, grounded: Readonly<{src: string, category: string}>, falling: Readonly<{src: string, category: string}>, pieceLock: Readonly<{src: string, category: string}>, voiceGameOver: Readonly<{src: string, category: string, label: string}>, voiceLetsGo: Readonly<{src: string, category: string, label: string}>, voiceLevel: Readonly<{src: string, category: string, label: string}>, tetrisowyShvt: Readonly<{src: string, category: string, label: string}>, tetrisowyShvt2: Readonly<{src: string, category: string, label: string}>, tetrisowyShvt3: Readonly<{src: string, category: string, label: string}>}>} soundFiles
-     */
     constructor(soundFiles, {
         AudioContextCtor = globalThis.AudioContext ?? globalThis.webkitAudioContext ?? null,
         fetchImpl = globalThis.fetch?.bind(globalThis) ?? null,
@@ -37,9 +34,7 @@ export class SoundManager {
         this.context = null;
         this.masterGain = null;
         this.categoryGains = {};
-        /** key -> AudioBuffer[] (usually length 1, more for sounds with several source-file variants). */
         this.buffers = {};
-        /** @type {Map<number, object>} */
         this.instances = new Map();
 
         this.muted = false;
@@ -47,6 +42,7 @@ export class SoundManager {
         this.categoryVolumes = {sfx: 1, music: 1};
         this.categoryMuted = {};
         this.soundVolumes = {};
+        this.soundMuted = {};
 
         this._previewInstance = null;
         this._previewKey = null;
@@ -55,6 +51,11 @@ export class SoundManager {
 
     get isSupported() {
         return Boolean(this.AudioContextCtor && this.fetchImpl);
+    }
+
+    _effectiveSoundVolume(key) {
+        if (this.soundMuted[key]) return 0;
+        return this.soundVolumes[key] ?? 1;
     }
 
     srcFor(key) {
@@ -95,11 +96,6 @@ export class SoundManager {
         return this.context;
     }
 
-    /**
-     * @param {(loaded: number, total: number) => void} [onProgress] - called once per sound
-     *   key as soon as it's fetched+decoded (or failed), so callers can drive a boot-time
-     *   progress bar. Safe to omit.
-     */
     init(onProgress = null) {
         if (this._ready) return this._ready;
 
@@ -171,7 +167,7 @@ export class SoundManager {
         source.detune.value = detune;
 
         const gainNode = context.createGain();
-        gainNode.gain.value = volume * (this.soundVolumes[key] ?? 1);
+        gainNode.gain.value = volume * this._effectiveSoundVolume(key);
         source.connect(gainNode);
         gainNode.connect(this.categoryGains[category] ?? this.masterGain);
 
@@ -302,7 +298,7 @@ export class SoundManager {
         const instance = this._instance(id);
         if (!instance) return;
         instance.baseVolume = volume;
-        instance.gainNode.gain.value = volume * (this.soundVolumes[instance.key] ?? 1);
+        instance.gainNode.gain.value = volume * this._effectiveSoundVolume(instance.key);
     }
 
     fadeInstanceVolume(id, volume, durationMs = 0) {
@@ -311,7 +307,7 @@ export class SoundManager {
         const context = this.ensureContext();
         if (!context) return;
 
-        const target = Math.min(1, Math.max(0, volume)) * (this.soundVolumes[instance.key] ?? 1);
+        const target = Math.min(1, Math.max(0, volume)) * this._effectiveSoundVolume(instance.key);
         instance.baseVolume = volume;
 
         const param = instance.gainNode.gain;
@@ -386,7 +382,6 @@ export class SoundManager {
         }
     }
 
-    /** @todo: unused? */
     getCategoryVolume(category) {
         return this.categoryVolumes[category] ?? 1;
     }
@@ -395,13 +390,19 @@ export class SoundManager {
         const clamped = Math.min(1, Math.max(0, volume));
         this.soundVolumes[key] = clamped;
         this.instances.forEach((instance) => {
-            if (instance.key === key) instance.gainNode.gain.value = instance.baseVolume * clamped;
+            if (instance.key === key) instance.gainNode.gain.value = instance.baseVolume * this._effectiveSoundVolume(key);
         });
     }
 
-    /** @todo: unused? */
     getSoundVolume(key) {
         return this.soundVolumes[key] ?? 1;
+    }
+
+    setSoundMuted(key, muted) {
+        this.soundMuted[key] = muted;
+        this.instances.forEach((instance) => {
+            if (instance.key === key) instance.gainNode.gain.value = instance.baseVolume * this._effectiveSoundVolume(key);
+        });
     }
 
     getDuration(key) {
@@ -409,7 +410,6 @@ export class SoundManager {
         return buffer ? buffer.duration : null;
     }
 
-    /** @todo: unused? */
     preview(key) {
         if (this._previewInstance !== null) this.stop(this._previewInstance);
 

@@ -85,7 +85,6 @@ export class Renderer {
         this._boardScaleX = this.boardCanvas.width / this.boardCanvasRect.width;
     }
 
-    /** @todo: unused? */
     destroy() {
         window.removeEventListener("resize", this._onWindowResize);
         clearTimeout(this._shakeTimer);
@@ -126,14 +125,6 @@ export class Renderer {
         }
     }
 
-    /**
-     * Forces the block/grid/glow sprite atlas, plus the line-clear particle color cache,
-     * to be built for the current cell size right now, instead of paying that cost inside
-     * the first drawBoard() / line clear. Used during app boot so a "building block cache"
-     * loading step does real, visible work rather than being a fake timer. Also warms the
-     * dedicated next-piece-preview cache (fixed at nextPreviewCellSize) so its first
-     * drawNext() doesn't pay a one-time rebuild either.
-     */
     warmSpriteCache() {
         const size = this.boardConfig.CELL_SIZE;
         if (size) {
@@ -154,13 +145,6 @@ export class Renderer {
         return Math.max(0, Math.min(SATURATION_LEVELS - 1, distanceFromBottom));
     }
 
-    /**
-     * Translucent particle color for a cell at row y, for line-clear fragments.
-     * Keyed off the same discrete saturation level the rest of the renderer
-     * uses (saturationLevelForRow), so it can be served from spriteCache's
-     * cache - warmed up front in warmSpriteCache() - instead of building a
-     * fresh `oklch(from ...)` string per fragment during buildClearFragments().
-     */
     particleColorForRow(color, y, rows) {
         return this.spriteCache.getParticleColor(color, this.saturationLevelForRow(y, rows));
     }
@@ -265,10 +249,6 @@ export class Renderer {
         }
     }
 
-    /** Whether backgroundCanvas already reflects the current size/grid/rows/cols/
-     * saturation config - i.e. whether an incremental patch (notifyPieceLocked/
-     * notifyLinesCleared) is safe to apply, or a full updateBoardBackground()
-     * rebuild is required first (first draw, resize, or a settings toggle). */
     _backgroundConfigCurrent(board, size) {
         return this._bgSize === size
             && this._bgGrid === this.gridEnabled
@@ -285,15 +265,6 @@ export class Renderer {
         this._bgSat = this.heightSaturationEnabled;
     }
 
-    /**
-     * Full rebuild fallback: redraws every cell of the locked board from scratch.
-     * O(rows*cols) - only meant to run on the rare events an incremental patch
-     * can't handle (first draw, resize, gridEnabled/heightSaturation toggles,
-     * board.reset(), addGarbageLines()). Ordinary piece locks and line clears are
-     * instead kept in sync cheaply via notifyPieceLocked()/notifyLinesCleared(),
-     * which is why this bails out immediately when the background is already
-     * current for board.version.
-     */
     updateBoardBackground(board, size) {
         const dirty = this._bgVersion !== board.version || !this._backgroundConfigCurrent(board, size);
         if (!dirty) return;
@@ -320,16 +291,6 @@ export class Renderer {
         this._stampBackgroundConfig(board, size);
     }
 
-    /**
-     * Cheap incremental counterpart to updateBoardBackground(), called right after
-     * board.lockPiece(). Instead of redrawing the whole board, it stamps just the
-     * newly-locked piece's own cells (typically ≤4) onto the existing
-     * backgroundCanvas, then advances _bgVersion to match "board.version" so the
-     * next updateBoardBackground() call sees the cache as already current and
-     * does no work at all. Falls through to a no-op (letting the next
-     * updateBoardBackground() do a full rebuild) if the background isn't already
-     * in a known-good state for the current size/grid/rows/cols/saturation config.
-     */
     notifyPieceLocked(piece, board) {
         const size = this.boardConfig.CELL_SIZE;
         if (!this._backgroundConfigCurrent(board, size)) return;
@@ -348,16 +309,6 @@ export class Renderer {
         this._bgVersion = board.version;
     }
 
-    /**
-     * Cheap incremental counterpart to updateBoardBackground(), called right after
-     * board.clearFullLines(). Rows below the lowest-index cleared line never move
-     * or change color (clearFullLines() only compacts rows at/above the cleared
-     * batch), so only the [0, affectedMaxRow] slice needs to be redrawn from the
-     * post-clear board state - everything below is left untouched.
-     *
-     * @param {import("../game/board.js").Board} board - board AFTER clearFullLines() ran
-     * @param {number[]} clearedRowIndices - the full-row indices from BEFORE clearFullLines() ran
-     */
     notifyLinesCleared(board, clearedRowIndices) {
         const size = this.boardConfig.CELL_SIZE;
         if (!this._backgroundConfigCurrent(board, size)) return;

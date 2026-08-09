@@ -79,7 +79,6 @@ export class MusicDirector {
         this._fadeIn(this.currentTier);
     }
 
-    /** @param {number} [delta] ms since the last update() call - drives the pitch-trend stepping in _updatePitch(); tier switching itself is not time-based. */
     update(board, delta = 0) {
         if (!this.enabled) return;
         const tension = MusicDirector.tensionFor(board);

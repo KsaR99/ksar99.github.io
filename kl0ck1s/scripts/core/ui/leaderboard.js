@@ -277,13 +277,6 @@ export class Leaderboard {
         return this.todayBestCache;
     }
 
-    /**
-     * Leaderboard dates are formatted relative to "now":
-     * - Different year: day/month/year + time
-     * - Same year, different month: day/month + time
-     * - Same month, different day: day + time
-     * - Same day: time only
-     */
     formatDate(iso) {
         const date = new Date(iso);
         const now = new Date();

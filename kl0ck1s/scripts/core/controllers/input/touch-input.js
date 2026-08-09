@@ -15,20 +15,6 @@ const SWIPE_DOWN_THRESHOLD_RATIO = 0.22;
 
 const DRAG_DISTANCE_IN_SCREENS = 0.8;
 
-/**
- * Touch input source for mobile. Two independent pieces:
- *
- *  1. bind() — direct touches on the board canvas: dragging steers the
- *     piece toward the finger (same column math as MouseInput), a quick
- *     tap rotates, and a downward swipe hard-drops.
- *  2. bindButtons(root) — the on-screen button bar (touch-controls),
- *     reusing the same `data-key-action` markup as the keyboard legend,
- *     but bound to pointerdown/pointerup so movement buttons can be held
- *     down to repeat instead of requiring one tap per row/column.
- *
- * Both report to the shared SteeringArbiter exactly like the other
- * sources, so keyboard/mouse/touch never fight over who's steering.
- */
 export class TouchInput extends InputSource {
     /**
      * @param {object} game

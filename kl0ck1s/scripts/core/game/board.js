@@ -16,7 +16,7 @@ export class Board {
     reset() {
         this.occupancy = new Uint32Array(this.rows);
         this.colors = new Uint8Array(this.rows * this.cols);
-        this.version++;
+        ++this.version;
     }
 
     isInsideCols(x) {

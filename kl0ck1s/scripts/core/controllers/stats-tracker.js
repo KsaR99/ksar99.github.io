@@ -108,17 +108,6 @@ export class StatsTracker {
         game.maxDrought = Math.max(game.maxDrought, game.drought);
     }
 
-    /**
-     * Adds points to the score. Deliberately does NOT push to the HUD itself -
-     * Game.update() already calls hud.update(this.stats) unconditionally once
-     * per rendered frame while running/clearing, so any score change is on
-     * screen within one frame regardless. addScore() used to call hud.update()
-     * (which reads the game.stats getter - a leaderboard filter+sort plus
-     * several i18n.t() lookups and format calls) on every single call, and it's
-     * called on every softDrop() step as well as every hardDrop() and line
-     * clear - holding soft drop alone could fire it dozens of times a second
-     * for a HUD update the frame loop was about to do anyway.
-     */
     addScore(points) {
         this.game.score += points;
     }

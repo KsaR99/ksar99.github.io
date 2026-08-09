@@ -2,6 +2,7 @@
 
 import {SETTINGS_KEY} from "../game/game-constants.js";
 import {defaultKeyBindings} from "../shared/key-bindings.js";
+import {isMobileViewport} from "../shared/utils.js";
 
 export class SettingsController {
     constructor(game) {
@@ -43,6 +44,7 @@ export class SettingsController {
                 falling: 0.75,
                 drop: 0.9
             },
+            soundMuted: {},
             keyBindings: defaultKeyBindings(),
         };
     }
@@ -74,12 +76,6 @@ export class SettingsController {
         }
     }
 
-    /**
-     * Applies a (possibly partial) settings object on top of the defaults,
-     * updating game.settings, game.difficulty/mode, and live audio/render
-     * state. Used both for the initial load and when switching to a profile
-     * that has its own saved settings.
-     */
     applyStoredSettings(stored) {
         const game = this.game;
         const defaults = this.defaultSettings();
@@ -87,6 +83,7 @@ export class SettingsController {
         settings.categoryVolumes = {...defaults.categoryVolumes, ...(stored.categoryVolumes ?? {})};
         settings.categoryMuted = {...defaults.categoryMuted, ...(stored.categoryMuted ?? {})};
         settings.soundVolumes = {...defaults.soundVolumes, ...(stored.soundVolumes ?? {})};
+        settings.soundMuted = {...defaults.soundMuted, ...(stored.soundMuted ?? {})};
         settings.keyBindings = {...defaults.keyBindings, ...(stored.keyBindings ?? {})};
 
         game.settings = settings;
@@ -106,7 +103,7 @@ export class SettingsController {
 
     applyAudioSettings() {
         const game = this.game;
-        const {categoryVolumes, categoryMuted, soundVolumes} = game.settings;
+        const {categoryVolumes, categoryMuted, soundVolumes, soundMuted} = game.settings;
         Object.entries(categoryVolumes ?? {}).forEach(([category, volume]) => {
             game.soundManager.setCategoryVolume(category, volume);
         });
@@ -115,6 +112,9 @@ export class SettingsController {
         });
         Object.entries(soundVolumes ?? {}).forEach(([key, volume]) => {
             game.soundManager.setSoundVolume(key, volume);
+        });
+        Object.entries(soundMuted ?? {}).forEach(([key, muted]) => {
+            game.soundManager.setSoundMuted(key, muted);
         });
     }
 
@@ -134,7 +134,7 @@ export class SettingsController {
         game.renderer.setTransparencyEnabled(transparency);
         game.renderer.setGhostEnabled(ghost);
         game.renderer.setGridEnabled(gridLines);
-        game.renderer.setShakeEnabled(screenShake);
+        game.renderer.setShakeEnabled(screenShake && !isMobileViewport());
         game.renderer.setHeightSaturationEnabled(heightSaturation);
 
         if (!fallTrail) {
@@ -190,10 +190,17 @@ export class SettingsController {
         const currentCategoryMuted = settings.categoryMuted?.[category] ?? false;
         if (currentCategoryMuted !== defaultCategoryMuted) return true;
 
-        return keys.some((key) => {
+        const volumeChanged = keys.some((key) => {
             const defaultVolume = defaults.soundVolumes[key] ?? 1;
             const currentVolume = settings.soundVolumes?.[key] ?? 1;
             return currentVolume !== defaultVolume;
+        });
+        if (volumeChanged) return true;
+
+        return keys.some((key) => {
+            const defaultMuted = defaults.soundMuted[key] ?? false;
+            const currentMuted = settings.soundMuted?.[key] ?? false;
+            return currentMuted !== defaultMuted;
         });
     }
 
@@ -216,6 +223,13 @@ export class SettingsController {
         });
         game.settings.soundVolumes = soundVolumes;
 
+        const soundMuted = {...game.settings.soundMuted};
+        keys.forEach((key) => {
+            if (key in defaults.soundMuted) soundMuted[key] = defaults.soundMuted[key];
+            else delete soundMuted[key];
+        });
+        game.settings.soundMuted = soundMuted;
+
         this.applyAudioSettings();
         this.saveSettings();
     }
@@ -228,6 +242,16 @@ export class SettingsController {
         game.soundManager.setCategoryMuted(category, categoryMuted[category]);
         this.saveSettings();
         return categoryMuted[category];
+    }
+
+    toggleSoundMuted(key) {
+        const game = this.game;
+        const soundMuted = {...game.settings.soundMuted};
+        soundMuted[key] = !soundMuted[key];
+        game.settings.soundMuted = soundMuted;
+        game.soundManager.setSoundMuted(key, soundMuted[key]);
+        this.saveSettings();
+        return soundMuted[key];
     }
 
     exportSettings() {
@@ -375,6 +399,25 @@ export class SettingsController {
         if (icon) icon.textContent = effectiveMuted ? "🔇" : "🔊";
 
         const slider = game.dom.querySelector(`[data-role="category-volume-slider"][data-category="${category}"]`);
+        if (slider) slider.disabled = muted;
+    }
+
+    syncSoundMuteToggle(key) {
+        const game = this.game;
+        if (!game.dom) return;
+        const button = game.dom.querySelector(`[data-role="sound-mute-toggle"][data-sound-key="${key}"]`);
+        if (!button) return;
+
+        const muted = Boolean(game.settings.soundMuted?.[key]);
+        const volume = game.settings.soundVolumes?.[key] ?? 1;
+        const effectiveMuted = muted || volume === 0;
+
+        button.setAttribute("aria-pressed", String(muted));
+        button.setAttribute("aria-label", game.i18n.t(muted ? "screens.options.unmute" : "screens.options.mute"));
+        const icon = button.querySelector('[data-role="sound-mute-toggle-icon"]');
+        if (icon) icon.textContent = effectiveMuted ? "🔇" : "🔊";
+
+        const slider = game.dom.querySelector(`[data-role="sound-volume-slider"][data-sound-key="${key}"]`);
         if (slider) slider.disabled = muted;
     }
 }

@@ -63,18 +63,15 @@ export function createBlockSprite(color, size, canvasFactory = () => document.cr
     return sprite;
 }
 
-/** Lightened/translucent variant of a (possibly height-desaturated) color, used for the hard-drop fall trail streak. */
 export function hardDropTrailColor(color, level = 0) {
     const resolvedColor = level ? colorForLevel(color, level) : color;
     return `oklch(from ${resolvedColor} calc(l + 0.3) c h / 0.7)`;
 }
 
-/** Lightened/translucent variant of a color, used for the slow-fall trail streak. */
 export function fallTrailColor(color) {
     return `oklch(from ${color} calc(l + 0.75) c h / 0.35)`;
 }
 
-/** Translucent variant of a (possibly height-desaturated) color, used for line-clear particle fragments. */
 export function particleColor(color, level = 0) {
     const resolvedColor = level ? colorForLevel(color, level) : color;
     return `oklch(from ${resolvedColor} l c h / 0.55)`;
@@ -213,20 +210,6 @@ export class SpriteCache {
         return row;
     }
 
-    /**
-     * Pre-paints glow sprites for every klockomino color, up front, instead of
-     * letting getGlow() build them one-by-one the first time each color+level
-     * combo is actually needed by a falling piece. Without this, the first
-     * synchronous createGlowSprite() (canvas + shadowBlur) for a never-seen
-     * combo happens mid-frame during real gameplay - cheap to absorb when
-     * pieces fall slowly, but visible as a stutter on fast difficulties like
-     * "pro" (20G), where new color/height combos keep showing up while the
-     * game itself is already running flat out.
-     *
-     * Idempotent and incremental: only fills in whatever hasn't been warmed
-     * yet for the requested size/level range, so it's cheap to call again
-     * after a resize or after height-saturation gets toggled on.
-     */
     warmGlow(size, saturationEnabled) {
         if (this.size !== size) this.rebuild(size);
 
@@ -244,13 +227,6 @@ export class SpriteCache {
         this._warmedGlowLevels = levels;
     }
 
-    /**
-     * Pre-paints hard-drop fall-trail sprites for every klockomino color, up
-     * front, same rationale as warmGlow() above. Keyed by color+level so the
-     * trail can reflect height saturation (fading from gray near the top of
-     * the board to full color near the bottom) instead of always using the
-     * piece's plain color regardless of how far it fell.
-     */
     warmHardDropTrail(size, saturationEnabled) {
         if (this.size !== size) this.rebuild(size);
 
@@ -269,12 +245,6 @@ export class SpriteCache {
         this._warmedHardDropTrailLevels = levels;
     }
 
-    /**
-     * Pre-paints slow-fall trail sprites for every klockomino color, up front,
-     * same rationale as warmGlow()/warmHardDropTrail() above. Unlike those two,
-     * the fall trail never reflects height saturation (it's always drawn at
-     * level 0), so there's just one sprite per color to warm.
-     */
     warmFallTrail(size) {
         if (this.size !== size) this.rebuild(size);
         if (this._warmedFallTrail) return;
@@ -286,19 +256,6 @@ export class SpriteCache {
         this._warmedFallTrail = true;
     }
 
-    /**
-     * Pre-computes the translucent particle color string for every klockomino
-     * color (and, when height saturation is on, every saturation level), same
-     * rationale as warmGlow()/warmHardDropTrail() above. Line-clear fragments
-     * are plain fillRect()s, not sprites, but building their `oklch(from ...)`
-     * color string still isn't free - and buildClearFragments() calls it once
-     * per fragment, not once per cleared cell, so the cost multiplies with the
-     * fragment count. Warming it up front keeps that fixed per-color/level
-     * cost from growing if the fragment count itself grows later. Unlike the
-     * sprite caches above, colors don't depend on cell size, so this doesn't
-     * get cleared by rebuild() and only needs to be (re)warmed when height
-     * saturation is toggled on.
-     */
     warmParticleColors(size, saturationEnabled) {
         if (this.size !== size) this.rebuild(size);
 

@@ -22,16 +22,6 @@ function emptyTimings() {
     return Object.fromEntries(CATEGORY_KEYS.map((key) => [key, {ms: 0, ops: 0}]));
 }
 
-/**
- * Picks an x for the falling piece to steer toward before it drops. Mostly aims at
- * one of the flattest landing spots on the board (lowest combined stack height under
- * the piece's width) so pieces actually interlock and rows complete sometimes -
- * pure Math.random() x placement almost never finishes a line on a board wider than
- * a couple of cells, which is why lineClearDetect/lineClearApply used to sit at 0 ops
- * for an entire benchmark run. The rest of the time it ignores the board and picks a
- * fully random spot anyway, so the benchmark still covers "bad" random placement,
- * near-full boards, etc. - not just an idealized flat-stacking bot.
- */
 function pickTargetX(board, piece, {randomChance = 0.25} = {}) {
     const {cols, rows, occupancy} = board;
     const maxX = cols - piece.width;
@@ -65,13 +55,6 @@ function pickTargetX(board, piece, {randomChance = 0.25} = {}) {
     return candidates[Math.floor(Math.random() * candidates.length)];
 }
 
-/**
- * Minimal stand-in for Game that exposes only the handful of small, DOM-free helper
- * methods PieceController/StatsTracker actually call on their `game` reference
- * (shift-anim interpolation, drop/shift smoothing, fall-trail bookkeeping). Copied
- * verbatim from Game rather than reused via prototype so this file doesn't have to
- * pull in Game's DOM/render-loop/init machinery just to borrow four helpers.
- */
 class BenchmarkShadowGame {
     constructor() {
         this.current = null;
@@ -131,36 +114,12 @@ class BenchmarkShadowGame {
     }
 }
 
-/**
- * Developer-mode tool: plays out `pieceCount` piece placements (rotated and steered
- * toward a landing column - see pickTargetX() - with some pure randomness mixed in,
- * so full rows actually complete sometimes instead of never) through the
- * *real* gameplay methods (PieceController.moveHorizontal/rotate/hardDrop/
- * finishLineClear, Board.lockPiece/getFullLineIndices/clearFullLines, the real
- * Renderer and SoundManager, ...) against a throwaway board/bag/stats set - the
- * live game's own board and score are never touched - and times where the
- * engine's time actually goes, so slow parts are easy to spot without profiling
- * tools. Because it drives the same code a real game does, it also plays out as
- * a (silent, fast-forwarded) real round on the preview canvas while it runs.
- */
 export class BenchmarkController {
     constructor(game) {
         this.game = game;
         this._offscreenRenderer = null;
     }
 
-    /** Builds a Renderer that draws to the benchmark's preview canvas (or a detached
-     * one if that markup isn't present), reusing the real, already-warmed sprite cache
-     * and the real board's cell size so render timings stay realistic.
-     *
-     * The options screen is a <template> that gets re-cloned into a fresh DOM node
-     * every time the dev-tools panel opens, so the previously-found canvas element
-     * goes stale (detached, still default-sized) as soon as options are closed and
-     * reopened. Rebuilding whenever the live DOM node differs from the one this
-     * renderer was last bound to keeps draws landing on the canvas actually on
-     * screen. Even when the node is unchanged, its resolution is re-synced on every
-     * call (cheap) so it reflects the live board's current cell size/dimensions
-     * right away instead of only whenever this renderer next happens to be rebuilt. */
     _getOffscreenRenderer() {
         const game = this.game;
         const liveRenderer = game.renderer;
@@ -209,24 +168,10 @@ export class BenchmarkController {
         return this._offscreenRenderer;
     }
 
-    /** Sizes/rebinds the preview canvas as soon as the dev-tools panel becomes
-     * visible, instead of leaving it at the browser's default 300x150 canvas
-     * resolution until the user presses "run" for the first time. */
     ensurePreviewCanvasSized() {
         this._getOffscreenRenderer();
     }
 
-    /** Inert stand-in for SoundManager used as `shadow.soundManager` inside the
-     * simulated gameplay path (PieceController/StatsTracker call `game.soundManager.play/
-     * stop/...` as an ordinary part of locking/rotating/clearing). Deliberately does NOT
-     * forward to the real SoundManager: play(key, {volume: 0}) still creates a real
-     * AudioBufferSourceNode + GainNode and calls source.start(0) - genuine Web Audio
-     * graph work - which would get silently absorbed into whichever benchmark category
-     * happens to call it (e.g. every lockCurrentPiece() -> "Blokowanie klocka na
-     * planszy"), mislabeling real audio-API cost as engine/render cost. The benchmark
-     * already measures actual WebAudio play/stop cost explicitly and separately (see the
-     * dedicated audioPlay/audioStop timings below, using the real liveGame.soundManager),
-     * so this stub only needs to satisfy the call sites without doing real audio work. */
     _mutedSoundManager() {
         return {
             play: () => null,
@@ -431,7 +376,7 @@ export class BenchmarkController {
                 try {
                     playedId = liveGame.soundManager.play("drop", {volume: 0});
                 } catch {
-                    // Audio engine unavailable - timing still reflects the (fast) no-op cost.
+                    // Audio engine unavailable.
                 }
                 timings.audioPlay.ms += mark() - t0;
                 timings.audioPlay.ops++;

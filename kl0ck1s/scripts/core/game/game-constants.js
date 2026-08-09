@@ -83,7 +83,11 @@ export const FALL_TRAIL_MAX_LENGTH = 10;
 export const FALL_TRAIL_MAX_ALPHA = 0.30;
 export const HARD_DROP_TRAIL_MAX_ALPHA = 0.30;
 export const HARD_DROP_TRAIL_DURATION_MS = 170;
-/** Row-distance between consecutive hard-drop trail layers - 1 = one layer per cell dropped, 0.5 = twice as many, half as far apart. */
+/**
+ * Row-distance between consecutive hard-drop trail layers
+ *  - 1 = one layer per cell dropped,
+ *  0.5 = twice as many, half as far apart.
+ */
 export const HARD_DROP_TRAIL_STEP = 0.75;
 
 export function fallTrailLengthForInterval(dropIntervalMs) {
@@ -96,13 +100,6 @@ export function fallTrailLengthForInterval(dropIntervalMs) {
     return Math.round(clamped * FALL_TRAIL_MAX_LENGTH);
 }
 
-/**
- * Per-segment alpha values for the fall trail, indexed by trail length
- * (0..FALL_TRAIL_MAX_LENGTH, one "bucket" per possible speed/level). Built
- * once as a module-level constant - i.e. once when the game loads - instead
- * of recomputing the `1 - i / count` falloff every render frame for every
- * trail segment.
- */
 function buildFallTrailAlphaCache() {
     const cache = [];
     for (let count = 0; count <= FALL_TRAIL_MAX_LENGTH; count++) {
@@ -116,10 +113,4 @@ function buildFallTrailAlphaCache() {
 }
 
 export const FALL_TRAIL_ALPHA_CACHE = buildFallTrailAlphaCache();
-
-/**
- * Assumed ms-per-frame used only to synthesize a plausible "pre-history" for
- * a freshly spawned piece's fall trail (see Game#_primeFallTrail) - i.e. how
- * far apart consecutive trail samples would normally land in time.
- */
 export const FALL_TRAIL_FRAME_MS = 1000 / 60;

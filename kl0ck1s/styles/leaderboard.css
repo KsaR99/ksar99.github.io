@@ -1,0 +1,116 @@
+.leaderboard {
+    width: 100%;
+    margin-top: auto;
+}
+
+.leaderboard__header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    margin: 0 0 0.5rem;
+}
+
+.leaderboard__title {
+    margin: 0;
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+}
+
+.leaderboard__share-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--panel);
+    color: var(--muted);
+    font-size: 0.8rem;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s ease, filter 0.15s ease, transform 0.15s ease;
+}
+
+.leaderboard__share-button:hover,
+.leaderboard__share-button:focus-visible {
+    color: var(--text);
+    filter: brightness(1.35);
+}
+
+.leaderboard__share-button:active {
+    transform: scale(0.92);
+}
+
+.leaderboard__share-button:disabled {
+    opacity: 0.6;
+    cursor: default;
+    transform: none;
+}
+
+.leaderboard__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.75rem;
+}
+
+.leaderboard__table tbody tr:nth-child(even) .leaderboard__cell {
+    background: color-mix(in oklch, var(--line) 30%, transparent);
+}
+
+.leaderboard__cell[data-field="rank"] {
+    color: var(--muted);
+    user-select: none;
+}
+
+.leaderboard__heading, .leaderboard__cell {
+    font-size: 0.85rem;
+    text-align: left;
+    padding: 0.2rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.leaderboard__row > .leaderboard__cell {
+    border-bottom: none;
+}
+
+.leaderboard__heading {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.leaderboard__row--new > .leaderboard__cell {
+    color: var(--good);
+    font-weight: 700;
+}
+
+.leaderboard__cell--date, .leaderboard__heading--date {
+    color: var(--muted);
+    white-space: nowrap;
+    text-align: right;
+}
+
+.leaderboard__empty {
+    color: var(--muted);
+    font-size: 0.8125rem;
+    text-align: center;
+}
+
+[data-field="leaderboard"] {
+    overflow: auto;
+}
+
+@media (width <= 30rem) {
+    .leaderboard__cell--date, .leaderboard__heading--date {
+        display: none;
+    }
+}

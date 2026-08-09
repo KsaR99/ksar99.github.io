@@ -63,9 +63,6 @@ function roundRect(ctx, x, y, w, h, r) {
     ctx.closePath();
 }
 
-// Converts a CSS linear-gradient() angle (0deg = "to top", clockwise) into
-// the two endpoints Canvas's createLinearGradient needs, for a box at
-// (x, y, w, h) - so the canvas gradient matches the CSS one it's mirroring.
 function angleGradientPoints(angleDeg, x, y, w, h) {
     const rad = (angleDeg * Math.PI) / 180;
     const dx = Math.sin(rad);

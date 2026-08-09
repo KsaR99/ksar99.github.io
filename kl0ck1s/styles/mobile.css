@@ -3,3 +3,26 @@
 .app:has(.board__overlay--visible) [data-role="touch-controls"] {
     display: none;
 }
+
+[data-role="options-group-advanced"],
+[data-role="reset-controls-button"],
+[data-role="options-group-mouse"] {
+    display: none;
+}
+
+.options__row:has([data-role="keybind-reset-button"]) {
+    display: none;
+}
+
+details[data-role="options-group-keyboard"] {
+    border: none;
+    padding: 0;
+}
+
+details[data-role="options-group-keyboard"] > summary {
+    display: none;
+}
+
+details[data-role="options-group-keyboard"] > .controls__list--touch {
+    display: flex;
+}

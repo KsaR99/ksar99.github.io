@@ -15,7 +15,7 @@ import {
     SENSITIVITY_STEP,
     SETTINGS_EXPORT_FILENAME,
 } from "../game/game-constants.js";
-import {copyTextToClipboard, numberToVoiceKeys} from "../shared/utils.js";
+import {copyTextToClipboard, debounce, isMobileViewport, numberToVoiceKeys} from "../shared/utils.js";
 import {voiceCountingKey} from "../shared/config.js";
 import {defaultKeyBindings} from "../shared/key-bindings.js";
 
@@ -968,7 +968,7 @@ export class ScreenFlow {
             });
         });
 
-        game.dom.querySelectorAll('[data-role="sound-list"]').forEach((list) => {
+        game.dom.querySelectorAll('[data-role="sound-list"], [data-role="sound-list-countdown"]').forEach((list) => {
             list.addEventListener("input", (event) => {
                 const slider = event.target.closest('[data-role="sound-volume-slider"]');
                 if (!slider) return;
@@ -977,13 +977,24 @@ export class ScreenFlow {
                 game.settings.soundVolumes = {...game.settings.soundVolumes, [key]: volume};
                 game.soundManager.setSoundVolume(key, volume);
                 settingsController.saveSettings();
+                settingsController.syncSoundMuteToggle(key);
                 this.syncSoundCategoryResetButtons();
             });
 
             list.addEventListener("click", (event) => {
-                const button = event.target.closest('[data-role="sound-preview-button"]');
-                if (!button) return;
-                this.togglePreviewButton(button, list);
+                const previewButton = event.target.closest('[data-role="sound-preview-button"]');
+                if (previewButton) {
+                    this.togglePreviewButton(previewButton, list);
+                    return;
+                }
+
+                const muteButton = event.target.closest('[data-role="sound-mute-toggle"]');
+                if (muteButton) {
+                    const key = muteButton.dataset.soundKey;
+                    settingsController.toggleSoundMuted(key);
+                    settingsController.syncSoundMuteToggle(key);
+                    this.syncSoundCategoryResetButtons();
+                }
             });
         });
 
@@ -1002,16 +1013,18 @@ export class ScreenFlow {
         this.bindSoundCategoryResetButtons();
         this.syncSoundCategoryResetButtons();
         this.syncCategoryResetButtons();
+        this.bindOptionsSearch();
     }
 
     categoryResetGroups() {
+        const graphicsKeys = ["screenShake", "glow", "transparency", "fallTrail"];
         return {
             "reset-general-button": ["volume", "muted", "hudRight", "theme"],
             "reset-controls-button": ["mouseControl", "mouseSensitivity", "touchSensitivity"],
-            "reset-gameplay-button": ["skipCountdown", "skipModeInfo"],
-            "reset-graphics-button": [
-                "ghost", "gridLines", "screenShake", "heightSaturation", "glow", "transparency", "fallTrail"
-            ],
+            "reset-gameplay-button": ["skipCountdown", "skipModeInfo", "ghost", "gridLines", "heightSaturation"],
+            "reset-graphics-button": isMobileViewport()
+                ? graphicsKeys.filter((key) => key !== "screenShake")
+                : graphicsKeys,
             "reset-advanced-button": ["keyboardDAS", "keyboardARR"],
         };
     }
@@ -1163,6 +1176,7 @@ export class ScreenFlow {
 
         const refreshList = () => {
             game.screens.renderKeybindRows(game.dom, list, game.settings.keyBindings, game.i18n);
+            this.syncKeybindResetButton();
         };
 
         list.addEventListener("click", (event) => {
@@ -1202,6 +1216,113 @@ export class ScreenFlow {
                 refreshList();
             });
         }
+
+        this.syncKeybindResetButton();
+    }
+
+    syncKeybindResetButton() {
+        const game = this.game;
+        if (!game.dom) return;
+        const resetButton = game.dom.querySelector('[data-role="keybind-reset-button"]');
+        if (!resetButton) return;
+        const defaults = defaultKeyBindings();
+        const bindings = game.settings.keyBindings ?? {};
+        const isDefault = Object.keys(defaults).every((key) => bindings[key] === defaults[key])
+            && Object.keys(bindings).every((key) => key in defaults);
+        resetButton.hidden = isDefault;
+    }
+
+    bindOptionsSearch() {
+        const game = this.game;
+        if (!game.dom) return;
+        const input = game.dom.querySelector('[data-role="options-search-input"]');
+        const panels = game.dom.querySelector('[data-role="options-panels"]');
+        const emptyState = game.dom.querySelector('[data-role="options-search-empty"]');
+        if (!input || !panels) return;
+
+        const rowSelector = ".options__row, .controls__item";
+        const groupSelector = '.options[data-role^="options-group-"]:not([data-role="options-group-developer"]), .options__group';
+        const searchHiddenRows = new Set();
+        const searchHiddenGroups = new Set();
+        const expandedByOpen = new Set();
+
+        const isInDeveloperGroup = (el) => Boolean(el.closest('[data-role="options-group-developer"]'));
+
+        const clearSearchState = () => {
+            searchHiddenRows.forEach((row) => {
+                row.hidden = false;
+            });
+            searchHiddenRows.clear();
+            searchHiddenGroups.forEach((group) => {
+                group.hidden = false;
+            });
+            searchHiddenGroups.clear();
+            expandedByOpen.forEach((details) => {
+                details.open = false;
+            });
+            expandedByOpen.clear();
+        };
+
+        const groupTitleText = (group) => {
+            const title = group.querySelector(":scope > summary, :scope > h3");
+            return title ? title.textContent.trim().toLowerCase() : "";
+        };
+
+        const rowMatchesQuery = (row, query) => {
+            if (row.textContent.trim().toLowerCase().includes(query)) return true;
+            let group = row.parentElement?.closest(groupSelector);
+            while (group) {
+                if (groupTitleText(group).includes(query)) return true;
+                group = group.parentElement?.closest(groupSelector);
+            }
+            return false;
+        };
+
+        const applyFilter = () => {
+            clearSearchState();
+
+            const query = input.value.trim().toLowerCase();
+            if (!query) {
+                if (emptyState) emptyState.hidden = true;
+                return;
+            }
+
+            const rows = Array.from(panels.querySelectorAll(rowSelector)).filter((row) => !isInDeveloperGroup(row));
+            let anyVisible = false;
+
+            rows.forEach((row) => {
+                if (row.hidden) return;
+                const matches = rowMatchesQuery(row, query);
+                if (!matches) {
+                    row.hidden = true;
+                    searchHiddenRows.add(row);
+                } else {
+                    anyVisible = true;
+                }
+            });
+
+            const groups = Array.from(panels.querySelectorAll(groupSelector)).filter((group) => !isInDeveloperGroup(group));
+            groups.forEach((group) => {
+                const hasVisibleRow = Array.from(group.querySelectorAll(rowSelector)).some((row) => !row.hidden);
+                if (!hasVisibleRow) {
+                    group.hidden = true;
+                    searchHiddenGroups.add(group);
+                } else if (group.tagName === "DETAILS" && !group.open) {
+                    group.open = true;
+                    expandedByOpen.add(group);
+                }
+            });
+
+            if (emptyState) emptyState.hidden = anyVisible;
+        };
+
+        input.value = this.optionsSearchQuery ?? "";
+        if (input.value) applyFilter();
+
+        input.addEventListener("input", debounce(() => {
+            this.optionsSearchQuery = input.value;
+            applyFilter();
+        }, 200));
     }
 
     setImportReviewVisible(visible) {
