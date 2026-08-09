@@ -357,6 +357,7 @@
         "step3Label": "준비 확인",
         "button": "멀티플레이어",
         "chooseConnection": "연결 방법을 선택하세요",
+        "chooseModeHint": "모드를 선택하세요",
         "hostButton": "방 만들기",
         "joinButton": "방 참가하기",
         "sendCodeHint": "이 코드를 함께 플레이할 상대에게 보내세요",
@@ -374,6 +375,8 @@
         "statusBothReadyGuest": "두 플레이어 모두 준비됨 — 호스트가 게임을 시작할 때까지 기다리세요.",
         "statusDisconnected": "상대방과의 연결이 끊어졌습니다.",
         "statusError": "연결 오류가 발생했습니다.",
+        "configHostHint": "아래에서 모드와 레벨을 변경할 수 있습니다",
+        "configGuestHint": "모드와 레벨은 호스트가 설정합니다",
         "youReady": "나: 준비됨",
         "youNotReady": "나: 준비 안 됨",
         "opponentFallback": "상대",
@@ -386,7 +389,9 @@
         "draw": "무승부!",
         "resultScore": "{result} (나: {local} / {name}: {remote})",
         "opponentScore": "{name}: {score}",
+        "themesInfo": "테마 — 나: {you} • {name}: {opponent}",
         "genericError": "연결을 설정하지 못했습니다.",
-        "pauseBlocked": "멀티플레이어 대전 중에는 일시정지를 사용할 수 없습니다."
+        "pauseBlocked": "멀티플레이어 대전 중에는 일시정지를 사용할 수 없습니다.",
+        "restartBlocked": "멀티플레이어 경기 중에는 재시작할 수 없습니다."
     }
 }

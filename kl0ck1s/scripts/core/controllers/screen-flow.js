@@ -517,7 +517,7 @@ export class ScreenFlow {
         const game = this.game;
         if (game.state === "running") {
             if (game.multiplayerConnected) {
-                this._showPauseBlockedHint();
+                this._showMultiplayerBlockedHint();
                 return;
             }
             game.state = "paused";
@@ -531,7 +531,9 @@ export class ScreenFlow {
         }
     }
 
-    _showPauseBlockedHint() {
+    /** Shown when pausing, opening options, or restarting is blocked mid-multiplayer-match
+     *  (see toggleOptions()/restart()) - defaults to the pause-blocked message. */
+    _showMultiplayerBlockedHint(messageKey = "multiplayer.pauseBlocked") {
         const game = this.game;
         if (!game.dom) return;
 
@@ -543,7 +545,7 @@ export class ScreenFlow {
             (game.dom.body ?? game.dom.documentElement)?.appendChild(toast);
         }
 
-        toast.textContent = game.i18n.t("multiplayer.pauseBlocked");
+        toast.textContent = game.i18n.t(messageKey);
         toast.classList.add("mp-pause-blocked-toast--visible");
 
         clearTimeout(this._pauseBlockedTimer);
@@ -555,6 +557,15 @@ export class ScreenFlow {
     restart() {
         const game = this.game;
         if (!["running", "paused", "clearing", "countdown", "gameOver-entry", "gameOver-saved"].includes(game.state)) {
+            return;
+        }
+
+        // Restarting mid-match would desync the two peers (only one board
+        // would reset) - same "blocked while connected" rule as pause/options
+        // above, and only while a match is actually in flight; once the round
+        // is over, "play again" from gameOver-saved is a normal rematch.
+        if (["running", "paused", "clearing", "countdown"].includes(game.state) && game.multiplayerConnected) {
+            this._showMultiplayerBlockedHint("multiplayer.restartBlocked");
             return;
         }
 
@@ -682,6 +693,15 @@ export class ScreenFlow {
 
         if (!["idle", "running", "paused", "gameOver-saved", "gameOver-entry"].includes(game.state))
             return;
+
+        // Opening options from "running" freezes gameplay updates the same
+        // way pausing does (see Game#update's early-return for non-"running"
+        // states) - so without this it was a loophole around the pause
+        // block above during a multiplayer match.
+        if (game.state === "running" && game.multiplayerConnected) {
+            this._showMultiplayerBlockedHint();
+            return;
+        }
 
         game.previousStateBeforeOptions = game.state;
         if (game.state === "running") {

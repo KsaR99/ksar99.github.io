@@ -357,6 +357,7 @@
         "step3Label": "Préparation",
         "button": "Multijoueur",
         "chooseConnection": "Choisis comment te connecter",
+        "chooseModeHint": "Choisissez un mode",
         "hostButton": "Créer une salle",
         "joinButton": "Rejoindre une salle",
         "sendCodeHint": "Envoie ce code au joueur avec qui tu veux jouer",
@@ -374,6 +375,8 @@
         "statusBothReadyGuest": "Les deux joueurs sont prêts — attends que l'hôte lance la partie.",
         "statusDisconnected": "La connexion avec l'adversaire a été interrompue.",
         "statusError": "Une erreur de connexion est survenue.",
+        "configHostHint": "Vous pouvez changer le mode et le niveau ci-dessous",
+        "configGuestHint": "Mode et niveau définis par l'hôte",
         "youReady": "Toi : prêt",
         "youNotReady": "Toi : pas prêt",
         "opponentFallback": "Adversaire",
@@ -386,7 +389,9 @@
         "draw": "Égalité !",
         "resultScore": "{result} (Toi : {local} / {name}: {remote})",
         "opponentScore": "{name}: {score}",
+        "themesInfo": "Thèmes — Toi : {you} • {name} : {opponent}",
         "genericError": "Impossible d'établir la connexion.",
-        "pauseBlocked": "La pause est désactivée pendant une partie multijoueur."
+        "pauseBlocked": "La pause est désactivée pendant une partie multijoueur.",
+        "restartBlocked": "Le redémarrage est désactivé pendant un match multijoueur."
     }
 }

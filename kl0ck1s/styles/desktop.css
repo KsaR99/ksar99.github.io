@@ -16,6 +16,7 @@
     display: block;
     width: auto;
     padding: 0;
+    position: relative;
 }
 
 .board__overlay {
@@ -114,10 +115,6 @@
     max-width: none;
     flex: 0 0 auto;
     order: 3;
-}
-
-.mp-opponent-badge {
-    display: none;
 }
 
 .sidebar--stats {

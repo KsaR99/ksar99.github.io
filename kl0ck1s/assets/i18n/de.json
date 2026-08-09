@@ -357,6 +357,7 @@
         "step3Label": "Bereitschaft",
         "button": "Mehrspieler",
         "chooseConnection": "Wähle eine Verbindungsart",
+        "chooseModeHint": "Wähle einen Modus",
         "hostButton": "Raum erstellen",
         "joinButton": "Raum beitreten",
         "sendCodeHint": "Sende diesen Code an den Spieler, mit dem du spielen möchtest",
@@ -374,6 +375,8 @@
         "statusBothReadyGuest": "Beide Spieler bereit — warte, bis der Host das Spiel startet.",
         "statusDisconnected": "Die Verbindung zum Gegner wurde unterbrochen.",
         "statusError": "Es ist ein Verbindungsfehler aufgetreten.",
+        "configHostHint": "Du kannst Modus und Level unten ändern",
+        "configGuestHint": "Modus und Level vom Host festgelegt",
         "youReady": "Du: bereit",
         "youNotReady": "Du: nicht bereit",
         "opponentFallback": "Gegner",
@@ -386,7 +389,9 @@
         "draw": "Unentschieden!",
         "resultScore": "{result} (Du: {local} / {name}: {remote})",
         "opponentScore": "{name}: {score}",
+        "themesInfo": "Motive — Du: {you} • {name}: {opponent}",
         "genericError": "Verbindung konnte nicht hergestellt werden.",
-        "pauseBlocked": "Pause ist während eines Mehrspieler-Matches deaktiviert."
+        "pauseBlocked": "Pause ist während eines Mehrspieler-Matches deaktiviert.",
+        "restartBlocked": "Neustart ist während eines Multiplayer-Matches deaktiviert."
     }
 }

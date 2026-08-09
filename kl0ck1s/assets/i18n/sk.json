@@ -357,6 +357,7 @@
         "step3Label": "Pripravenosť",
         "button": "Multiplayer",
         "chooseConnection": "Vyber spôsob pripojenia",
+        "chooseModeHint": "Vyberte režim",
         "hostButton": "Vytvoriť miestnosť",
         "joinButton": "Pripojiť sa do miestnosti",
         "sendCodeHint": "Pošli tento kód hráčovi, s ktorým chceš hrať",
@@ -374,6 +375,8 @@
         "statusBothReadyGuest": "Obaja hráči sú pripravení — počkaj, kým hostiteľ spustí hru.",
         "statusDisconnected": "Spojenie s protihráčom bolo prerušené.",
         "statusError": "Nastala chyba pripojenia.",
+        "configHostHint": "Režim a úroveň môžete zmeniť nižšie",
+        "configGuestHint": "Režim a úroveň nastavil hostiteľ",
         "youReady": "Ty: pripravený",
         "youNotReady": "Ty: nepripravený",
         "opponentFallback": "Protihráč",
@@ -386,7 +389,9 @@
         "draw": "Remíza!",
         "resultScore": "{result} (Ty: {local} / {name}: {remote})",
         "opponentScore": "{name}: {score}",
+        "themesInfo": "Motívy — Ty: {you} • {name}: {opponent}",
         "genericError": "Nepodarilo sa nadviazať spojenie.",
-        "pauseBlocked": "Pauza je počas multiplayerového zápasu vypnutá."
+        "pauseBlocked": "Pauza je počas multiplayerového zápasu vypnutá.",
+        "restartBlocked": "Reštart je počas multiplayerového zápasu zakázaný."
     }
 }

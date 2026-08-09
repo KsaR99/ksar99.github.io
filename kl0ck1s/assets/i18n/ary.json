@@ -357,6 +357,7 @@
         "step3Label": "الاستعداد",
         "button": "ملتيبلاير",
         "chooseConnection": "ختار كيفاش بغيتي تتصل",
+        "chooseModeHint": "ختار المود",
         "hostButton": "صاوب بيت",
         "joinButton": "دخل لبيت",
         "sendCodeHint": "صيفط هاد الكود للاعب اللي بغيتي تلعب معاه",
@@ -374,6 +375,8 @@
         "statusBothReadyGuest": "بجوج اللاعبين واجدين — تسنى صاحب البيت باش يبدا اللعبة.",
         "statusDisconnected": "الاتصال مع الخصم تقطع.",
         "statusError": "وقع خطأ فالاتصال.",
+        "configHostHint": "تقدر تبدل المود والمستوى تحت",
+        "configGuestHint": "المود والمستوى محددين من صاحب البيت",
         "youReady": "نتا: واجد",
         "youNotReady": "نتا: ماشي واجد",
         "opponentFallback": "الخصم",
@@ -386,7 +389,9 @@
         "draw": "تعادل!",
         "resultScore": "{result} (نتا: {local} / {name}: {remote})",
         "opponentScore": "{name}: {score}",
+        "themesInfo": "الثيمات — نتا: {you} • {name}: {opponent}",
         "genericError": "ما قدرناش نديرو الاتصال.",
-        "pauseBlocked": "التوقف ماشي متاح فالماتش ديال ملتيبلاير."
+        "pauseBlocked": "التوقف ماشي متاح فالماتش ديال ملتيبلاير.",
+        "restartBlocked": "ماشي ممكن تعاود بدا الماتش منين كون فمولتيبلاير."
     }
 }

@@ -357,6 +357,7 @@
         "step3Label": "Confirmación",
         "button": "Multijugador",
         "chooseConnection": "Elige cómo conectarte",
+        "chooseModeHint": "Elige un modo",
         "hostButton": "Crear sala",
         "joinButton": "Unirse a una sala",
         "sendCodeHint": "Envía este código al jugador con el que quieres jugar",
@@ -374,6 +375,8 @@
         "statusBothReadyGuest": "Ambos jugadores listos — espera a que el host empiece la partida.",
         "statusDisconnected": "Se perdió la conexión con el oponente.",
         "statusError": "Se produjo un error de conexión.",
+        "configHostHint": "Puedes cambiar el modo y el nivel abajo",
+        "configGuestHint": "Modo y nivel establecidos por el host",
         "youReady": "Tú: listo",
         "youNotReady": "Tú: no listo",
         "opponentFallback": "Oponente",
@@ -386,7 +389,9 @@
         "draw": "¡Empate!",
         "resultScore": "{result} (Tú: {local} / {name}: {remote})",
         "opponentScore": "{name}: {score}",
+        "themesInfo": "Temas — Tú: {you} • {name}: {opponent}",
         "genericError": "No se pudo establecer la conexión.",
-        "pauseBlocked": "La pausa está desactivada durante una partida multijugador."
+        "pauseBlocked": "La pausa está desactivada durante una partida multijugador.",
+        "restartBlocked": "El reinicio está desactivado durante una partida multijugador."
     }
 }

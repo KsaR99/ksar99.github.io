@@ -357,6 +357,7 @@
         "step3Label": "Готовность",
         "button": "Мультиплеер",
         "chooseConnection": "Выберите способ подключения",
+        "chooseModeHint": "Выберите режим",
         "hostButton": "Создать комнату",
         "joinButton": "Присоединиться к комнате",
         "sendCodeHint": "Отправьте этот код игроку, с которым хотите сыграть",
@@ -374,6 +375,8 @@
         "statusBothReadyGuest": "Оба игрока готовы — дождитесь, пока хост начнёт игру.",
         "statusDisconnected": "Соединение с соперником было потеряно.",
         "statusError": "Произошла ошибка подключения.",
+        "configHostHint": "Вы можете изменить режим и уровень ниже",
+        "configGuestHint": "Режим и уровень заданы хостом",
         "youReady": "Вы: готовы",
         "youNotReady": "Вы: не готовы",
         "opponentFallback": "Соперник",
@@ -386,7 +389,9 @@
         "draw": "Ничья!",
         "resultScore": "{result} (Вы: {local} / {name}: {remote})",
         "opponentScore": "{name}: {score}",
+        "themesInfo": "Темы — Вы: {you} • {name}: {opponent}",
         "genericError": "Не удалось установить соединение.",
-        "pauseBlocked": "Пауза недоступна во время мультиплеерного матча."
+        "pauseBlocked": "Пауза недоступна во время мультиплеерного матча.",
+        "restartBlocked": "Перезапуск недоступен во время мультиплеерного матча."
     }
 }

@@ -357,6 +357,7 @@
         "step3Label": "準備確認",
         "button": "マルチプレイヤー",
         "chooseConnection": "接続方法を選択",
+        "chooseModeHint": "モードを選んでください",
         "hostButton": "部屋を作る",
         "joinButton": "部屋に参加",
         "sendCodeHint": "このコードを一緒に遊びたいプレイヤーに送ってください",
@@ -374,6 +375,8 @@
         "statusBothReadyGuest": "両プレイヤーの準備完了 — ホストがゲームを開始するのを待ってください。",
         "statusDisconnected": "相手との接続が切断されました。",
         "statusError": "接続エラーが発生しました。",
+        "configHostHint": "下でモードとレベルを変更できます",
+        "configGuestHint": "モードとレベルはホストが設定します",
         "youReady": "自分: 準備完了",
         "youNotReady": "自分: 未準備",
         "opponentFallback": "相手",
@@ -386,7 +389,9 @@
         "draw": "引き分け！",
         "resultScore": "{result}（自分: {local} / {name}: {remote}）",
         "opponentScore": "{name}: {score}",
+        "themesInfo": "テーマ — あなた: {you} • {name}: {opponent}",
         "genericError": "接続を確立できませんでした。",
-        "pauseBlocked": "マルチプレイヤーの対戦中は一時停止できません。"
+        "pauseBlocked": "マルチプレイヤーの対戦中は一時停止できません。",
+        "restartBlocked": "マルチプレイヤーの対戦中はリスタートできません。"
     }
 }

@@ -22,20 +22,20 @@ export class MultiplayerSession extends EventTarget {
         this.peer.addEventListener("message", (event) => this._onMessage(event.detail));
     }
 
-    static createHost(options = {}) {
-        return new MultiplayerSession({role: PEER_ROLE.HOST, ...options});
-    }
-
-    static createGuest(options = {}) {
-        return new MultiplayerSession({role: PEER_ROLE.GUEST, ...options});
-    }
-
     get isConnected() {
         return this.peer.isOpen;
     }
 
     get bothReady() {
         return this.localReady && this.remoteReady;
+    }
+
+    static createHost(options = {}) {
+        return new MultiplayerSession({role: PEER_ROLE.HOST, ...options});
+    }
+
+    static createGuest(options = {}) {
+        return new MultiplayerSession({role: PEER_ROLE.GUEST, ...options});
     }
 
     /** Host: creates the room and returns the base64 code to send to the guest. */

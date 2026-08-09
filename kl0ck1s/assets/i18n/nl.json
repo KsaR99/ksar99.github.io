@@ -357,6 +357,7 @@
         "step3Label": "Gereedheid",
         "button": "Multiplayer",
         "chooseConnection": "Kies hoe je wilt verbinden",
+        "chooseModeHint": "Kies een modus",
         "hostButton": "Kamer maken",
         "joinButton": "Kamer joinen",
         "sendCodeHint": "Stuur deze code naar de speler met wie je wilt spelen",
@@ -374,6 +375,8 @@
         "statusBothReadyGuest": "Beide spelers zijn klaar — wacht tot de host de game start.",
         "statusDisconnected": "De verbinding met de tegenstander is verbroken.",
         "statusError": "Er is een verbindingsfout opgetreden.",
+        "configHostHint": "Je kunt de modus en het niveau hieronder wijzigen",
+        "configGuestHint": "Modus en niveau ingesteld door de host",
         "youReady": "Jij: klaar",
         "youNotReady": "Jij: niet klaar",
         "opponentFallback": "Tegenstander",
@@ -386,7 +389,9 @@
         "draw": "Gelijkspel!",
         "resultScore": "{result} (Jij: {local} / {name}: {remote})",
         "opponentScore": "{name}: {score}",
+        "themesInfo": "Thema's — Jij: {you} • {name}: {opponent}",
         "genericError": "Er kon geen verbinding tot stand worden gebracht.",
-        "pauseBlocked": "Pauzeren is uitgeschakeld tijdens een multiplayerwedstrijd."
+        "pauseBlocked": "Pauzeren is uitgeschakeld tijdens een multiplayerwedstrijd.",
+        "restartBlocked": "Herstarten is uitgeschakeld tijdens een multiplayerwedstrijd."
     }
 }

@@ -357,6 +357,7 @@
         "step3Label": "Kesiapan",
         "button": "Multiplayer",
         "chooseConnection": "Pilih cara terhubung",
+        "chooseModeHint": "Pilih mode",
         "hostButton": "Buat ruangan",
         "joinButton": "Gabung ke ruangan",
         "sendCodeHint": "Kirim kode ini ke pemain yang ingin kamu ajak main",
@@ -374,6 +375,8 @@
         "statusBothReadyGuest": "Kedua pemain siap — tunggu host memulai permainan.",
         "statusDisconnected": "Koneksi dengan lawan terputus.",
         "statusError": "Terjadi kesalahan koneksi.",
+        "configHostHint": "Anda dapat mengubah mode dan level di bawah",
+        "configGuestHint": "Mode dan level ditentukan oleh host",
         "youReady": "Kamu: siap",
         "youNotReady": "Kamu: belum siap",
         "opponentFallback": "Lawan",
@@ -386,7 +389,9 @@
         "draw": "Seri!",
         "resultScore": "{result} (Kamu: {local} / {name}: {remote})",
         "opponentScore": "{name}: {score}",
+        "themesInfo": "Tema — Kamu: {you} • {name}: {opponent}",
         "genericError": "Gagal membuat koneksi.",
-        "pauseBlocked": "Jeda dinonaktifkan selama pertandingan multiplayer."
+        "pauseBlocked": "Jeda dinonaktifkan selama pertandingan multiplayer.",
+        "restartBlocked": "Mulai ulang dinonaktifkan selama pertandingan multipemain."
     }
 }

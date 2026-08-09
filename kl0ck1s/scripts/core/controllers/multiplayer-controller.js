@@ -1,10 +1,10 @@
 "use strict";
 
 import {MultiplayerSession} from "../net/multiplayer-session.js";
-import {BotOpponent, BOT_DIFFICULTIES} from "../ai/bot-opponent.js";
+import {BOT_DIFFICULTIES, BotOpponent} from "../ai/bot-opponent.js";
 import {PieceBag} from "../game/piece-bag.js";
 import {mulberry32, randomSeed} from "../shared/seeded-random.js";
-import {copyTextToClipboard, formatNumber} from "../shared/utils.js";
+import {copyTextToClipboard, forEachShapeCell, formatNumber} from "../shared/utils.js";
 import {BOARD_CONFIG, COLOR_PALETTE, KLOCKOMINO_TYPES} from "../shared/config.js";
 
 const SCORE_POLL_MS = 200;
@@ -47,6 +47,49 @@ const STEP_BY_PANEL = {
  * pieces - restored to plain randomness once the match ends.
  */
 export class MultiplayerController {
+    /**
+     * Every row in the post-match stat comparison table: how to read the raw
+     * (unformatted) number used to decide who did better, how to read the
+     * already-formatted display string, and which direction counts as
+     * "better" for that stat. Most stats are "more is better"; drought and
+     * burn are the opposite - a *lower* drought/burn means fewer pieces spent
+     * waiting for an I-piece or stuck clearing non-Tetrises.
+     */
+    static RESULT_STAT_ROWS = [
+        {role: "lines", raw: (s) => s.lines ?? 0, display: (s, raw) => s.display?.lines ?? String(raw)},
+        {
+            role: "trt",
+            raw: (s) => s.tetrisRatePercent ?? 0,
+            display: (s, raw) => s.display?.tetrisRate ?? `${raw.toFixed(1)}%`
+        },
+        {role: "pps", raw: (s) => s.pps ?? 0, display: (s, raw) => s.display?.pps ?? raw.toFixed(2)},
+        {
+            role: "efficiency",
+            raw: (s) => s.efficiency ?? 0,
+            display: (s, raw) => s.display?.efficiency ?? formatNumber(Math.round(raw))
+        },
+        {role: "combo", raw: (s) => s.maxCombo ?? 0, display: (s, raw) => s.display?.maxCombo ?? String(raw)},
+        {role: "burn", raw: (s) => s.burn ?? 0, display: (s, raw) => s.display?.burn ?? String(raw), lowerBetter: true},
+        {
+            role: "drought-max",
+            raw: (s) => s.maxDrought ?? 0,
+            display: (s, raw) => s.display?.maxDrought ?? String(raw),
+            lowerBetter: true
+        },
+        {
+            role: "drought-total",
+            raw: (s) => s.droughtTotal ?? 0,
+            display: (s, raw) => s.display?.droughtTotal ?? String(raw),
+            lowerBetter: true
+        },
+        {
+            role: "drought-avg",
+            raw: (s) => s.droughtAvg ?? 0,
+            display: (s, raw) => s.display?.droughtAvg ?? raw.toFixed(1),
+            lowerBetter: true
+        },
+    ];
+
     constructor(game, dom = globalThis.document ?? null, i18n = null) {
         this.game = game;
         this.dom = dom;
@@ -60,19 +103,45 @@ export class MultiplayerController {
         this.botOpponent = null;
 
         this._pollTimer = null;
+        this._disconnectToastTimer = null;
         this._lastSentScore = -1;
         this._lastSentBoardVersion = -1;
         this._localFinalScore = null;
         this._remoteFinalScore = null;
+        this._localFinalStats = null;
+        this._remoteFinalStats = null;
         this._wasInMatch = false;
         this._remoteName = null;
         this._lastRemoteScore = 0;
+        this._lastRemoteStats = null;
+        // Live-piece overlay (see _drawOpponentBoard): the opponent's locked
+        // board cells received so far, plus their currently falling piece
+        // (if any) so the panel shows real movement/rotation, not just a
+        // static board that only updates when a piece locks.
+        this._lastRemoteCells = null;
+        this._remoteLivePiece = null;
         this._opponentBadgeEl = null;
+        this._opponentNameBadgeEl = null;
+        this._opponentScoreBadgeEl = null;
+        this._opponentBestBadgeEl = null;
+        this._opponentLinesBadgeEl = null;
+        this._opponentTrtBadgeEl = null;
+        this._opponentPpsBadgeEl = null;
+        this._opponentDroughtBadgeEl = null;
+        this._resultPanelEl = null;
         this._opponentPanelEl = null;
         this._opponentNameEl = null;
-        this._opponentScoreEl = null;
         this._opponentCanvasEl = null;
         this._opponentCanvasCtx = null;
+        this._opponentBoardHost = null;
+        this._localHeaderEl = null;
+        this._handleOpponentWindowResize = null;
+        this._botStartTimer = null;
+        this._botStartDeadline = 0;
+        this._botDifficultyKey = null;
+
+        this._guestOriginalMode = null;
+        this._guestOriginalDifficulty = null;
 
         this._onKeydown = this._onKeydown.bind(this);
     }
@@ -89,6 +158,7 @@ export class MultiplayerController {
             join: this.dom?.querySelector('[data-role="mp-panel-join"]') ?? null,
             bot: this.dom?.querySelector('[data-role="mp-panel-bot"]') ?? null,
             ready: this.dom?.querySelector('[data-role="mp-panel-ready"]') ?? null,
+            result: this.dom?.querySelector('[data-role="mp-panel-result"]') ?? null,
         };
     }
 
@@ -115,6 +185,13 @@ export class MultiplayerController {
             button.addEventListener("click", () => this._beginBot(button.dataset.difficulty));
         });
 
+        this.dom.querySelector('[data-role="mp-bot-mode-prev"]')?.addEventListener("click", () => this._changeMatchMode(-1));
+        this.dom.querySelector('[data-role="mp-bot-mode-next"]')?.addEventListener("click", () => this._changeMatchMode(1));
+        this.dom.querySelector('[data-role="mp-ready-mode-prev"]')?.addEventListener("click", () => this._changeMatchMode(-1));
+        this.dom.querySelector('[data-role="mp-ready-mode-next"]')?.addEventListener("click", () => this._changeMatchMode(1));
+        this.dom.querySelector('[data-role="mp-ready-difficulty-prev"]')?.addEventListener("click", () => this._changeMatchDifficulty(-1));
+        this.dom.querySelector('[data-role="mp-ready-difficulty-next"]')?.addEventListener("click", () => this._changeMatchDifficulty(1));
+
         this.dom.querySelector('[data-role="mp-host-copy-button"]')?.addEventListener("click", (event) =>
             this._copyFrom('[data-role="mp-host-code"]', event.currentTarget));
         this.dom.querySelector('[data-role="mp-host-connect-button"]')?.addEventListener("click", () => this._completeHost());
@@ -125,6 +202,9 @@ export class MultiplayerController {
 
         this.dom.querySelector('[data-role="mp-ready-button"]')?.addEventListener("click", () => this._toggleReady());
         this.dom.querySelector('[data-role="mp-start-button"]')?.addEventListener("click", () => this._hostStart());
+        this.dom.querySelector('[data-role="mp-leave-button"]')?.addEventListener("click", () => this._leaveMatch());
+        this.dom.querySelector('[data-role="mp-result-rematch-button"]')?.addEventListener("click", () => this._rematch());
+        this.dom.querySelector('[data-role="mp-result-close-button"]')?.addEventListener("click", () => this._closeResult());
     }
 
     open() {
@@ -146,11 +226,11 @@ export class MultiplayerController {
         if (this.session && !this.session.isConnected) this._resetSession();
     }
 
+    // --- role/host/join flow ---
+
     _onKeydown(event) {
         if (event.key === "Escape") this.close();
     }
-
-    // --- role/host/join flow ---
 
     _showPanel(name) {
         const panels = this.panels;
@@ -158,6 +238,7 @@ export class MultiplayerController {
             if (el) el.hidden = key !== name;
         });
         this._updateSteps(name);
+        this._renderConfigPanels();
     }
 
     _updateSteps(name) {
@@ -172,6 +253,79 @@ export class MultiplayerController {
 
         const caption = this.dom.querySelector('[data-field="mp-step-caption"]');
         if (caption) caption.textContent = info ? this._t(info.labelKey) : "";
+    }
+
+    _renderConfigPanels() {
+        const game = this.game;
+
+        const botModeLabel = this.dom.querySelector('[data-field="mp-bot-mode-label"]');
+        if (botModeLabel) botModeLabel.textContent = this._t(`modes.${game.mode}.name`);
+        const botModeDescription = this.dom.querySelector('[data-field="mp-bot-mode-description"]');
+        if (botModeDescription) botModeDescription.textContent = `💡 ${this._t(`modes.${game.mode}.description`)}`;
+
+        const readyModeLabel = this.dom.querySelector('[data-field="mp-ready-mode-label"]');
+        if (readyModeLabel) readyModeLabel.textContent = this._t(`modes.${game.mode}.name`);
+
+        const diffDef = game.difficulties[game.difficulty];
+        const readyDifficultyLabel = this.dom.querySelector('[data-field="mp-ready-difficulty-label"]');
+        if (readyDifficultyLabel) readyDifficultyLabel.textContent = this._t(`difficulty.${game.difficulty}`);
+        const readyDifficultyLevel = this.dom.querySelector('[data-field="mp-ready-difficulty-level"]');
+        if (readyDifficultyLevel && diffDef) {
+            readyDifficultyLevel.textContent = this._t("difficulty.levelPrefix", {level: diffDef.startLevel});
+        }
+
+        const isHost = this.role === "host";
+        this.dom.querySelectorAll(
+            '[data-role="mp-ready-mode-prev"], [data-role="mp-ready-mode-next"], ' +
+            '[data-role="mp-ready-difficulty-prev"], [data-role="mp-ready-difficulty-next"]'
+        ).forEach((button) => {
+            button.disabled = !isHost;
+        });
+
+        const hint = this.dom.querySelector('[data-field="mp-config-hint"]');
+        if (hint) hint.textContent = this._t(isHost ? "multiplayer.configHostHint" : "multiplayer.configGuestHint");
+    }
+
+    _changeMatchMode(dir) {
+        if (this.role === "guest") return;
+        this.game.modeController.changeMode(dir);
+        this._renderConfigPanels();
+        this._sendConfigIfHost();
+    }
+
+    _changeMatchDifficulty(dir) {
+        if (this.role === "guest") return;
+        this.game.difficultyController.changeDifficulty(dir);
+        this._renderConfigPanels();
+        this._sendConfigIfHost();
+    }
+
+    _sendConfigIfHost() {
+        if (this.role !== "host" || !this.session?.isConnected) return;
+        this._sendToPeer({kind: "config", mode: this.game.mode, difficulty: this.game.difficulty});
+    }
+
+    _applyRemoteConfig(mode, difficulty) {
+        const game = this.game;
+        if (this.role !== "guest") return;
+        if (!(game.state === "idle" || game.state === "gameOver-saved")) return;
+
+        if (mode && game.gameModes[mode] && mode !== game.mode) {
+            if (this._guestOriginalMode === null) this._guestOriginalMode = game.mode;
+            game.mode = mode;
+            game.modeController.reset();
+        }
+
+        if (difficulty && game.difficulties[difficulty] && difficulty !== game.difficulty) {
+            if (this._guestOriginalDifficulty === null) this._guestOriginalDifficulty = game.difficulty;
+            game.difficulty = difficulty;
+            game.levelTier = difficulty;
+            game.level = game.difficulties[difficulty].startLevel;
+            game.lines = 0;
+        }
+
+        game.hud.update(game.stats);
+        this._renderConfigPanels();
     }
 
     async _beginHost() {
@@ -218,6 +372,8 @@ export class MultiplayerController {
         }
     }
 
+    // --- practice vs bot ---
+
     async _beginJoin() {
         this._clearError();
         this._resetSession();
@@ -246,14 +402,13 @@ export class MultiplayerController {
         }
     }
 
-    // --- practice vs bot ---
-
     /** Starts a local bot match: no session, no handshake - straight into the game. */
     _beginBot(difficultyKey) {
         if (!BOT_DIFFICULTIES[difficultyKey]) return;
         this._clearError();
         this._resetSession();
         this.role = "bot";
+        this._botDifficultyKey = difficultyKey;
 
         const seed = randomSeed();
         // Same seed, two independent bags: the player's real game and the
@@ -265,17 +420,58 @@ export class MultiplayerController {
             rows: BOARD_CONFIG.ROWS,
             seed,
             difficultyKey,
+            startLevel: this.game.level,
+            // Whatever mode the host picked in the bot panel (cheese race,
+            // survival, dig survival, ...) - without this the bot always
+            // played a plain endless marathon board regardless of the
+            // selected mode (see BotOpponent's mode-setup for what this drives).
+            mode: this.game.mode,
+            modeDef: this.game.gameModes[this.game.mode],
         });
         this.botOpponent.addEventListener("message", (event) => this._onPeerMessage(event.detail));
         this._remoteName = this._t("multiplayer.botName", {difficulty: this._t(`difficulty.${difficultyKey}`)});
         this.game.multiplayerConnected = true;
 
         this._launchMatch();
-        this.botOpponent.start();
+        // Don't call botOpponent.start() yet - _launchMatch() only *begins*
+        // the countdown (game.state becomes "countdown"), it doesn't wait for
+        // it, so starting the bot's timer here let it place its first piece
+        // (and the peer's board-lock message) before the countdown even
+        // finished on screen. Wait for the real "running" state instead.
+        this._botStartDeadline = Date.now() + 8000;
+        this._startBotWhenRunning();
+    }
+
+    /** Polls (lightweight, ~50ms) until the countdown finishes and the match is actually
+     *  "running" before letting the headless bot start placing pieces - see _beginBot().
+     *  `game.state` is still "idle" for a beat after this is first called: the start-button's
+     *  click handler (screenFlow.handleEnter) is async (it awaits commitProfile() before
+     *  moving the state to "countdown"), so state hasn't advanced yet by the time _launchMatch()
+     *  returns - polling has to tolerate that instead of treating early "idle" as an abort. */
+    _startBotWhenRunning() {
+        clearTimeout(this._botStartTimer);
+        this._botStartTimer = null;
+
+        const bot = this.botOpponent;
+        if (!bot) return;
+
+        const state = this.game.state;
+        if (state === "running") {
+            bot.start();
+            return;
+        }
+        // Left the match (or it never started) before the countdown finished
+        // - don't keep polling forever. "idle" alone isn't proof of that (see
+        // above), so only give up once we've waited past a generous deadline.
+        if (!RUNNING_STATES.has(state) && Date.now() > this._botStartDeadline) return;
+
+        this._botStartTimer = setTimeout(() => this._startBotWhenRunning(), 50);
     }
 
     _teardownBotMode() {
         if (!this.botOpponent && this.role !== "bot") return;
+        clearTimeout(this._botStartTimer);
+        this._botStartTimer = null;
         this.botOpponent?.stop();
         this.botOpponent = null;
         // Restore true randomness now that no bot match is using the seeded
@@ -284,6 +480,8 @@ export class MultiplayerController {
         this.game.bag = this._defaultBag;
         this.role = null;
     }
+
+    // --- ready / start handshake ---
 
     _copyFrom(selector, button) {
         const el = this.dom.querySelector(selector);
@@ -296,8 +494,6 @@ export class MultiplayerController {
         });
     }
 
-    // --- ready / start handshake ---
-
     _bindSessionEvents() {
         const session = this.session;
         session.addEventListener("connected", () => {
@@ -309,6 +505,7 @@ export class MultiplayerController {
             // generic "Opponent" label, on its ready badges, score badge and
             // final result line.
             this._sendToPeer({kind: "name", name: this.game.playerName || ""});
+            this._sendConfigIfHost();
         });
         session.addEventListener("ready", () => this._updateReadyBadges());
         session.addEventListener("bothready", () => {
@@ -318,13 +515,30 @@ export class MultiplayerController {
             const startButton = this.dom.querySelector('[data-role="mp-start-button"]');
             if (startButton) startButton.hidden = this.role !== "host";
         });
-        session.addEventListener("start", () => this._launchMatch());
+        session.addEventListener("start", (event) => {
+            // "random" mode is resolved to a concrete mode by whichever side
+            // calls resolveRandomMode() first (see _hostStart) - without
+            // applying the host's resolved pick here, the guest would go on
+            // to resolve its own independent (and likely different) random
+            // mode when _launchMatch() below clicks its own start button.
+            const remoteMode = event.detail?.mode;
+            if (this.role === "guest" && remoteMode && this.game.gameModes[remoteMode] && remoteMode !== this.game.mode) {
+                this.game.mode = remoteMode;
+                this.game.modeController.reset();
+            }
+            this._launchMatch();
+        });
         session.addEventListener("message", (event) => this._onPeerMessage(event.detail));
         session.addEventListener("disconnected", () => {
             this._setStatus(this._t("multiplayer.statusDisconnected"));
+            // The status text above only reaches the player if the (closed,
+            // during an active match) overlay happens to be open - show a
+            // toast too so a mid-match disconnect is actually noticed.
+            const wasInMatch = RUNNING_STATES.has(this.game.state) || FINISHED_STATES.has(this.game.state);
             this._stopScoreSync();
             this._hideOpponentUI();
             this.game.multiplayerConnected = false;
+            if (wasInMatch) this._showDisconnectToast();
         });
         session.addEventListener("error", () => this._setStatus(this._t("multiplayer.statusError")));
     }
@@ -355,14 +569,24 @@ export class MultiplayerController {
 
     _hostStart() {
         if (!this.session || this.role !== "host") return;
-        this.session.sendStart();
+        // Resolve "random" mode once, here, so both peers play the same
+        // concrete mode - otherwise each side's own _launchMatch() below
+        // would call resolveRandomMode() independently and likely diverge.
+        this.game.modeController.resolveRandomMode();
+        this._renderConfigPanels();
+        this.session.sendStart({mode: this.game.mode});
         this._launchMatch();
     }
 
+    // --- in-match score sync ---
+
     _launchMatch() {
         this.close();
+        this._hideResultPanel();
         this._localFinalScore = null;
         this._remoteFinalScore = null;
+        this._localFinalStats = null;
+        this._remoteFinalStats = null;
         this._lastSentScore = -1;
         this._lastSentBoardVersion = -1;
         this._wasInMatch = false;
@@ -372,8 +596,6 @@ export class MultiplayerController {
         startButton?.click();
         this._startScoreSync();
     }
-
-    // --- in-match score sync ---
 
     _startScoreSync() {
         this._stopScoreSync();
@@ -396,28 +618,46 @@ export class MultiplayerController {
             if (this._localFinalScore !== null || this._remoteFinalScore !== null) {
                 this._localFinalScore = null;
                 this._remoteFinalScore = null;
+                this._localFinalStats = null;
+                this._remoteFinalStats = null;
                 this._lastSentScore = -1;
                 this._lastSentBoardVersion = -1;
+                this._lastRemoteCells = null;
+                this._remoteLivePiece = null;
+                this._hideResultPanel();
                 this._showOpponentUI();
             }
 
             this._wasInMatch = true;
-            if (game.score !== this._lastSentScore) {
-                this._lastSentScore = game.score;
-                this._sendToPeer({kind: "score", score: game.score});
-            }
+            const statsSnapshot = this._localStatsSnapshot();
+            this._lastSentScore = statsSnapshot.score;
+            this._sendToPeer({kind: "stats", ...statsSnapshot});
             // The board's `version` only bumps on a lock/clear/garbage change
             // (see Board), so this stays cheap: most polls send nothing.
             if (game.board && game.board.version !== this._lastSentBoardVersion) {
                 this._lastSentBoardVersion = game.board.version;
                 this._sendToPeer({kind: "board", cells: Array.from(game.board.colors)});
             }
+            // The falling piece itself never bumps board.version (only a
+            // lock/clear does) - without this, the opponent panel only ever
+            // showed the board as it looked *after* each piece landed, never
+            // the piece actually moving/rotating on the way down. Sent every
+            // poll (not diffed) since it's virtually always moving.
+            if (game.state === "running" && game.current) {
+                const p = game.current;
+                this._sendToPeer({
+                    kind: "piece",
+                    x: p.x, y: p.y, mask: p.mask, width: p.width, height: p.height, colorIndex: p.colorIndex,
+                });
+            }
             return;
         }
 
         if (this._wasInMatch && FINISHED_STATES.has(game.state) && this._localFinalScore === null) {
-            this._localFinalScore = game.score;
-            this._sendToPeer({kind: "final", score: game.score});
+            const finalSnapshot = this._localStatsSnapshot();
+            this._localFinalScore = finalSnapshot.score;
+            this._localFinalStats = finalSnapshot;
+            this._sendToPeer({kind: "final", ...finalSnapshot});
             // A bot may never top out on its own (a good one can run
             // indefinitely) - once the player's round is over, lock in
             // whatever score it has right now instead of waiting on it.
@@ -427,51 +667,268 @@ export class MultiplayerController {
 
         if (!this._wasInMatch) return;
         if (!RUNNING_STATES.has(game.state) && !FINISHED_STATES.has(game.state)) {
-            // Left the match entirely (e.g. back to idle) without a game-over — stop polling.
-            this._stopScoreSync();
+            // Left the match entirely (e.g. back to idle via the game-over
+            // screen's own controls, bypassing the "leave"/result-panel
+            // buttons) - tear the whole session down the same way
+            // _leaveMatch() does, not just the score-sync/opponent-UI bits,
+            // or role/session/multiplayerConnected are left stuck "in
+            // multiplayer" (pause and options blocked, etc.) for every
+            // solo game afterwards.
             this._wasInMatch = false;
-            this._hideOpponentUI();
-            this._teardownBotMode();
+            this._resetSession();
         }
+    }
+
+    /**
+     * Snapshot of every stat shown on the local sidebar (except Time, which
+     * only makes sense locally) - sent to the peer on every poll tick so the
+     * opponent badge can mirror the same rows, and again (unthrottled) once
+     * the round ends so the result comparison has both sides' final numbers.
+     * `display` carries the already-formatted strings (same formatting the
+     * local sidebar itself uses) so the opponent panel never has to
+     * reimplement formatNumber/toFixed rounding; the raw numeric fields
+     * alongside them are only for the result panel's better-value highlight.
+     */
+    _localStatsSnapshot() {
+        const game = this.game;
+        const stats = game.stats;
+        const totalClears = Object.values(game.clearCounts).reduce((sum, n) => sum + n, 0);
+        const tetrisRatePercent = totalClears ? (game.clearCounts[4] / totalClears) * 100 : 0;
+        const elapsedSeconds = game.elapsedMs / 1000;
+        const pps = elapsedSeconds > 0 ? game.piecesSpawned / elapsedSeconds : 0;
+        const efficiencyValue = game.lines > 0 ? game.score / game.lines : 0;
+        const droughtAvgValue = game.droughtCount > 0 ? game.droughtTotal / game.droughtCount : 0;
+        const isTimedRaceMode = game.mode === "sprint" || game.mode === "cheeseRace";
+        const bestEntry = game.leaderboard.bestEntry(game.mode);
+        const bestRaw = bestEntry ? (isTimedRaceMode ? bestEntry.timeMs : bestEntry.score) : null;
+
+        // Whether the player actually reached this mode's finish line (not
+        // just however many lines they had when the round ended for some
+        // other reason, e.g. topping out) - mirrors ModeController#
+        // checkObjectiveComplete's own conditions but without its side
+        // effects (that method also *ends the round*), so it's safe to call
+        // here purely to read the current state.
+        const def = game.gameModes[game.mode];
+        let raceCompleted = null;
+        if (game.mode === "sprint") raceCompleted = game.lines >= def.sprintTarget;
+        else if (game.mode === "cheeseRace") raceCompleted = game.lines >= def.cheeseRows;
+        else if (game.mode === "digSurvival") raceCompleted = (game.modeState?.digCleared ?? 0) >= def.digTarget;
+
+        return {
+            score: game.score,
+            lines: game.lines,
+            elapsedMs: game.elapsedMs,
+            raceCompleted,
+            drought: game.drought,
+            // maxDrought/droughtTotal/droughtAvg are the meaningful drought
+            // numbers for a *finished* run - `drought` above is just however
+            // many non-I pieces happened to be pending the moment the match
+            // ended, which is fine for the live opponent badge but useless
+            // for the post-match comparison (see _showResultPanel).
+            maxDrought: game.maxDrought,
+            droughtTotal: game.droughtTotal,
+            droughtAvg: droughtAvgValue,
+            burn: game.burn,
+            maxCombo: game.maxCombo,
+            efficiency: efficiencyValue,
+            tetrisRatePercent,
+            pps,
+            bestRaw,
+            bestIsTime: isTimedRaceMode,
+            display: {
+                best: stats.best,
+                score: stats.score,
+                lines: String(stats.lines),
+                tetrisRate: stats.tetrisRate,
+                pps: stats.pps,
+                drought: String(stats.drought),
+                maxDrought: String(stats.maxDrought),
+                droughtTotal: String(stats.droughtTotal),
+                droughtAvg: stats.droughtAvg,
+                burn: String(stats.burn),
+                maxCombo: String(stats.maxCombo),
+                efficiency: stats.efficiency,
+            },
+        };
     }
 
     _onPeerMessage(payload) {
         if (!payload || typeof payload !== "object") return;
 
-        if (payload.kind === "score") {
-            this._updateOpponentScore(payload.score);
+        if (payload.kind === "stats") {
+            this._updateOpponentStats(payload);
         } else if (payload.kind === "final") {
             this._remoteFinalScore = payload.score;
-            this._updateOpponentScore(payload.score);
+            this._remoteFinalStats = payload;
+            this._updateOpponentStats(payload);
             this._maybeShowResult();
+        } else if (payload.kind === "config") {
+            this._applyRemoteConfig(payload.mode, payload.difficulty);
         } else if (payload.kind === "name") {
             this._remoteName = (payload.name || "").trim() || null;
             this._updateReadyBadges();
             if (this._opponentNameEl) this._opponentNameEl.textContent = this._remoteDisplayName();
-            this._updateOpponentScore(this._lastRemoteScore);
+            if (this._opponentNameBadgeEl) this._opponentNameBadgeEl.textContent = this._remoteDisplayName();
+            if (this._lastRemoteStats) this._updateOpponentStats(this._lastRemoteStats);
         } else if (payload.kind === "board") {
-            this._drawOpponentBoard(payload.cells);
+            this._lastRemoteCells = payload.cells;
+            // The piece that just locked is now baked into `cells` - drop the
+            // stale live-piece overlay so it isn't drawn twice until the next
+            // "piece" update (for the newly-spawned piece) arrives.
+            this._remoteLivePiece = null;
+            this._drawOpponentBoard(this._lastRemoteCells, null);
+        } else if (payload.kind === "piece") {
+            this._remoteLivePiece = payload.cleared ? null : payload;
+            this._drawOpponentBoard(this._lastRemoteCells, this._remoteLivePiece);
         }
     }
 
     _maybeShowResult() {
         if (this._localFinalScore === null || this._remoteFinalScore === null) return;
+        if (this._localFinalStats === null || this._remoteFinalStats === null) return;
 
-        let resultKey;
-        if (this._localFinalScore > this._remoteFinalScore) resultKey = "multiplayer.won";
-        else if (this._localFinalScore < this._remoteFinalScore) resultKey = "multiplayer.lost";
-        else resultKey = "multiplayer.draw";
-
-        const resultText = this._t("multiplayer.resultScore", {
-            result: this._t(resultKey),
-            local: formatNumber(this._localFinalScore),
-            remote: formatNumber(this._remoteFinalScore),
-            name: this._remoteDisplayName(),
-        });
-        this._setOpponentBadgeText(resultText);
-        if (this._opponentScoreEl) this._opponentScoreEl.textContent = resultText;
         this._stopScoreSync();
         this.session?.setReady(false);
+        this._hideOpponentUI();
+        this._showResultPanel();
+    }
+
+    _hideResultPanel() {
+        const panel = this.dom?.querySelector('[data-role="mp-panel-result"]');
+        if (panel) panel.hidden = true;
+        const steps = this.dom?.querySelector('[data-role="mp-steps"]');
+        const caption = this.dom?.querySelector('[data-field="mp-step-caption"]');
+        if (steps) steps.hidden = false;
+        if (caption) caption.hidden = false;
+        this._resultPanelEl = null;
+    }
+
+    _showResultPanel() {
+        const panel = this.dom?.querySelector('[data-role="mp-panel-result"]');
+        const local = this._localFinalStats;
+        const remote = this._remoteFinalStats;
+        if (!panel || !local || !remote) return;
+
+        const localScore = local.score ?? 0;
+        const remoteScore = remote.score ?? 0;
+
+        // In a race mode (sprint/cheese race) the objective is finishing
+        // the target - and finishing it faster - not racking up more score
+        // along the way, so the overall win/loss is decided by who
+        // actually completed it, then by completion time; score alone only
+        // decides it outside race modes, or if neither side finished.
+        const isRaceMode = this.game.mode === "sprint" || this.game.mode === "cheeseRace";
+        let resultKey;
+        if (isRaceMode && (local.raceCompleted || remote.raceCompleted)) {
+            if (local.raceCompleted && remote.raceCompleted) {
+                resultKey = local.elapsedMs === remote.elapsedMs
+                    ? "draw"
+                    : local.elapsedMs < remote.elapsedMs ? "win" : "loss";
+            } else {
+                resultKey = local.raceCompleted ? "win" : "loss";
+            }
+        } else {
+            resultKey = localScore === remoteScore
+                ? "draw"
+                : localScore > remoteScore ? "win" : "loss";
+        }
+
+        const set = (role, value) => {
+            const el = panel.querySelector(`[data-role="${role}"]`);
+            if (el) el.textContent = value;
+            return el;
+        };
+
+        // Clears any previous better/worse coloring, then (if the two sides
+        // differ) colors the winning side's cell green and the losing side's
+        // cell red - so every row is judged on its own merits instead of
+        // just inheriting whoever won on total score.
+        const colorPair = (localEl, remoteEl, localRaw, remoteRaw, lowerBetter) => {
+            localEl?.classList.remove("mp-result-value--better", "mp-result-value--worse");
+            remoteEl?.classList.remove("mp-result-value--better", "mp-result-value--worse");
+            if (localRaw === remoteRaw) return;
+            const localIsBetter = lowerBetter ? localRaw < remoteRaw : localRaw > remoteRaw;
+            localEl?.classList.add(localIsBetter ? "mp-result-value--better" : "mp-result-value--worse");
+            remoteEl?.classList.add(localIsBetter ? "mp-result-value--worse" : "mp-result-value--better");
+        };
+
+        const localName = this.game.playerName || this._t("leaderboard.defaultName");
+        const remoteName = this._remoteDisplayName();
+        const titleKey = resultKey === "draw" ? "multiplayer.draw" : resultKey === "win" ? "multiplayer.won" : "multiplayer.lost";
+
+        const titleEl = set("mp-result-title", this._t(titleKey));
+        titleEl?.classList.remove("mp-result-panel__title--win", "mp-result-panel__title--loss", "mp-result-panel__title--draw");
+        titleEl?.classList.add(`mp-result-panel__title--${resultKey}`);
+
+        set("mp-result-local-name", localName);
+        set("mp-result-remote-name", remoteName);
+        set("mp-result-local-name-mini", localName);
+        set("mp-result-remote-name-mini", remoteName);
+
+        const localScoreEl = set("mp-result-local-score", local.display?.score ?? formatNumber(localScore));
+        const remoteScoreEl = set("mp-result-remote-score", remote.display?.score ?? formatNumber(remoteScore));
+        colorPair(localScoreEl, remoteScoreEl, localScore, remoteScore, false);
+
+        for (const {role, raw, display, lowerBetter} of MultiplayerController.RESULT_STAT_ROWS) {
+            const localRaw = raw(local);
+            const remoteRaw = raw(remote);
+            const localEl = set(`mp-result-local-${role}`, display(local, localRaw));
+            const remoteEl = set(`mp-result-remote-${role}`, display(remote, remoteRaw));
+            colorPair(localEl, remoteEl, localRaw, remoteRaw, lowerBetter);
+        }
+
+        const steps = this.dom?.querySelector('[data-role="mp-steps"]');
+        const caption = this.dom?.querySelector('[data-field="mp-step-caption"]');
+        if (steps) steps.hidden = true;
+        if (caption) caption.hidden = true;
+
+        panel.hidden = false;
+        this._resultPanelEl = panel;
+
+        const overlay = this.overlayEl;
+        if (overlay) {
+            overlay.hidden = false;
+            requestAnimationFrame(() => overlay.classList.add("mp-overlay--visible"));
+        }
+    }
+
+    _rematch() {
+        this._hideResultPanel();
+        this._localFinalScore = null;
+        this._remoteFinalScore = null;
+        this._localFinalStats = null;
+        this._remoteFinalStats = null;
+        this._lastSentScore = -1;
+        this._lastSentBoardVersion = -1;
+        this._lastRemoteCells = null;
+        this._remoteLivePiece = null;
+
+        if (this.role === "bot") {
+            const difficulty = this._botDifficultyKey;
+            if (difficulty) this._beginBot(difficulty);
+            return;
+        }
+
+        if (!this.session?.isConnected) return;
+
+        this._showPanel("ready");
+        this.session.setReady(true);
+    }
+
+    _closeResult() {
+        this._hideResultPanel();
+        this._resetSession();
+        this.close();
+    }
+
+    _leaveMatch() {
+        const game = this.game;
+        game.pieceController.stopAllGameplaySounds();
+        game.musicDirector.stop(0);
+        this._hideResultPanel();
+        this._resetSession();
+        this.close();
+        game.screenFlow.showIdleScreen().then();
     }
 
     // --- opponent panel (nickname/score badge everywhere + full board on desktop) ---
@@ -486,39 +943,98 @@ export class MultiplayerController {
         this._hideOpponentBoard();
     }
 
-    /** Compact "name: score" text badge — shown everywhere (mobile included), hidden on
-     *  desktop via CSS once the full board panel below covers the same info. */
+    /** Mini stats-card for the opponent — mirrors the local player's own
+     *  `[data-role="stats-card"]` panel: nickname line, a leave-match button,
+     *  then every stat row the local sidebar shows except Time (that one
+     *  only makes sense locally), always rendered above the local card. */
     _showOpponentBadge() {
         this._hideOpponentBadge();
-        const host = this.dom.querySelector('[data-role="stats-card"]') ?? this.dom.querySelector(".app__sidebar");
-        if (!host) return;
+        const statsCard = this.dom.querySelector('[data-role="stats-card"]');
+        const sidebar = this.dom.querySelector(".app__sidebar");
+        if (!statsCard && !sidebar) return;
 
-        const badge = this.dom.createElement("div");
-        badge.className = "mp-opponent-badge";
-        badge.dataset.role = "mp-opponent-badge";
-        badge.textContent = this._t("multiplayer.opponentScore", {score: 0, name: this._remoteDisplayName()});
-        host.prepend(badge);
-        this._opponentBadgeEl = badge;
+        const panel = this.dom.createElement("div");
+        panel.className = "card stats mp-opponent-stats";
+        panel.dataset.role = "mp-opponent-stats-card";
+        panel.appendChild(this._createLeaveButton());
+
+        const name = this.dom.createElement("p");
+        name.className = "stats__status";
+        name.dataset.role = "mp-opponent-name";
+        name.textContent = this._remoteDisplayName();
+        panel.appendChild(name);
+
+        this._opponentBestBadgeEl = this._appendStatRow(panel, "sidebar.best", "mp-opponent-best-value", "—");
+        this._opponentScoreBadgeEl = this._appendStatRow(panel, "sidebar.score", "mp-opponent-score-value", formatNumber(0));
+        this._opponentLinesBadgeEl = this._appendStatRow(panel, "sidebar.lines", "mp-opponent-lines-value", "0");
+        this._opponentTrtBadgeEl = this._appendStatRow(panel, "sidebar.tetrisRate", "mp-opponent-trt-value", "0.0%");
+        this._opponentPpsBadgeEl = this._appendStatRow(panel, "sidebar.pps", "mp-opponent-pps-value", "0.00");
+        this._opponentDroughtBadgeEl = this._appendStatRow(panel, "sidebar.drought", "mp-opponent-drought-value", "0");
+
+        if (statsCard) statsCard.insertAdjacentElement("beforebegin", panel);
+        else sidebar.prepend(panel);
+
+        this._opponentBadgeEl = panel;
+        this._opponentNameBadgeEl = name;
         this._lastRemoteScore = 0;
+        this._lastRemoteStats = null;
+    }
+
+    /** Appends one `.stats__row` (title + value, same markup as the local sidebar's rows) to `panel` and returns the value element. */
+    _appendStatRow(panel, titleKey, valueRole, initialText) {
+        const row = this.dom.createElement("div");
+        row.className = "stats__row";
+
+        const title = this.dom.createElement("h3");
+        title.className = "card__title";
+        title.textContent = this._t(titleKey);
+        row.appendChild(title);
+
+        const value = this.dom.createElement("div");
+        value.className = "stats__value";
+        value.dataset.role = valueRole;
+        value.textContent = initialText;
+        row.appendChild(value);
+
+        panel.appendChild(row);
+        return value;
+    }
+
+    /** Small "✕" button that disconnects from the current match/bot session (see _leaveMatch) - used on both the opponent badge and the opponent board panel header, since neither is reachable while the pause/options menus are blocked mid-match. */
+    _createLeaveButton() {
+        const button = this.dom.createElement("button");
+        button.type = "button";
+        button.className = "mp-leave-button";
+        button.dataset.role = "mp-leave-inline-button";
+        button.setAttribute("aria-label", this._t("multiplayer.leaveButton"));
+        button.textContent = "✕";
+        button.addEventListener("click", () => this._leaveMatch());
+        return button;
     }
 
     _hideOpponentBadge() {
         this._opponentBadgeEl?.remove();
         this._opponentBadgeEl = null;
+        this._opponentNameBadgeEl = null;
+        this._opponentScoreBadgeEl = null;
+        this._opponentBestBadgeEl = null;
+        this._opponentLinesBadgeEl = null;
+        this._opponentTrtBadgeEl = null;
+        this._opponentPpsBadgeEl = null;
+        this._opponentDroughtBadgeEl = null;
     }
 
-    _setOpponentBadgeText(text) {
-        if (this._opponentBadgeEl) this._opponentBadgeEl.textContent = text;
-    }
-
-    /** Updates both the text badge and the desktop panel's header score. */
-    _updateOpponentScore(score) {
-        this._lastRemoteScore = score;
-        this._setOpponentBadgeText(this._t("multiplayer.opponentScore", {
-            score: formatNumber(score),
-            name: this._remoteDisplayName(),
-        }));
-        if (this._opponentScoreEl) this._opponentScoreEl.textContent = formatNumber(score);
+    /** Updates every opponent stat row (badge) from a "stats"/"final" payload (see _localStatsSnapshot) - uses the sender's own already-formatted display strings so rounding/formatting always matches what that player sees on their own sidebar. */
+    _updateOpponentStats(payload) {
+        this._lastRemoteScore = payload.score ?? 0;
+        this._lastRemoteStats = payload;
+        const display = payload.display || {};
+        if (this._opponentBestBadgeEl) this._opponentBestBadgeEl.textContent = display.best ?? "—";
+        if (this._opponentScoreBadgeEl) this._opponentScoreBadgeEl.textContent = display.score ?? formatNumber(payload.score ?? 0);
+        if (this._opponentLinesBadgeEl) this._opponentLinesBadgeEl.textContent = display.lines ?? String(payload.lines ?? 0);
+        if (this._opponentTrtBadgeEl) this._opponentTrtBadgeEl.textContent = display.tetrisRate ?? "0.0%";
+        if (this._opponentPpsBadgeEl) this._opponentPpsBadgeEl.textContent = display.pps ?? "0.00";
+        if (this._opponentDroughtBadgeEl) this._opponentDroughtBadgeEl.textContent = display.drought ?? String(payload.drought ?? 0);
     }
 
     /**
@@ -539,6 +1055,27 @@ export class MultiplayerController {
         const boardHost = this.dom.querySelector(".app__board");
         if (!boardHost) return;
 
+        // Local nickname pinned to the top edge of the local board, mirroring
+        // the opponent's own header below - this has to be a padding-top on
+        // `.app__board` plus an absolutely-positioned label inside it, not a
+        // real flow child: main.js's resizeBoardCanvas()/getChrome() only
+        // reads the *padding* of `.app__board` when it works out how much
+        // vertical space is left for the canvas, so a real child here would
+        // be invisible to that calculation and the canvas would overflow
+        // past the bottom of the viewport.
+        const localHeader = this.dom.createElement("div");
+        localHeader.className = "mp-opponent-column__header mp-local-board-header";
+
+        const localName = this.dom.createElement("span");
+        localName.className = "mp-opponent-column__name";
+        localName.textContent = this._localDisplayName();
+        localHeader.appendChild(localName);
+
+        boardHost.prepend(localHeader);
+        this._opponentBoardHost = boardHost;
+        this._localHeaderEl = localHeader;
+        boardHost.style.paddingTop = `${localHeader.offsetHeight}px`;
+
         const panel = this.dom.createElement("div");
         panel.className = "app__sidebar mp-opponent-column";
         panel.dataset.role = "mp-opponent-panel";
@@ -550,11 +1087,7 @@ export class MultiplayerController {
         name.className = "mp-opponent-column__name";
         name.textContent = this._remoteDisplayName();
         header.appendChild(name);
-
-        const score = this.dom.createElement("span");
-        score.className = "mp-opponent-column__score";
-        score.textContent = formatNumber(0);
-        header.appendChild(score);
+        header.appendChild(this._createLeaveButton());
 
         panel.appendChild(header);
 
@@ -567,38 +1100,90 @@ export class MultiplayerController {
         const canvas = this.dom.createElement("canvas");
         canvas.className = "board__canvas mp-opponent-column__canvas";
         canvas.dataset.role = "mp-opponent-canvas";
-        const cellSize = BOARD_CONFIG.CELL_SIZE || OPPONENT_BOARD_FALLBACK_CELL_PX;
-        canvas.width = cellSize * BOARD_CONFIG.COLS;
-        canvas.height = cellSize * BOARD_CONFIG.ROWS;
+
+        // Same board__filter/board__filter-canvas pair the main board uses
+        // (see index.html) - mirrors whatever theme (VHS/matrix/rain/snow)
+        // is currently active, matching the local board's look instead of
+        // always rendering plain.
+        const filterEl = this.dom.createElement("div");
+        filterEl.className = "board__filter";
+        filterEl.dataset.theme = "none";
+
+        const filterCanvas = this.dom.createElement("canvas");
+        filterCanvas.className = "board__filter-canvas";
+        filterEl.appendChild(filterCanvas);
 
         stage.appendChild(canvas);
+        stage.appendChild(filterEl);
         boardEl.appendChild(stage);
         panel.appendChild(boardEl);
 
         boardHost.insertAdjacentElement("afterend", panel);
 
         this._opponentPanelEl = panel;
+        this._opponentHeaderEl = header;
         this._opponentNameEl = name;
-        this._opponentScoreEl = score;
         this._opponentCanvasEl = canvas;
         this._opponentCanvasCtx = canvas.getContext("2d");
-        this._drawOpponentBoard(null);
+        this.game.themeOverlay.registerTarget("opponent", {overlayEl: filterEl, canvas: filterCanvas});
 
         // The panel takes up real horizontal space next to the board (it's
         // sized like a second board, not a slim stat column) — nudge the
         // layout to recompute the local board's size around it, the same
-        // way a window resize would.
+        // way a window resize would. This must happen BEFORE sizing the
+        // opponent canvas below, since it's what settles the final,
+        // post-panel BOARD_CONFIG.CELL_SIZE.
         this._notifyLayoutResize();
+        this._syncOpponentCanvasSize();
+
+        // A real window resize after the panel is already up (e.g. the
+        // user resizes the browser mid-match) only updates the *local*
+        // canvas today - main.js has no idea the opponent canvas exists.
+        // Piggyback on the same event to keep it in step too.
+        this._handleOpponentWindowResize = () => this._syncOpponentCanvasSize();
+        const resizeTarget = globalThis.visualViewport ?? globalThis.window ?? null;
+        resizeTarget?.addEventListener("resize", this._handleOpponentWindowResize);
+    }
+
+    /**
+     * Resizes the opponent canvas to match the local board's current
+     * `BOARD_CONFIG.CELL_SIZE` (recomputed by main.js's resize handler,
+     * which always runs first) and redraws its last known contents -
+     * otherwise a canvas resize clears itself to blank.
+     */
+    _syncOpponentCanvasSize() {
+        const canvas = this._opponentCanvasEl;
+        if (!canvas) return;
+        const cellSize = BOARD_CONFIG.CELL_SIZE || OPPONENT_BOARD_FALLBACK_CELL_PX;
+        const width = cellSize * BOARD_CONFIG.COLS;
+        const height = cellSize * BOARD_CONFIG.ROWS;
+        if (canvas.width === width && canvas.height === height) return;
+        canvas.width = width;
+        canvas.height = height;
+        this.game.themeOverlay.resize(width, height, "opponent");
+        this._drawOpponentBoard(this._lastRemoteCells, this._remoteLivePiece);
     }
 
     _hideOpponentBoard() {
-        if (!this._opponentPanelEl) return;
-        this._opponentPanelEl.remove();
+        if (!this._opponentPanelEl && !this._localHeaderEl) return;
+        this.game.themeOverlay.unregisterTarget("opponent");
+        this._opponentPanelEl?.remove();
         this._opponentPanelEl = null;
+        this._opponentHeaderEl = null;
         this._opponentNameEl = null;
-        this._opponentScoreEl = null;
+        this._localHeaderEl?.remove();
+        this._localHeaderEl = null;
+        if (this._opponentBoardHost) {
+            this._opponentBoardHost.style.paddingTop = "";
+            this._opponentBoardHost = null;
+        }
         this._opponentCanvasEl = null;
         this._opponentCanvasCtx = null;
+        if (this._handleOpponentWindowResize) {
+            const resizeTarget = globalThis.visualViewport ?? globalThis.window ?? null;
+            resizeTarget?.removeEventListener("resize", this._handleOpponentWindowResize);
+            this._handleOpponentWindowResize = null;
+        }
         this._notifyLayoutResize();
     }
 
@@ -612,15 +1197,47 @@ export class MultiplayerController {
         return this._remoteName || this._t("multiplayer.opponentFallback");
     }
 
+    /** The local player's own nickname, else the same fallback used on the leaderboard. */
+    _localDisplayName() {
+        return this.game.playerName || this._t("leaderboard.defaultName");
+    }
+
     /**
      * Draws the opponent's locked board onto the desktop board panel's
      * canvas. `cells` is the flat colorIndex array from Board#colors
      * (row-major, 0 = empty); null/undefined clears the board (e.g. right
      * after a rematch).
+     *
+     * This reuses the real Renderer's `drawCell`/`drawGrid` (same sprite
+     * cache, same cell size as the local board - see
+     * OPPONENT_BOARD_FALLBACK_CELL_PX) instead of hand-rolled `fillRect`s, so
+     * the opponent's klockominos actually look like klockominos - grid lines,
+     * glow, height-based saturation - matching whatever appearance settings
+     * *this* player has chosen in Options, exactly like the local board.
      */
-    _drawOpponentBoard(cells) {
+    /**
+     * Draws the opponent's locked board onto the desktop board panel's
+     * canvas, plus their live falling piece on top of it if we have one (see
+     * the "piece" message in _pollMatchState/_onPeerMessage) - without this
+     * overlay the panel only ever showed the board as it looked *after* each
+     * lock, never a piece actually moving or rotating on the way down.
+     *
+     * `cells` is the flat colorIndex array from Board#colors (row-major,
+     * 0 = empty); null/undefined clears the board (e.g. right after a
+     * rematch). `livePiece` is `{x, y, mask, width, height, colorIndex}` or
+     * null/undefined.
+     *
+     * Reuses the real Renderer's `drawCell`/`drawGrid` (same sprite cache,
+     * same cell size as the local board - see OPPONENT_BOARD_FALLBACK_CELL_PX)
+     * instead of hand-rolled `fillRect`s, so the opponent's klockominos
+     * actually look like klockominos - grid lines, glow, height-based
+     * saturation - matching whatever appearance settings *this* player has
+     * chosen in Options, exactly like the local board.
+     */
+    _drawOpponentBoard(cells, livePiece = null) {
         const ctx = this._opponentCanvasCtx;
         const canvas = this._opponentCanvasEl;
+        const renderer = this.game.renderer;
         if (!ctx || !canvas) return;
 
         const {COLS, ROWS} = BOARD_CONFIG;
@@ -628,15 +1245,54 @@ export class MultiplayerController {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+        if (!renderer) {
+            // No renderer available (shouldn't happen in practice) - fall
+            // back to flat rectangles rather than drawing nothing.
+            const drawFlat = (x, y, colorIndex) => {
+                if (!colorIndex) return;
+                ctx.fillStyle = COLOR_PALETTE[colorIndex] ?? "#888";
+                ctx.fillRect(x * size, y * size, size, size);
+            };
+            if (cells) {
+                for (let y = 0; y < ROWS; y++) {
+                    for (let x = 0; x < COLS; x++) drawFlat(x, y, cells[y * COLS + x]);
+                }
+            }
+            if (livePiece) {
+                forEachShapeCell(livePiece.mask, livePiece.width, livePiece.height, (r, c) => {
+                    const y = livePiece.y + r;
+                    if (y < 0) return;
+                    drawFlat(livePiece.x + c, y, livePiece.colorIndex);
+                });
+            }
+            return;
+        }
+
+        const board = {cols: COLS, rows: ROWS};
+        if (renderer.gridEnabled) renderer.drawGrid(board, ctx);
+
         if (cells) {
             for (let y = 0; y < ROWS; y++) {
+                const level = renderer.saturationLevelForRow(y, ROWS);
                 for (let x = 0; x < COLS; x++) {
                     const colorIndex = cells[y * COLS + x];
                     if (!colorIndex) continue;
-                    ctx.fillStyle = COLOR_PALETTE[colorIndex] ?? "#888";
-                    ctx.fillRect(x * size, y * size, size, size);
+                    renderer.drawCell(ctx, x, y, COLOR_PALETTE[colorIndex] ?? "#888", size, {level});
                 }
             }
+        }
+
+        if (livePiece) {
+            // Glow, matching how the local board draws its own falling piece
+            // (see Renderer#drawPiece) - visually distinguishes it from the
+            // already-locked stack underneath.
+            const color = COLOR_PALETTE[livePiece.colorIndex] ?? "#888";
+            forEachShapeCell(livePiece.mask, livePiece.width, livePiece.height, (r, c) => {
+                const y = livePiece.y + r;
+                if (y < 0) return;
+                const level = renderer.saturationLevelForRow(y, ROWS);
+                renderer.drawCell(ctx, livePiece.x + c, y, color, size, {glow: true, level});
+            });
         }
     }
 
@@ -661,6 +1317,28 @@ export class MultiplayerController {
         if (el) el.textContent = text;
     }
 
+    /** Bottom toast shown when the peer drops mid-match, when the lobby overlay (with its own
+     *  status line) isn't around to see it - reuses the pause-blocked toast's look and feel. */
+    _showDisconnectToast() {
+        if (!this.dom) return;
+
+        let toast = this.dom.querySelector('[data-role="mp-disconnect-toast"]');
+        if (!toast) {
+            toast = this.dom.createElement("div");
+            toast.className = "mp-pause-blocked-toast";
+            toast.dataset.role = "mp-disconnect-toast";
+            (this.dom.body ?? this.dom.documentElement)?.appendChild(toast);
+        }
+
+        toast.textContent = this._t("multiplayer.opponentDisconnected");
+        toast.classList.add("mp-pause-blocked-toast--visible");
+
+        clearTimeout(this._disconnectToastTimer);
+        this._disconnectToastTimer = setTimeout(() => {
+            toast.classList.remove("mp-pause-blocked-toast--visible");
+        }, 3000);
+    }
+
     _showError(err) {
         const el = this.dom.querySelector('[data-field="mp-error-text"]');
         if (!el) return;
@@ -679,10 +1357,27 @@ export class MultiplayerController {
         this._teardownBotMode();
         this.session?.close();
         this.session = null;
+        if (this.role === "guest" && (this._guestOriginalMode !== null || this._guestOriginalDifficulty !== null)) {
+            const game = this.game;
+            if (this._guestOriginalMode !== null) {
+                game.mode = this._guestOriginalMode;
+                game.modeController.reset();
+            }
+            if (this._guestOriginalDifficulty !== null) {
+                game.difficulty = this._guestOriginalDifficulty;
+                game.levelTier = this._guestOriginalDifficulty;
+                game.level = game.difficulties[this._guestOriginalDifficulty].startLevel;
+            }
+            game.hud.update(game.stats);
+        }
+        this._guestOriginalMode = null;
+        this._guestOriginalDifficulty = null;
         this.role = null;
         this.game.multiplayerConnected = false;
         this._remoteName = null;
         this._lastRemoteScore = 0;
+        this._lastRemoteCells = null;
+        this._remoteLivePiece = null;
         this._lastSentBoardVersion = -1;
     }
 }

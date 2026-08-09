@@ -357,6 +357,7 @@
         "step3Label": "Pronti",
         "button": "Multiplayer",
         "chooseConnection": "Scegli come connetterti",
+        "chooseModeHint": "Scegli una modalità",
         "hostButton": "Crea stanza",
         "joinButton": "Unisciti a una stanza",
         "sendCodeHint": "Invia questo codice al giocatore con cui vuoi giocare",
@@ -374,6 +375,8 @@
         "statusBothReadyGuest": "Entrambi i giocatori sono pronti — attendi che l'host avvii la partita.",
         "statusDisconnected": "La connessione con l'avversario è stata interrotta.",
         "statusError": "Si è verificato un errore di connessione.",
+        "configHostHint": "Puoi cambiare modalità e livello qui sotto",
+        "configGuestHint": "Modalità e livello impostati dall'host",
         "youReady": "Tu: pronto",
         "youNotReady": "Tu: non pronto",
         "opponentFallback": "Avversario",
@@ -386,7 +389,9 @@
         "draw": "Pareggio!",
         "resultScore": "{result} (Tu: {local} / {name}: {remote})",
         "opponentScore": "{name}: {score}",
+        "themesInfo": "Temi — Tu: {you} • {name}: {opponent}",
         "genericError": "Impossibile stabilire la connessione.",
-        "pauseBlocked": "La pausa è disattivata durante una partita multiplayer."
+        "pauseBlocked": "La pausa è disattivata durante una partita multiplayer.",
+        "restartBlocked": "Il riavvio è disabilitato durante una partita multiplayer."
     }
 }

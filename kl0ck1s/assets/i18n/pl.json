@@ -1,411 +1,416 @@
 {
-  "locale": "pl-PL",
-  "boot": {
-    "settings": "Wczytywanie ustawień...",
-    "sprites": "Tworzenie cache klocków...",
-    "audio": "Wczytywanie audio...",
-    "finalize": "Uruchamianie..."
-  },
-  "sidebar": {
-    "nextPiece": "Następny klocek",
-    "score": "Wynik",
-    "time": "Czas",
-    "lines": "Linie",
-    "best": "Rekord",
-    "drought": "Posucha",
-    "tetrisRate": "W4L",
-    "pps": "PPS",
-    "objective": "Cel",
-    "statusLive": "Aktualna gra",
-    "statusLast": "Ostatnia gra"
-  },
-  "controls": {
-    "toggle": "Sterowanie",
-    "rotate": "Obrót",
-    "rotate180": "Obrót 180°",
-    "moveLeftRight": "Ruch lewo / prawo",
-    "softDrop": "Szybszy spadek",
-    "hardDrop": "Natychmiastowy spadek",
-    "pause": "Pauza",
-    "start": "Start / nowa gra",
-    "mute": "Wycisz dźwięk",
-    "options": "Opcje",
-    "spaceKey": "Spacja",
-    "restart": "Restart",
-    "exitToMenu": "Wyjdź do menu",
-    "touchMove": "Ruch",
-    "touchMoveGesture": "Przeciągnij po planszy",
-    "touchRotateGesture": "Stuknij planszę",
-    "touchHardDropGesture": "Przesuń w dół",
-    "touchSoftDropGesture": "Przytrzymaj ▼",
-    "touchPauseGesture": "Przycisk ❚❚",
-    "confirm": "Zatwierdź",
-    "cancel": "Anuluj"
-  },
-  "screens": {
-    "idle": {
-      "hint": "Poziom trudności",
-      "modeHint": "Tryb",
-      "startButton": "Start",
-      "namePlaceholder": "Twój nick",
-      "newProfileOption": "+ Nowy profil",
-      "profileSelectLabel": "Przełącz profil",
-      "deleteProfileButton": "Usuń profil",
-      "deleteProfileConfirm": "Usunąć profil {name}? Będziesz mógł go przywrócić przez 7 dni.",
-      "restoreProfileGroup": "Przywróć profil"
+    "locale": "pl-PL",
+    "boot": {
+        "settings": "Wczytywanie ustawień...",
+        "sprites": "Tworzenie cache klocków...",
+        "audio": "Wczytywanie audio...",
+        "finalize": "Uruchamianie..."
     },
-    "modeInfo": {
-      "subtitle": "Tryb: {mode}",
-      "continueButton": "Kontynuuj"
+    "sidebar": {
+        "nextPiece": "Następny klocek",
+        "score": "Wynik",
+        "time": "Czas",
+        "lines": "Linie",
+        "best": "Rekord",
+        "drought": "Posucha",
+        "tetrisRate": "W4L",
+        "pps": "PPS",
+        "objective": "Cel",
+        "statusLive": "Aktualna gra",
+        "statusLast": "Ostatnia gra"
     },
-    "paused": {
-      "title": "PAUZA",
-      "resumeHintBefore": "Naciśnij",
-      "resumeHintAfter": " aby wznowić",
-      "optionsHintBefore": "Naciśnij",
-      "optionsHintAfter": " aby otworzyć opcje",
-      "resumeButton": "Wznów"
+    "controls": {
+        "toggle": "Sterowanie",
+        "rotate": "Obrót",
+        "rotate180": "Obrót 180°",
+        "moveLeftRight": "Ruch lewo / prawo",
+        "softDrop": "Szybszy spadek",
+        "hardDrop": "Natychmiastowy spadek",
+        "pause": "Pauza",
+        "start": "Start / nowa gra",
+        "mute": "Wycisz dźwięk",
+        "options": "Opcje",
+        "spaceKey": "Spacja",
+        "restart": "Restart",
+        "exitToMenu": "Wyjdź do menu",
+        "touchMove": "Ruch",
+        "touchMoveGesture": "Przeciągnij po planszy",
+        "touchRotateGesture": "Stuknij planszę",
+        "touchHardDropGesture": "Przesuń w dół",
+        "touchSoftDropGesture": "Przytrzymaj ▼",
+        "touchPauseGesture": "Przycisk ❚❚",
+        "confirm": "Zatwierdź",
+        "cancel": "Anuluj"
     },
-    "options": {
-      "title": "OPCJE",
-      "closeHintBefore": "Naciśnij",
-      "closeHintAfter": " aby zamknąć",
-      "generalTitle": "Ogólne",
-      "searchPlaceholder": "Szukaj opcji…",
-      "searchNoResults": "Brak pasujących opcji",
-      "language": "Język",
-      "soundTitle": "Dźwięk",
-      "mute": "Wycisz",
-      "unmute": "Wyłącz wyciszenie",
-      "volume": "Głośność",
-      "sfxTitle": "Efekty dźwiękowe",
-      "musicTitle": "Muzyka",
-      "voicesTitle": "Głosy",
-      "countdownTitle": "Odliczanie",
-      "categoryVolume": "Głośność kategorii",
-      "preview": "Odtwórz",
-      "pause": "Pauza",
-      "hudRight": "HUD po prawej",
-      "gameplayTitle": "Rozgrywka",
-      "skipCountdown": "Pomiń odliczanie",
-      "skipModeInfo": "Pomiń ekran informacyjny trybu",
-      "controlsTitle": "Sterowanie",
-      "mouseTitle": "Mysz",
-      "mouseControl": "Sterowanie myszką",
-      "graphicsTitle": "Grafika",
-      "ghost": "Duszek",
-      "gridLines": "Linie siatki",
-      "screenShake": "Trzęsienie ekranu",
-      "heightSaturation": "Nasycenie wg wysokości",
-      "performanceTitle": "Wydajność",
-      "glow": "Poświata (blur)",
-      "transparency": "Przezroczystość",
-      "fallTrail": "Smuga spadku",
-      "theme": "Motyw",
-      "themeNone": "Brak",
-      "themeVHS": "Szum VHS",
-      "themeMatrix": "Matrix",
-      "themeRain": "Deszcz",
-      "themeSnow": "Śnieg",
-      "close": "Zamknij",
-      "mouseSensitivity": "Czułość myszy",
-      "touchSensitivity": "Czułość dotyku",
-      "calibrateSensitivity": "Kalibracja czułości",
-      "calibrateSensitivityButton": "Kalibruj",
-      "advancedTitle": "Zaawansowane",
-      "keyboardDas": "DAS klawiatury (ms)",
-      "keyboardArr": "ARR klawiatury (ms)",
-      "calibrateKeyboard": "Kalibracja klawiatury",
-      "calibrateKeyboardButton": "Kalibruj",
-      "dataTitle": "Import / Eksport",
-      "exportLabel": "Eksportuj opcje do pliku",
-      "exportButton": "Eksportuj",
-      "importLabel": "Importuj opcje z pliku",
-      "importButton": "Importuj",
-      "importDiffTitle": "Import opcji",
-      "importDiffSubtitle": "Liczba opcji różniących się od bieżących ustawień: {count}",
-      "importSelectAll": "Zaznacz wszystkie",
-      "importApply": "Zatwierdź zaznaczone",
-      "importCancel": "Anuluj",
-      "importClose": "OK",
-      "importNoChanges": "Zaimportowany plik jest identyczny z bieżącymi opcjami — nie ma nic do zmiany.",
-      "importInvalid": "Ten plik nie wygląda na prawidłowy eksport opcji.",
-      "valueOn": "Wł.",
-      "valueOff": "Wył.",
-      "autoValue": "auto",
-      "soundVolumesLabel": "Głośności poszczególnych dźwięków",
-      "keyboardTitle": "Klawiatura",
-      "keyboardHint": "Kliknij klawisz, aby go zmienić",
-      "keyboardResetButton": "Przywróć domyślne",
-      "resetDefaults": "Przywróć domyślne",
-      "keyboardPressKey": "Naciśnij klawisz…",
-      "keyboardReset": "Resetuj klawisze",
-      "developerTitle": "Developerskie",
-      "benchmark": "Benchmark",
-      "benchmarkHint": "Symuluje szybką losową rozgrywkę i mierzy czas każdej części silnika, żeby znaleźć najwolniejszą.",
-      "benchmarkButton": "Uruchom benchmark",
-      "benchmarkRunning": "Trwa… ({percent}%)",
-      "benchmarkDone": "Zasymulowano {pieces} klocków w {ms} ms. Najwolniejsze: {label} ({percent}%).",
-      "benchmarkCopyButton": "Kopiuj wyniki",
-      "benchmarkCopied": "Skopiowano do schowka",
-      "benchmarkCopyFailed": "Nie udało się skopiować"
+    "screens": {
+        "idle": {
+            "hint": "Poziom trudności",
+            "modeHint": "Tryb",
+            "startButton": "Start",
+            "namePlaceholder": "Twój nick",
+            "newProfileOption": "+ Nowy profil",
+            "profileSelectLabel": "Przełącz profil",
+            "deleteProfileButton": "Usuń profil",
+            "deleteProfileConfirm": "Usunąć profil {name}? Będziesz mógł go przywrócić przez 7 dni.",
+            "restoreProfileGroup": "Przywróć profil"
+        },
+        "modeInfo": {
+            "subtitle": "Tryb: {mode}",
+            "continueButton": "Kontynuuj"
+        },
+        "paused": {
+            "title": "PAUZA",
+            "resumeHintBefore": "Naciśnij",
+            "resumeHintAfter": " aby wznowić",
+            "optionsHintBefore": "Naciśnij",
+            "optionsHintAfter": " aby otworzyć opcje",
+            "resumeButton": "Wznów"
+        },
+        "options": {
+            "title": "OPCJE",
+            "closeHintBefore": "Naciśnij",
+            "closeHintAfter": " aby zamknąć",
+            "generalTitle": "Ogólne",
+            "searchPlaceholder": "Szukaj opcji…",
+            "searchNoResults": "Brak pasujących opcji",
+            "language": "Język",
+            "soundTitle": "Dźwięk",
+            "mute": "Wycisz",
+            "unmute": "Wyłącz wyciszenie",
+            "volume": "Głośność",
+            "sfxTitle": "Efekty dźwiękowe",
+            "musicTitle": "Muzyka",
+            "voicesTitle": "Głosy",
+            "countdownTitle": "Odliczanie",
+            "categoryVolume": "Głośność kategorii",
+            "preview": "Odtwórz",
+            "pause": "Pauza",
+            "hudRight": "HUD po prawej",
+            "gameplayTitle": "Rozgrywka",
+            "skipCountdown": "Pomiń odliczanie",
+            "skipModeInfo": "Pomiń ekran informacyjny trybu",
+            "controlsTitle": "Sterowanie",
+            "mouseTitle": "Mysz",
+            "mouseControl": "Sterowanie myszką",
+            "graphicsTitle": "Grafika",
+            "ghost": "Duszek",
+            "gridLines": "Linie siatki",
+            "screenShake": "Trzęsienie ekranu",
+            "heightSaturation": "Nasycenie wg wysokości",
+            "performanceTitle": "Wydajność",
+            "glow": "Poświata (blur)",
+            "transparency": "Przezroczystość",
+            "fallTrail": "Smuga spadku",
+            "theme": "Motyw",
+            "themeNone": "Brak",
+            "themeVHS": "Szum VHS",
+            "themeMatrix": "Matrix",
+            "themeRain": "Deszcz",
+            "themeSnow": "Śnieg",
+            "close": "Zamknij",
+            "mouseSensitivity": "Czułość myszy",
+            "touchSensitivity": "Czułość dotyku",
+            "calibrateSensitivity": "Kalibracja czułości",
+            "calibrateSensitivityButton": "Kalibruj",
+            "advancedTitle": "Zaawansowane",
+            "keyboardDas": "DAS klawiatury (ms)",
+            "keyboardArr": "ARR klawiatury (ms)",
+            "calibrateKeyboard": "Kalibracja klawiatury",
+            "calibrateKeyboardButton": "Kalibruj",
+            "dataTitle": "Import / Eksport",
+            "exportLabel": "Eksportuj opcje do pliku",
+            "exportButton": "Eksportuj",
+            "importLabel": "Importuj opcje z pliku",
+            "importButton": "Importuj",
+            "importDiffTitle": "Import opcji",
+            "importDiffSubtitle": "Liczba opcji różniących się od bieżących ustawień: {count}",
+            "importSelectAll": "Zaznacz wszystkie",
+            "importApply": "Zatwierdź zaznaczone",
+            "importCancel": "Anuluj",
+            "importClose": "OK",
+            "importNoChanges": "Zaimportowany plik jest identyczny z bieżącymi opcjami — nie ma nic do zmiany.",
+            "importInvalid": "Ten plik nie wygląda na prawidłowy eksport opcji.",
+            "valueOn": "Wł.",
+            "valueOff": "Wył.",
+            "autoValue": "auto",
+            "soundVolumesLabel": "Głośności poszczególnych dźwięków",
+            "keyboardTitle": "Klawiatura",
+            "keyboardHint": "Kliknij klawisz, aby go zmienić",
+            "keyboardResetButton": "Przywróć domyślne",
+            "resetDefaults": "Przywróć domyślne",
+            "keyboardPressKey": "Naciśnij klawisz…",
+            "keyboardReset": "Resetuj klawisze",
+            "developerTitle": "Developerskie",
+            "benchmark": "Benchmark",
+            "benchmarkHint": "Symuluje szybką losową rozgrywkę i mierzy czas każdej części silnika, żeby znaleźć najwolniejszą.",
+            "benchmarkButton": "Uruchom benchmark",
+            "benchmarkRunning": "Trwa… ({percent}%)",
+            "benchmarkDone": "Zasymulowano {pieces} klocków w {ms} ms. Najwolniejsze: {label} ({percent}%).",
+            "benchmarkCopyButton": "Kopiuj wyniki",
+            "benchmarkCopied": "Skopiowano do schowka",
+            "benchmarkCopyFailed": "Nie udało się skopiować"
+        },
+        "calibration": {
+            "gestures": {
+                "sideToCenter": "Przeciągnij klocek do środkowej kolumny",
+                "sideToEdge": "Przeciągnij klocek do skrajnej kolumny",
+                "toWall": "Do ściany {kbd}",
+                "click": "Kliknij raz {kbd}",
+                "hardDrop": "Wykonaj szybki spadek",
+                "softDropOne": "Wykonaj krok miękkiego spadku",
+                "rotate": "Obróć klocek",
+                "hold": "Przytrzymaj {kbd}, a potem puść"
+            },
+            "progress": "Runda {pass}/{totalPasses} · Krok {step}/{steps}",
+            "resultTitle": "KALIBRACJA CZUŁOŚCI",
+            "resultSuccessBefore": "Twoja czułość została ustawiona na",
+            "resultFailed": "Nie udało się wyznaczyć czułości — spróbuj ponownie, przeciągając myszą lub palcem.",
+            "resultClose": "Zamknij",
+            "resultSave": "Zapisz",
+            "resultDiscard": "Odrzuć",
+            "resultRestart": "Powtórz"
+        },
+        "keyboardCalibration": {
+            "resultTitle": "KALIBRACJA KLAWIATURY",
+            "resultDas": "DAS:",
+            "resultArr": "ARR:",
+            "resultFailed": "Nie zebrano wystarczających danych — spróbuj przytrzymać klawisz kierunku choć raz.",
+            "resultSave": "Zapisz",
+            "resultDiscard": "Odrzuć",
+            "resultRestart": "Powtórz"
+        },
+        "loading": {
+            "leaderboardHint": "Wczytywanie tabeli wyników..."
+        },
+        "gameOverEntry": {
+            "title": "KONIEC GRY",
+            "titleSprintComplete": "SPRINT UKOŃCZONY",
+            "titleTimeUp": "CZAS MINĄŁ",
+            "titleCheeseClear": "SER WYCZYSZCZONY",
+            "titleDigComplete": "WYKOPANO",
+            "scoreLabel": "Wynik:",
+            "levelLabel": "poziom",
+            "linesLabel": "linii",
+            "todayBestLabel": "Dzisiejszy najlepszy wynik:",
+            "todayBestBy": "przez",
+            "submit": "Kontynuuj",
+            "shareButton": "Udostępnij",
+            "statsTitle": "Statystyki sesji",
+            "gameTimeLabel": "Czas gry",
+            "droughtLabel": "D.MAX",
+            "droughtTotalLabel": "D.TOTAL",
+            "droughtAvgLabel": "D.AVG",
+            "burnLabel": "BRN",
+            "transitionLabel": "TRNS",
+            "tetrisRateLabel": "Wskaźnik 4 linii (W4L)",
+            "clearsLabel": "Czyszczenia (1/2/3/4 linie)",
+            "ppsLabel": "PPS",
+            "spinsLabel": "Spiny (T / T-mini / inne)",
+            "maxComboLabel": "Najdłuższe combo",
+            "efficiencyLabel": "Efektywność (pkt/linię)"
+        },
+        "gameOverSaved": {
+            "title": "WYNIK ZAPISANY",
+            "playAgainButton": "Zagraj ponownie"
+        }
     },
-    "calibration": {
-      "gestures": {
-        "sideToCenter": "Przeciągnij klocek do środkowej kolumny",
-        "sideToEdge": "Przeciągnij klocek do skrajnej kolumny",
-        "toWall": "Do ściany {kbd}",
-        "click": "Kliknij raz {kbd}",
-        "hardDrop": "Wykonaj szybki spadek",
-        "softDropOne": "Wykonaj krok miękkiego spadku",
-        "rotate": "Obróć klocek",
-        "hold": "Przytrzymaj {kbd}, a potem puść"
-      },
-      "progress": "Runda {pass}/{totalPasses} · Krok {step}/{steps}",
-      "resultTitle": "KALIBRACJA CZUŁOŚCI",
-      "resultSuccessBefore": "Twoja czułość została ustawiona na",
-      "resultFailed": "Nie udało się wyznaczyć czułości — spróbuj ponownie, przeciągając myszą lub palcem.",
-      "resultClose": "Zamknij",
-      "resultSave": "Zapisz",
-      "resultDiscard": "Odrzuć",
-      "resultRestart": "Powtórz"
+    "leaderboard": {
+        "title": "Tabela wyników",
+        "empty": "Brak wyników — zagraj pierwszy!",
+        "headers": {
+            "name": "Nick",
+            "score": "Wynik",
+            "time": "Czas",
+            "level": "Poz.",
+            "lines": "Linie",
+            "date": "Data"
+        },
+        "defaultName": "Gracz",
+        "shareButton": "Udostępnij tabelę wyników"
     },
-    "keyboardCalibration": {
-      "resultTitle": "KALIBRACJA KLAWIATURY",
-      "resultDas": "DAS:",
-      "resultArr": "ARR:",
-      "resultFailed": "Nie zebrano wystarczających danych — spróbuj przytrzymać klawisz kierunku choć raz.",
-      "resultSave": "Zapisz",
-      "resultDiscard": "Odrzuć",
-      "resultRestart": "Powtórz"
+    "credits": {
+        "roleDeveloper": "Inżynier oprogramowania",
+        "roleTester": "Tester",
+        "roleMusic": "Muzyka",
+        "roleSfx": "SFX"
     },
-    "loading": {
-      "leaderboardHint": "Wczytywanie tabeli wyników..."
+    "difficulty": {
+        "easy": "Początkujący",
+        "medium": "Średni",
+        "hard": "Zaawansowany",
+        "expert": "Ekspert",
+        "pro": "PRO",
+        "levelPrefix": "poziom {level}"
     },
-    "gameOverEntry": {
-      "title": "KONIEC GRY",
-      "titleSprintComplete": "SPRINT UKOŃCZONY",
-      "titleTimeUp": "CZAS MINĄŁ",
-      "titleCheeseClear": "SER WYCZYSZCZONY",
-      "titleDigComplete": "WYKOPANO",
-      "scoreLabel": "Wynik:",
-      "levelLabel": "poziom",
-      "linesLabel": "linii",
-      "todayBestLabel": "Dzisiejszy najlepszy wynik:",
-      "todayBestBy": "przez",
-      "submit": "Kontynuuj",
-      "shareButton": "Udostępnij",
-      "statsTitle": "Statystyki sesji",
-      "gameTimeLabel": "Czas gry",
-      "droughtLabel": "D.MAX",
-      "droughtTotalLabel": "D.TOTAL",
-      "droughtAvgLabel": "D.AVG",
-      "burnLabel": "BRN",
-      "transitionLabel": "TRNS",
-      "tetrisRateLabel": "Wskaźnik 4 linii (W4L)",
-      "clearsLabel": "Czyszczenia (1/2/3/4 linie)",
-      "ppsLabel": "PPS",
-      "spinsLabel": "Spiny (T / T-mini / inne)",
-      "maxComboLabel": "Najdłuższe combo",
-      "efficiencyLabel": "Efektywność (pkt/linię)"
+    "modes": {
+        "marathon": {
+            "name": "Maraton",
+            "description": "Klasyczna, nieskończona gra",
+            "rules": [
+                "♾️ Gra bez końca — układaj linie i rośnij w poziomach",
+                "📈 Tempo opadania rośnie z każdym poziomem",
+                "🏆 Liczy się wynik i najwyższy osiągnięty poziom"
+            ]
+        },
+        "sprint": {
+            "name": "Sprint",
+            "description": "Ułóż 40 linii najszybciej jak potrafisz",
+            "rules": [
+                "🎯 Cel: ułóż 40 linii",
+                "⏱️ Liczy się czas ukończenia — bądź jak najszybszy",
+                "🚫 Nieukończony bieg nie trafia na tablicę wyników"
+            ]
+        },
+        "ultra": {
+            "name": "Ultra",
+            "description": "Najwyższy wynik w 3 minuty",
+            "rules": [
+                "⏱️ Masz dokładnie 3 minuty",
+                "💯 Zdobądź jak najwyższy wynik, zanim czas się skończy",
+                "📊 Liczy się tylko wynik na koniec czasu"
+            ]
+        },
+        "survival": {
+            "name": "Przetrwanie",
+            "description": "Uważaj na rosnące śmieciowe linie",
+            "rules": [
+                "🧱 Śmieciowe linie rosną od dołu przez cały czas",
+                "🕳️ Znajdź i wykorzystaj przerwy w śmieciowych liniach",
+                "☠️ Gra kończy się, gdy plansza się przepełni"
+            ]
+        },
+        "cheeseRace": {
+            "name": "Wyścig z serem",
+            "description": "Wykop wcześniej ułożony stos jak najszybciej",
+            "rules": [
+                "🧀 Plansza startuje z 10 rzędami sera (śmieciowych linii) z dziurą",
+                "⏱️ Wykop wszystko najszybciej jak się da",
+                "🚫 Nieukończony bieg nie trafia na tablicę wyników"
+            ]
+        },
+        "digSurvival": {
+            "name": "Kopanie na przetrwanie",
+            "description": "Kop bez końca — śmieciowe linie odrastają za każdym razem, gdy je wykopiesz. Przetrwaj i wykop ich 100.",
+            "rules": [
+                "🧀 Start z niewielkim stosem śmieciowych linii u dołu planszy",
+                "♻️ Każda wykopana linia natychmiast odrasta od dołu — stos nigdy się nie kończy",
+                "🎯 Wykop w sumie 100 linii, by wygrać",
+                "☠️ Gra kończy się, gdy plansza się przepełni"
+            ]
+        },
+        "countdown": {
+            "name": "Odliczanie",
+            "description": "Czyść linie, by zegar nie doszedł do zera",
+            "rules": [
+                "⏱️ Start z 60 sekundami na zegarze",
+                "➕ Każde czyszczenie linii dodaje czasu (więcej za 4 linie)",
+                "⏳ Gra kończy się, gdy zegar dojdzie do zera"
+            ]
+        },
+        "random": {
+            "name": "Losowy",
+            "description": "Losuje jeden z pozostałych trybów po naciśnięciu Start",
+            "rules": [
+                "🎲 Losuje jeden z pozostałych trybów",
+                "▶️ Runda toczy się dokładnie tak, jak w wylosowanym trybie",
+                "🔁 Wybierz Losowy ponownie po kolejną niespodziankę"
+            ]
+        }
     },
-    "gameOverSaved": {
-      "title": "WYNIK ZAPISANY",
-      "playAgainButton": "Zagraj ponownie"
+    "game": {
+        "levelUpBanner": "POZIOM {level}"
+    },
+    "benchmark": {
+        "categories": {
+            "pieceGeneration": "Generowanie klocków",
+            "movement": "Sprawdzanie ruchu",
+            "rotation": "Rotacja i kicki",
+            "dropOffset": "Liczenie zrzutu (hard drop)",
+            "lockPiece": "Blokowanie klocka na planszy",
+            "lineClearDetect": "Wykrywanie pełnych linii",
+            "lineClearApply": "Usuwanie pełnych linii",
+            "scoring": "Punktacja",
+            "renderRefreshRect": "Render: odświeżenie prostokąta canvasu",
+            "renderBackgroundRebuild": "Render: przebudowa tła planszy",
+            "renderBlit": "Render: kopiowanie tła na canvas",
+            "renderDrawPiece": "Render: spadający klocek",
+            "renderDrawGhost": "Render: cień klocka",
+            "audioPlay": "Dźwięk: odtwarzanie",
+            "audioStop": "Dźwięk: zatrzymywanie"
+        }
+    },
+    "sounds": {
+        "lineClear1": "linia",
+        "lineClear2": "II: linia",
+        "lineClear3": "III: linia",
+        "lineClear4": "IV: linia",
+        "drop": "Upadek klocka",
+        "gameOver": "Koniec gry",
+        "levelUp": "Awans poziomu",
+        "rotate": "Obrót",
+        "grounded": "Klocek na dole",
+        "falling": "Spadanie klocka",
+        "pieceLock": "Osadzenie klocka"
+    },
+    "share": {
+        "text": "Zdobyłem {score} pkt w trybie {mode} w {app}! 🎮",
+        "textByName": "{name} zdobył(a) {score} pkt w trybie {mode} w {app}! 🎮",
+        "tableText": "Moja tabela wyników trybu {mode} w {app}! 🎮",
+        "status": {
+            "shared": "Udostępniono!",
+            "copied": "Skopiowano obraz!",
+            "downloaded": "Zapisano obraz!",
+            "error": "Nie udało się",
+            "empty": "Brak wyników"
+        }
+    },
+    "multiplayer": {
+        "title": "Multiplayer",
+        "step1Label": "Wybór połączenia",
+        "step2Label": "Wymiana kodów",
+        "step2LabelBot": "Poziom trudności",
+        "step3Label": "Gotowość",
+        "button": "Multiplayer",
+        "chooseConnection": "Wybierz sposób połączenia",
+        "chooseModeHint": "Wybierz tryb",
+        "chooseBotDifficulty": "Wybierz poziom trudności",
+        "botHint": "Trenuj sam — bot losuje dokładnie te same klocki co Ty, w tej samej kolejności, i zaczyna na Twoim aktualnie wybranym poziomie.",
+        "hostButton": "Stwórz pokój",
+        "joinButton": "Dołącz do pokoju",
+        "botButton": "Graj z botem",
+        "sendCodeHint": "Wyślij ten kod graczowi, z którym chcesz zagrać",
+        "copyButton": "Kopiuj kod",
+        "generatingCode": "Proszę czekać, tworzę kod…",
+        "pasteAnswerHint": "Wklej kod odpowiedzi od drugiego gracza",
+        "codePlaceholder": "Wklej kod tutaj…",
+        "connectButton": "Połącz",
+        "pasteHostHint": "Wklej kod pokoju otrzymany od hosta",
+        "joinConnectButton": "Dołącz",
+        "sendBackHint": "Odeślij ten kod hostowi",
+        "statusConnecting": "Łączenie…",
+        "statusConnected": "Połączono. Kliknij „Gotowy”, gdy jesteś gotowy do gry.",
+        "statusBothReadyHost": "Obaj gracze gotowi — możesz rozpocząć grę.",
+        "statusBothReadyGuest": "Obaj gracze gotowi — czekaj, aż host rozpocznie grę.",
+        "statusDisconnected": "Połączenie z przeciwnikiem zostało przerwane.",
+        "statusError": "Wystąpił błąd połączenia.",
+        "configHostHint": "Możesz zmienić tryb i poziom poniżej",
+        "configGuestHint": "Tryb i poziom ustawione przez hosta",
+        "youReady": "Ty: gotowy",
+        "youNotReady": "Ty: nie gotowy",
+        "opponentFallback": "Przeciwnik",
+        "botName": "Bot ({difficulty})",
+        "opponentReady": "{name}: gotowy",
+        "opponentNotReady": "{name}: nie gotowy",
+        "readyButton": "Gotowy",
+        "startButton": "Rozpocznij grę",
+        "won": "🏆 Wygrałeś!",
+        "lost": "Przegrałeś.",
+        "draw": "Remis!",
+        "resultScore": "{result} (Ty: {local} / {name}: {remote})",
+        "opponentScore": "{name}: {score}",
+        "themesInfo": "Motywy — Ty: {you} • {name}: {opponent}",
+        "genericError": "Nie udało się nawiązać połączenia.",
+        "pauseBlocked": "Pauza niedostępna w meczu multiplayer.",
+        "restartBlocked": "Restart niedostępny w meczu multiplayer."
     }
-  },
-  "leaderboard": {
-    "title": "Tabela wyników",
-    "empty": "Brak wyników — zagraj pierwszy!",
-    "headers": {
-      "name": "Nick",
-      "score": "Wynik",
-      "time": "Czas",
-      "level": "Poz.",
-      "lines": "Linie",
-      "date": "Data"
-    },
-    "defaultName": "Gracz",
-    "shareButton": "Udostępnij tabelę wyników"
-  },
-  "credits": {
-    "roleDeveloper": "Inżynier oprogramowania",
-    "roleTester": "Tester",
-    "roleMusic": "Muzyka",
-    "roleSfx": "SFX"
-  },
-  "difficulty": {
-    "easy": "Początkujący",
-    "medium": "Średni",
-    "hard": "Zaawansowany",
-    "expert": "Ekspert",
-    "pro": "PRO",
-    "levelPrefix": "poziom {level}"
-  },
-  "modes": {
-    "marathon": {
-      "name": "Maraton",
-      "description": "Klasyczna, nieskończona gra",
-      "rules": [
-        "♾️ Gra bez końca — układaj linie i rośnij w poziomach",
-        "📈 Tempo opadania rośnie z każdym poziomem",
-        "🏆 Liczy się wynik i najwyższy osiągnięty poziom"
-      ]
-    },
-    "sprint": {
-      "name": "Sprint",
-      "description": "Ułóż 40 linii najszybciej jak potrafisz",
-      "rules": [
-        "🎯 Cel: ułóż 40 linii",
-        "⏱️ Liczy się czas ukończenia — bądź jak najszybszy",
-        "🚫 Nieukończony bieg nie trafia na tablicę wyników"
-      ]
-    },
-    "ultra": {
-      "name": "Ultra",
-      "description": "Najwyższy wynik w 3 minuty",
-      "rules": [
-        "⏱️ Masz dokładnie 3 minuty",
-        "💯 Zdobądź jak najwyższy wynik, zanim czas się skończy",
-        "📊 Liczy się tylko wynik na koniec czasu"
-      ]
-    },
-    "survival": {
-      "name": "Przetrwanie",
-      "description": "Uważaj na rosnące śmieciowe linie",
-      "rules": [
-        "🧱 Śmieciowe linie rosną od dołu przez cały czas",
-        "🕳️ Znajdź i wykorzystaj przerwy w śmieciowych liniach",
-        "☠️ Gra kończy się, gdy plansza się przepełni"
-      ]
-    },
-    "cheeseRace": {
-      "name": "Wyścig z serem",
-      "description": "Wykop wcześniej ułożony stos jak najszybciej",
-      "rules": [
-        "🧀 Plansza startuje z 10 rzędami sera (śmieciowych linii) z dziurą",
-        "⏱️ Wykop wszystko najszybciej jak się da",
-        "🚫 Nieukończony bieg nie trafia na tablicę wyników"
-      ]
-    },
-    "digSurvival": {
-      "name": "Kopanie na przetrwanie",
-      "description": "Kop bez końca — śmieciowe linie odrastają za każdym razem, gdy je wykopiesz. Przetrwaj i wykop ich 100.",
-      "rules": [
-        "🧀 Start z niewielkim stosem śmieciowych linii u dołu planszy",
-        "♻️ Każda wykopana linia natychmiast odrasta od dołu — stos nigdy się nie kończy",
-        "🎯 Wykop w sumie 100 linii, by wygrać",
-        "☠️ Gra kończy się, gdy plansza się przepełni"
-      ]
-    },
-    "countdown": {
-      "name": "Odliczanie",
-      "description": "Czyść linie, by zegar nie doszedł do zera",
-      "rules": [
-        "⏱️ Start z 60 sekundami na zegarze",
-        "➕ Każde czyszczenie linii dodaje czasu (więcej za 4 linie)",
-        "⏳ Gra kończy się, gdy zegar dojdzie do zera"
-      ]
-    },
-    "random": {
-      "name": "Losowy",
-      "description": "Losuje jeden z pozostałych trybów po naciśnięciu Start",
-      "rules": [
-        "🎲 Losuje jeden z pozostałych trybów",
-        "▶️ Runda toczy się dokładnie tak, jak w wylosowanym trybie",
-        "🔁 Wybierz Losowy ponownie po kolejną niespodziankę"
-      ]
-    }
-  },
-  "game": {
-    "levelUpBanner": "POZIOM {level}"
-  },
-  "benchmark": {
-    "categories": {
-      "pieceGeneration": "Generowanie klocków",
-      "movement": "Sprawdzanie ruchu",
-      "rotation": "Rotacja i kicki",
-      "dropOffset": "Liczenie zrzutu (hard drop)",
-      "lockPiece": "Blokowanie klocka na planszy",
-      "lineClearDetect": "Wykrywanie pełnych linii",
-      "lineClearApply": "Usuwanie pełnych linii",
-      "scoring": "Punktacja",
-      "renderRefreshRect": "Render: odświeżenie prostokąta canvasu",
-      "renderBackgroundRebuild": "Render: przebudowa tła planszy",
-      "renderBlit": "Render: kopiowanie tła na canvas",
-      "renderDrawPiece": "Render: spadający klocek",
-      "renderDrawGhost": "Render: cień klocka",
-      "audioPlay": "Dźwięk: odtwarzanie",
-      "audioStop": "Dźwięk: zatrzymywanie"
-    }
-  },
-  "sounds": {
-    "lineClear1": "linia",
-    "lineClear2": "II: linia",
-    "lineClear3": "III: linia",
-    "lineClear4": "IV: linia",
-    "drop": "Upadek klocka",
-    "gameOver": "Koniec gry",
-    "levelUp": "Awans poziomu",
-    "rotate": "Obrót",
-    "grounded": "Klocek na dole",
-    "falling": "Spadanie klocka",
-    "pieceLock": "Osadzenie klocka"
-  },
-  "share": {
-    "text": "Zdobyłem {score} pkt w trybie {mode} w {app}! 🎮",
-    "textByName": "{name} zdobył(a) {score} pkt w trybie {mode} w {app}! 🎮",
-    "tableText": "Moja tabela wyników trybu {mode} w {app}! 🎮",
-    "status": {
-      "shared": "Udostępniono!",
-      "copied": "Skopiowano obraz!",
-      "downloaded": "Zapisano obraz!",
-      "error": "Nie udało się",
-      "empty": "Brak wyników"
-    }
-  },
-  "multiplayer": {
-    "title": "Multiplayer",
-    "step1Label": "Wybór połączenia",
-    "step2Label": "Wymiana kodów",
-    "step2LabelBot": "Poziom trudności",
-    "step3Label": "Gotowość",
-    "button": "Multiplayer",
-    "chooseConnection": "Wybierz sposób połączenia",
-    "chooseBotDifficulty": "Wybierz poziom trudności",
-    "botHint": "Trenuj sam — bot losuje dokładnie te same klocki co Ty, w tej samej kolejności.",
-    "hostButton": "Stwórz pokój",
-    "joinButton": "Dołącz do pokoju",
-    "botButton": "Graj z botem",
-    "sendCodeHint": "Wyślij ten kod graczowi, z którym chcesz zagrać",
-    "copyButton": "Kopiuj kod",
-    "generatingCode": "Proszę czekać, tworzę kod…",
-    "pasteAnswerHint": "Wklej kod odpowiedzi od drugiego gracza",
-    "codePlaceholder": "Wklej kod tutaj…",
-    "connectButton": "Połącz",
-    "pasteHostHint": "Wklej kod pokoju otrzymany od hosta",
-    "joinConnectButton": "Dołącz",
-    "sendBackHint": "Odeślij ten kod hostowi",
-    "statusConnecting": "Łączenie…",
-    "statusConnected": "Połączono. Kliknij „Gotowy”, gdy jesteś gotowy do gry.",
-    "statusBothReadyHost": "Obaj gracze gotowi — możesz rozpocząć grę.",
-    "statusBothReadyGuest": "Obaj gracze gotowi — czekaj, aż host rozpocznie grę.",
-    "statusDisconnected": "Połączenie z przeciwnikiem zostało przerwane.",
-    "statusError": "Wystąpił błąd połączenia.",
-    "youReady": "Ty: gotowy",
-    "youNotReady": "Ty: nie gotowy",
-    "opponentFallback": "Przeciwnik",
-    "botName": "Bot ({difficulty})",
-    "opponentReady": "{name}: gotowy",
-    "opponentNotReady": "{name}: nie gotowy",
-    "readyButton": "Gotowy",
-    "startButton": "Rozpocznij grę",
-    "won": "🏆 Wygrałeś!",
-    "lost": "Przegrałeś.",
-    "draw": "Remis!",
-    "resultScore": "{result} (Ty: {local} / {name}: {remote})",
-    "opponentScore": "{name}: {score}",
-    "genericError": "Nie udało się nawiązać połączenia.",
-    "pauseBlocked": "Pauza niedostępna w meczu multiplayer."
-  }
 }
