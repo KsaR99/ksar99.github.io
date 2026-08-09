@@ -8,8 +8,10 @@ const SCORE_POLL_MS = 200;
 const RUNNING_STATES = new Set(["countdown", "running", "clearing", "paused"]);
 const FINISHED_STATES = new Set(["gameOver-entry", "gameOver-saved"]);
 
-// Pixel size of one cell in the opponent's mini board preview (desktop only).
-const OPPONENT_BOARD_CELL_PX = 10;
+// Fallback cell size (px) for the opponent's board if used before the main
+// board has ever been sized (shouldn't happen in practice — a match can't
+// start before that initial layout pass runs).
+const OPPONENT_BOARD_FALLBACK_CELL_PX = 24;
 
 // Which of the 3 numbered steps is "current" for a given panel, and which
 // i18n key describes it in the caption line under the dots.
@@ -26,9 +28,10 @@ const STEP_BY_PANEL = {
  * overlay (mirrors ConfirmDialog's pattern), then on match start simply
  * clicks the real start-button so the untouched single-player Game runs
  * locally on both peers. While running it exchanges score/name/board updates
- * over the MultiplayerSession data channel and shows a live opponent panel
- * (nickname, score, and — on desktop — a mini render of their board) plus a
- * win/lose result once both sides finish.
+ * over the MultiplayerSession data channel and shows a live opponent panel —
+ * a compact nickname+score badge everywhere, plus, on desktop, a full-size
+ * board rendered right next to the local one (same cell size, same `.board`
+ * markup) — followed by a win/lose result once both sides finish.
  */
 export class MultiplayerController {
     constructor(game, dom = globalThis.document ?? null, i18n = null) {
@@ -47,9 +50,9 @@ export class MultiplayerController {
         this._remoteName = null;
         this._lastRemoteScore = 0;
         this._opponentBadgeEl = null;
+        this._opponentPanelEl = null;
         this._opponentNameEl = null;
         this._opponentScoreEl = null;
-        this._opponentPanelEl = null;
         this._opponentCanvasEl = null;
         this._opponentCanvasCtx = null;
 
@@ -257,7 +260,7 @@ export class MultiplayerController {
         session.addEventListener("disconnected", () => {
             this._setStatus(this._t("multiplayer.statusDisconnected"));
             this._stopScoreSync();
-            this._hideOpponentBadge();
+            this._hideOpponentUI();
             this.game.multiplayerConnected = false;
         });
         session.addEventListener("error", () => this._setStatus(this._t("multiplayer.statusError")));
@@ -300,7 +303,7 @@ export class MultiplayerController {
         this._lastSentScore = -1;
         this._lastSentBoardVersion = -1;
         this._wasInMatch = false;
-        this._showOpponentBadge();
+        this._showOpponentUI();
 
         const startButton = this.dom.querySelector('[data-role="start-button"]');
         startButton?.click();
@@ -332,7 +335,7 @@ export class MultiplayerController {
                 this._remoteFinalScore = null;
                 this._lastSentScore = -1;
                 this._lastSentBoardVersion = -1;
-                this._showOpponentBadge();
+                this._showOpponentUI();
             }
 
             this._wasInMatch = true;
@@ -360,7 +363,7 @@ export class MultiplayerController {
             // Left the match entirely (e.g. back to idle) without a game-over — stop polling.
             this._stopScoreSync();
             this._wasInMatch = false;
-            this._hideOpponentBadge();
+            this._hideOpponentUI();
         }
     }
 
@@ -368,15 +371,16 @@ export class MultiplayerController {
         if (!payload || typeof payload !== "object") return;
 
         if (payload.kind === "score") {
-            this._setOpponentBadgeScore(payload.score);
+            this._updateOpponentScore(payload.score);
         } else if (payload.kind === "final") {
             this._remoteFinalScore = payload.score;
-            this._setOpponentBadgeScore(payload.score);
+            this._updateOpponentScore(payload.score);
             this._maybeShowResult();
         } else if (payload.kind === "name") {
             this._remoteName = (payload.name || "").trim() || null;
             this._updateReadyBadges();
-            this._setOpponentBadgeScore(this._lastRemoteScore);
+            if (this._opponentNameEl) this._opponentNameEl.textContent = this._remoteDisplayName();
+            this._updateOpponentScore(this._lastRemoteScore);
         } else if (payload.kind === "board") {
             this._drawOpponentBoard(payload.cells);
         }
@@ -390,69 +394,149 @@ export class MultiplayerController {
         else if (this._localFinalScore < this._remoteFinalScore) resultKey = "multiplayer.lost";
         else resultKey = "multiplayer.draw";
 
-        this._setOpponentBadgeText(this._t("multiplayer.resultScore", {
+        const resultText = this._t("multiplayer.resultScore", {
             result: this._t(resultKey),
             local: formatNumber(this._localFinalScore),
             remote: formatNumber(this._remoteFinalScore),
             name: this._remoteDisplayName(),
-        }));
+        });
+        this._setOpponentBadgeText(resultText);
+        if (this._opponentScoreEl) this._opponentScoreEl.textContent = resultText;
         this._stopScoreSync();
         this.session?.setReady(false);
     }
 
+    // --- opponent panel (nickname/score badge everywhere + full board on desktop) ---
+
+    _showOpponentUI() {
+        this._showOpponentBadge();
+        this._showOpponentBoard();
+    }
+
+    _hideOpponentUI() {
+        this._hideOpponentBadge();
+        this._hideOpponentBoard();
+    }
+
+    /** Compact "name: score" text badge — shown everywhere (mobile included), hidden on
+     *  desktop via CSS once the full board panel below covers the same info. */
     _showOpponentBadge() {
         this._hideOpponentBadge();
         const host = this.dom.querySelector('[data-role="stats-card"]') ?? this.dom.querySelector(".app__sidebar");
         if (!host) return;
 
-        const panel = this.dom.createElement("div");
-        panel.className = "mp-opponent-panel";
-        panel.dataset.role = "mp-opponent-panel";
-
-        // Mini render of the opponent's board — CSS only shows this on
-        // desktop (see multiplayer.css / desktop.css); it's cheap enough to
-        // always build and keep updated regardless.
-        const canvas = this.dom.createElement("canvas");
-        canvas.className = "mp-opponent-panel__canvas";
-        canvas.dataset.role = "mp-opponent-canvas";
-        canvas.width = BOARD_CONFIG.COLS * OPPONENT_BOARD_CELL_PX;
-        canvas.height = BOARD_CONFIG.ROWS * OPPONENT_BOARD_CELL_PX;
-        panel.appendChild(canvas);
-        this._opponentCanvasEl = canvas;
-        this._opponentCanvasCtx = canvas.getContext("2d");
-
         const badge = this.dom.createElement("div");
         badge.className = "mp-opponent-badge";
         badge.dataset.role = "mp-opponent-badge";
         badge.textContent = this._t("multiplayer.opponentScore", {score: 0, name: this._remoteDisplayName()});
-        panel.appendChild(badge);
-
-        host.prepend(panel);
-        this._opponentPanelEl = panel;
+        host.prepend(badge);
         this._opponentBadgeEl = badge;
         this._lastRemoteScore = 0;
-        this._drawOpponentBoard(null);
     }
 
-    _setOpponentBadgeScore(score) {
-        this._lastRemoteScore = score;
-        this._setOpponentBadgeText(this._t("multiplayer.opponentScore", {
-            score: formatNumber(score),
-            name: this._remoteDisplayName(),
-        }));
+    _hideOpponentBadge() {
+        this._opponentBadgeEl?.remove();
+        this._opponentBadgeEl = null;
     }
 
     _setOpponentBadgeText(text) {
         if (this._opponentBadgeEl) this._opponentBadgeEl.textContent = text;
     }
 
-    _hideOpponentBadge() {
-        this._opponentPanelEl?.remove();
+    /** Updates both the text badge and the desktop panel's header score. */
+    _updateOpponentScore(score) {
+        this._lastRemoteScore = score;
+        this._setOpponentBadgeText(this._t("multiplayer.opponentScore", {
+            score: formatNumber(score),
+            name: this._remoteDisplayName(),
+        }));
+        if (this._opponentScoreEl) this._opponentScoreEl.textContent = formatNumber(score);
+    }
+
+    /**
+     * Full-size board rendered right next to the local one (desktop only,
+     * see CSS) — same `.board`/`.board__canvas` markup and the same cell
+     * size as the local board, for a literal 1:1 visual match, with the
+     * opponent's nickname and score in a header above it.
+     */
+    _showOpponentBoard() {
+        this._hideOpponentBoard();
+        // Full-size board is desktop-only real estate (mirrors the site's own
+        // `(width >= 48rem)` breakpoint for styles/desktop.css) — skip
+        // building it at all on narrow viewports rather than relying on CSS
+        // alone to hide it, so it doesn't nudge the mobile layout's sidebar
+        // width bookkeeping in main.js.
+        if (!globalThis.matchMedia?.("(width >= 48rem)").matches) return;
+
+        const boardHost = this.dom.querySelector(".app__board");
+        if (!boardHost) return;
+
+        const panel = this.dom.createElement("div");
+        panel.className = "app__sidebar mp-opponent-column";
+        panel.dataset.role = "mp-opponent-panel";
+
+        const header = this.dom.createElement("div");
+        header.className = "mp-opponent-column__header";
+
+        const name = this.dom.createElement("span");
+        name.className = "mp-opponent-column__name";
+        name.textContent = this._remoteDisplayName();
+        header.appendChild(name);
+
+        const score = this.dom.createElement("span");
+        score.className = "mp-opponent-column__score";
+        score.textContent = formatNumber(0);
+        header.appendChild(score);
+
+        panel.appendChild(header);
+
+        const boardEl = this.dom.createElement("div");
+        boardEl.className = "board mp-opponent-column__board";
+
+        const stage = this.dom.createElement("div");
+        stage.className = "board__stage";
+
+        const canvas = this.dom.createElement("canvas");
+        canvas.className = "board__canvas mp-opponent-column__canvas";
+        canvas.dataset.role = "mp-opponent-canvas";
+        const cellSize = BOARD_CONFIG.CELL_SIZE || OPPONENT_BOARD_FALLBACK_CELL_PX;
+        canvas.width = cellSize * BOARD_CONFIG.COLS;
+        canvas.height = cellSize * BOARD_CONFIG.ROWS;
+
+        stage.appendChild(canvas);
+        boardEl.appendChild(stage);
+        panel.appendChild(boardEl);
+
+        boardHost.insertAdjacentElement("afterend", panel);
+
+        this._opponentPanelEl = panel;
+        this._opponentNameEl = name;
+        this._opponentScoreEl = score;
+        this._opponentCanvasEl = canvas;
+        this._opponentCanvasCtx = canvas.getContext("2d");
+        this._drawOpponentBoard(null);
+
+        // The panel takes up real horizontal space next to the board (it's
+        // sized like a second board, not a slim stat column) — nudge the
+        // layout to recompute the local board's size around it, the same
+        // way a window resize would.
+        this._notifyLayoutResize();
+    }
+
+    _hideOpponentBoard() {
+        if (!this._opponentPanelEl) return;
+        this._opponentPanelEl.remove();
         this._opponentPanelEl = null;
-        this._opponentBadgeEl = null;
         this._opponentNameEl = null;
+        this._opponentScoreEl = null;
         this._opponentCanvasEl = null;
         this._opponentCanvasCtx = null;
+        this._notifyLayoutResize();
+    }
+
+    _notifyLayoutResize() {
+        const target = globalThis.visualViewport ?? globalThis.window ?? null;
+        target?.dispatchEvent(new Event("resize"));
     }
 
     /** The opponent's nickname once known over the data channel, else a generic fallback label. */
@@ -461,9 +545,10 @@ export class MultiplayerController {
     }
 
     /**
-     * Draws a compact preview of the opponent's locked board onto the mini
-     * canvas. `cells` is the flat colorIndex array from Board#colors (row-major,
-     * 0 = empty); null/undefined clears the board (e.g. right after a rematch).
+     * Draws the opponent's locked board onto the desktop board panel's
+     * canvas. `cells` is the flat colorIndex array from Board#colors
+     * (row-major, 0 = empty); null/undefined clears the board (e.g. right
+     * after a rematch).
      */
     _drawOpponentBoard(cells) {
         const ctx = this._opponentCanvasCtx;
@@ -471,29 +556,20 @@ export class MultiplayerController {
         if (!ctx || !canvas) return;
 
         const {COLS, ROWS} = BOARD_CONFIG;
-        const size = OPPONENT_BOARD_CELL_PX;
-        const styles = getComputedStyle(canvas);
-        const emptyColor = styles.getPropertyValue("--bg-2").trim() || "#000";
-        const lineColor = styles.getPropertyValue("--line").trim() || "#444";
+        const size = canvas.width / COLS;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = emptyColor;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         if (cells) {
             for (let y = 0; y < ROWS; y++) {
                 for (let x = 0; x < COLS; x++) {
                     const colorIndex = cells[y * COLS + x];
                     if (!colorIndex) continue;
-                    ctx.fillStyle = COLOR_PALETTE[colorIndex] ?? emptyColor;
+                    ctx.fillStyle = COLOR_PALETTE[colorIndex] ?? "#888";
                     ctx.fillRect(x * size, y * size, size, size);
                 }
             }
         }
-
-        ctx.strokeStyle = lineColor;
-        ctx.lineWidth = 1;
-        ctx.strokeRect(0.5, 0.5, canvas.width - 1, canvas.height - 1);
     }
 
     _sendToPeer(payload) {
@@ -531,7 +607,7 @@ export class MultiplayerController {
 
     _resetSession() {
         this._stopScoreSync();
-        this._hideOpponentBadge();
+        this._hideOpponentUI();
         this.session?.close();
         this.session = null;
         this.role = null;

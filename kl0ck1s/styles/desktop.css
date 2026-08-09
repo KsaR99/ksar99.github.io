@@ -103,8 +103,21 @@
     flex: 0 1 13.75rem;
 }
 
-.mp-opponent-panel__canvas {
-    display: block;
+.mp-opponent-column {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    /* Later in the cascade than the plain .app__sidebar rule above (equal
+       specificity), so this column sizes to its own content — like a
+       second board — instead of the slim stats-sidebar clamp. */
+    width: auto;
+    max-width: none;
+    flex: 0 0 auto;
+    order: 3;
+}
+
+.mp-opponent-badge {
+    display: none;
 }
 
 .sidebar--stats {
