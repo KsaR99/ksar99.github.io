@@ -15,6 +15,7 @@
     <link href="styles/options.css?v=43" rel="stylesheet">
     <link href="styles/menu.css?v=43" rel="stylesheet">
     <link href="styles/leaderboard.css?v=43" rel="stylesheet">
+    <link href="styles/multiplayer.css?v=43" rel="stylesheet">
     <link href="styles/mobile.css?v=43" media="(width < 48rem)" rel="stylesheet">
     <link href="styles/desktop.css?v=43" media="(width >= 48rem)" rel="stylesheet">
     <meta content="notranslate" name="google">
@@ -43,6 +44,101 @@
                     type="button">Confirm
             </button>
         </div>
+    </div>
+</div>
+<div class="mp-overlay" data-role="mp-overlay" hidden>
+    <div aria-modal="true" class="mp-dialog" data-role="mp-dialog" role="dialog">
+        <button aria-label="Close" class="mp-dialog__close" data-role="mp-close-button" type="button">✕</button>
+        <h2 class="screen__title mp-dialog__title" data-i18n="multiplayer.title">Multiplayer</h2>
+        <div class="mp-steps" data-role="mp-steps">
+            <span class="mp-step" data-role="mp-step" data-step="1" data-i18n-title="multiplayer.step1Label"
+                  aria-label="Connection type">1</span>
+            <span class="mp-step-sep"></span>
+            <span class="mp-step" data-role="mp-step" data-step="2" data-i18n-title="multiplayer.step2Label"
+                  aria-label="Exchange codes">2</span>
+            <span class="mp-step-sep"></span>
+            <span class="mp-step" data-role="mp-step" data-step="3" data-i18n-title="multiplayer.step3Label"
+                  aria-label="Ready check">3</span>
+        </div>
+        <p class="mp-step-caption" data-field="mp-step-caption"></p>
+
+        <div class="mp-panel" data-role="mp-panel-role">
+            <p class="screen__hint" data-i18n="multiplayer.chooseConnection">Choose how to connect</p>
+            <div class="screen__button-row">
+                <button class="button button--accent" data-i18n="multiplayer.hostButton" data-role="mp-host-button"
+                        type="button">Create room
+                </button>
+                <button class="button button--primary" data-i18n="multiplayer.joinButton" data-role="mp-join-button"
+                        type="button">Join room
+                </button>
+            </div>
+        </div>
+
+        <div class="mp-panel" data-role="mp-panel-host" hidden>
+            <div data-role="mp-host-code-wrap">
+                <p class="screen__hint" data-i18n="multiplayer.sendCodeHint">Send this code to the player you want to
+                    play with</p>
+                <input class="mp-code" data-i18n-placeholder="multiplayer.generatingCode" data-role="mp-host-code"
+                       disabled placeholder="Please wait, generating code…" type="password">
+                <button class="button button--primary mp-copy-button" data-i18n="multiplayer.copyButton" disabled
+                        data-role="mp-host-copy-button" type="button">
+                    Copy code
+                </button>
+            </div>
+
+            <div data-role="mp-host-answer-wrap" hidden>
+                <p class="screen__hint" data-i18n="multiplayer.pasteAnswerHint">Paste the answer code from the other
+                    player</p>
+                <input class="mp-code" data-i18n-placeholder="multiplayer.codePlaceholder"
+                       data-role="mp-host-answer-input" placeholder="Paste code here…" type="password">
+                <button class="button button--accent" data-i18n="multiplayer.connectButton"
+                        data-role="mp-host-connect-button" type="button">Connect
+                </button>
+            </div>
+        </div>
+
+        <div class="mp-panel" data-role="mp-panel-join" hidden>
+            <p class="screen__hint" data-i18n="multiplayer.pasteHostHint">Paste the room code you got from the
+                host</p>
+            <input class="mp-code" data-i18n-placeholder="multiplayer.codePlaceholder" data-role="mp-join-code-input"
+                   placeholder="Paste code here…" type="password">
+            <button class="button button--accent" data-i18n="multiplayer.joinConnectButton"
+                    data-role="mp-join-connect-button" type="button">Join
+            </button>
+
+            <div data-role="mp-join-answer-wrap" hidden>
+                <p class="screen__hint" data-i18n="multiplayer.sendBackHint">Send this code back to the host</p>
+                <input class="mp-code" data-i18n-placeholder="multiplayer.generatingCode"
+                       data-role="mp-join-answer-code" disabled placeholder="Please wait, generating code…"
+                       type="password">
+                <button class="button button--primary mp-copy-button" data-i18n="multiplayer.copyButton" disabled
+                        data-role="mp-join-copy-button" type="button">
+                    Copy code
+                </button>
+            </div>
+        </div>
+
+        <div class="mp-panel" data-role="mp-panel-ready" hidden>
+            <p class="mp-status" data-field="mp-status-text" data-i18n="multiplayer.statusConnecting">Connecting…
+            </p>
+            <div class="mp-ready-row">
+                <span class="mp-ready-badge" data-i18n="multiplayer.youNotReady"
+                      data-role="mp-local-ready-badge">You: not ready</span>
+                <span class="mp-ready-badge" data-i18n="multiplayer.opponentNotReady"
+                      data-role="mp-remote-ready-badge">Opponent: not ready</span>
+            </div>
+            <div class="screen__button-row">
+                <button class="button button--accent" data-i18n="multiplayer.readyButton" data-role="mp-ready-button"
+                        type="button">Ready
+                </button>
+                <button class="button button--primary" data-i18n="multiplayer.startButton" data-role="mp-start-button"
+                        hidden type="button">
+                    Start game
+                </button>
+            </div>
+        </div>
+
+        <p class="mp-error" data-field="mp-error-text" hidden></p>
     </div>
 </div>
 <div class="app" id="app-root">

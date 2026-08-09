@@ -1027,6 +1027,12 @@ body.perf-no-glow .board__filter--active[data-theme="vhs"]::after {
     &:hover {
         filter: brightness(1.5);
     }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
 }
 
 .button--primary {

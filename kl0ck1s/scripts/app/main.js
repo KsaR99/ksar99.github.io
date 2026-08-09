@@ -28,6 +28,7 @@ import {Renderer} from "../core/rendering/renderer.js";
 import {HUD} from "../core/ui/hud.js";
 import {Game} from "../core/game/game.js";
 import {I18n} from "../core/services/i18n.js";
+import {MultiplayerController} from "../core/controllers/multiplayer-controller.js";
 import {BootLoader} from "./boot-loader.js";
 
 // Disable right click, for the mouse.
@@ -217,6 +218,9 @@ game.init({
     console.error(err);
     boot.finish();
 }).finally(() => clearTimeout(bootWatchdog));
+
+const multiplayerController = new MultiplayerController(game, document, i18n);
+multiplayerController.init();
 
 const fabControlsBtn = document.querySelector('[data-role="fab-controls"]');
 if (fabControlsBtn) {
