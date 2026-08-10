@@ -14,7 +14,7 @@ export const BOT_DIFFICULTIES = Object.freeze({
         minIntervalMs: 550,
         mistakeChance: 0.35,
         lookahead: false,
-        reactionMs: 260,
+        reactionMs: 300,
     }),
     medium: Object.freeze({
         startLevel: 3,
@@ -22,7 +22,7 @@ export const BOT_DIFFICULTIES = Object.freeze({
         minIntervalMs: 350,
         mistakeChance: 0.14,
         lookahead: true,
-        reactionMs: 150,
+        reactionMs: 210,
     }),
     hard: Object.freeze({
         startLevel: 6,
@@ -30,7 +30,7 @@ export const BOT_DIFFICULTIES = Object.freeze({
         minIntervalMs: 180,
         mistakeChance: 0.03,
         lookahead: true,
-        reactionMs: 70,
+        reactionMs: 90,
     }),
 });
 
@@ -42,7 +42,7 @@ const WEIGHTS = Object.freeze({
 });
 
 function buildDropRows(fullRows, rowCount) {
-    const dropRows = new Array(rowCount).fill(0);
+    const dropRows = new Uint8Array(rowCount);
     for (let y = 0; y < rowCount; y++) {
         dropRows[y] = fullRows.reduce((count, clearedY) => count + (clearedY > y ? 1 : 0), 0);
     }
@@ -103,7 +103,7 @@ function collapseFullLines(occupancy, cols, rows) {
 }
 
 function analyzeBoard(occupancy, cols, rows) {
-    const heights = new Array(cols).fill(0);
+    const heights = new Uint8Array(cols);
     let holes = 0;
     for (let c = 0; c < cols; c++) {
         let topSeen = false;
@@ -374,18 +374,26 @@ export class BotOpponent extends EventTarget {
     }
 
     _animateDrop(placement, colorIndex, onDone) {
-        const stepMs = 40;
         const def = KLOCKOMINOS[this.current];
         const spawnX = Math.floor((this.cols - def.width) / 2);
 
-        const startFall = () => this._animateFall(placement, colorIndex, onDone);
+        this._sendPiece({
+            x: spawnX, y: 0, mask: def.states[0],
+            width: placement.width, height: placement.height, colorIndex,
+        });
+        this._dropTimer = setTimeout(
+            () => this._rotateThenSlide(placement, colorIndex, spawnX, onDone),
+            this.profile.reactionMs,
+        );
+    }
+
+    _rotateThenSlide(placement, colorIndex, spawnX, onDone) {
+        const stepMs = 40;
+        const def = KLOCKOMINOS[this.current];
+        const startSlide = () => this._animateSlide(placement, colorIndex, spawnX, onDone);
 
         if (placement.rotationState === 0) {
-            this._sendPiece({
-                x: spawnX, y: 0, mask: def.states[0],
-                width: placement.width, height: placement.height, colorIndex,
-            });
-            this._dropTimer = setTimeout(startFall, stepMs);
+            startSlide();
             return;
         }
 
@@ -397,13 +405,42 @@ export class BotOpponent extends EventTarget {
                 width: placement.width, height: placement.height, colorIndex,
             });
             if (state >= placement.rotationState) {
-                this._dropTimer = setTimeout(startFall, stepMs);
+                this._dropTimer = setTimeout(startSlide, stepMs);
                 return;
             }
             state++;
             this._dropTimer = setTimeout(rotateTick, stepMs);
         };
         rotateTick();
+    }
+
+    /** Walks the piece left/right, one column per tick, from spawnX to its target column. */
+    _animateSlide(placement, colorIndex, spawnX, onDone) {
+        const startFall = () => this._animateFall(placement, colorIndex, onDone);
+
+        if (spawnX === placement.x) {
+            startFall();
+            return;
+        }
+
+        const dx = placement.x > spawnX ? 1 : -1;
+        const slideStepMs = Math.max(18, Math.round(this.profile.reactionMs / 4));
+
+        let x = spawnX;
+        const tick = () => {
+            if (this.finished) return;
+            x += dx;
+            this._sendPiece({
+                x, y: 0, mask: placement.mask,
+                width: placement.width, height: placement.height, colorIndex,
+            });
+            if (x === placement.x) {
+                this._dropTimer = setTimeout(startFall, slideStepMs);
+                return;
+            }
+            this._dropTimer = setTimeout(tick, slideStepMs);
+        };
+        tick();
     }
 
     _animateFall(placement, colorIndex, onDone) {

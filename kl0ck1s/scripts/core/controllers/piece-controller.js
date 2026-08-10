@@ -374,7 +374,7 @@ export class PieceController {
     }
 
     buildDropRows(fullRows, rowCount) {
-        const dropRows = new Array(rowCount).fill(0);
+        const dropRows = new Uint8Array(rowCount);
         for (let y = 0; y < rowCount; y++) {
             dropRows[y] = fullRows.reduce((count, clearedY) => count + (clearedY > y ? 1 : 0), 0);
         }

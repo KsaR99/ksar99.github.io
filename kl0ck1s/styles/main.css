@@ -632,6 +632,7 @@ body.perf-no-glow .board__filter--active[data-theme="vhs"]::after {
     color: var(--muted);
     font-size: clamp(.78rem, .2vw + .72rem, .9rem);
     user-select: none;
+    text-align: center;
 }
 
 .screen__hint--tiny {

@@ -28,7 +28,7 @@ function pickTargetX(board, piece, {randomChance = 0.25} = {}) {
     if (maxX <= 0) return 0;
     if (Math.random() < randomChance) return Math.floor(Math.random() * (maxX + 1));
 
-    const heights = new Array(cols);
+    const heights = new Uint8Array(cols);
     for (let c = 0; c < cols; c++) {
         let top = rows;
         for (let y = 0; y < rows; y++) {

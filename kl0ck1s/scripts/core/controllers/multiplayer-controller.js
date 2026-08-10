@@ -1209,7 +1209,7 @@ export class MultiplayerController {
     _computeOpponentPostClearCells(rc) {
         const {COLS, ROWS} = BOARD_CONFIG;
         const lineSet = new Set(rc.lines);
-        const result = new Array(COLS * ROWS).fill(0);
+        const result = new Uint8Array(COLS * ROWS);
 
         for (let y = 0; y < ROWS; y++) {
             if (lineSet.has(y)) continue;
