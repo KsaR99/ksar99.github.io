@@ -190,7 +190,7 @@ export class Renderer {
      * }}
      */
     buildClearFragments({cells, cols, rows, lineIndices, size = this.boardConfig.CELL_SIZE}) {
-        const fragmentsPerAxis = 6;
+        const fragmentsPerAxis = 8;
         const fragsPerCell = fragmentsPerAxis * fragmentsPerAxis;
         const fragSize = size / fragmentsPerAxis;
         const halfFragSize = fragSize / 2;
@@ -298,7 +298,7 @@ export class Renderer {
         this._boardOffsetY = 0;
         if (!this.boardEl) return;
         this.boardEl.style.transition = "none";
-        this.boardEl.style.transform = "translate(0, 0)";
+        this.boardEl.style.translate = "0 0";
     }
 
     _applyBoardOffset(transitionMs) {

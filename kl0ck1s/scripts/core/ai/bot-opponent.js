@@ -597,7 +597,7 @@ export class BotOpponent extends EventTarget {
         const now = this._finishedAt ?? Date.now();
         const elapsedMs = this._startedAt ? now - this._startedAt : 0;
         const elapsedSeconds = elapsedMs / 1000;
-        const pps = elapsedSeconds > 0 ? this.piecesSpawned / elapsedSeconds : 0;
+        const pps = elapsedSeconds >= 1 ? this.piecesSpawned / elapsedSeconds : 0;
         const efficiencyValue = this.lines > 0 ? this.score / this.lines : 0;
         const droughtAvgValue = this.droughtCount > 0 ? this.droughtTotal / this.droughtCount : 0;
 

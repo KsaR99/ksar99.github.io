@@ -13,6 +13,8 @@ const FINISHED_STATES = new Set(["gameOver-entry", "gameOver-saved"]);
 
 const OPPONENT_BOARD_FALLBACK_CELL_PX = 24;
 
+const BOT_DIFFICULTY_ORDER = ["easy", "medium", "hard"];
+
 const STEP_BY_PANEL = {
     role: {step: 1, labelKey: "multiplayer.step1Label"},
     host: {step: 2, labelKey: "multiplayer.step2Label"},
@@ -151,9 +153,13 @@ export class MultiplayerController {
         this.dom.querySelector('[data-role="mp-join-button"]')?.addEventListener("click", () => this._showPanel("join"));
         this.dom.querySelector('[data-role="mp-bot-button"]')?.addEventListener("click", () => this._showPanel("bot"));
 
-        this.dom.querySelectorAll('[data-role="mp-bot-difficulty-button"]').forEach((button) => {
-            button.addEventListener("click", () => this._beginBot(button.dataset.difficulty));
+        const botDifficultySlider = this.dom.querySelector('[data-role="mp-bot-difficulty-slider"]');
+        botDifficultySlider?.addEventListener("input", () => this._syncBotDifficultySlider());
+        this.dom.querySelector('[data-role="mp-bot-difficulty-start"]')?.addEventListener("click", () => {
+            const key = BOT_DIFFICULTY_ORDER[Number(botDifficultySlider?.value ?? 0)] ?? "easy";
+            this._beginBot(key);
         });
+        this._syncBotDifficultySlider();
 
         this.dom.querySelector('[data-role="mp-bot-mode-prev"]')?.addEventListener("click", () => this._changeMatchMode(-1));
         this.dom.querySelector('[data-role="mp-bot-mode-next"]')?.addEventListener("click", () => this._changeMatchMode(1));
@@ -279,6 +285,8 @@ export class MultiplayerController {
             botLevelValue.textContent = this._t("difficulty.levelPrefix", {level: diffDefForBot.startLevel});
         }
 
+        this._syncBotDifficultySlider();
+
         const readyModeLabel = this.dom.querySelector('[data-field="mp-ready-mode-label"]');
         if (readyModeLabel) readyModeLabel.textContent = this._t(`modes.${game.mode}.name`);
 
@@ -300,6 +308,16 @@ export class MultiplayerController {
 
         const hint = this.dom.querySelector('[data-field="mp-config-hint"]');
         if (hint) hint.textContent = this._t(isHost ? "multiplayer.configHostHint" : "multiplayer.configGuestHint");
+    }
+
+    _syncBotDifficultySlider() {
+        const slider = this.dom?.querySelector('[data-role="mp-bot-difficulty-slider"]');
+        if (!slider) return;
+        const key = BOT_DIFFICULTY_ORDER[Number(slider.value)] ?? "easy";
+        slider.setAttribute("aria-valuetext", this._t(`difficulty.${key}`));
+        this.dom.querySelectorAll('[data-role="mp-bot-difficulty-tick"]').forEach((tick) => {
+            tick.classList.toggle("bot-difficulty-slider__tick--active", tick.dataset.difficulty === key);
+        });
     }
 
     _changeMatchMode(dir) {
@@ -644,7 +662,7 @@ export class MultiplayerController {
         const totalClears = Object.values(game.clearCounts).reduce((sum, n) => sum + n, 0);
         const tetrisRatePercent = totalClears ? (game.clearCounts[4] / totalClears) * 100 : 0;
         const elapsedSeconds = game.elapsedMs / 1000;
-        const pps = elapsedSeconds > 0 ? game.piecesSpawned / elapsedSeconds : 0;
+        const pps = elapsedSeconds >= 1 ? game.piecesSpawned / elapsedSeconds : 0;
         const efficiencyValue = game.lines > 0 ? game.score / game.lines : 0;
         const droughtAvgValue = game.droughtCount > 0 ? game.droughtTotal / game.droughtCount : 0;
         const isTimedRaceMode = game.mode === "sprint" || game.mode === "cheeseRace";
@@ -823,6 +841,10 @@ export class MultiplayerController {
         if (steps) steps.hidden = true;
         if (caption) caption.hidden = true;
 
+        Object.entries(this.panels).forEach(([key, el]) => {
+            if (el && key !== "result") el.hidden = true;
+        });
+
         panel.hidden = false;
         this._resultPanelEl = panel;
 
@@ -932,6 +954,7 @@ export class MultiplayerController {
         panel.appendChild(name);
 
         this._opponentBestBadgeEl = this._appendStatRow(panel, "sidebar.best", "mp-opponent-best-value", "—");
+        this._opponentBestBadgeEl.closest(".stats__row").classList.add("stats__row--hidden");
         this._opponentScoreBadgeEl = this._appendStatRow(panel, "sidebar.score", "mp-opponent-score-value", formatNumber(0));
         this._opponentLinesBadgeEl = this._appendStatRow(panel, "sidebar.lines", "mp-opponent-lines-value", "0");
         this._opponentTrtBadgeEl = this._appendStatRow(panel, "sidebar.tetrisRate", "mp-opponent-trt-value", "0.0%");
@@ -993,6 +1016,8 @@ export class MultiplayerController {
         this._lastRemoteScore = payload.score ?? 0;
         this._lastRemoteStats = payload;
         const display = payload.display || {};
+        const bestRow = this._opponentBestBadgeEl?.closest(".stats__row");
+        if (bestRow) bestRow.classList.toggle("stats__row--hidden", payload.bestRaw === null || payload.bestRaw === undefined);
         if (this._opponentBestBadgeEl) this._opponentBestBadgeEl.textContent = display.best ?? "—";
         if (this._opponentScoreBadgeEl) this._opponentScoreBadgeEl.textContent = display.score ?? formatNumber(payload.score ?? 0);
         if (this._opponentLinesBadgeEl) this._opponentLinesBadgeEl.textContent = display.lines ?? String(payload.lines ?? 0);

@@ -1,6 +1,8 @@
-.app:has(.board__overlay--visible) [data-role="next-piece-card"],
-.app:has(.board__overlay--visible) [data-role="difficulty-stat"],
-.app:has(.board__overlay--visible) [data-role="touch-controls"] {
+.app:has(.board__overlay--visible) :where(
+    [data-role="next-piece-card"],
+    [data-role="difficulty-stat"],
+    [data-role="touch-controls"]
+) {
     display: none;
 }
 
@@ -17,12 +19,12 @@
 details[data-role="options-group-keyboard"] {
     border: none;
     padding: 0;
-}
 
-details[data-role="options-group-keyboard"] > summary {
-    display: none;
-}
+    & > summary {
+        display: none;
+    }
 
-details[data-role="options-group-keyboard"] > .controls__list--touch {
-    display: flex;
+    & > .controls__list--touch {
+        display: flex;
+    }
 }

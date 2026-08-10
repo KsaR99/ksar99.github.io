@@ -24,8 +24,8 @@ export class Rain {
     _spawnDrop(i, width, height, initial = false) {
         this.x[i] = Math.random() * width;
         this.y[i] = initial ? Math.random() * height : Math.random() * -height;
-        this.length[i] = 10 + Math.random() * 14;
-        this.speed[i] = 6 + Math.random() * 6;
+        this.length[i] = 12 + Math.random() * 14;
+        this.speed[i] = 10 + Math.random() * 6;
         this.drift[i] = -0.5 + Math.random();
     }
 

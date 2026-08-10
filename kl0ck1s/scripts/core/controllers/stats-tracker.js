@@ -26,7 +26,7 @@ export class StatsTracker {
         const tetrisRatePercent = totalClears ? (game.clearCounts[4] / totalClears) * 100 : 0;
 
         const elapsedSeconds = game.elapsedMs / 1000;
-        const pps = elapsedSeconds > 0 ? game.piecesSpawned / elapsedSeconds : 0;
+        const pps = elapsedSeconds >= 1 ? game.piecesSpawned / elapsedSeconds : 0;
         const efficiencyValue = game.lines > 0 ? game.score / game.lines : 0;
         const droughtAvgValue = game.droughtCount > 0 ? game.droughtTotal / game.droughtCount : 0;
 

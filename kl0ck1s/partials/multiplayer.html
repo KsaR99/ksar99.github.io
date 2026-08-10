@@ -62,16 +62,23 @@
                         type="button">►
                 </button>
             </div>
-            <p class="screen__hint" data-i18n="multiplayer.chooseBotDifficulty">Choose a difficulty</p>
-            <div class="screen__button-row screen__button-row--stack">
-                <button class="button button--primary" data-difficulty="easy" data-i18n="difficulty.easy"
-                        data-role="mp-bot-difficulty-button" type="button">Rookie
-                </button>
-                <button class="button button--primary" data-difficulty="medium" data-i18n="difficulty.medium"
-                        data-role="mp-bot-difficulty-button" type="button">Amateur
-                </button>
-                <button class="button button--accent" data-difficulty="hard" data-i18n="difficulty.hard"
-                        data-role="mp-bot-difficulty-button" type="button">Veteran
+            <p class="screen__hint" data-i18n="multiplayer.chooseBotDifficulty" id="mp-bot-difficulty-hint">Poziom
+                trudności bota</p>
+            <div class="bot-difficulty-slider" data-role="mp-bot-difficulty-slider-wrap">
+                <input aria-labelledby="mp-bot-difficulty-hint" class="bot-difficulty-slider__input"
+                       data-role="mp-bot-difficulty-slider" max="2" min="0" step="1" type="range" value="0">
+                <div class="bot-difficulty-slider__ticks" data-role="mp-bot-difficulty-ticks">
+                    <span class="bot-difficulty-slider__tick" data-difficulty="easy" data-i18n="difficulty.easy"
+                          data-role="mp-bot-difficulty-tick">Początkujący</span>
+                    <span class="bot-difficulty-slider__tick" data-difficulty="medium" data-i18n="difficulty.medium"
+                          data-role="mp-bot-difficulty-tick">Średni</span>
+                    <span class="bot-difficulty-slider__tick" data-difficulty="hard" data-i18n="difficulty.hard"
+                          data-role="mp-bot-difficulty-tick">Zaawansowany</span>
+                </div>
+            </div>
+            <div class="screen__button-row">
+                <button class="button button--accent" data-i18n="multiplayer.startButton"
+                        data-role="mp-bot-difficulty-start" type="button">Rozpocznij grę
                 </button>
             </div>
         </div>
@@ -184,8 +191,8 @@
             </div>
             <div class="mp-result-stats">
                 <div class="mp-result-stat mp-result-stat--header">
-                    <span></span>
                     <strong data-result-side="local" data-role="mp-result-local-name-mini">You</strong>
+                    <span class="mp-result-stat__vs">vs.</span>
                     <strong data-result-side="remote" data-role="mp-result-remote-name-mini">Opponent</strong>
                 </div>
                 <div class="mp-result-stat"><span data-i18n="sidebar.lines">Lines</span><strong

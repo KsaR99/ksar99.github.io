@@ -1,11 +1,12 @@
 "use strict";
 
 const CHARS = "Kl0ck1's";
-const FONT_SIZE = 22;
+const FONT_SIZE = 18;
+const FONT = `400 ${FONT_SIZE}px "Noto Sans Mono", monospace`;
 const FALL_SPEED = 0.1; // Rows per rendered frame
 const HEAD_COLOR = "oklch(0.751 0.133 144.116)";
 const BODY_COLOR = "oklch(0.543 0.123 151.327)";
-const DIM_COLOR = "oklch(0.3 0.075 152.239)";
+const DIM_COLOR = "oklch(0.363 0.093 151.376)";
 
 export class Matrix {
     constructor(canvas, ctx = null) {
@@ -62,8 +63,8 @@ export class Matrix {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        ctx.font = `400 ${FONT_SIZE}px "Noto Sans Mono", monospace`;
-        ctx.textBaseline = "middle";
+        if (ctx.font !== FONT) ctx.font = FONT;
+        if (ctx.textBaseline !== "middle") ctx.textBaseline = "middle";
 
         ctx.fillStyle = HEAD_COLOR;
         for (let i = 0; i < count; i++) {
