@@ -118,8 +118,7 @@ export function createGridCellSprite(size, canvasFactory = () => document.create
 
 export function createGlowSprite(color, size, canvasFactory = () => document.createElement("canvas")) {
     const blur = size * GLOW_BLUR_RATIO;
-    const pad = Math.ceil(blur);
-    const base = createBlockSprite(color, size, canvasFactory);
+    const pad = Math.max(1, Math.ceil(blur * 2));
 
     const sprite = canvasFactory();
     sprite.width = size + pad * 2;
@@ -134,7 +133,7 @@ export function createGlowSprite(color, size, canvasFactory = () => document.cre
     spriteCtx.fillRect(pad, pad, size, size);
 
     spriteCtx.shadowBlur = 0;
-    spriteCtx.drawImage(base, pad, pad);
+    paintBlock(spriteCtx, pad, pad, size, color);
 
     return sprite;
 }
@@ -144,10 +143,12 @@ export class SpriteCache {
         this.klockominos = klockominos;
         this.canvasFactory = canvasFactory;
         this.size = 0;
+        this.atlasCellSize = 0;
         this.glowPad = 0;
         this.atlas = null;
         this.atlasRows = new Map();
         this.glowSprites = new Map();
+        this.blockSprites = new Map();
         this.hardDropTrailSprites = new Map();
         this.fallTrailSprites = new Map();
         this.particleColors = new Map();
@@ -160,8 +161,10 @@ export class SpriteCache {
 
     rebuild(size) {
         this.size = size;
-        this.glowPad = Math.ceil(size * GLOW_BLUR_RATIO);
+        this.atlasCellSize = Math.max(1, Math.round(size));
+        this.glowPad = Math.max(1, Math.ceil(size * GLOW_BLUR_RATIO * 2));
         this.glowSprites.clear();
+        this.blockSprites.clear();
         this.hardDropTrailSprites.clear();
         this.fallTrailSprites.clear();
         this._warmedGlowLevels = 0;
@@ -173,8 +176,8 @@ export class SpriteCache {
         this.atlasRows = new Map(colors.map((color, row) => [color, row]));
 
         this.atlas = this.canvasFactory();
-        this.atlas.width = size * SATURATION_LEVELS;
-        this.atlas.height = size * Math.max(1, colors.length);
+        this.atlas.width = this.atlasCellSize * SATURATION_LEVELS;
+        this.atlas.height = this.atlasCellSize * Math.max(1, colors.length);
 
         const atlasCtx = this.atlas.getContext("2d");
         atlasCtx.imageSmoothingEnabled = false;
@@ -184,7 +187,7 @@ export class SpriteCache {
 
     _paintRow(atlasCtx, row, color) {
         for (let level = 0; level < SATURATION_LEVELS; level++) {
-            paintBlock(atlasCtx, level * this.size, row * this.size, this.size, colorForLevel(color, level));
+            paintBlock(atlasCtx, level * this.atlasCellSize, row * this.atlasCellSize, this.atlasCellSize, colorForLevel(color, level));
         }
     }
 
@@ -195,7 +198,7 @@ export class SpriteCache {
         if (this.atlasRows.size >= MAX_DYNAMIC_ATLAS_ROWS) return null;
 
         row = this.atlasRows.size;
-        const neededHeight = (row + 1) * this.size;
+        const neededHeight = (row + 1) * this.atlasCellSize;
         if (this.atlas.height < neededHeight) {
             const grown = this.canvasFactory();
             grown.width = this.atlas.width;
@@ -287,10 +290,15 @@ export class SpriteCache {
 
     getRegion(color, currentSize, level = 0) {
         if (this.size !== currentSize) this.rebuild(currentSize);
-        const row = this._rowFor(color);
-        if (row === null) return null;
-        const col = Math.min(SATURATION_LEVELS - 1, Math.max(0, level));
-        return {image: this.atlas, sx: col * this.size, sy: row * this.size, sw: this.size, sh: this.size};
+        const resolvedLevel = Math.min(SATURATION_LEVELS - 1, Math.max(0, Math.floor(level)));
+        const key = resolvedLevel ? `${color}|${resolvedLevel}` : color;
+        let image = this.blockSprites.get(key);
+        if (!image) {
+            const resolvedColor = resolvedLevel ? colorForLevel(color, resolvedLevel) : color;
+            image = createBlockSprite(resolvedColor, this.size, this.canvasFactory);
+            this.blockSprites.set(key, image);
+        }
+        return {image, sx: 0, sy: 0, sw: this.size, sh: this.size};
     }
 
     getGlow(color, currentSize, level = 0) {

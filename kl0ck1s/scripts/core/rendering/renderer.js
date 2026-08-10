@@ -303,10 +303,9 @@ export class Renderer {
 
         if (glow) {
             const sprite = cache.getGlow(color, size, level);
-            const offset = cache.glowPad;
-            const drawSize = size + offset * 2;
             if (sprite) {
-                context.drawImage(sprite, x * size - offset, y * size - offset, drawSize, drawSize);
+                const offset = (sprite.width - size) / 2;
+                context.drawImage(sprite, x * size - offset, y * size - offset);
             } else {
                 context.fillStyle = color;
                 context.fillRect(x * size, y * size, size, size);
