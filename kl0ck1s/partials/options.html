@@ -209,9 +209,10 @@
                 <summary class="options__title" data-i18n="screens.options.controlsTitle">Controls</summary>
                 <label class="options__row">
                     <span data-i18n="screens.options.touchSensitivity">Touch sensitivity</span>
-                    <input class="options__input options__input--number" data-role="touch-sensitivity-input"
+                    <input class="options__input options__input--number" data-i18n-placeholder="screens.options.autoValue"
+                           data-role="touch-sensitivity-input"
                            inputmode="decimal"
-                           placeholder="auto" type="number">
+                           max="2" min="0.5" placeholder="auto" step="0.05" type="number">
                 </label>
                 <div class="options__row options__row--end">
                     <button class="options__preview-button options__preview-button--wide"
@@ -271,7 +272,7 @@
                         </li>
                     </ul>
                     <div class="options__row">
-                        <span data-i18n="screens.options.keyboardReset">Reset keys</span>
+                        <span data-i18n="screens.options.keyboardReset" data-role="keybind-reset-label" hidden>Reset keys</span>
                         <button class="options__preview-button options__preview-button--wide"
                                 data-i18n="screens.options.keyboardResetButton"
                                 data-role="keybind-reset-button" hidden type="button">Reset to defaults

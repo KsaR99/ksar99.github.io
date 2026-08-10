@@ -163,16 +163,7 @@ export class Renderer {
     }
 
     /**
-     * Builds line-clear particle fragments from a flat colors array. Shared by the local
-     * board (PieceController) and any board rendered elsewhere (e.g. the multiplayer
-     * opponent/bot canvas) so both get the same particle-burst effect.
-     *
-     * Returned as a struct-of-arrays (parallel TypedArrays) rather than an array of
-     * per-fragment objects: a line clear can spawn hundreds of fragments (36 per cleared
-     * cell), so this avoids allocating that many small objects - and the GC churn that
-     * comes with it - every time a line clears. Colors are deduplicated into a small
-     * `colors` string table and referenced by index via a Uint16Array, since CSS color
-     * strings can't live in a numeric typed array.
+     * Builds line-clear particle fragments from a flat colors array.
      *
      * @param {object} params
      * @param {Uint8Array|number[]} params.cells - flat colorIndex array, length cols*rows
@@ -195,7 +186,6 @@ export class Renderer {
         const fragSize = size / fragmentsPerAxis;
         const halfFragSize = fragSize / 2;
 
-        // First pass: count non-empty cells so the TypedArrays can be sized exactly once.
         let cellCount = 0;
         for (const y of lineIndices) {
             for (let x = 0; x < cols; x++) {
@@ -371,11 +361,12 @@ export class Renderer {
         if (ghost) {
             context.save();
             context.globalAlpha *= GHOST_ALPHA;
-            context.drawImage(region.image, region.sx, region.sy, region.sw, region.sh, x * size, y * size, size, size);
-            context.restore();
-        } else {
-            context.drawImage(region.image, region.sx, region.sy, region.sw, region.sh, x * size, y * size, size, size);
         }
+
+        context.drawImage(region.image, region.sx, region.sy, region.sw, region.sh, x * size, y * size, size, size);
+
+        if (ghost)
+            context.restore();
     }
 
     drawGrid(board, context = this.ctx, fromRow = 0, toRow = board.rows - 1) {

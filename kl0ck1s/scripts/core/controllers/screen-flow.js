@@ -926,18 +926,19 @@ export class ScreenFlow {
             touchSensitivityInput.min = SENSITIVITY_MIN;
             touchSensitivityInput.max = SENSITIVITY_MAX;
             touchSensitivityInput.step = SENSITIVITY_STEP;
-            touchSensitivityInput.value = game.settings.touchSensitivity ?? "";
+            touchSensitivityInput.value = game.settings.touchSensitivity ?? 1;
 
             touchSensitivityInput.addEventListener("change", () => {
                 if (touchSensitivityInput.value === "") {
                     delete game.settings.touchSensitivity;
+                    touchSensitivityInput.value = 1;
                     settingsController.saveSettings();
                     this.syncCategoryResetButtons();
                     return;
                 }
                 const parsed = parseFloat(touchSensitivityInput.value);
                 if (!Number.isFinite(parsed)) {
-                    touchSensitivityInput.value = game.settings.touchSensitivity ?? "";
+                    touchSensitivityInput.value = game.settings.touchSensitivity ?? 1;
                     return;
                 }
                 const value = clampToStep(parsed, SENSITIVITY_MIN, SENSITIVITY_MAX, SENSITIVITY_STEP);
@@ -1273,12 +1274,14 @@ export class ScreenFlow {
         const game = this.game;
         if (!game.dom) return;
         const resetButton = game.dom.querySelector('[data-role="keybind-reset-button"]');
+        const resetLabel = game.dom.querySelector('[data-role="keybind-reset-label"]');
         if (!resetButton) return;
         const defaults = defaultKeyBindings();
         const bindings = game.settings.keyBindings ?? {};
         const isDefault = Object.keys(defaults).every((key) => bindings[key] === defaults[key])
             && Object.keys(bindings).every((key) => key in defaults);
         resetButton.hidden = isDefault;
+        if (resetLabel) resetLabel.hidden = isDefault;
     }
 
     bindOptionsSearch() {

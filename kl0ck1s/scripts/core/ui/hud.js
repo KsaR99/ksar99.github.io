@@ -189,8 +189,7 @@ export class HUD {
     }
 
     hideOverlay() {
-        this.overlayEl.classList.remove("board__overlay--visible");
-        this.overlayEl.classList.remove("board__overlay--transparent");
+        this.overlayEl.classList.remove("board__overlay--visible", "board__overlay--transparent");
         this.overlayEl.replaceChildren();
     }
 }

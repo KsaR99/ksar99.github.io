@@ -174,7 +174,12 @@ export class SettingsController {
     isSettingsGroupModified(keys) {
         const game = this.game;
         const defaults = this.defaultSettings();
-        return keys.some((key) => JSON.stringify(game.settings[key]) !== JSON.stringify(defaults[key]));
+        return keys.some((key) => {
+            if (key === "touchSensitivity") {
+                return (game.settings.touchSensitivity ?? 1) !== (defaults.touchSensitivity ?? 1);
+            }
+            return JSON.stringify(game.settings[key]) !== JSON.stringify(defaults[key]);
+        });
     }
 
     isSoundCategoryModified(category, keys) {

@@ -194,7 +194,7 @@ const THEME_LABEL_KEYS = {
 function formatSettingValue(key, value, i18n) {
     if (key === "language") return i18n.languages[value] ?? value;
     if (key === "theme") return i18n.t(THEME_LABEL_KEYS[value] ?? "screens.options.themeNone");
-    if (key === "touchSensitivity") return value == null ? i18n.t("screens.options.autoValue") : `${Math.round(value * 100)}%`;
+    if (key === "touchSensitivity") return (value ?? 1) === 1 ? i18n.t("screens.options.autoValue") : `${Math.round(value * 100)}%`;
     if (key === "volume" || key === "mouseSensitivity") return `${Math.round(value * 100)}%`;
     if (key === "keyboardDAS" || key === "keyboardARR") return `${Math.round(value)} ms`;
     if (typeof value === "boolean") return i18n.t(value ? "screens.options.valueOn" : "screens.options.valueOff");
@@ -515,8 +515,8 @@ export const Screens = {
 
         const todayBestRow = screen.querySelector('[data-role="today-best-row"]');
         if (todayBestEntry) {
-            screen.querySelector('[data-field="todayBest"]').textContent = formatNumber(todayBestEntry.score);
-            screen.querySelector('[data-field="todayBestName"]').textContent = todayBestEntry.name;
+            todayBestRow.querySelector('[data-field="todayBest"]').textContent = formatNumber(todayBestEntry.score);
+            todayBestRow.querySelector('[data-field="todayBestName"]').textContent = todayBestEntry.name;
         } else if (todayBestRow) {
             todayBestRow.remove();
         }

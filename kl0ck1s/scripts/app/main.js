@@ -31,8 +31,10 @@ import {I18n} from "../core/services/i18n.js";
 import {MultiplayerController} from "../core/controllers/multiplayer-controller.js";
 import {BootLoader} from "./boot-loader.js";
 
+const bodyEl = document.querySelector('body');
+
 // Disable right click, for the mouse.
-const appEl = document.querySelector(".app");
+const appEl = bodyEl.querySelector(".app");
 appEl.addEventListener('contextmenu', event => event.preventDefault());
 
 const bootScreenEl = document.getElementById("boot-screen");
@@ -49,13 +51,13 @@ const partials = Promise.all(
     )
 );
 await i18n.init();
-(await partials).forEach((html) => document.body.insertAdjacentHTML("beforeend", html));
-i18n.applyStatic(document);
+(await partials).forEach((html) => bodyEl.insertAdjacentHTML("beforeend", html));
+i18n.applyStatic(bodyEl);
 
-const bodyEl = document.querySelector('body');
-const boardStage = document.querySelector(".board__stage");
+
+const boardStage = bodyEl.querySelector(".board__stage");
 const boardDiv = boardStage.parentElement;
-const sidebarStatsEl = document.querySelector(".sidebar--stats");
+const sidebarStatsEl = bodyEl.querySelector(".sidebar--stats");
 const statsCardEl = sidebarStatsEl.querySelector('[data-role="stats-card"]');
 const nextPieceCardEl = sidebarStatsEl.querySelector('[data-role="next-piece-card"]');
 
@@ -69,7 +71,7 @@ const nextCtx = nextCanvas.getContext("2d");
 nextCtx.imageSmoothingEnabled = false;
 
 function getSidebarInlineFootprint() {
-    const sidebars = document.querySelectorAll(".app__sidebar");
+    const sidebars = bodyEl.querySelectorAll(".app__sidebar");
     let width = 0;
     let count = 0;
     sidebars.forEach((el) => {
@@ -223,7 +225,7 @@ const multiplayerController = new MultiplayerController(game, document, i18n);
 game.multiplayerController = multiplayerController;
 multiplayerController.init();
 
-const fabControlsBtn = document.querySelector('[data-role="fab-controls"]');
+const fabControlsBtn = bodyEl.querySelector('[data-role="fab-controls"]');
 if (fabControlsBtn) {
     fabControlsBtn.addEventListener("click", () => {
         game.screenFlow.toggleOptions();
