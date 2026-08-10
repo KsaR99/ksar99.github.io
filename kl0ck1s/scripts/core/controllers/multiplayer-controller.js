@@ -5,56 +5,22 @@ import {BOT_DIFFICULTIES, BotOpponent} from "../ai/bot-opponent.js";
 import {PieceBag} from "../game/piece-bag.js";
 import {mulberry32, randomSeed} from "../shared/seeded-random.js";
 import {copyTextToClipboard, forEachShapeCell, formatNumber} from "../shared/utils.js";
-import {BOARD_CONFIG, COLOR_PALETTE, KLOCKOMINO_TYPES} from "../shared/config.js";
+import {BOARD_CONFIG, COLOR_PALETTE, KLOCKOMINO_TYPES, LINE_CLEAR_FLASH_PHASE_FRACTION} from "../shared/config.js";
 
 const SCORE_POLL_MS = 200;
-const RUNNING_STATES = new Set(["countdown", "running", "clearing", "paused"]);
+const RUNNING_STATES = new Set(["countdown", "running", "clearing", "paused", "options"]);
 const FINISHED_STATES = new Set(["gameOver-entry", "gameOver-saved"]);
 
-// Fallback cell size (px) for the opponent's board if used before the main
-// board has ever been sized (shouldn't happen in practice — a match can't
-// start before that initial layout pass runs).
 const OPPONENT_BOARD_FALLBACK_CELL_PX = 24;
 
-// Which of the 3 numbered steps is "current" for a given panel, and which
-// i18n key describes it in the caption line under the dots.
 const STEP_BY_PANEL = {
     role: {step: 1, labelKey: "multiplayer.step1Label"},
     host: {step: 2, labelKey: "multiplayer.step2Label"},
     join: {step: 2, labelKey: "multiplayer.step2Label"},
-    bot: {step: 2, labelKey: "multiplayer.step2LabelBot"},
     ready: {step: 3, labelKey: "multiplayer.step3Label"},
 };
 
-/**
- * Bolts a peer-to-peer multiplayer lobby + light race-sync layer onto the
- * existing single-player screen flow, without touching it: it opens its own
- * overlay (mirrors ConfirmDialog's pattern), then on match start simply
- * clicks the real start-button so the untouched single-player Game runs
- * locally on both peers. While running it exchanges score/name/board updates
- * over the MultiplayerSession data channel and shows a live opponent panel —
- * a compact nickname+score badge everywhere, plus, on desktop, a full-size
- * board rendered right next to the local one (same cell size, same `.board`
- * markup) — followed by a win/lose result once both sides finish.
- *
- * The same overlay also offers a "practice vs bot" option: a local,
- * headless BotOpponent stands in for the peer, so there's no handshake and
- * no `MultiplayerSession` at all - the bot just fires the same
- * `{kind: "score"|"board"|"final"}` "message" shape a real peer would, so
- * every opponent-panel/result code path below runs unmodified for both.
- * For that single match the player's own piece bag is swapped for a seeded
- * one shared with the bot, so both boards draw the exact same sequence of
- * pieces - restored to plain randomness once the match ends.
- */
 export class MultiplayerController {
-    /**
-     * Every row in the post-match stat comparison table: how to read the raw
-     * (unformatted) number used to decide who did better, how to read the
-     * already-formatted display string, and which direction counts as
-     * "better" for that stat. Most stats are "more is better"; drought and
-     * burn are the opposite - a *lower* drought/burn means fewer pieces spent
-     * waiting for an I-piece or stuck clearing non-Tetrises.
-     */
     static RESULT_STAT_ROWS = [
         {role: "lines", raw: (s) => s.lines ?? 0, display: (s, raw) => s.display?.lines ?? String(raw)},
         {
@@ -97,8 +63,6 @@ export class MultiplayerController {
         this.session = null;
         this.role = null;
 
-        // The player's real bag, saved once so it can be restored after a
-        // bot match swaps in a seeded one (see _beginBot/_teardownBotMode).
         this._defaultBag = game.bag;
         this.botOpponent = null;
 
@@ -114,12 +78,11 @@ export class MultiplayerController {
         this._remoteName = null;
         this._lastRemoteScore = 0;
         this._lastRemoteStats = null;
-        // Live-piece overlay (see _drawOpponentBoard): the opponent's locked
-        // board cells received so far, plus their currently falling piece
-        // (if any) so the panel shows real movement/rotation, not just a
-        // static board that only updates when a piece locks.
         this._lastRemoteCells = null;
         this._remoteLivePiece = null;
+        this._remoteClearing = null;
+        this._wasLocalClearing = false;
+        this._frameLoopRaf = null;
         this._opponentBadgeEl = null;
         this._opponentNameBadgeEl = null;
         this._opponentScoreBadgeEl = null;
@@ -135,18 +98,19 @@ export class MultiplayerController {
         this._opponentCanvasCtx = null;
         this._opponentBoardHost = null;
         this._localHeaderEl = null;
+        this._raceMeterEl = null;
+        this._raceMeterFillEl = null;
         this._handleOpponentWindowResize = null;
         this._botStartTimer = null;
         this._botStartDeadline = 0;
         this._botDifficultyKey = null;
-
         this._guestOriginalMode = null;
         this._guestOriginalDifficulty = null;
+        this._activePanelName = null;
 
         this._onKeydown = this._onKeydown.bind(this);
     }
 
-    // --- element getters (queried live: the overlay itself is static, but game screens rerender) ---
     get overlayEl() {
         return this.dom?.querySelector('[data-role="mp-overlay"]') ?? null;
     }
@@ -165,9 +129,6 @@ export class MultiplayerController {
     init() {
         if (!this.dom) return;
 
-        // The multiplayer button lives inside screen templates that get
-        // re-rendered on every idle/game-over-saved screen, so delegate
-        // from a node that's never replaced instead of rebinding per render.
         this.dom.addEventListener("click", (event) => {
             if (event.target.closest('[data-role="multiplayer-button"]')) this.open();
         });
@@ -187,6 +148,8 @@ export class MultiplayerController {
 
         this.dom.querySelector('[data-role="mp-bot-mode-prev"]')?.addEventListener("click", () => this._changeMatchMode(-1));
         this.dom.querySelector('[data-role="mp-bot-mode-next"]')?.addEventListener("click", () => this._changeMatchMode(1));
+        this.dom.querySelector('[data-role="mp-bot-level-prev"]')?.addEventListener("click", () => this._changeBotLevel(-1));
+        this.dom.querySelector('[data-role="mp-bot-level-next"]')?.addEventListener("click", () => this._changeBotLevel(1));
         this.dom.querySelector('[data-role="mp-ready-mode-prev"]')?.addEventListener("click", () => this._changeMatchMode(-1));
         this.dom.querySelector('[data-role="mp-ready-mode-next"]')?.addEventListener("click", () => this._changeMatchMode(1));
         this.dom.querySelector('[data-role="mp-ready-difficulty-prev"]')?.addEventListener("click", () => this._changeMatchDifficulty(-1));
@@ -205,6 +168,35 @@ export class MultiplayerController {
         this.dom.querySelector('[data-role="mp-leave-button"]')?.addEventListener("click", () => this._leaveMatch());
         this.dom.querySelector('[data-role="mp-result-rematch-button"]')?.addEventListener("click", () => this._rematch());
         this.dom.querySelector('[data-role="mp-result-close-button"]')?.addEventListener("click", () => this._closeResult());
+
+        this._startFrameLoop();
+    }
+
+    _startFrameLoop() {
+        const tick = () => {
+            this._frameTick();
+            this._frameLoopRaf = requestAnimationFrame(tick);
+        };
+        this._frameLoopRaf = requestAnimationFrame(tick);
+    }
+
+    _frameTick() {
+        const game = this.game;
+        const isClearing = game.state === "clearing";
+        if (isClearing && !this._wasLocalClearing && this.session?.isConnected) {
+            this._sendToPeer({
+                kind: "clearing",
+                cells: Array.from(game.board.colors),
+                lines: game.clearingLines,
+                dropRows: game.clearingDropRows,
+                duration: game.lineClearAnimationDuration,
+            });
+
+            this._lastSentBoardVersion = game.board.version;
+        }
+        this._wasLocalClearing = isClearing;
+
+        if (this._remoteClearing) this._renderRemoteClearingFrame();
     }
 
     open() {
@@ -221,12 +213,9 @@ export class MultiplayerController {
         this.overlayEl.classList.remove("mp-overlay--visible");
         this.overlayEl.hidden = true;
         this.dom.removeEventListener("keydown", this._onKeydown);
-        // Only tear down an unfinished handshake; a connected session survives
-        // closing the dialog so score sync / rematches keep working.
+
         if (this.session && !this.session.isConnected) this._resetSession();
     }
-
-    // --- role/host/join flow ---
 
     _onKeydown(event) {
         if (event.key === "Escape") this.close();
@@ -237,22 +226,32 @@ export class MultiplayerController {
         Object.entries(panels).forEach(([key, el]) => {
             if (el) el.hidden = key !== name;
         });
+        this._activePanelName = name;
         this._updateSteps(name);
         this._renderConfigPanels();
     }
 
     _updateSteps(name) {
         const info = STEP_BY_PANEL[name];
-        const activeStep = info?.step ?? 1;
+        const steps = this.dom.querySelector('[data-role="mp-steps"]');
+        const caption = this.dom.querySelector('[data-field="mp-step-caption"]');
+
+        if (!info) {
+            if (steps) steps.hidden = true;
+            if (caption) caption.hidden = true;
+            return;
+        }
+
+        if (steps) steps.hidden = false;
+        if (caption) caption.hidden = false;
 
         this.dom.querySelectorAll('[data-role="mp-step"]').forEach((el) => {
             const step = Number(el.dataset.step);
-            el.classList.toggle("mp-step--active", step === activeStep);
-            el.classList.toggle("mp-step--done", step < activeStep);
+            el.classList.toggle("mp-step--active", step === info.step);
+            el.classList.toggle("mp-step--done", step < info.step);
         });
 
-        const caption = this.dom.querySelector('[data-field="mp-step-caption"]');
-        if (caption) caption.textContent = info ? this._t(info.labelKey) : "";
+        if (caption) caption.textContent = this._t(info.labelKey);
     }
 
     _renderConfigPanels() {
@@ -262,6 +261,14 @@ export class MultiplayerController {
         if (botModeLabel) botModeLabel.textContent = this._t(`modes.${game.mode}.name`);
         const botModeDescription = this.dom.querySelector('[data-field="mp-bot-mode-description"]');
         if (botModeDescription) botModeDescription.textContent = `💡 ${this._t(`modes.${game.mode}.description`)}`;
+
+        const diffDefForBot = game.difficulties[game.difficulty];
+        const botLevelLabel = this.dom.querySelector('[data-field="mp-bot-level-label"]');
+        if (botLevelLabel) botLevelLabel.textContent = this._t(`difficulty.${game.difficulty}`);
+        const botLevelValue = this.dom.querySelector('[data-field="mp-bot-level-value"]');
+        if (botLevelValue && diffDefForBot) {
+            botLevelValue.textContent = this._t("difficulty.levelPrefix", {level: diffDefForBot.startLevel});
+        }
 
         const readyModeLabel = this.dom.querySelector('[data-field="mp-ready-mode-label"]');
         if (readyModeLabel) readyModeLabel.textContent = this._t(`modes.${game.mode}.name`);
@@ -293,6 +300,11 @@ export class MultiplayerController {
         this._sendConfigIfHost();
     }
 
+    _changeBotLevel(dir) {
+        this.game.difficultyController.changeDifficulty(dir);
+        this._renderConfigPanels();
+    }
+
     _changeMatchDifficulty(dir) {
         if (this.role === "guest") return;
         this.game.difficultyController.changeDifficulty(dir);
@@ -308,7 +320,7 @@ export class MultiplayerController {
     _applyRemoteConfig(mode, difficulty) {
         const game = this.game;
         if (this.role !== "guest") return;
-        if (!(game.state === "idle" || game.state === "gameOver-saved")) return;
+        if (RUNNING_STATES.has(game.state)) return;
 
         if (mode && game.gameModes[mode] && mode !== game.mode) {
             if (this._guestOriginalMode === null) this._guestOriginalMode = game.mode;
@@ -339,11 +351,6 @@ export class MultiplayerController {
         const codeEl = this.dom.querySelector('[data-role="mp-host-code"]');
         const copyButton = this.dom.querySelector('[data-role="mp-host-copy-button"]');
         const answerWrap = this.dom.querySelector('[data-role="mp-host-answer-wrap"]');
-        // The code isn't ready yet (ICE gathering can take a few seconds) - clear
-        // the field so its "please wait, generating…" placeholder shows through,
-        // disable copying until there's an actual code to copy, and keep the
-        // "paste the guest's answer" section hidden until there's a code for
-        // the guest to actually answer to.
         if (codeEl) codeEl.value = "";
         if (copyButton) copyButton.disabled = true;
         if (answerWrap) answerWrap.hidden = true;
@@ -352,8 +359,6 @@ export class MultiplayerController {
             const code = await this.session.createRoom();
             if (codeEl) codeEl.value = code;
             if (copyButton) copyButton.disabled = false;
-            // Only now can the host actually accept an answer, so this is the
-            // first point it makes sense to show the paste field.
             if (answerWrap) answerWrap.hidden = false;
         } catch (err) {
             this._showError(err);
@@ -372,8 +377,6 @@ export class MultiplayerController {
         }
     }
 
-    // --- practice vs bot ---
-
     async _beginJoin() {
         this._clearError();
         this._resetSession();
@@ -386,8 +389,6 @@ export class MultiplayerController {
         const answerEl = this.dom.querySelector('[data-role="mp-join-answer-code"]');
         const copyButton = this.dom.querySelector('[data-role="mp-join-copy-button"]');
 
-        // Same "please wait" treatment as the host's code while the answer is
-        // being generated.
         if (answerEl) answerEl.value = "";
         if (copyButton) copyButton.disabled = true;
         if (answerWrap) answerWrap.hidden = false;
@@ -410,9 +411,10 @@ export class MultiplayerController {
         this.role = "bot";
         this._botDifficultyKey = difficultyKey;
 
+        this.game.modeController.resolveRandomMode();
+
         const seed = randomSeed();
-        // Same seed, two independent bags: the player's real game and the
-        // bot's headless one now draw pieces in the exact same order.
+
         this.game.bag = new PieceBag(KLOCKOMINO_TYPES, mulberry32(seed));
         this.botOpponent = new BotOpponent({
             types: KLOCKOMINO_TYPES,
@@ -421,33 +423,19 @@ export class MultiplayerController {
             seed,
             difficultyKey,
             startLevel: this.game.level,
-            // Whatever mode the host picked in the bot panel (cheese race,
-            // survival, dig survival, ...) - without this the bot always
-            // played a plain endless marathon board regardless of the
-            // selected mode (see BotOpponent's mode-setup for what this drives).
             mode: this.game.mode,
             modeDef: this.game.gameModes[this.game.mode],
         });
         this.botOpponent.addEventListener("message", (event) => this._onPeerMessage(event.detail));
         this._remoteName = this._t("multiplayer.botName", {difficulty: this._t(`difficulty.${difficultyKey}`)});
         this.game.multiplayerConnected = true;
+        this.game.multiplayerVsBot = true;
 
         this._launchMatch();
-        // Don't call botOpponent.start() yet - _launchMatch() only *begins*
-        // the countdown (game.state becomes "countdown"), it doesn't wait for
-        // it, so starting the bot's timer here let it place its first piece
-        // (and the peer's board-lock message) before the countdown even
-        // finished on screen. Wait for the real "running" state instead.
         this._botStartDeadline = Date.now() + 8000;
         this._startBotWhenRunning();
     }
 
-    /** Polls (lightweight, ~50ms) until the countdown finishes and the match is actually
-     *  "running" before letting the headless bot start placing pieces - see _beginBot().
-     *  `game.state` is still "idle" for a beat after this is first called: the start-button's
-     *  click handler (screenFlow.handleEnter) is async (it awaits commitProfile() before
-     *  moving the state to "countdown"), so state hasn't advanced yet by the time _launchMatch()
-     *  returns - polling has to tolerate that instead of treating early "idle" as an abort. */
     _startBotWhenRunning() {
         clearTimeout(this._botStartTimer);
         this._botStartTimer = null;
@@ -460,9 +448,7 @@ export class MultiplayerController {
             bot.start();
             return;
         }
-        // Left the match (or it never started) before the countdown finished
-        // - don't keep polling forever. "idle" alone isn't proof of that (see
-        // above), so only give up once we've waited past a generous deadline.
+
         if (!RUNNING_STATES.has(state) && Date.now() > this._botStartDeadline) return;
 
         this._botStartTimer = setTimeout(() => this._startBotWhenRunning(), 50);
@@ -474,14 +460,9 @@ export class MultiplayerController {
         this._botStartTimer = null;
         this.botOpponent?.stop();
         this.botOpponent = null;
-        // Restore true randomness now that no bot match is using the seeded
-        // bag - a fresh instance rather than mutating game.bag's private
-        // state, since PieceBag exposes no reset/reseed hook.
         this.game.bag = this._defaultBag;
         this.role = null;
     }
-
-    // --- ready / start handshake ---
 
     _copyFrom(selector, button) {
         const el = this.dom.querySelector(selector);
@@ -501,9 +482,7 @@ export class MultiplayerController {
             this._updateReadyBadges();
             this._setStatus(this._t("multiplayer.statusConnected"));
             this.game.multiplayerConnected = true;
-            // Let the peer know our nickname so it can show it instead of the
-            // generic "Opponent" label, on its ready badges, score badge and
-            // final result line.
+            this.game.multiplayerVsBot = false;
             this._sendToPeer({kind: "name", name: this.game.playerName || ""});
             this._sendConfigIfHost();
         });
@@ -516,11 +495,6 @@ export class MultiplayerController {
             if (startButton) startButton.hidden = this.role !== "host";
         });
         session.addEventListener("start", (event) => {
-            // "random" mode is resolved to a concrete mode by whichever side
-            // calls resolveRandomMode() first (see _hostStart) - without
-            // applying the host's resolved pick here, the guest would go on
-            // to resolve its own independent (and likely different) random
-            // mode when _launchMatch() below clicks its own start button.
             const remoteMode = event.detail?.mode;
             if (this.role === "guest" && remoteMode && this.game.gameModes[remoteMode] && remoteMode !== this.game.mode) {
                 this.game.mode = remoteMode;
@@ -531,9 +505,7 @@ export class MultiplayerController {
         session.addEventListener("message", (event) => this._onPeerMessage(event.detail));
         session.addEventListener("disconnected", () => {
             this._setStatus(this._t("multiplayer.statusDisconnected"));
-            // The status text above only reaches the player if the (closed,
-            // during an active match) overlay happens to be open - show a
-            // toast too so a mid-match disconnect is actually noticed.
+
             const wasInMatch = RUNNING_STATES.has(this.game.state) || FINISHED_STATES.has(this.game.state);
             this._stopScoreSync();
             this._hideOpponentUI();
@@ -569,16 +541,12 @@ export class MultiplayerController {
 
     _hostStart() {
         if (!this.session || this.role !== "host") return;
-        // Resolve "random" mode once, here, so both peers play the same
-        // concrete mode - otherwise each side's own _launchMatch() below
-        // would call resolveRandomMode() independently and likely diverge.
+
         this.game.modeController.resolveRandomMode();
         this._renderConfigPanels();
         this.session.sendStart({mode: this.game.mode});
         this._launchMatch();
     }
-
-    // --- in-match score sync ---
 
     _launchMatch() {
         this.close();
@@ -611,38 +579,23 @@ export class MultiplayerController {
         const game = this.game;
         const inMatch = RUNNING_STATES.has(game.state);
 
-        if (inMatch) {
-            // A rematch (e.g. "Play again" from the game-over screen) re-enters
-            // a running state after a finished one — clear the previous result
-            // so the new match's outcome isn't shadowed by the old one.
-            if (this._localFinalScore !== null || this._remoteFinalScore !== null) {
-                this._localFinalScore = null;
-                this._remoteFinalScore = null;
-                this._localFinalStats = null;
-                this._remoteFinalStats = null;
-                this._lastSentScore = -1;
-                this._lastSentBoardVersion = -1;
-                this._lastRemoteCells = null;
-                this._remoteLivePiece = null;
-                this._hideResultPanel();
-                this._showOpponentUI();
-            }
+        if (this.botOpponent) {
+            if (game.state === "paused" || game.state === "options") this.botOpponent.pause();
+            else if (game.state === "running") this.botOpponent.resume();
+        }
 
+        if (inMatch) {
             this._wasInMatch = true;
             const statsSnapshot = this._localStatsSnapshot();
             this._lastSentScore = statsSnapshot.score;
             this._sendToPeer({kind: "stats", ...statsSnapshot});
-            // The board's `version` only bumps on a lock/clear/garbage change
-            // (see Board), so this stays cheap: most polls send nothing.
-            if (game.board && game.board.version !== this._lastSentBoardVersion) {
+            this._updateRaceMeter(statsSnapshot);
+
+            if (game.board && game.state !== "clearing" && game.board.version !== this._lastSentBoardVersion) {
                 this._lastSentBoardVersion = game.board.version;
                 this._sendToPeer({kind: "board", cells: Array.from(game.board.colors)});
             }
-            // The falling piece itself never bumps board.version (only a
-            // lock/clear does) - without this, the opponent panel only ever
-            // showed the board as it looked *after* each piece landed, never
-            // the piece actually moving/rotating on the way down. Sent every
-            // poll (not diffed) since it's virtually always moving.
+
             if (game.state === "running" && game.current) {
                 const p = game.current;
                 this._sendToPeer({
@@ -658,37 +611,17 @@ export class MultiplayerController {
             this._localFinalScore = finalSnapshot.score;
             this._localFinalStats = finalSnapshot;
             this._sendToPeer({kind: "final", ...finalSnapshot});
-            // A bot may never top out on its own (a good one can run
-            // indefinitely) - once the player's round is over, lock in
-            // whatever score it has right now instead of waiting on it.
             this.botOpponent?.finish();
             this._maybeShowResult();
         }
 
         if (!this._wasInMatch) return;
         if (!RUNNING_STATES.has(game.state) && !FINISHED_STATES.has(game.state)) {
-            // Left the match entirely (e.g. back to idle via the game-over
-            // screen's own controls, bypassing the "leave"/result-panel
-            // buttons) - tear the whole session down the same way
-            // _leaveMatch() does, not just the score-sync/opponent-UI bits,
-            // or role/session/multiplayerConnected are left stuck "in
-            // multiplayer" (pause and options blocked, etc.) for every
-            // solo game afterwards.
             this._wasInMatch = false;
             this._resetSession();
         }
     }
 
-    /**
-     * Snapshot of every stat shown on the local sidebar (except Time, which
-     * only makes sense locally) - sent to the peer on every poll tick so the
-     * opponent badge can mirror the same rows, and again (unthrottled) once
-     * the round ends so the result comparison has both sides' final numbers.
-     * `display` carries the already-formatted strings (same formatting the
-     * local sidebar itself uses) so the opponent panel never has to
-     * reimplement formatNumber/toFixed rounding; the raw numeric fields
-     * alongside them are only for the result panel's better-value highlight.
-     */
     _localStatsSnapshot() {
         const game = this.game;
         const stats = game.stats;
@@ -702,12 +635,6 @@ export class MultiplayerController {
         const bestEntry = game.leaderboard.bestEntry(game.mode);
         const bestRaw = bestEntry ? (isTimedRaceMode ? bestEntry.timeMs : bestEntry.score) : null;
 
-        // Whether the player actually reached this mode's finish line (not
-        // just however many lines they had when the round ended for some
-        // other reason, e.g. topping out) - mirrors ModeController#
-        // checkObjectiveComplete's own conditions but without its side
-        // effects (that method also *ends the round*), so it's safe to call
-        // here purely to read the current state.
         const def = game.gameModes[game.mode];
         let raceCompleted = null;
         if (game.mode === "sprint") raceCompleted = game.lines >= def.sprintTarget;
@@ -720,11 +647,6 @@ export class MultiplayerController {
             elapsedMs: game.elapsedMs,
             raceCompleted,
             drought: game.drought,
-            // maxDrought/droughtTotal/droughtAvg are the meaningful drought
-            // numbers for a *finished* run - `drought` above is just however
-            // many non-I pieces happened to be pending the moment the match
-            // ended, which is fine for the live opponent badge but useless
-            // for the post-match comparison (see _showResultPanel).
             maxDrought: game.maxDrought,
             droughtTotal: game.droughtTotal,
             droughtAvg: droughtAvgValue,
@@ -761,6 +683,9 @@ export class MultiplayerController {
             this._remoteFinalScore = payload.score;
             this._remoteFinalStats = payload;
             this._updateOpponentStats(payload);
+            if (this._localFinalScore === null && RUNNING_STATES.has(this.game.state)) {
+                this.game.screenFlow.endRound("topOut");
+            }
             this._maybeShowResult();
         } else if (payload.kind === "config") {
             this._applyRemoteConfig(payload.mode, payload.difficulty);
@@ -772,14 +697,26 @@ export class MultiplayerController {
             if (this._lastRemoteStats) this._updateOpponentStats(this._lastRemoteStats);
         } else if (payload.kind === "board") {
             this._lastRemoteCells = payload.cells;
-            // The piece that just locked is now baked into `cells` - drop the
-            // stale live-piece overlay so it isn't drawn twice until the next
-            // "piece" update (for the newly-spawned piece) arrives.
             this._remoteLivePiece = null;
-            this._drawOpponentBoard(this._lastRemoteCells, null);
+            if (!this._remoteClearing) this._drawOpponentBoard(this._lastRemoteCells, null);
         } else if (payload.kind === "piece") {
             this._remoteLivePiece = payload.cleared ? null : payload;
-            this._drawOpponentBoard(this._lastRemoteCells, this._remoteLivePiece);
+            if (!this._remoteClearing) this._drawOpponentBoard(this._lastRemoteCells, this._remoteLivePiece);
+        } else if (payload.kind === "clearing") {
+            if (this._remoteClearing) {
+                this._drawOpponentClearingFrame(this._remoteClearing, 1);
+            }
+            this._lastRemoteCells = payload.cells;
+            this._remoteLivePiece = null;
+            const lines = payload.lines || [];
+            this._remoteClearing = {
+                cells: payload.cells,
+                lines,
+                dropRows: payload.dropRows || [],
+                duration: payload.duration || 260,
+                startTime: performance.now(),
+                fragments: this._buildOpponentClearFragments(payload.cells, lines),
+            };
         }
     }
 
@@ -796,10 +733,7 @@ export class MultiplayerController {
     _hideResultPanel() {
         const panel = this.dom?.querySelector('[data-role="mp-panel-result"]');
         if (panel) panel.hidden = true;
-        const steps = this.dom?.querySelector('[data-role="mp-steps"]');
-        const caption = this.dom?.querySelector('[data-field="mp-step-caption"]');
-        if (steps) steps.hidden = false;
-        if (caption) caption.hidden = false;
+        this._updateSteps(this._activePanelName);
         this._resultPanelEl = null;
     }
 
@@ -812,11 +746,6 @@ export class MultiplayerController {
         const localScore = local.score ?? 0;
         const remoteScore = remote.score ?? 0;
 
-        // In a race mode (sprint/cheese race) the objective is finishing
-        // the target - and finishing it faster - not racking up more score
-        // along the way, so the overall win/loss is decided by who
-        // actually completed it, then by completion time; score alone only
-        // decides it outside race modes, or if neither side finished.
         const isRaceMode = this.game.mode === "sprint" || this.game.mode === "cheeseRace";
         let resultKey;
         if (isRaceMode && (local.raceCompleted || remote.raceCompleted)) {
@@ -839,10 +768,6 @@ export class MultiplayerController {
             return el;
         };
 
-        // Clears any previous better/worse coloring, then (if the two sides
-        // differ) colors the winning side's cell green and the losing side's
-        // cell red - so every row is judged on its own merits instead of
-        // just inheriting whoever won on total score.
         const colorPair = (localEl, remoteEl, localRaw, remoteRaw, lowerBetter) => {
             localEl?.classList.remove("mp-result-value--better", "mp-result-value--worse");
             remoteEl?.classList.remove("mp-result-value--better", "mp-result-value--worse");
@@ -902,6 +827,12 @@ export class MultiplayerController {
         this._lastSentBoardVersion = -1;
         this._lastRemoteCells = null;
         this._remoteLivePiece = null;
+        this._remoteClearing = null;
+
+        if (this.game.state === "gameOver-entry") {
+            this.game.settings.mode = this.game.mode;
+            this.game.screenFlow.continueFromGameOverEntry();
+        }
 
         if (this.role === "bot") {
             const difficulty = this._botDifficultyKey;
@@ -931,8 +862,6 @@ export class MultiplayerController {
         game.screenFlow.showIdleScreen().then();
     }
 
-    // --- opponent panel (nickname/score badge everywhere + full board on desktop) ---
-
     _showOpponentUI() {
         this._showOpponentBadge();
         this._showOpponentBoard();
@@ -943,10 +872,6 @@ export class MultiplayerController {
         this._hideOpponentBoard();
     }
 
-    /** Mini stats-card for the opponent — mirrors the local player's own
-     *  `[data-role="stats-card"]` panel: nickname line, a leave-match button,
-     *  then every stat row the local sidebar shows except Time (that one
-     *  only makes sense locally), always rendered above the local card. */
     _showOpponentBadge() {
         this._hideOpponentBadge();
         const statsCard = this.dom.querySelector('[data-role="stats-card"]');
@@ -980,7 +905,6 @@ export class MultiplayerController {
         this._lastRemoteStats = null;
     }
 
-    /** Appends one `.stats__row` (title + value, same markup as the local sidebar's rows) to `panel` and returns the value element. */
     _appendStatRow(panel, titleKey, valueRole, initialText) {
         const row = this.dom.createElement("div");
         row.className = "stats__row";
@@ -1000,7 +924,6 @@ export class MultiplayerController {
         return value;
     }
 
-    /** Small "✕" button that disconnects from the current match/bot session (see _leaveMatch) - used on both the opponent badge and the opponent board panel header, since neither is reachable while the pause/options menus are blocked mid-match. */
     _createLeaveButton() {
         const button = this.dom.createElement("button");
         button.type = "button";
@@ -1024,7 +947,6 @@ export class MultiplayerController {
         this._opponentDroughtBadgeEl = null;
     }
 
-    /** Updates every opponent stat row (badge) from a "stats"/"final" payload (see _localStatsSnapshot) - uses the sender's own already-formatted display strings so rounding/formatting always matches what that player sees on their own sidebar. */
     _updateOpponentStats(payload) {
         this._lastRemoteScore = payload.score ?? 0;
         this._lastRemoteStats = payload;
@@ -1037,32 +959,36 @@ export class MultiplayerController {
         if (this._opponentDroughtBadgeEl) this._opponentDroughtBadgeEl.textContent = display.drought ?? String(payload.drought ?? 0);
     }
 
-    /**
-     * Full-size board rendered right next to the local one (desktop only,
-     * see CSS) — same `.board`/`.board__canvas` markup and the same cell
-     * size as the local board, for a literal 1:1 visual match, with the
-     * opponent's nickname and score in a header above it.
-     */
+    _raceMetric(stats) {
+        if (["sprint", "cheeseRace", "digSurvival"].includes(this.game.mode)) return stats.lines ?? 0;
+        return stats.score ?? 0;
+    }
+
+    _updateRaceMeter(localStats) {
+        const fill = this._raceMeterFillEl;
+        if (!fill) return;
+        const remoteStats = this._lastRemoteStats;
+        if (!remoteStats) {
+            fill.style.height = "50%";
+            fill.dataset.state = "even";
+            return;
+        }
+        const local = this._raceMetric(localStats);
+        const remote = this._raceMetric(remoteStats);
+        const total = local + remote;
+        const percent = total === 0 ? 50 : 50 + 50 * (local - remote) / total;
+        fill.style.height = `${Math.max(0, Math.min(100, percent))}%`;
+        fill.dataset.state = percent > 50 ? "winning" : percent < 50 ? "losing" : "even";
+    }
+
     _showOpponentBoard() {
         this._hideOpponentBoard();
-        // Full-size board is desktop-only real estate (mirrors the site's own
-        // `(width >= 48rem)` breakpoint for styles/desktop.css) — skip
-        // building it at all on narrow viewports rather than relying on CSS
-        // alone to hide it, so it doesn't nudge the mobile layout's sidebar
-        // width bookkeeping in main.js.
+
         if (!globalThis.matchMedia?.("(width >= 48rem)").matches) return;
 
         const boardHost = this.dom.querySelector(".app__board");
         if (!boardHost) return;
 
-        // Local nickname pinned to the top edge of the local board, mirroring
-        // the opponent's own header below - this has to be a padding-top on
-        // `.app__board` plus an absolutely-positioned label inside it, not a
-        // real flow child: main.js's resizeBoardCanvas()/getChrome() only
-        // reads the *padding* of `.app__board` when it works out how much
-        // vertical space is left for the canvas, so a real child here would
-        // be invisible to that calculation and the canvas would overflow
-        // past the bottom of the viewport.
         const localHeader = this.dom.createElement("div");
         localHeader.className = "mp-opponent-column__header mp-local-board-header";
 
@@ -1101,10 +1027,6 @@ export class MultiplayerController {
         canvas.className = "board__canvas mp-opponent-column__canvas";
         canvas.dataset.role = "mp-opponent-canvas";
 
-        // Same board__filter/board__filter-canvas pair the main board uses
-        // (see index.html) - mirrors whatever theme (VHS/matrix/rain/snow)
-        // is currently active, matching the local board's look instead of
-        // always rendering plain.
         const filterEl = this.dom.createElement("div");
         filterEl.className = "board__filter";
         filterEl.dataset.theme = "none";
@@ -1120,37 +1042,32 @@ export class MultiplayerController {
 
         boardHost.insertAdjacentElement("afterend", panel);
 
+        const raceMeter = this.dom.createElement("div");
+        raceMeter.className = "app__sidebar mp-race-meter";
+        raceMeter.dataset.role = "mp-race-meter";
+        const raceMeterFill = this.dom.createElement("div");
+        raceMeterFill.className = "mp-race-meter__fill";
+        raceMeterFill.dataset.role = "mp-race-meter-fill";
+        raceMeter.appendChild(raceMeterFill);
+        boardHost.insertAdjacentElement("afterend", raceMeter);
+
         this._opponentPanelEl = panel;
         this._opponentHeaderEl = header;
         this._opponentNameEl = name;
+        this._raceMeterEl = raceMeter;
+        this._raceMeterFillEl = raceMeterFill;
         this._opponentCanvasEl = canvas;
         this._opponentCanvasCtx = canvas.getContext("2d");
         this.game.themeOverlay.registerTarget("opponent", {overlayEl: filterEl, canvas: filterCanvas});
 
-        // The panel takes up real horizontal space next to the board (it's
-        // sized like a second board, not a slim stat column) — nudge the
-        // layout to recompute the local board's size around it, the same
-        // way a window resize would. This must happen BEFORE sizing the
-        // opponent canvas below, since it's what settles the final,
-        // post-panel BOARD_CONFIG.CELL_SIZE.
         this._notifyLayoutResize();
         this._syncOpponentCanvasSize();
 
-        // A real window resize after the panel is already up (e.g. the
-        // user resizes the browser mid-match) only updates the *local*
-        // canvas today - main.js has no idea the opponent canvas exists.
-        // Piggyback on the same event to keep it in step too.
         this._handleOpponentWindowResize = () => this._syncOpponentCanvasSize();
         const resizeTarget = globalThis.visualViewport ?? globalThis.window ?? null;
         resizeTarget?.addEventListener("resize", this._handleOpponentWindowResize);
     }
 
-    /**
-     * Resizes the opponent canvas to match the local board's current
-     * `BOARD_CONFIG.CELL_SIZE` (recomputed by main.js's resize handler,
-     * which always runs first) and redraws its last known contents -
-     * otherwise a canvas resize clears itself to blank.
-     */
     _syncOpponentCanvasSize() {
         const canvas = this._opponentCanvasEl;
         if (!canvas) return;
@@ -1171,6 +1088,9 @@ export class MultiplayerController {
         this._opponentPanelEl = null;
         this._opponentHeaderEl = null;
         this._opponentNameEl = null;
+        this._raceMeterEl?.remove();
+        this._raceMeterEl = null;
+        this._raceMeterFillEl = null;
         this._localHeaderEl?.remove();
         this._localHeaderEl = null;
         if (this._opponentBoardHost) {
@@ -1192,48 +1112,29 @@ export class MultiplayerController {
         target?.dispatchEvent(new Event("resize"));
     }
 
-    /** The opponent's nickname once known over the data channel, else a generic fallback label. */
     _remoteDisplayName() {
         return this._remoteName || this._t("multiplayer.opponentFallback");
     }
 
-    /** The local player's own nickname, else the same fallback used on the leaderboard. */
     _localDisplayName() {
         return this.game.playerName || this._t("leaderboard.defaultName");
     }
 
-    /**
-     * Draws the opponent's locked board onto the desktop board panel's
-     * canvas. `cells` is the flat colorIndex array from Board#colors
-     * (row-major, 0 = empty); null/undefined clears the board (e.g. right
-     * after a rematch).
-     *
-     * This reuses the real Renderer's `drawCell`/`drawGrid` (same sprite
-     * cache, same cell size as the local board - see
-     * OPPONENT_BOARD_FALLBACK_CELL_PX) instead of hand-rolled `fillRect`s, so
-     * the opponent's klockominos actually look like klockominos - grid lines,
-     * glow, height-based saturation - matching whatever appearance settings
-     * *this* player has chosen in Options, exactly like the local board.
-     */
-    /**
-     * Draws the opponent's locked board onto the desktop board panel's
-     * canvas, plus their live falling piece on top of it if we have one (see
-     * the "piece" message in _pollMatchState/_onPeerMessage) - without this
-     * overlay the panel only ever showed the board as it looked *after* each
-     * lock, never a piece actually moving or rotating on the way down.
-     *
-     * `cells` is the flat colorIndex array from Board#colors (row-major,
-     * 0 = empty); null/undefined clears the board (e.g. right after a
-     * rematch). `livePiece` is `{x, y, mask, width, height, colorIndex}` or
-     * null/undefined.
-     *
-     * Reuses the real Renderer's `drawCell`/`drawGrid` (same sprite cache,
-     * same cell size as the local board - see OPPONENT_BOARD_FALLBACK_CELL_PX)
-     * instead of hand-rolled `fillRect`s, so the opponent's klockominos
-     * actually look like klockominos - grid lines, glow, height-based
-     * saturation - matching whatever appearance settings *this* player has
-     * chosen in Options, exactly like the local board.
-     */
+    _buildOpponentClearFragments(cells, lineIndices) {
+        const renderer = this.game.renderer;
+        const canvas = this._opponentCanvasEl;
+        if (!renderer || !canvas || !cells || lineIndices.length === 0) return [];
+
+        const {COLS, ROWS} = BOARD_CONFIG;
+        return renderer.buildClearFragments({
+            cells,
+            cols: COLS,
+            rows: ROWS,
+            lineIndices,
+            size: canvas.width / COLS,
+        });
+    }
+
     _drawOpponentBoard(cells, livePiece = null) {
         const ctx = this._opponentCanvasCtx;
         const canvas = this._opponentCanvasEl;
@@ -1246,8 +1147,6 @@ export class MultiplayerController {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         if (!renderer) {
-            // No renderer available (shouldn't happen in practice) - fall
-            // back to flat rectangles rather than drawing nothing.
             const drawFlat = (x, y, colorIndex) => {
                 if (!colorIndex) return;
                 ctx.fillStyle = COLOR_PALETTE[colorIndex] ?? "#888";
@@ -1283,9 +1182,6 @@ export class MultiplayerController {
         }
 
         if (livePiece) {
-            // Glow, matching how the local board draws its own falling piece
-            // (see Renderer#drawPiece) - visually distinguishes it from the
-            // already-locked stack underneath.
             const color = COLOR_PALETTE[livePiece.colorIndex] ?? "#888";
             forEachShapeCell(livePiece.mask, livePiece.width, livePiece.height, (r, c) => {
                 const y = livePiece.y + r;
@@ -1293,6 +1189,138 @@ export class MultiplayerController {
                 const level = renderer.saturationLevelForRow(y, ROWS);
                 renderer.drawCell(ctx, livePiece.x + c, y, color, size, {glow: true, level});
             });
+        }
+    }
+
+    _renderRemoteClearingFrame() {
+        const rc = this._remoteClearing;
+        const progress = (performance.now() - rc.startTime) / rc.duration;
+
+        if (progress >= 1) {
+            this._lastRemoteCells = this._computeOpponentPostClearCells(rc);
+            this._remoteClearing = null;
+            this._drawOpponentBoard(this._lastRemoteCells, this._remoteLivePiece);
+            return;
+        }
+
+        this._drawOpponentClearingFrame(rc, progress);
+    }
+
+    _computeOpponentPostClearCells(rc) {
+        const {COLS, ROWS} = BOARD_CONFIG;
+        const lineSet = new Set(rc.lines);
+        const result = new Array(COLS * ROWS).fill(0);
+
+        for (let y = 0; y < ROWS; y++) {
+            if (lineSet.has(y)) continue;
+            const targetY = y + (rc.dropRows[y] || 0);
+            if (targetY < 0 || targetY >= ROWS) continue;
+            for (let x = 0; x < COLS; x++) {
+                result[targetY * COLS + x] = rc.cells[y * COLS + x];
+            }
+        }
+
+        return result;
+    }
+
+    _ensureOpponentAboveCache(rc, size) {
+        if (rc._aboveCache && rc._aboveCache.size === size) return rc._aboveCache;
+
+        const {COLS, ROWS} = BOARD_CONFIG;
+        const renderer = this.game.renderer;
+        const lineSet = new Set(rc.lines);
+
+        const canvas = this.dom.createElement("canvas");
+        canvas.width = COLS * size;
+        canvas.height = ROWS * size;
+        const ctx = canvas.getContext("2d");
+
+        const segments = [];
+        let runStart = -1;
+        let runDrop = 0;
+        const flushRun = (endExclusive) => {
+            if (runStart === -1) return;
+            segments.push({top: runStart, height: endExclusive - runStart, dropAmount: runDrop});
+            runStart = -1;
+        };
+
+        for (let y = 0; y < ROWS; y++) {
+            if (lineSet.has(y)) {
+                flushRun(y);
+                continue;
+            }
+
+            const drop = rc.dropRows[y] || 0;
+            if (runStart === -1) {
+                runStart = y;
+                runDrop = drop;
+            } else if (drop !== runDrop) {
+                flushRun(y);
+                runStart = y;
+                runDrop = drop;
+            }
+
+            const level = renderer.saturationLevelForRow(y, ROWS);
+            for (let x = 0; x < COLS; x++) {
+                const colorIndex = rc.cells[y * COLS + x];
+                if (!colorIndex) continue;
+                renderer.drawCell(ctx, x, y, COLOR_PALETTE[colorIndex] ?? "#888", size, {level});
+            }
+        }
+        flushRun(ROWS);
+
+        rc._aboveCache = {canvas, segments, size};
+        return rc._aboveCache;
+    }
+
+    _drawOpponentClearingFrame(rc, progress) {
+        const ctx = this._opponentCanvasCtx;
+        const canvas = this._opponentCanvasEl;
+        const renderer = this.game.renderer;
+        if (!ctx || !canvas || !renderer || !rc?.cells) return;
+
+        const {COLS, ROWS} = BOARD_CONFIG;
+        const size = canvas.width / COLS;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const p = Math.min(1, progress);
+        const flashEnd = LINE_CLEAR_FLASH_PHASE_FRACTION;
+        const maskStart = flashEnd * 0.5;
+        const fallProgress = p < maskStart ? 0 : Math.min(1, (p - maskStart) / (1 - maskStart));
+        const rowsGone = p >= maskStart;
+
+        const board = {cols: COLS, rows: ROWS};
+        if (renderer.gridEnabled) renderer.drawGrid(board, ctx);
+
+        const above = this._ensureOpponentAboveCache(rc, size);
+        const width = COLS * size;
+        for (const segment of above.segments) {
+            const dy = segment.top * size + segment.dropAmount * size * fallProgress;
+            const segHeight = segment.height * size;
+            ctx.drawImage(
+                above.canvas,
+                0, segment.top * size, width, segHeight,
+                0, dy, width, segHeight,
+            );
+        }
+
+        if (!rowsGone) {
+            for (const y of rc.lines) {
+                const level = renderer.saturationLevelForRow(y, ROWS);
+                for (let x = 0; x < COLS; x++) {
+                    const colorIndex = rc.cells[y * COLS + x];
+                    if (!colorIndex) continue;
+                    renderer.drawCell(ctx, x, y, COLOR_PALETTE[colorIndex] ?? "#888", size, {level});
+                }
+            }
+        }
+
+        if (rowsGone) renderer.drawFragments(ctx, rc.fragments || [], fallProgress);
+
+        if (p < flashEnd) {
+            const flashProgress = p < maskStart ? 0 : (p - maskStart) / (flashEnd - maskStart);
+            renderer.drawClearingFlash(rc.lines, flashProgress, {ctx, size, cols: COLS});
         }
     }
 
@@ -1306,8 +1334,6 @@ export class MultiplayerController {
         }
     }
 
-    // --- helpers ---
-
     _t(key, vars = {}) {
         return this.i18n ? this.i18n.t(key, vars) : key;
     }
@@ -1317,8 +1343,6 @@ export class MultiplayerController {
         if (el) el.textContent = text;
     }
 
-    /** Bottom toast shown when the peer drops mid-match, when the lobby overlay (with its own
-     *  status line) isn't around to see it - reuses the pause-blocked toast's look and feel. */
     _showDisconnectToast() {
         if (!this.dom) return;
 
@@ -1374,10 +1398,13 @@ export class MultiplayerController {
         this._guestOriginalDifficulty = null;
         this.role = null;
         this.game.multiplayerConnected = false;
+        this.game.multiplayerVsBot = false;
         this._remoteName = null;
         this._lastRemoteScore = 0;
         this._lastRemoteCells = null;
         this._remoteLivePiece = null;
+        this._remoteClearing = null;
+        this._wasLocalClearing = false;
         this._lastSentBoardVersion = -1;
     }
 }

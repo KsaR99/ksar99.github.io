@@ -1,52 +1,53 @@
 "use strict";
 
-import {KLOCKOMINOS} from "../shared/config.js";
+import {KLOCKOMINOS, LINE_CLEAR_ANIMATION_DURATION_MS} from "../shared/config.js";
 import {Board} from "../game/board.js";
 import {PieceBag} from "../game/piece-bag.js";
 import {levelForLines, pointsForLineClear} from "../game/scoring.js";
 import {mulberry32} from "../shared/seeded-random.js";
 import {formatNumber} from "../shared/utils.js";
 
-/**
- * Per-difficulty tuning. `placeIntervalMs`/`minIntervalMs` control how fast
- * the bot places pieces (ramping down as it clears lines, like real gravity
- * speeding up with level); `mistakeChance` is the odds it ignores its best
- * move and plays a weaker one instead, so "easy" doesn't play a flawless
- * game; `lookahead` turns on a shallow (next-piece) search.
- */
 export const BOT_DIFFICULTIES = Object.freeze({
     easy: Object.freeze({
         startLevel: 1,
         placeIntervalMs: 900,
         minIntervalMs: 550,
         mistakeChance: 0.35,
-        lookahead: false
+        lookahead: false,
+        reactionMs: 260,
     }),
     medium: Object.freeze({
         startLevel: 3,
         placeIntervalMs: 600,
         minIntervalMs: 350,
         mistakeChance: 0.14,
-        lookahead: true
+        lookahead: true,
+        reactionMs: 150,
     }),
     hard: Object.freeze({
         startLevel: 6,
         placeIntervalMs: 380,
         minIntervalMs: 180,
         mistakeChance: 0.03,
-        lookahead: true
+        lookahead: true,
+        reactionMs: 70,
     }),
 });
 
-// Classic "El-Tetris"-style heuristic weights: reward clearing lines, punish
-// tall/holey/bumpy boards. Tuned for stable, sensible play rather than
-// perfect play.
 const WEIGHTS = Object.freeze({
     aggregateHeight: -0.510066,
     lines: 0.760666,
     holes: -0.35663,
     bumpiness: -0.184483,
 });
+
+function buildDropRows(fullRows, rowCount) {
+    const dropRows = new Array(rowCount).fill(0);
+    for (let y = 0; y < rowCount; y++) {
+        dropRows[y] = fullRows.reduce((count, clearedY) => count + (clearedY > y ? 1 : 0), 0);
+    }
+    return dropRows;
+}
 
 function collidesAt(occupancy, cols, rows, mask, width, height, px, py) {
     for (let r = 0; r < height; r++) {
@@ -161,14 +162,6 @@ function enumeratePlacements(type, occupancy, cols, rows) {
     return placements;
 }
 
-/**
- * Picks where to put `type`. With `nextType` + `lookahead` it breaks ties
- * among the strongest immediate placements by also checking how good the
- * *following* piece's best placement would be on each resulting board -
- * cheap (a second flat search, no recursion) but enough to avoid short-sighted
- * moves like leaving a well that only an I-piece could fix right before an
- * S-piece is due.
- */
 function choosePlacement(type, nextType, occupancy, cols, rows, {lookahead, mistakeChance, random}) {
     const placements = enumeratePlacements(type, occupancy, cols, rows);
     if (!placements.length) return null;
@@ -188,8 +181,6 @@ function choosePlacement(type, nextType, occupancy, cols, rows, {lookahead, mist
         ranked = withLookahead;
     }
 
-    // "Mistakes" pick a middling placement instead of the best one, so lower
-    // difficulties visibly misplay sometimes rather than playing perfectly-but-slowly.
     if (ranked.length > 1 && random() < mistakeChance) {
         const pool = ranked.slice(0, Math.min(ranked.length, 5));
         return pool[Math.floor(random() * pool.length)];
@@ -197,16 +188,6 @@ function choosePlacement(type, nextType, occupancy, cols, rows, {lookahead, mist
     return ranked[0];
 }
 
-/**
- * Runs a fully local, headless Tetris game and picks moves for itself on a
- * timer, standing in for a second player in the "practice vs bot" mode.
- * Talks to MultiplayerController the same way a MultiplayerSession does:
- * it's an EventTarget that fires "message" events shaped like
- * `{kind: "stats"|"board"|"piece"|"final", ...}`, matching what
- * MultiplayerController#_localStatsSnapshot sends for a real peer, so the
- * controller's existing peer-message handling (opponent badge/board/result)
- * works unmodified.
- */
 export class BotOpponent extends EventTarget {
     constructor({
                     types,
@@ -216,12 +197,6 @@ export class BotOpponent extends EventTarget {
                     difficultyKey = "medium",
                     difficulties = BOT_DIFFICULTIES,
                     startLevel = null,
-                    // The selected game mode's key + definition (see
-                    // GAME_MODES in config.js) - drives the same cheese/
-                    // garbage/dig setup ModeController applies to the
-                    // player's own board, so the bot's board actually
-                    // matches whatever mode was picked instead of always
-                    // playing a plain endless marathon.
                     mode = null,
                     modeDef = null
                 }) {
@@ -236,8 +211,6 @@ export class BotOpponent extends EventTarget {
         this.modeDef = modeDef ?? {};
 
         this.board = new Board(cols, rows);
-        // Same starting stack the player's board gets from
-        // ModeController#setupBoard (cheese race / dig survival).
         if (this.modeDef.cheeseRows) this.board.addGarbageLines(this.modeDef.cheeseRows);
 
         this.bag = new PieceBag(types, mulberry32(seed));
@@ -250,13 +223,11 @@ export class BotOpponent extends EventTarget {
         this.score = 0;
         this.finished = false;
 
-        // Survival mode's periodic garbage growth (mirrors
-        // ModeController#update's garbageTimer accumulation).
         this._garbageTimer = null;
 
-        // Mirrors StatsTracker's fields (see stats-tracker.js) so the bot can
-        // send a full "stats"/"final" snapshot in the same shape a real peer
-        // does, instead of just a bare score.
+        this.countdownRemainingMs = this.modeDef.countdownStartMs ?? 0;
+        this._countdownTimer = null;
+
         this.clearCounts = {1: 0, 2: 0, 3: 0, 4: 0};
         this.piecesSpawned = 0;
         this.drought = 0;
@@ -271,6 +242,9 @@ export class BotOpponent extends EventTarget {
 
         this._timer = null;
         this._dropTimer = null;
+        this._clearTimer = null;
+        this._pendingClear = null;
+        this._paused = false;
     }
 
     start() {
@@ -281,6 +255,7 @@ export class BotOpponent extends EventTarget {
         this._sendStats();
         this._scheduleNext();
         this._scheduleSurvivalGarbage();
+        this._scheduleCountdownTick();
     }
 
     /** Mirrors StatsTracker#registerPieceSpawn - tracks the I-piece drought. */
@@ -303,22 +278,39 @@ export class BotOpponent extends EventTarget {
         this._timer = null;
         if (this._dropTimer) clearTimeout(this._dropTimer);
         this._dropTimer = null;
+        if (this._clearTimer) clearTimeout(this._clearTimer);
+        this._clearTimer = null;
         if (this._garbageTimer) clearTimeout(this._garbageTimer);
         this._garbageTimer = null;
+        if (this._countdownTimer) clearTimeout(this._countdownTimer);
+        this._countdownTimer = null;
     }
 
-    /** Re-arms survival mode's garbage timer (no-op for every other mode). */
+    pause() {
+        if (this._paused || this.finished) return;
+        this._paused = true;
+        this.stop();
+    }
+
+    resume() {
+        if (!this._paused || this.finished) return;
+        this._paused = false;
+
+        if (this._pendingClear) {
+            this._pendingClear = null;
+            this._finishClear();
+        } else {
+            this._scheduleNext();
+        }
+        this._scheduleSurvivalGarbage();
+        this._scheduleCountdownTick();
+    }
+
     _scheduleSurvivalGarbage() {
         if (this.finished || !this.modeDef.garbage) return;
         this._garbageTimer = setTimeout(() => this._addSurvivalGarbage(), this.modeDef.garbageIntervalMs);
     }
 
-    /**
-     * Adds a random-height garbage chunk to the bot's own board, same as
-     * ModeController#update does for the player's board in survival mode. If
-     * a piece is mid-drop, wait a beat rather than mutating the occupancy
-     * the in-flight animation was computed against.
-     */
     _addSurvivalGarbage() {
         if (this.finished) return;
         if (this._dropTimer) {
@@ -338,13 +330,24 @@ export class BotOpponent extends EventTarget {
         this._scheduleSurvivalGarbage();
     }
 
+    _scheduleCountdownTick() {
+        if (this.finished || this.mode !== "countdown") return;
+        const stepMs = 200;
+        this._countdownTimer = setTimeout(() => {
+            this.countdownRemainingMs -= stepMs;
+            if (this.countdownRemainingMs <= 0) {
+                this.finish();
+                return;
+            }
+            this._scheduleCountdownTick();
+        }, stepMs);
+    }
+
     _intervalForLevel() {
         const {placeIntervalMs, minIntervalMs} = this.profile;
-        // Ramps down ~4% per level above the bot's start level, floored at minIntervalMs -
-        // mirrors the game's own "gets faster as you clear lines" feel without needing
-        // the full drop-speed curve (the bot places whole pieces, not single rows).
         const levelsIn = Math.max(0, this.level - this.startLevel);
         const eased = placeIntervalMs * Math.pow(0.96, levelsIn);
+
         return Math.max(minIntervalMs, eased);
     }
 
@@ -370,16 +373,6 @@ export class BotOpponent extends EventTarget {
         this._animateDrop(placement, colorIndex, () => this._commitPlacement(placement, colorIndex));
     }
 
-    /**
-     * Reveals the piece at its spawn rotation, steps it through each
-     * intermediate rotation up to the chosen one (so a rotation is actually
-     * visible instead of the piece just appearing pre-rotated), then falls
-     * it down to its resting row before `_commitPlacement` locks it in -
-     * without this the bot would place pieces instantly (empty cell ->
-     * locked cell, no in-between), so the "piece" live-update
-     * MultiplayerController relies on to show movement/rotation on the
-     * opponent panel never had anything to show.
-     */
     _animateDrop(placement, colorIndex, onDone) {
         const stepMs = 40;
         const def = KLOCKOMINOS[this.current];
@@ -396,10 +389,6 @@ export class BotOpponent extends EventTarget {
             return;
         }
 
-        // Step through 1, 2, ... up to the target rotation state, one frame
-        // each, holding the piece at the spawn column the whole time - the
-        // same shape a player rotating in place before moving/dropping
-        // would show.
         let state = 0;
         const rotateTick = () => {
             if (this.finished) return;
@@ -417,24 +406,12 @@ export class BotOpponent extends EventTarget {
         rotateTick();
     }
 
-    /**
-     * Falls the already-rotated piece from the top down to its resting row.
-     * Speed is a fixed *per-row* rate (not a fixed total duration) so the
-     * piece actually takes longer to fall the further it has to go, instead
-     * of every drop - 1 row or 16 - taking the same wall-clock time. That
-     * old behaviour made deep drops look like the bot was slamming the
-     * piece down (holding the drop key) on every single placement, while
-     * shallow drops looked unnaturally slow by comparison.
-     */
     _animateFall(placement, colorIndex, onDone) {
         const startY = 0;
         const distance = Math.max(0, placement.y - startY);
 
         const msPerRow = 35;
         const minTotalMs = 60;
-        // Bounded by a share of the bot's own placement cadence, not a tiny
-        // fixed millisecond ceiling, so a near-full-height drop on a slow
-        // difficulty still visibly takes noticeably longer than a 1-row one.
         const maxTotalMs = Math.max(minTotalMs, this._intervalForLevel() * 0.8);
         const totalMs = Math.min(maxTotalMs, Math.max(minTotalMs, distance * msPerRow));
         const stepMs = 40;
@@ -471,6 +448,32 @@ export class BotOpponent extends EventTarget {
             y: placement.y,
         };
         this.board.lockPiece(piece);
+
+        const fullRows = this.board.getFullLineIndices();
+        if (fullRows.length === 0) {
+            this._finishClear();
+            return;
+        }
+
+        this.dispatchEvent(new CustomEvent("message", {
+            detail: {
+                kind: "clearing",
+                cells: Array.from(this.board.colors),
+                lines: fullRows,
+                dropRows: buildDropRows(fullRows, this.rows),
+                duration: LINE_CLEAR_ANIMATION_DURATION_MS,
+            },
+        }));
+
+        this._pendingClear = fullRows;
+        this._clearTimer = setTimeout(() => {
+            this._clearTimer = null;
+            this._pendingClear = null;
+            this._finishClear();
+        }, LINE_CLEAR_ANIMATION_DURATION_MS);
+    }
+
+    _finishClear() {
         const cleared = this.board.clearFullLines();
 
         if (cleared > 0) {
@@ -482,8 +485,11 @@ export class BotOpponent extends EventTarget {
             ++this.currentCombo;
             this.maxCombo = Math.max(this.maxCombo, this.currentCombo);
 
-            // Dig survival: every cleared line regrows immediately, same as
-            // ModeController#onLinesCleared does for the player's board.
+            if (this.mode === "countdown" && this.modeDef.countdownBonusMs) {
+                const bonusMs = this.modeDef.countdownBonusMs[Math.min(cleared, this.modeDef.countdownBonusMs.length - 1)];
+                this.countdownRemainingMs += bonusMs;
+            }
+
             if (this.mode === "digSurvival") {
                 const {toppedOut} = this.board.addGarbageLines(cleared);
                 if (toppedOut) {
@@ -497,19 +503,9 @@ export class BotOpponent extends EventTarget {
             this.currentCombo = 0;
         }
 
-        // The receiving end clears its live-piece overlay as soon as a
-        // "board" update comes in (see MultiplayerController#_onPeerMessage)
-        // - no need for a separate "piece cleared" message here.
         this._sendBoard();
         this._sendStats();
 
-        // Sprint/cheese race/dig survival all have a concrete finish line
-        // (see ModeController#checkObjectiveComplete for the player-side
-        // equivalent) - without this the bot just kept digging/sprinting
-        // forever, so by the time the player's own round ended at exactly
-        // their target the bot could've already blown past it (e.g. 11
-        // lines vs. the player's 10), corrupting both the "who finished
-        // first" result and the line-count comparison.
         if (this._objectiveComplete()) {
             this.finish();
             return;
@@ -519,7 +515,6 @@ export class BotOpponent extends EventTarget {
         this.pending = this.bag.next();
         this._registerPieceSpawn(this.current);
 
-        // Spawn check for the *new* current piece - if it can't even appear, the bot topped out.
         const def = KLOCKOMINOS[this.current];
         const spawnX = Math.floor((this.cols - def.width) / 2);
         if (collidesAt(this.board.occupancy, this.cols, this.rows, def.states[0], def.width, def.height, spawnX, 0)) {
@@ -543,21 +538,9 @@ export class BotOpponent extends EventTarget {
         this.finish();
     }
 
-    /**
-     * Locks in the bot's current score as final and stops it. Called both
-     * when the bot tops out on its own board, and by the controller when
-     * the *player's* round ends first (sprint/ultra/etc. finish on a
-     * target, not necessarily a top-out) - either way the match needs a
-     * result instead of waiting on a bot that might play for a long time.
-     */
     finish() {
         if (this.finished) return;
         this.finished = true;
-        // Freeze the clock at the moment of finishing (mirrors game.elapsedMs,
-        // which stops advancing once the player's own state leaves
-        // "running") - otherwise a bot stopped a few seconds *after* the
-        // player's round ended would report extra elapsed time it never
-        // actually needed, skewing the sprint/cheese-race time comparison.
         this._finishedAt = Date.now();
         this.stop();
         this.dispatchEvent(new CustomEvent("message", {detail: {kind: "final", ...this._statsSnapshot()}}));
@@ -571,13 +554,6 @@ export class BotOpponent extends EventTarget {
         this.dispatchEvent(new CustomEvent("message", {detail: {kind: "stats", ...this._statsSnapshot()}}));
     }
 
-    /**
-     * Same shape as MultiplayerController#_localStatsSnapshot for a real
-     * peer - both the raw numeric fields (for the result panel's
-     * better/worse comparison) and the pre-formatted `display` strings (for
-     * the live opponent badge), so the controller's handling of "stats"/
-     * "final" messages works identically whether the peer is a bot or human.
-     */
     _statsSnapshot() {
         const totalClears = Object.values(this.clearCounts).reduce((sum, n) => sum + n, 0);
         const tetrisRatePercent = totalClears ? (this.clearCounts[4] / totalClears) * 100 : 0;
@@ -592,11 +568,6 @@ export class BotOpponent extends EventTarget {
             score: this.score,
             lines: this.lines,
             elapsedMs,
-            // Whether the bot actually reached this mode's finish line
-            // (sprint/cheese race/dig survival) rather than just being cut
-            // off when the player's own round ended first - see
-            // MultiplayerController#_showResultPanel, which needs this to
-            // judge a race by who finished (and how fast), not by score.
             raceCompleted: this._objectiveComplete(),
             drought: this.drought,
             maxDrought: this.maxDrought,

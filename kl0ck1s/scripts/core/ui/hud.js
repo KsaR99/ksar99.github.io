@@ -47,6 +47,7 @@ export class HUD {
             hasLinesRow: undefined,
             hasPlayedBefore: undefined,
             isPlaying: undefined,
+            statsStatusMode: undefined,
             statsStatusText: undefined,
         };
     }
@@ -66,17 +67,18 @@ export class HUD {
         }
     }
 
-    setPlaying(isPlaying) {
-        if (this._cache.isPlaying === isPlaying) return;
+    setPlaying(isPlaying, mode = null) {
+        if (this._cache.isPlaying === isPlaying && this._cache.statsStatusMode === mode) return;
         this._cache.isPlaying = isPlaying;
+        this._cache.statsStatusMode = mode;
 
         if (this.nextPieceCardEl) {
             this.nextPieceCardEl.classList.toggle("card--hidden", !isPlaying);
         }
         if (this.statsStatusEl) {
-            const text = this.i18n
-                ? this.i18n.t(isPlaying ? "sidebar.statusLive" : "sidebar.statusLast")
-                : (isPlaying ? "Current game" : "Last game");
+            const text = isPlaying && mode
+                ? (this.i18n ? this.i18n.t(`modes.${mode}.name`) : mode)
+                : (this.i18n ? this.i18n.t("sidebar.statusLast") : "Last game");
 
             if (this._cache.statsStatusText !== text) {
                 this._cache.statsStatusText = text;

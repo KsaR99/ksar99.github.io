@@ -53,6 +53,10 @@
     margin: 0 0 0.25rem;
 }
 
+.mp-steps[hidden] {
+    display: none;
+}
+
 .mp-step {
     display: flex;
     align-items: center;
@@ -236,6 +240,32 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     text-align: center;
+}
+
+.mp-race-meter {
+    position: relative;
+    display: block;
+    background: oklch(25.03% 0.027 271);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.mp-race-meter__fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 50%;
+    background: var(--progress-bar__fill-bg);
+    transition: height 0.2s ease, background-color 0.2s ease;
+}
+
+.mp-race-meter__fill[data-state="winning"] {
+    background: var(--good);
+}
+
+.mp-race-meter__fill[data-state="losing"] {
+    background: var(--danger);
 }
 
 .mp-pause-blocked-toast {

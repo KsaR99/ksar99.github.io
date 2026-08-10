@@ -27,8 +27,7 @@ function waitForIceGatheringComplete(pc, timeoutMs) {
         };
 
         pc.addEventListener("icegatheringstatechange", onChange);
-        // Some networks never reach "complete" (e.g. no reachable STUN server);
-        // fall back to whatever candidates were gathered so far instead of hanging forever.
+
         const timer = setTimeout(finish, timeoutMs);
     });
 }

@@ -73,8 +73,21 @@ export class Renderer {
         this._clearingStaticVersion = -1;
         this._clearingStaticSize = 0;
         this._clearingStaticFromRow = -1;
-        this._clearingStaticGrid = null;
         this._clearingStaticSat = null;
+        this._clearingAboveCanvas = document.createElement("canvas");
+        this._clearingAboveCtx = this._clearingAboveCanvas.getContext("2d");
+        this._clearingAboveVersion = -1;
+        this._clearingAboveSize = 0;
+        this._clearingAboveSat = null;
+        this._clearingAboveLineIndicesRef = null;
+        this._clearingAboveDropRowsRef = null;
+        this._clearingAboveSegments = [];
+
+        this._clearingGridCanvas = document.createElement("canvas");
+        this._clearingGridCtx = this._clearingGridCanvas.getContext("2d");
+        this._clearingGridSize = 0;
+        this._clearingGridRows = 0;
+        this._clearingGridCols = 0;
 
         this._onWindowResize = () => this.refreshBoardCanvasRect();
         window.addEventListener("resize", this._onWindowResize);
@@ -147,6 +160,86 @@ export class Renderer {
 
     particleColorForRow(color, y, rows) {
         return this.spriteCache.getParticleColor(color, this.saturationLevelForRow(y, rows));
+    }
+
+    /**
+     * Builds line-clear particle fragments from a flat colors array. Shared by the local
+     * board (PieceController) and any board rendered elsewhere (e.g. the multiplayer
+     * opponent/bot canvas) so both get the same particle-burst effect.
+     *
+     * @param {object} params
+     * @param {Uint8Array|number[]} params.cells - flat colorIndex array, length cols*rows
+     * @param {number} params.cols
+     * @param {number} params.rows - total board rows (used for height-saturation)
+     * @param {number[]} params.lineIndices - rows being cleared
+     * @param {number} [params.size] - cell size in px; defaults to this board's cell size
+     */
+    buildClearFragments({cells, cols, rows, lineIndices, size = this.boardConfig.CELL_SIZE}) {
+        const fragmentsPerAxis = 9;
+        const fragSize = size / fragmentsPerAxis;
+        const fragments = [];
+
+        lineIndices.forEach((y) => {
+            for (let x = 0; x < cols; x++) {
+                const colorIndex = cells[y * cols + x];
+                if (!colorIndex) continue;
+                const fragmentColor = this.particleColorForRow(this.colorPalette[colorIndex], y, rows);
+
+                for (let fy = 0; fy < fragmentsPerAxis; fy++) {
+                    for (let fx = 0; fx < fragmentsPerAxis; fx++) {
+                        const startX = x * size + (fx + 0.5) * fragSize;
+                        const startY = y * size + (fy + 0.2) * fragSize;
+
+                        const angle = Math.random() * Math.PI * 2;
+                        const distance = size * (0.2 + Math.random() * 0.5);
+
+                        fragments.push({
+                            startX,
+                            startY,
+                            dx: Math.cos(angle) * distance,
+                            dy: Math.sin(angle) * distance,
+                            rotation0: Math.random() * Math.PI * 2,
+                            dRotation: (Math.random() - 0.5) * Math.PI * 6,
+                            size: fragSize,
+                            halfSize: fragSize / 2,
+                            color: fragmentColor
+                        });
+                    }
+                }
+            }
+        });
+
+        return fragments;
+    }
+
+    /**
+     * Draws a line-clear particle burst onto any canvas context.
+     *
+     * @param {CanvasRenderingContext2D} ctx
+     * @param {Array<object>} fragments
+     * @param {number} particleProgress - 0..1
+     */
+    drawFragments(ctx, fragments, particleProgress) {
+        if (!fragments || fragments.length === 0) return;
+
+        const fragmentAlpha = 0.75 * (1 - particleProgress);
+
+        ctx.save();
+        ctx.globalAlpha = fragmentAlpha;
+
+        for (const frag of fragments) {
+            const x = frag.startX + frag.dx * particleProgress;
+            const y = frag.startY + frag.dy * particleProgress;
+            const rotation = frag.rotation0 + frag.dRotation * particleProgress;
+            const cos = Math.cos(rotation);
+            const sin = Math.sin(rotation);
+            ctx.setTransform(cos, sin, -sin, cos, x, y);
+            ctx.fillStyle = frag.color;
+            ctx.fillRect(-frag.halfSize, -frag.halfSize, frag.size, frag.size);
+        }
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.restore();
     }
 
     resetBoardTransform() {
@@ -340,7 +433,6 @@ export class Renderer {
         const dirty = this._clearingStaticVersion !== board.version
             || this._clearingStaticSize !== size
             || this._clearingStaticFromRow !== staticFromRow
-            || this._clearingStaticGrid !== this.gridEnabled
             || this._clearingStaticSat !== this.heightSaturationEnabled;
 
         if (!dirty) return;
@@ -354,15 +446,8 @@ export class Renderer {
         const sCtx = this._clearingStaticCtx;
         sCtx.clearRect(0, 0, width, height);
 
-        const gridSprite = this.gridEnabled ? this.spriteCache.getGridCell(size) : null;
-
         for (let y = staticFromRow; y < board.rows; y++) {
             const localY = y - staticFromRow;
-            if (gridSprite) {
-                for (let x = 0; x < board.cols; x++) {
-                    sCtx.drawImage(gridSprite, x * size, localY * size, size, size);
-                }
-            }
             for (let x = 0; x < board.cols; x++) {
                 const colorIndex = board.colors[y * board.cols + x];
                 if (colorIndex) this.drawCell(sCtx, x, localY, this.colorPalette[colorIndex], size, {level: this.saturationLevelForRow(y, board.rows)});
@@ -372,8 +457,28 @@ export class Renderer {
         this._clearingStaticVersion = board.version;
         this._clearingStaticSize = size;
         this._clearingStaticFromRow = staticFromRow;
-        this._clearingStaticGrid = this.gridEnabled;
         this._clearingStaticSat = this.heightSaturationEnabled;
+    }
+
+    _ensureClearingGridCache(board, size) {
+        const dirty = this._clearingGridSize !== size
+            || this._clearingGridRows !== board.rows
+            || this._clearingGridCols !== board.cols;
+
+        if (!dirty) return;
+
+        const width = board.cols * size;
+        const height = board.rows * size;
+        if (this._clearingGridCanvas.width !== width) this._clearingGridCanvas.width = width;
+        if (this._clearingGridCanvas.height !== height) this._clearingGridCanvas.height = height;
+
+        const gCtx = this._clearingGridCtx;
+        gCtx.clearRect(0, 0, width, height);
+        this.drawGrid(board, gCtx, 0, board.rows - 1);
+
+        this._clearingGridSize = size;
+        this._clearingGridRows = board.rows;
+        this._clearingGridCols = board.cols;
     }
 
     drawBoard(board) {
@@ -386,6 +491,67 @@ export class Renderer {
         ctx.drawImage(this.backgroundCanvas, 0, 0);
     }
 
+    _ensureClearingAboveCache(board, size, affectedMaxRow, lineIndices, dropRows) {
+        const dirty = this._clearingAboveVersion !== board.version
+            || this._clearingAboveSize !== size
+            || this._clearingAboveLineIndicesRef !== lineIndices
+            || this._clearingAboveDropRowsRef !== dropRows
+            || this._clearingAboveSat !== this.heightSaturationEnabled;
+
+        if (!dirty) return;
+
+        const clearingSet = new Set(lineIndices);
+        const width = board.cols * size;
+        const height = (affectedMaxRow + 1) * size;
+        if (this._clearingAboveCanvas.width !== width) this._clearingAboveCanvas.width = width;
+        if (this._clearingAboveCanvas.height !== Math.max(1, height)) {
+            this._clearingAboveCanvas.height = Math.max(1, height);
+        }
+
+        const ctx = this._clearingAboveCtx;
+        ctx.clearRect(0, 0, width, Math.max(1, height));
+
+        const segments = [];
+        let runStart = -1;
+        let runDrop = 0;
+
+        const flushRun = (endExclusive) => {
+            if (runStart === -1) return;
+            segments.push({top: runStart, height: endExclusive - runStart, dropAmount: runDrop});
+            runStart = -1;
+        };
+
+        for (let y = 0; y <= affectedMaxRow; y++) {
+            if (clearingSet.has(y)) {
+                flushRun(y);
+                continue;
+            }
+            const drop = dropRows[y] || 0;
+            if (runStart === -1) {
+                runStart = y;
+                runDrop = drop;
+            } else if (drop !== runDrop) {
+                flushRun(y);
+                runStart = y;
+                runDrop = drop;
+            }
+
+            for (let x = 0; x < board.cols; x++) {
+                const colorIndex = board.colors[y * board.cols + x];
+                if (!colorIndex) continue;
+                this.drawCell(ctx, x, y, this.colorPalette[colorIndex], size, {level: this.saturationLevelForRow(y, board.rows)});
+            }
+        }
+        flushRun(affectedMaxRow + 1);
+
+        this._clearingAboveSegments = segments;
+        this._clearingAboveVersion = board.version;
+        this._clearingAboveSize = size;
+        this._clearingAboveLineIndicesRef = lineIndices;
+        this._clearingAboveDropRowsRef = dropRows;
+        this._clearingAboveSat = this.heightSaturationEnabled;
+    }
+
     drawClearingFrame(board, lineIndices, dropRows, fragments, progress) {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx, boardCanvas} = this;
@@ -395,51 +561,42 @@ export class Renderer {
         const maskStart = flashEnd * 0.5;
         const fallProgress = p < maskStart ? 0 : Math.min(1, (p - maskStart) / (1 - maskStart));
         const rowsGone = p >= maskStart;
-        const clearingSet = new Set(lineIndices);
 
         const affectedMaxRow = lineIndices.length ? Math.max(...lineIndices) : -1;
         const staticFromRow = affectedMaxRow + 1;
         this._ensureClearingStaticBackground(board, size, staticFromRow);
+        this._ensureClearingAboveCache(board, size, affectedMaxRow, lineIndices, dropRows);
+        if (this.gridEnabled) this._ensureClearingGridCache(board, size);
 
         ctx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
-        if (this.gridEnabled) this.drawGrid(board, ctx, 0, affectedMaxRow);
+
+        if (this.gridEnabled) ctx.drawImage(this._clearingGridCanvas, 0, 0);
+
+        const width = board.cols * size;
+        for (const segment of this._clearingAboveSegments) {
+            const dy = segment.top * size + segment.dropAmount * size * fallProgress;
+            const segHeight = segment.height * size;
+            ctx.drawImage(
+                this._clearingAboveCanvas,
+                0, segment.top * size, width, segHeight,
+                0, dy, width, segHeight,
+            );
+        }
+
+        if (!rowsGone) {
+            for (const y of lineIndices) {
+                for (let x = 0; x < board.cols; x++) {
+                    const colorIndex = board.colors[y * board.cols + x];
+                    if (!colorIndex) continue;
+                    const level = this.saturationLevelForRow(y, board.rows);
+                    this.drawCell(ctx, x, y, this.colorPalette[colorIndex], size, {level});
+                }
+            }
+        }
+
         if (staticFromRow < board.rows) ctx.drawImage(this._clearingStaticCanvas, 0, staticFromRow * size);
 
-        for (let y = 0; y <= affectedMaxRow; y++) {
-            const isClearingRow = clearingSet.has(y);
-            if (isClearingRow && rowsGone) continue;
-
-            const yPos = isClearingRow ? y : y + (dropRows[y] || 0) * fallProgress;
-            for (let x = 0; x < board.cols; x++) {
-                const colorIndex = board.colors[y * board.cols + x];
-                if (!colorIndex) continue;
-                const level = this.saturationLevelForRow(Math.round(yPos), board.rows);
-                this.drawCell(ctx, x, yPos, this.colorPalette[colorIndex], size, {level});
-            }
-        }
-
-        if (fragments && fragments.length > 0 && rowsGone) {
-            const particleProgress = fallProgress;
-            const fragmentAlpha = 0.75 * (1 - particleProgress);
-
-            ctx.save();
-            ctx.globalAlpha = fragmentAlpha;
-
-            for (const frag of fragments) {
-                const x = frag.startX + frag.dx * particleProgress;
-                const y = frag.startY + frag.dy * particleProgress;
-                const rotation = frag.rotation0 + frag.dRotation * particleProgress;
-
-                ctx.save();
-                ctx.translate(x, y);
-                ctx.rotate(rotation);
-                ctx.fillStyle = frag.color;
-                ctx.fillRect(-frag.halfSize, -frag.halfSize, frag.size, frag.size);
-                ctx.restore();
-            }
-
-            ctx.restore();
-        }
+        if (rowsGone) this.drawFragments(ctx, fragments, fallProgress);
 
         if (p < flashEnd) {
             const flashProgress = p < maskStart ? 0 : (p - maskStart) / (flashEnd - maskStart);
@@ -564,10 +721,11 @@ export class Renderer {
         });
     }
 
-    drawClearingFlash(lineIndices, progress) {
-        const size = this.boardConfig.CELL_SIZE;
-        const {ctx} = this;
-
+    drawClearingFlash(lineIndices, progress, {
+        ctx = this.ctx,
+        size = this.boardConfig.CELL_SIZE,
+        cols = this.boardConfig.COLS
+    } = {}) {
         const alpha = 1 - progress;
 
         ctx.save();
@@ -579,7 +737,7 @@ export class Renderer {
         ctx.fillStyle = `oklch(1 0 0 / ${alpha})`;
 
         lineIndices.forEach((y) => {
-            ctx.fillRect(0, y * size, this.boardConfig.COLS * size, size);
+            ctx.fillRect(0, y * size, cols * size, size);
         });
 
         ctx.restore();

@@ -382,45 +382,13 @@ export class PieceController {
     }
 
     buildClearFragments(rows) {
-        const game = this.game;
-        const {board, renderer} = game;
-        const size = renderer.boardConfig.CELL_SIZE;
-        const cols = board.cols;
-        const fragmentsPerAxis = 9;
-        const fragSize = size / fragmentsPerAxis;
-        const fragments = [];
-
-        rows.forEach((y) => {
-            for (let x = 0; x < cols; x++) {
-                const colorIndex = board.colors[y * cols + x];
-                if (!colorIndex) continue;
-                const fragmentColor = renderer.particleColorForRow(renderer.colorPalette[colorIndex], y, board.rows);
-
-                for (let fy = 0; fy < fragmentsPerAxis; fy++) {
-                    for (let fx = 0; fx < fragmentsPerAxis; fx++) {
-                        const startX = x * size + (fx + 0.5) * fragSize;
-                        const startY = y * size + (fy + 0.2) * fragSize;
-
-                        const angle = Math.random() * Math.PI * 2;
-                        const distance = size * (0.2 + Math.random() * 0.5);
-
-                        fragments.push({
-                            startX,
-                            startY,
-                            dx: Math.cos(angle) * distance,
-                            dy: Math.sin(angle) * distance,
-                            rotation0: Math.random() * Math.PI * 2,
-                            dRotation: (Math.random() - 0.5) * Math.PI * 6,
-                            size: fragSize,
-                            halfSize: fragSize / 2,
-                            color: fragmentColor
-                        });
-                    }
-                }
-            }
+        const {board, renderer} = this.game;
+        return renderer.buildClearFragments({
+            cells: board.colors,
+            cols: board.cols,
+            rows: board.rows,
+            lineIndices: rows,
         });
-
-        return fragments;
     }
 
     finishLineClear() {

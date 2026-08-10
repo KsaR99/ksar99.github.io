@@ -114,6 +114,14 @@
     width: auto;
     max-width: none;
     flex: 0 0 auto;
+    order: 4;
+}
+
+.mp-race-meter {
+    width: 0.85rem;
+    max-width: none;
+    flex: 0 0 auto;
+    align-self: stretch;
     order: 3;
 }
 

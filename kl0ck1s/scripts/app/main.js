@@ -44,13 +44,13 @@ const boot = new BootLoader({
 
 const i18n = new I18n();
 const partials = Promise.all(
-    ["options", "menu", "gameover", "leaderboard"].map((name) =>
+    ["options", "menu", "gameover", "leaderboard", "multiplayer"].map((name) =>
         fetch(`partials/${name}.html`).then((response) => response.text())
     )
 );
 await i18n.init();
-i18n.applyStatic(document);
 (await partials).forEach((html) => document.body.insertAdjacentHTML("beforeend", html));
+i18n.applyStatic(document);
 
 const bodyEl = document.querySelector('body');
 const boardStage = document.querySelector(".board__stage");

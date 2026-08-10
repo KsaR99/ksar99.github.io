@@ -279,10 +279,7 @@ export class ScreenFlow {
 
     showModeInfo() {
         const game = this.game;
-        // While paired with a multiplayer opponent, the two peers' matches
-        // (including rematches) must start together — an extra "tap to
-        // continue" tip screen would leave one side waiting on it while the
-        // other's countdown/race has already begun.
+
         if (game.settings.skipModeInfo || game.multiplayerConnected) {
             this.startCountdown();
             return;
@@ -376,7 +373,7 @@ export class ScreenFlow {
         const game = this.game;
         game.state = "running";
         game.isPlayingSession = true;
-        game.hud.setPlaying(true);
+        game.hud.setPlaying(true, game.mode);
         game.hud.hideOverlay();
         game.musicDirector.start(game.board);
 
@@ -516,8 +513,8 @@ export class ScreenFlow {
     togglePause() {
         const game = this.game;
         if (game.state === "running") {
-            if (game.multiplayerConnected) {
-                this._showMultiplayerBlockedHint();
+            if (game.multiplayerConnected && !game.multiplayerVsBot) {
+                this.toggleOptions();
                 return;
             }
             game.state = "paused";
@@ -560,10 +557,6 @@ export class ScreenFlow {
             return;
         }
 
-        // Restarting mid-match would desync the two peers (only one board
-        // would reset) - same "blocked while connected" rule as pause/options
-        // above, and only while a match is actually in flight; once the round
-        // is over, "play again" from gameOver-saved is a normal rematch.
         if (["running", "paused", "clearing", "countdown"].includes(game.state) && game.multiplayerConnected) {
             this._showMultiplayerBlockedHint("multiplayer.restartBlocked");
             return;
@@ -645,7 +638,7 @@ export class ScreenFlow {
     refreshLanguage() {
         const game = this.game;
         if (game.dom) game.i18n.applyStatic(game.dom);
-        game.hud.setPlaying(game.isPlayingSession);
+        game.hud.setPlaying(game.isPlayingSession, game.mode);
         game.hud.update(game.stats);
         this.refreshCurrentScreen();
     }
@@ -693,15 +686,6 @@ export class ScreenFlow {
 
         if (!["idle", "running", "paused", "gameOver-saved", "gameOver-entry"].includes(game.state))
             return;
-
-        // Opening options from "running" freezes gameplay updates the same
-        // way pausing does (see Game#update's early-return for non-"running"
-        // states) - so without this it was a loophole around the pause
-        // block above during a multiplayer match.
-        if (game.state === "running" && game.multiplayerConnected) {
-            this._showMultiplayerBlockedHint();
-            return;
-        }
 
         game.previousStateBeforeOptions = game.state;
         if (game.state === "running") {

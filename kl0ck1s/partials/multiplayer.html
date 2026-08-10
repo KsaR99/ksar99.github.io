@@ -1,0 +1,232 @@
+<div class="mp-overlay" data-role="mp-overlay" hidden>
+    <div aria-modal="true" class="mp-dialog" data-role="mp-dialog" role="dialog">
+        <button aria-label="Close" class="mp-dialog__close" data-role="mp-close-button" type="button">✕</button>
+        <h2 class="screen__title mp-dialog__title" data-i18n="multiplayer.title">Multiplayer</h2>
+        <div class="mp-steps" data-role="mp-steps">
+            <span aria-label="Connection type" class="mp-step" data-i18n-title="multiplayer.step1Label"
+                  data-role="mp-step"
+                  data-step="1">1</span>
+            <span class="mp-step-sep"></span>
+            <span aria-label="Exchange codes" class="mp-step" data-i18n-title="multiplayer.step2Label"
+                  data-role="mp-step"
+                  data-step="2">2</span>
+            <span class="mp-step-sep"></span>
+            <span aria-label="Ready check" class="mp-step" data-i18n-title="multiplayer.step3Label" data-role="mp-step"
+                  data-step="3">3</span>
+        </div>
+        <p class="mp-step-caption" data-field="mp-step-caption"></p>
+
+        <div class="mp-panel" data-role="mp-panel-role">
+            <p class="screen__hint" data-i18n="multiplayer.chooseConnection">Choose how to connect</p>
+            <div class="screen__button-row">
+                <button class="button button--accent" data-i18n="multiplayer.hostButton" data-role="mp-host-button"
+                        type="button">Create room
+                </button>
+                <button class="button button--primary" data-i18n="multiplayer.joinButton" data-role="mp-join-button"
+                        type="button">Join room
+                </button>
+            </div>
+            <div class="screen__button-row">
+                <button class="button button--primary mp-bot-button" data-i18n="multiplayer.botButton"
+                        data-role="mp-bot-button" type="button">Play vs bot
+                </button>
+            </div>
+        </div>
+
+        <div class="mp-panel" data-role="mp-panel-bot" hidden>
+            <p class="screen__hint" data-i18n="multiplayer.chooseModeHint">Choose a mode</p>
+            <div class="difficulty difficulty--modes difficulty--carousel" data-role="mp-bot-mode-select">
+                <button aria-label="Previous mode" class="difficulty__nav" data-role="mp-bot-mode-prev"
+                        type="button">◄
+                </button>
+                <div class="difficulty__current">
+                    <span class="difficulty__label" data-field="mp-bot-mode-label"></span>
+                </div>
+                <button aria-label="Next mode" class="difficulty__nav" data-role="mp-bot-mode-next"
+                        type="button">►
+                </button>
+            </div>
+            <div class="mode-description" data-field="mp-bot-mode-description"></div>
+            <p class="screen__hint" data-i18n="screens.idle.hint">Choose difficulty</p>
+            <div class="difficulty difficulty--carousel" data-role="mp-bot-level-select">
+                <button aria-label="Previous difficulty" class="difficulty__nav" data-role="mp-bot-level-prev"
+                        type="button">◄
+                </button>
+                <div class="difficulty__current">
+                    <span class="difficulty__label" data-field="mp-bot-level-label"></span>
+                    <span class="difficulty__level" data-field="mp-bot-level-value"></span>
+                </div>
+                <button aria-label="Next difficulty" class="difficulty__nav" data-role="mp-bot-level-next"
+                        type="button">►
+                </button>
+            </div>
+            <p class="screen__hint" data-i18n="multiplayer.chooseBotDifficulty">Choose a difficulty</p>
+            <p class="mp-bot-hint" data-i18n="multiplayer.botHint">Practice on your own — the bot draws the exact
+                same pieces as you, in the same order, and starts at your currently selected level.</p>
+            <div class="screen__button-row screen__button-row--stack">
+                <button class="button button--primary" data-difficulty="easy" data-i18n="difficulty.easy"
+                        data-role="mp-bot-difficulty-button" type="button">Rookie
+                </button>
+                <button class="button button--primary" data-difficulty="medium" data-i18n="difficulty.medium"
+                        data-role="mp-bot-difficulty-button" type="button">Amateur
+                </button>
+                <button class="button button--accent" data-difficulty="hard" data-i18n="difficulty.hard"
+                        data-role="mp-bot-difficulty-button" type="button">Veteran
+                </button>
+            </div>
+        </div>
+
+        <div class="mp-panel" data-role="mp-panel-host" hidden>
+            <div data-role="mp-host-code-wrap">
+                <p class="screen__hint" data-i18n="multiplayer.sendCodeHint">Send this code to the player you want to
+                    play with</p>
+                <input class="mp-code" data-i18n-placeholder="multiplayer.generatingCode" data-role="mp-host-code"
+                       disabled placeholder="Please wait, generating code…" type="password">
+                <button class="button button--primary mp-copy-button" data-i18n="multiplayer.copyButton"
+                        data-role="mp-host-copy-button"
+                        disabled type="button">
+                    Copy code
+                </button>
+            </div>
+
+            <div data-role="mp-host-answer-wrap" hidden>
+                <p class="screen__hint" data-i18n="multiplayer.pasteAnswerHint">Paste the answer code from the other
+                    player</p>
+                <input class="mp-code" data-i18n-placeholder="multiplayer.codePlaceholder"
+                       data-role="mp-host-answer-input" placeholder="Paste code here…" type="password">
+                <button class="button button--accent" data-i18n="multiplayer.connectButton"
+                        data-role="mp-host-connect-button" type="button">Connect
+                </button>
+            </div>
+        </div>
+
+        <div class="mp-panel" data-role="mp-panel-join" hidden>
+            <p class="screen__hint" data-i18n="multiplayer.pasteHostHint">Paste the room code you got from the
+                host</p>
+            <input class="mp-code" data-i18n-placeholder="multiplayer.codePlaceholder" data-role="mp-join-code-input"
+                   placeholder="Paste code here…" type="password">
+            <button class="button button--accent" data-i18n="multiplayer.joinConnectButton"
+                    data-role="mp-join-connect-button" type="button">Join
+            </button>
+
+            <div data-role="mp-join-answer-wrap" hidden>
+                <p class="screen__hint" data-i18n="multiplayer.sendBackHint">Send this code back to the host</p>
+                <input class="mp-code" data-i18n-placeholder="multiplayer.generatingCode"
+                       data-role="mp-join-answer-code" disabled placeholder="Please wait, generating code…"
+                       type="password">
+                <button class="button button--primary mp-copy-button" data-i18n="multiplayer.copyButton"
+                        data-role="mp-join-copy-button"
+                        disabled type="button">
+                    Copy code
+                </button>
+            </div>
+        </div>
+
+        <div class="mp-panel" data-role="mp-panel-ready" hidden>
+            <p class="mp-status" data-field="mp-status-text" data-i18n="multiplayer.statusConnecting">Connecting…
+            </p>
+            <div class="mp-config" data-role="mp-config">
+                <p class="mp-config__hint" data-field="mp-config-hint"></p>
+                <div class="difficulty difficulty--modes difficulty--carousel" data-role="mp-ready-mode-select">
+                    <button aria-label="Previous mode" class="difficulty__nav" data-role="mp-ready-mode-prev"
+                            type="button">◄
+                    </button>
+                    <div class="difficulty__current">
+                        <span class="difficulty__label" data-field="mp-ready-mode-label"></span>
+                    </div>
+                    <button aria-label="Next mode" class="difficulty__nav" data-role="mp-ready-mode-next"
+                            type="button">►
+                    </button>
+                </div>
+                <div class="difficulty difficulty--carousel" data-role="mp-ready-difficulty-select">
+                    <button aria-label="Previous difficulty" class="difficulty__nav"
+                            data-role="mp-ready-difficulty-prev"
+                            type="button">◄
+                    </button>
+                    <div class="difficulty__current">
+                        <span class="difficulty__label" data-field="mp-ready-difficulty-label"></span>
+                        <span class="difficulty__level" data-field="mp-ready-difficulty-level"></span>
+                    </div>
+                    <button aria-label="Next difficulty" class="difficulty__nav" data-role="mp-ready-difficulty-next"
+                            type="button">►
+                    </button>
+                </div>
+            </div>
+            <div class="mp-ready-row">
+                <span class="mp-ready-badge" data-i18n="multiplayer.youNotReady"
+                      data-role="mp-local-ready-badge">You: not ready</span>
+                <span class="mp-ready-badge" data-i18n="multiplayer.opponentNotReady"
+                      data-role="mp-remote-ready-badge">Opponent: not ready</span>
+            </div>
+            <div class="screen__button-row">
+                <button class="button button--accent" data-i18n="multiplayer.readyButton" data-role="mp-ready-button"
+                        type="button">Ready
+                </button>
+                <button class="button button--primary" data-i18n="multiplayer.startButton" data-role="mp-start-button"
+                        hidden type="button">
+                    Start game
+                </button>
+            </div>
+        </div>
+
+        <div class="mp-panel mp-result-panel" data-role="mp-panel-result" hidden>
+            <h2 class="screen__title mp-result-panel__title" data-role="mp-result-title">YOU WIN</h2>
+            <div class="mp-result-players">
+                <div class="mp-result-player">
+                    <span class="mp-result-player__name" data-role="mp-result-local-name">You</span>
+                    <strong class="mp-result-player__score" data-role="mp-result-local-score">0</strong>
+                </div>
+                <span class="mp-result-vs">VS</span>
+                <div class="mp-result-player">
+                    <span class="mp-result-player__name" data-role="mp-result-remote-name">Opponent</span>
+                    <strong class="mp-result-player__score" data-role="mp-result-remote-score">0</strong>
+                </div>
+            </div>
+            <div class="mp-result-stats">
+                <div class="mp-result-stat mp-result-stat--header">
+                    <span></span>
+                    <strong data-result-side="local" data-role="mp-result-local-name-mini">You</strong>
+                    <strong data-result-side="remote" data-role="mp-result-remote-name-mini">Opponent</strong>
+                </div>
+                <div class="mp-result-stat"><span data-i18n="sidebar.lines">Lines</span><strong
+                    data-result-side="local" data-role="mp-result-local-lines">0</strong><strong
+                    data-result-side="remote" data-role="mp-result-remote-lines">0</strong></div>
+                <div class="mp-result-stat"><span
+                    data-i18n="screens.gameOverEntry.tetrisRateLabel">Tetris rate</span><strong
+                    data-result-side="local" data-role="mp-result-local-trt">0.0%</strong><strong
+                    data-result-side="remote" data-role="mp-result-remote-trt">0.0%</strong></div>
+                <div class="mp-result-stat"><span data-i18n="screens.gameOverEntry.ppsLabel">PPS</span><strong
+                    data-result-side="local" data-role="mp-result-local-pps">0.00</strong><strong
+                    data-result-side="remote" data-role="mp-result-remote-pps">0.00</strong></div>
+                <div class="mp-result-stat"><span
+                    data-i18n="screens.gameOverEntry.efficiencyLabel">Efficiency</span><strong
+                    data-result-side="local" data-role="mp-result-local-efficiency">0</strong><strong
+                    data-result-side="remote" data-role="mp-result-remote-efficiency">0</strong></div>
+                <div class="mp-result-stat"><span
+                    data-i18n="screens.gameOverEntry.maxComboLabel">Longest combo</span><strong
+                    data-result-side="local" data-role="mp-result-local-combo">0</strong><strong
+                    data-result-side="remote" data-role="mp-result-remote-combo">0</strong></div>
+                <div class="mp-result-stat"><span data-i18n="screens.gameOverEntry.burnLabel">BRN</span><strong
+                    data-result-side="local" data-role="mp-result-local-burn">0</strong><strong
+                    data-result-side="remote" data-role="mp-result-remote-burn">0</strong></div>
+                <div class="mp-result-stat"><span data-i18n="screens.gameOverEntry.droughtLabel">D.MAX</span><strong
+                    data-result-side="local" data-role="mp-result-local-drought-max">0</strong><strong
+                    data-result-side="remote" data-role="mp-result-remote-drought-max">0</strong></div>
+                <div class="mp-result-stat"><span
+                    data-i18n="screens.gameOverEntry.droughtTotalLabel">D.TOTAL</span><strong
+                    data-result-side="local" data-role="mp-result-local-drought-total">0</strong><strong
+                    data-result-side="remote" data-role="mp-result-remote-drought-total">0</strong></div>
+                <div class="mp-result-stat"><span data-i18n="screens.gameOverEntry.droughtAvgLabel">D.AVG</span><strong
+                    data-result-side="local" data-role="mp-result-local-drought-avg">0.0</strong><strong
+                    data-result-side="remote" data-role="mp-result-remote-drought-avg">0.0</strong></div>
+            </div>
+            <div class="screen__button-row">
+                <button class="button button--accent" data-role="mp-result-rematch-button" type="button">Rematch
+                </button>
+                <button class="button button--primary" data-role="mp-result-close-button" type="button">Close</button>
+            </div>
+        </div>
+
+        <p class="mp-error" data-field="mp-error-text" hidden></p>
+    </div>
+</div>
