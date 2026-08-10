@@ -304,14 +304,14 @@ export class Renderer {
     _applyBoardOffset(transitionMs) {
         const el = this.boardEl;
         if (!el) return;
-        el.style.transition = `transform ${transitionMs}ms ease-out`;
-        el.style.transform = `translate(${this._boardOffsetX ?? 0}rem, ${this._boardOffsetY ?? 0}rem)`;
+        el.style.transition = `translate ${transitionMs}ms ease-out`;
+        el.style.translate = `${this._boardOffsetX ?? 0}rem ${this._boardOffsetY ?? 0}rem`;
     }
 
     shakeMove(dir) {
         if (!this.shakeEnabled || !this.boardEl || !dir) return;
         clearTimeout(this._shakeTimer);
-        this._boardOffsetX = dir < 0 ? 0.5 : -0.5;
+        this._boardOffsetX = dir < 0 ? 0.4 : -0.4;
         this._applyBoardOffset(70);
         this._shakeTimer = setTimeout(() => {
             this._boardOffsetX = 0;
@@ -323,7 +323,7 @@ export class Renderer {
         if (!this.shakeEnabled || !this.boardEl) return;
         clearTimeout(this._squashTimerA);
         clearTimeout(this._squashTimerB);
-        this._boardOffsetY = 0.6;
+        this._boardOffsetY = 0.5;
         this._applyBoardOffset(70);
         this._squashTimerA = setTimeout(() => {
             this._boardOffsetY = -0.5;
