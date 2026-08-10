@@ -46,8 +46,8 @@ body {
     &[data-theme="none"] {
         --body-bg: radial-gradient(circle at 50% 100%, oklch(0.89 0 0) 0, oklch(0.26 0.04 283.84) 60%);
         --app-bg: oklch(0.18 0.02 254.93 / 0.9);
-        --board-bg: oklch(0.33 0 0);
-        --board-accent: oklch(0.72 0 0 / 0.85);
+        --board-bg: oklch(0.18 0 0);
+        --board-accent: oklch(0.49 0 0 / 0.85);
         --stats__status--live-color: oklch(0.84 0.11 151.71);
     }
 

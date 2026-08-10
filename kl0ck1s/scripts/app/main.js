@@ -220,6 +220,7 @@ game.init({
 }).finally(() => clearTimeout(bootWatchdog));
 
 const multiplayerController = new MultiplayerController(game, document, i18n);
+game.multiplayerController = multiplayerController;
 multiplayerController.init();
 
 const fabControlsBtn = document.querySelector('[data-role="fab-controls"]');

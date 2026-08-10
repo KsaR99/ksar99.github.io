@@ -443,6 +443,12 @@ export class ScreenFlow {
     exitToMenu() {
         const game = this.game;
         if (!["running", "paused", "countdown", "clearing", "modeInfo"].includes(game.state)) return;
+
+        if (game.multiplayerConnected && game.multiplayerController) {
+            game.multiplayerController.leaveMatch();
+            return;
+        }
+
         game.pieceController.stopAllGameplaySounds();
         game.musicDirector.stop(0);
         this.showIdleScreen().then();
@@ -558,6 +564,10 @@ export class ScreenFlow {
         }
 
         if (["running", "paused", "clearing", "countdown"].includes(game.state) && game.multiplayerConnected) {
+            if (game.multiplayerVsBot && game.multiplayerController) {
+                game.multiplayerController.restartBotMatch();
+                return;
+            }
             this._showMultiplayerBlockedHint("multiplayer.restartBlocked");
             return;
         }
@@ -594,6 +604,11 @@ export class ScreenFlow {
 
     async handleEnter() {
         const game = this.game;
+        const mp = game.multiplayerController;
+        if (mp?.isOpen) {
+            if (mp.isResultPanelVisible) mp.rematch();
+            return;
+        }
         if (game.state === "idle" || game.state === "gameOver-saved") {
             if (!this.isNicknameValid()) return;
             if (game.playerName) await this.commitProfile(game.playerName);

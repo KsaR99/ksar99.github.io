@@ -115,6 +115,10 @@ export class MultiplayerController {
         return this.dom?.querySelector('[data-role="mp-overlay"]') ?? null;
     }
 
+    get isOpen() {
+        return !!this.overlayEl && !this.overlayEl.hidden;
+    }
+
     get panels() {
         return {
             role: this.dom?.querySelector('[data-role="mp-panel-role"]') ?? null,
@@ -124,6 +128,11 @@ export class MultiplayerController {
             ready: this.dom?.querySelector('[data-role="mp-panel-ready"]') ?? null,
             result: this.dom?.querySelector('[data-role="mp-panel-result"]') ?? null,
         };
+    }
+
+    /** True while the post-match win/loss results panel is on screen. */
+    get isResultPanelVisible() {
+        return !!this._resultPanelEl;
     }
 
     init() {
@@ -560,8 +569,15 @@ export class MultiplayerController {
         this._wasInMatch = false;
         this._showOpponentUI();
 
-        const startButton = this.dom.querySelector('[data-role="start-button"]');
-        startButton?.click();
+        const game = this.game;
+        if (game.state === "idle" || game.state === "gameOver-saved") {
+            const startButton = this.dom.querySelector('[data-role="start-button"]');
+            startButton?.click();
+        } else {
+            game.pieceController.stopAllGameplaySounds();
+            game.musicDirector.stop(0);
+            game.screenFlow.startCountdown();
+        }
         this._startScoreSync();
     }
 
@@ -854,12 +870,38 @@ export class MultiplayerController {
 
     _leaveMatch() {
         const game = this.game;
+        const wasBot = this.role === "bot";
         game.pieceController.stopAllGameplaySounds();
         game.musicDirector.stop(0);
         this._hideResultPanel();
         this._resetSession();
+
+        if (wasBot) {
+            game.screenFlow.showIdleScreen().then(() => this.open());
+            return;
+        }
+
         this.close();
         game.screenFlow.showIdleScreen().then();
+    }
+
+    /** Public entry point for leaving a match mid-game (e.g. the exitToMenu/"X" action) -
+     *  cleans up the session/bot and opponent UI instead of just switching screens. */
+    leaveMatch() {
+        this._leaveMatch();
+    }
+
+    /** Public entry point for restarting a running bot match (e.g. the restart/"R" action). */
+    restartBotMatch() {
+        if (this.role !== "bot" || !this._botDifficultyKey) return;
+        this._beginBot(this._botDifficultyKey);
+    }
+
+    /** Public entry point for the rematch action (e.g. the confirm/"Enter" action while
+     *  the result panel is visible). */
+    rematch() {
+        if (!this.isResultPanelVisible) return;
+        this._rematch();
     }
 
     _showOpponentUI() {

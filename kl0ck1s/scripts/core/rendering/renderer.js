@@ -175,7 +175,7 @@ export class Renderer {
      * @param {number} [params.size] - cell size in px; defaults to this board's cell size
      */
     buildClearFragments({cells, cols, rows, lineIndices, size = this.boardConfig.CELL_SIZE}) {
-        const fragmentsPerAxis = 9;
+        const fragmentsPerAxis = 6;
         const fragSize = size / fragmentsPerAxis;
         const fragments = [];
 
