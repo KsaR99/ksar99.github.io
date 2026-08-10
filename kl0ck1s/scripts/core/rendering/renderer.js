@@ -167,75 +167,123 @@ export class Renderer {
      * board (PieceController) and any board rendered elsewhere (e.g. the multiplayer
      * opponent/bot canvas) so both get the same particle-burst effect.
      *
+     * Returned as a struct-of-arrays (parallel TypedArrays) rather than an array of
+     * per-fragment objects: a line clear can spawn hundreds of fragments (36 per cleared
+     * cell), so this avoids allocating that many small objects - and the GC churn that
+     * comes with it - every time a line clears. Colors are deduplicated into a small
+     * `colors` string table and referenced by index via a Uint16Array, since CSS color
+     * strings can't live in a numeric typed array.
+     *
      * @param {object} params
      * @param {Uint8Array|number[]} params.cells - flat colorIndex array, length cols*rows
      * @param {number} params.cols
      * @param {number} params.rows - total board rows (used for height-saturation)
      * @param {number[]} params.lineIndices - rows being cleared
      * @param {number} [params.size] - cell size in px; defaults to this board's cell size
+     * @returns {{
+     *   count: number,
+     *   startX: Float32Array, startY: Float32Array,
+     *   dx: Float32Array, dy: Float32Array,
+     *   rotation0: Float32Array, dRotation: Float32Array,
+     *   size: Float32Array, halfSize: Float32Array,
+     *   colorIndex: Uint16Array, colors: string[]
+     * }}
      */
     buildClearFragments({cells, cols, rows, lineIndices, size = this.boardConfig.CELL_SIZE}) {
         const fragmentsPerAxis = 6;
+        const fragsPerCell = fragmentsPerAxis * fragmentsPerAxis;
         const fragSize = size / fragmentsPerAxis;
-        const fragments = [];
+        const halfFragSize = fragSize / 2;
 
-        lineIndices.forEach((y) => {
+        // First pass: count non-empty cells so the TypedArrays can be sized exactly once.
+        let cellCount = 0;
+        for (const y of lineIndices) {
             for (let x = 0; x < cols; x++) {
-                const colorIndex = cells[y * cols + x];
-                if (!colorIndex) continue;
-                const fragmentColor = this.particleColorForRow(this.colorPalette[colorIndex], y, rows);
+                if (cells[y * cols + x]) cellCount++;
+            }
+        }
+
+        const count = cellCount * fragsPerCell;
+        const startX = new Float32Array(count);
+        const startY = new Float32Array(count);
+        const dx = new Float32Array(count);
+        const dy = new Float32Array(count);
+        const rotation0 = new Float32Array(count);
+        const dRotation = new Float32Array(count);
+        const fragSizeArr = new Float32Array(count).fill(fragSize);
+        const halfSizeArr = new Float32Array(count).fill(halfFragSize);
+        const colorIndex = new Uint16Array(count);
+        const colors = [];
+        const colorSlot = new Map();
+
+        let i = 0;
+        for (const y of lineIndices) {
+            for (let x = 0; x < cols; x++) {
+                const cellColorIndex = cells[y * cols + x];
+                if (!cellColorIndex) continue;
+                const fragmentColor = this.particleColorForRow(this.colorPalette[cellColorIndex], y, rows);
+
+                let cIdx = colorSlot.get(fragmentColor);
+                if (cIdx === undefined) {
+                    cIdx = colors.length;
+                    colors.push(fragmentColor);
+                    colorSlot.set(fragmentColor, cIdx);
+                }
 
                 for (let fy = 0; fy < fragmentsPerAxis; fy++) {
-                    for (let fx = 0; fx < fragmentsPerAxis; fx++) {
-                        const startX = x * size + (fx + 0.5) * fragSize;
-                        const startY = y * size + (fy + 0.2) * fragSize;
+                    for (let fx = 0; fx < fragmentsPerAxis; fx++, i++) {
+                        startX[i] = x * size + (fx + 0.5) * fragSize;
+                        startY[i] = y * size + (fy + 0.2) * fragSize;
 
                         const angle = Math.random() * Math.PI * 2;
                         const distance = size * (0.2 + Math.random() * 0.5);
 
-                        fragments.push({
-                            startX,
-                            startY,
-                            dx: Math.cos(angle) * distance,
-                            dy: Math.sin(angle) * distance,
-                            rotation0: Math.random() * Math.PI * 2,
-                            dRotation: (Math.random() - 0.5) * Math.PI * 6,
-                            size: fragSize,
-                            halfSize: fragSize / 2,
-                            color: fragmentColor
-                        });
+                        dx[i] = Math.cos(angle) * distance;
+                        dy[i] = Math.sin(angle) * distance;
+                        rotation0[i] = Math.random() * Math.PI * 2;
+                        dRotation[i] = (Math.random() - 0.5) * Math.PI * 6;
+                        colorIndex[i] = cIdx;
                     }
                 }
             }
-        });
+        }
 
-        return fragments;
+        return {
+            count,
+            startX, startY,
+            dx, dy,
+            rotation0, dRotation,
+            size: fragSizeArr, halfSize: halfSizeArr,
+            colorIndex, colors,
+        };
     }
 
     /**
      * Draws a line-clear particle burst onto any canvas context.
      *
      * @param {CanvasRenderingContext2D} ctx
-     * @param {Array<object>} fragments
+     * @param {ReturnType<Renderer["buildClearFragments"]>} fragments
      * @param {number} particleProgress - 0..1
      */
     drawFragments(ctx, fragments, particleProgress) {
-        if (!fragments || fragments.length === 0) return;
+        if (!fragments || !fragments.count) return;
 
+        const {count, startX, startY, dx, dy, rotation0, dRotation, size, halfSize, colorIndex, colors} = fragments;
         const fragmentAlpha = 0.75 * (1 - particleProgress);
 
         ctx.save();
         ctx.globalAlpha = fragmentAlpha;
 
-        for (const frag of fragments) {
-            const x = frag.startX + frag.dx * particleProgress;
-            const y = frag.startY + frag.dy * particleProgress;
-            const rotation = frag.rotation0 + frag.dRotation * particleProgress;
+        for (let i = 0; i < count; i++) {
+            const x = startX[i] + dx[i] * particleProgress;
+            const y = startY[i] + dy[i] * particleProgress;
+            const rotation = rotation0[i] + dRotation[i] * particleProgress;
             const cos = Math.cos(rotation);
             const sin = Math.sin(rotation);
             ctx.setTransform(cos, sin, -sin, cos, x, y);
-            ctx.fillStyle = frag.color;
-            ctx.fillRect(-frag.halfSize, -frag.halfSize, frag.size, frag.size);
+            ctx.fillStyle = colors[colorIndex[i]];
+            const half = halfSize[i];
+            ctx.fillRect(-half, -half, size[i], size[i]);
         }
 
         ctx.setTransform(1, 0, 0, 1, 0, 0);

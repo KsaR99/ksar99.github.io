@@ -10,58 +10,68 @@ export class Rain {
         this.active = false;
         this.rafId = null;
         this.frameCount = 0;
-        this.drops = [];
+
+        this.count = 0;
+        this.x = new Float32Array(0);
+        this.y = new Float32Array(0);
+        this.length = new Float32Array(0);
+        this.speed = new Float32Array(0);
+        this.drift = new Float32Array(0);
+
         this._loop = this.loop.bind(this);
     }
 
-    _spawnDrop(width, height, initial = false) {
-        return {
-            x: Math.random() * width,
-            y: initial ? Math.random() * height : Math.random() * -height,
-            length: 10 + Math.random() * 14,
-            speed: 6 + Math.random() * 6,
-            drift: -0.5 + Math.random(),
-        };
+    _spawnDrop(i, width, height, initial = false) {
+        this.x[i] = Math.random() * width;
+        this.y[i] = initial ? Math.random() * height : Math.random() * -height;
+        this.length[i] = 10 + Math.random() * 14;
+        this.speed[i] = 6 + Math.random() * 6;
+        this.drift[i] = -0.5 + Math.random();
     }
 
     resize(width, height) {
         const w = Math.max(1, Math.round(width));
         const h = Math.max(1, Math.round(height));
-        if (this._lastWidth === w && this._lastHeight === h && this.drops.length) return;
+        if (this._lastWidth === w && this._lastHeight === h && this.count) return;
         this._lastWidth = w;
         this._lastHeight = h;
 
         this.canvas.width = w;
         this.canvas.height = h;
 
-        const count = Math.max(8, Math.round(w * DENSITY));
-        this.drops = Array.from({length: count}, () => this._spawnDrop(w, h, true));
+        this.count = Math.max(8, Math.round(w * DENSITY));
+        this.x = new Float32Array(this.count);
+        this.y = new Float32Array(this.count);
+        this.length = new Float32Array(this.count);
+        this.speed = new Float32Array(this.count);
+        this.drift = new Float32Array(this.count);
+        for (let i = 0; i < this.count; i++) this._spawnDrop(i, w, h, true);
         this.ctx.clearRect(0, 0, w, h);
     }
 
     drawFrame() {
-        const {ctx, canvas, drops} = this;
-        if (!drops.length || canvas.width === 0 || canvas.height === 0) return;
+        const {ctx, canvas, count, x, y, length, speed, drift} = this;
+        if (!count || canvas.width === 0 || canvas.height === 0) return;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.strokeStyle = DROP_COLOR;
         ctx.lineWidth = 1;
         ctx.lineCap = "round";
 
-        drops.forEach((drop) => {
-            ctx.beginPath();
-            ctx.moveTo(drop.x, drop.y);
-            ctx.lineTo(drop.x + drop.drift * 2, drop.y + drop.length);
-            ctx.stroke();
+        const path = new Path2D();
+        for (let i = 0; i < count; i++) {
+            path.moveTo(x[i], y[i]);
+            path.lineTo(x[i] + drift[i] * 2, y[i] + length[i]);
 
-            drop.x += drop.drift;
-            drop.y += drop.speed;
+            x[i] += drift[i];
+            y[i] += speed[i];
 
-            if (drop.y - drop.length > canvas.height) {
-                Object.assign(drop, this._spawnDrop(canvas.width, 0));
-                drop.y = -drop.length;
+            if (y[i] - length[i] > canvas.height) {
+                this._spawnDrop(i, canvas.width, 0);
+                y[i] = -length[i];
             }
-        });
+        }
+        ctx.stroke(path);
     }
 
     loop() {

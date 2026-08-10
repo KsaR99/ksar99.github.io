@@ -149,6 +149,15 @@ export class MusicDirector {
                 clearTimeout(pendingTimeout);
                 this._fadeTimeouts.delete(pendingId);
             }
+
+            if (this.fadingOutIds.has(pendingId)) {
+                this.fadingOutIds.delete(pendingId);
+                this.soundManager.fadeInstanceVolume(pendingId, 1, this.fadeDurationMs);
+                this.currentInstanceId = pendingId;
+                this.soundManager.setDetune(pendingId, this._pitchSemitones * 100);
+                return;
+            }
+
             this.fadingOutIds.delete(pendingId);
 
             if (this.soundManager.resume(pendingId)) {
