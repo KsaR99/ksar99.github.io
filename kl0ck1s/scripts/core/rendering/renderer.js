@@ -667,7 +667,7 @@ export class Renderer {
         ctx.save();
         for (let i = 0; i < count; i++) {
             const alpha = alphas[i];
-            if (alpha <= 0.02) continue;
+            if (alpha <= 0.02) break;
 
             const idx = (headIndex - 1 - i + capacity * 2) % capacity;
             const snap = trail[idx];
@@ -704,7 +704,7 @@ export class Renderer {
             if (!entry.mask) continue;
 
             const alpha = HARD_DROP_TRAIL_MAX_ALPHA * (1 - i / count) * fade;
-            if (alpha <= 0.02) continue;
+            if (alpha <= 0.02) break;
 
             ctx.globalAlpha = alpha;
             const sprite = this.spriteCache.getHardDropTrail(entry.color, size, entry.level ?? 0);

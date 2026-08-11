@@ -128,7 +128,7 @@ function resizeBoardCanvas() {
 }
 
 const themeCanvas = boardStage.querySelector("#filter-canvas");
-const themeCtx = themeCanvas.getContext("2d", {willReadFrequently: true});
+const themeCtx = themeCanvas.getContext("2d");
 
 const spriteCache = new SpriteCache(KLOCKOMINOS, () => document.createElement("canvas"));
 const nextSpriteCache = new SpriteCache(KLOCKOMINOS, () => document.createElement("canvas"));

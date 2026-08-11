@@ -8,6 +8,33 @@ const HEAD_COLOR = "oklch(0.751 0.133 144.116)";
 const BODY_COLOR = "oklch(0.543 0.123 151.327)";
 const DIM_COLOR = "oklch(0.363 0.093 151.376)";
 
+const GLYPH_COLORS = [HEAD_COLOR, BODY_COLOR, DIM_COLOR];
+const GLYPH_H = FONT_SIZE * 2;
+
+let glyphSprites = null;
+
+function getGlyphSprites() {
+    if (glyphSprites) return glyphSprites;
+
+    glyphSprites = GLYPH_COLORS.map((color) => {
+        const row = new Array(CHARS.length);
+        for (let c = 0; c < CHARS.length; c++) {
+            const sprite = document.createElement("canvas");
+            sprite.width = FONT_SIZE;
+            sprite.height = GLYPH_H;
+            const sctx = sprite.getContext("2d");
+            sctx.font = FONT;
+            sctx.textBaseline = "middle";
+            sctx.fillStyle = color;
+            sctx.fillText(CHARS[c], 0, GLYPH_H / 2);
+            row[c] = sprite;
+        }
+        return row;
+    });
+
+    return glyphSprites;
+}
+
 export class Matrix {
     constructor(canvas, ctx = null) {
         this.canvas = canvas;
@@ -23,6 +50,8 @@ export class Matrix {
         this.switchEvery = new Uint8Array(0);
         this.tick = new Uint8Array(0);
         this.tailLength = new Uint8Array(0);
+
+        this._sprites = getGlyphSprites();
 
         this._loop = this.loop.bind(this);
     }
@@ -63,17 +92,15 @@ export class Matrix {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        if (ctx.font !== FONT) ctx.font = FONT;
-        if (ctx.textBaseline !== "middle") ctx.textBaseline = "middle";
+        const [headSprites, bodySprites, dimSprites] = this._sprites;
+        const spriteDy = GLYPH_H / 2;
 
-        ctx.fillStyle = HEAD_COLOR;
         for (let i = 0; i < count; i++) {
             const ty = y[i];
             if (ty < -FONT_SIZE || ty > canvas.height) continue;
-            ctx.fillText(CHARS[charIndex[i]], i * FONT_SIZE, ty);
+            ctx.drawImage(headSprites[charIndex[i]], i * FONT_SIZE, ty - spriteDy);
         }
 
-        ctx.fillStyle = BODY_COLOR;
         for (let i = 0; i < count; i++) {
             const tail = tailLength[i];
             const bodyEnd = tail * 0.5;
@@ -81,11 +108,10 @@ export class Matrix {
             for (let t = 1; t < bodyEnd; t++) {
                 const ty = y[i] - t * FONT_SIZE;
                 if (ty < -FONT_SIZE || ty > canvas.height) continue;
-                ctx.fillText(CHARS[(charIndex[i] + t) % CHARS.length], x, ty);
+                ctx.drawImage(bodySprites[(charIndex[i] + t) % CHARS.length], x, ty - spriteDy);
             }
         }
 
-        ctx.fillStyle = DIM_COLOR;
         for (let i = 0; i < count; i++) {
             const tail = tailLength[i];
             const bodyEnd = tail * 0.5;
@@ -93,7 +119,7 @@ export class Matrix {
             for (let t = Math.max(1, Math.ceil(bodyEnd)); t < tail; t++) {
                 const ty = y[i] - t * FONT_SIZE;
                 if (ty < -FONT_SIZE || ty > canvas.height) continue;
-                ctx.fillText(CHARS[(charIndex[i] + t) % CHARS.length], x, ty);
+                ctx.drawImage(dimSprites[(charIndex[i] + t) % CHARS.length], x, ty - spriteDy);
             }
         }
 

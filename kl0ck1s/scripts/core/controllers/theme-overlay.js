@@ -34,7 +34,7 @@ export class ThemeOverlay {
         this.unregisterTarget(key);
         this._targets.set(key, {
             overlayEl: overlayEl ?? null,
-            themes: this._buildThemes(canvas, ctx ?? canvas.getContext("2d", {willReadFrequently: true})),
+            themes: this._buildThemes(canvas, ctx ?? canvas.getContext("2d")),
         });
         this._updateTarget(key);
     }

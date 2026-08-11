@@ -7,14 +7,21 @@ import {Renderer} from "../rendering/renderer.js";
 import {PieceController} from "./piece-controller.js";
 import {ModeController} from "./mode-controller.js";
 import {StatsTracker} from "./stats-tracker.js";
+import {MusicDirector} from "../services/music-director.js";
+import {VHS} from "../ui/themes/vhs.js";
+import {Matrix} from "../ui/themes/matrix.js";
+import {Rain} from "../ui/themes/rain.js";
+import {Snow} from "../ui/themes/snow.js";
 import {pointsForHardDrop, pointsForLineClear} from "../game/scoring.js";
 import {dropIntervalForLevel, nowMs, smoothedInterval, tierForLevel} from "../shared/utils.js";
-import {HARD_DROP_TRAIL_DURATION_MS} from "../game/game-constants.js";
+import {FALL_TRAIL_MAX_LENGTH, fallTrailLengthForInterval, HARD_DROP_TRAIL_DURATION_MS} from "../game/game-constants.js";
 
 const CATEGORY_KEYS = [
     "pieceGeneration", "movement", "rotation",
     "dropOffset", "lockPiece", "lineClearDetect", "lineClearApply", "scoring",
     "renderBackgroundRebuild", "renderBlit", "renderDrawPiece", "renderDrawGhost",
+    "renderFallTrail", "renderHardDropTrail", "renderClearingFrame",
+    "boardShake", "themeEffectDraw", "musicDirectorUpdate",
     "audioPlay", "audioStop",
 ];
 
@@ -64,6 +71,13 @@ class BenchmarkShadowGame {
         this.effectiveShiftIntervalMs = Infinity;
         this.shiftAnim = null;
         this.hardDropTrail = null;
+
+        this.fallTrail = Array.from({length: FALL_TRAIL_MAX_LENGTH}, () => ({
+            x: 0, y: 0, mask: null, width: 0, height: 0, color: null,
+        }));
+        this.fallTrailHead = 0;
+        this.fallTrailCount = 0;
+        this._trailPieceRef = null;
     }
 
     get stats() {
@@ -112,6 +126,43 @@ class BenchmarkShadowGame {
 
         this.hardDropTrail = {entries, elapsed: 0, duration: HARD_DROP_TRAIL_DURATION_MS};
     }
+
+    updateFallTrail(renderedPiece) {
+        const moveIntervalMs = Math.min(this.effectiveDropIntervalMs, this.effectiveShiftIntervalMs);
+        const trailLength = fallTrailLengthForInterval(moveIntervalMs);
+
+        if (trailLength === 0) {
+            this.fallTrailCount = 0;
+            return;
+        }
+
+        if (this._trailPieceRef !== this.current) {
+            this._trailPieceRef = this.current;
+            for (let i = 0; i < trailLength; i++) {
+                const slot = this.fallTrail[i];
+                slot.x = renderedPiece.x;
+                slot.y = renderedPiece.y;
+                slot.mask = renderedPiece.mask;
+                slot.width = renderedPiece.width;
+                slot.height = renderedPiece.height;
+                slot.color = renderedPiece.color;
+            }
+            this.fallTrailHead = trailLength % FALL_TRAIL_MAX_LENGTH;
+            this.fallTrailCount = trailLength;
+            return;
+        }
+
+        const slot = this.fallTrail[this.fallTrailHead];
+        slot.x = renderedPiece.x;
+        slot.y = renderedPiece.y;
+        slot.mask = renderedPiece.mask;
+        slot.width = renderedPiece.width;
+        slot.height = renderedPiece.height;
+        slot.color = renderedPiece.color;
+
+        this.fallTrailHead = (this.fallTrailHead + 1) % FALL_TRAIL_MAX_LENGTH;
+        this.fallTrailCount = Math.min(trailLength, this.fallTrailCount + 1);
+    }
 }
 
 export class BenchmarkController {
@@ -146,7 +197,7 @@ export class BenchmarkController {
 
         this._offscreenRenderer = new Renderer({
             bodyEl: document.body,
-            boardEl: null,
+            boardEl: document.createElement("div"),
             ctx,
             boardCanvas,
             nextCtx,
@@ -172,6 +223,25 @@ export class BenchmarkController {
         this._getOffscreenRenderer();
     }
 
+    _getOffscreenThemeEffects(width, height) {
+        if (this._offscreenThemeEffects) {
+            for (const instance of Object.values(this._offscreenThemeEffects)) instance.resize(width, height);
+            return this._offscreenThemeEffects;
+        }
+
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        this._offscreenThemeEffects = {
+            vhs: new VHS(canvas, ctx),
+            matrix: new Matrix(canvas, ctx),
+            rain: new Rain(canvas, ctx),
+            snow: new Snow(canvas, ctx),
+        };
+        for (const instance of Object.values(this._offscreenThemeEffects)) instance.resize(width, height);
+        return this._offscreenThemeEffects;
+    }
+
     _mutedSoundManager() {
         return {
             play: () => null,
@@ -180,11 +250,17 @@ export class BenchmarkController {
             },
             stopCategory: () => {
             },
-            pause: () => {
-            },
-            resume: () => {
-            },
+            pause: () => false,
+            resume: () => false,
             setPlaybackRate: () => {
+            },
+            fadeInstanceVolume: () => {
+            },
+            setInstanceVolume: () => {
+            },
+            setDetune: () => {
+            },
+            rampInstanceDetune: () => {
             },
             getDuration: (...args) => this.game.soundManager.getDuration(...args),
         };
@@ -218,6 +294,7 @@ export class BenchmarkController {
             }
         };
         shadow.soundManager = this._mutedSoundManager();
+        shadow.musicDirector = new MusicDirector(shadow.soundManager);
         shadow.sensitivityCalibrationController = null;
         shadow.steeringArbiter = null;
         shadow.pointerClientX = null;
@@ -266,6 +343,7 @@ export class BenchmarkController {
         };
 
         startNewRound();
+        shadow.musicDirector.start(shadow.board);
 
         const measurementBag = new PieceBag(shadow.bag.types);
 
@@ -302,6 +380,12 @@ export class BenchmarkController {
                     shadow.pieceController.moveHorizontal(dir);
                     timings.movement.ms += mark() - t0;
                     timings.movement.ops++;
+
+                    t0 = mark();
+                    shadow.renderer.shakeMove(dir);
+                    timings.boardShake.ms += mark() - t0;
+                    timings.boardShake.ops++;
+
                     if (shadow.current.x === targetX) break;
                 }
 
@@ -329,6 +413,13 @@ export class BenchmarkController {
                 timings.lockPiece.ms += mark() - t0;
                 timings.lockPiece.ops++;
 
+                if (shadow.hardDropTrail) {
+                    t0 = mark();
+                    shadow.renderer.drawHardDropTrail(shadow.hardDropTrail.entries, 0.5);
+                    timings.renderHardDropTrail.ms += mark() - t0;
+                    timings.renderHardDropTrail.ops++;
+                }
+
                 t0 = mark();
                 const fullRows = shadow.board.getFullLineIndices();
                 timings.lineClearDetect.ms += mark() - t0;
@@ -340,6 +431,16 @@ export class BenchmarkController {
                     pointsForLineClear(clearedCount, shadow.level, shadow.scoring);
                     timings.scoring.ms += mark() - t0;
                     timings.scoring.ops++;
+
+                    t0 = mark();
+                    for (const progress of [0.25, 0.5, 0.75, 1]) {
+                        shadow.renderer.drawClearingFrame(
+                            shadow.board, shadow.clearingLines, shadow.clearingDropRows,
+                            shadow.clearingFragments, progress
+                        );
+                    }
+                    timings.renderClearingFrame.ms += mark() - t0;
+                    timings.renderClearingFrame.ops++;
 
                     t0 = mark();
                     shadow.pieceController.finishLineClear();
@@ -370,6 +471,33 @@ export class BenchmarkController {
                 shadow.renderer.drawGhost(piece, shadow.board);
                 timings.renderDrawGhost.ms += mark() - t0;
                 timings.renderDrawGhost.ops++;
+
+                if (shadow.settings.fallTrail) {
+                    t0 = mark();
+                    shadow.updateFallTrail(piece);
+                    shadow.renderer.drawFallTrail(shadow.fallTrail, shadow.fallTrailHead, shadow.fallTrailCount);
+                    timings.renderFallTrail.ms += mark() - t0;
+                    timings.renderFallTrail.ops++;
+                }
+
+                const activeTheme = shadow.settings.theme;
+                if (activeTheme && activeTheme !== "none") {
+                    const themeEffects = this._getOffscreenThemeEffects(
+                        shadow.renderer.boardCanvas.width, shadow.renderer.boardCanvas.height
+                    );
+                    const effect = themeEffects[activeTheme];
+                    if (effect) {
+                        t0 = mark();
+                        effect.drawFrame();
+                        timings.themeEffectDraw.ms += mark() - t0;
+                        timings.themeEffectDraw.ops++;
+                    }
+                }
+
+                t0 = mark();
+                shadow.musicDirector.update(shadow.board, 16);
+                timings.musicDirectorUpdate.ms += mark() - t0;
+                timings.musicDirectorUpdate.ops++;
 
                 t0 = mark();
                 let playedId = null;
