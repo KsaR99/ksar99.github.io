@@ -297,9 +297,6 @@ export class ShareService {
         ctx.font = `800 ${fontSize}px 'Noto Sans Mono', monospace`;
         ctx.textAlign = "center";
         const width = ctx.measureText(text).width;
-
-        // Mirror .brand__title's `linear-gradient(350deg, ...)` over the
-        // wordmark's own box, so the logo reads the same as it does in-game.
         const boxX = centerX - width / 2;
         const boxY = y - fontSize * 0.9;
         const boxH = fontSize * 1.15;

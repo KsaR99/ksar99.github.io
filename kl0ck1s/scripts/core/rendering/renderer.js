@@ -294,8 +294,10 @@ export class Renderer {
     _applyBoardOffset(transitionMs) {
         const el = this.boardEl;
         if (!el) return;
-        el.style.transition = `translate ${transitionMs}ms ease-out`;
-        el.style.translate = `${this._boardOffsetX ?? 0}rem ${this._boardOffsetY ?? 0}rem`;
+
+        el.style.setProperty("--shake-duration", `${transitionMs}ms`);
+        el.style.translate =
+            `${this._boardOffsetX ?? 0}rem ${this._boardOffsetY ?? 0}rem`;
     }
 
     shakeMove(dir) {
@@ -333,7 +335,9 @@ export class Renderer {
     }
 
     setTheme(theme) {
-        this.bodyEl.dataset.theme = theme || "none";
+        const bodyClasses = this.bodyEl.classList;
+        bodyClasses.remove("body--theme-none", "body--theme-matrix", "body--theme-rain", "body--theme-snow", "body--theme-vhs");
+        bodyClasses.add(`body--theme-${theme || "none"}`);
     }
 
     drawCell(context, x, y, color, size, {glow = false, ghost = false, level = 0, cache = this.spriteCache} = {}) {

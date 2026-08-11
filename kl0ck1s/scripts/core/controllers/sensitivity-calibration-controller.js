@@ -334,7 +334,8 @@ export class SensitivityCalibrationController {
         const {number, tint} = COUNTDOWN_STEPS[this.countdownIndex];
         this.game.soundManager.play(voiceCountingKey(number));
         el.textContent = number;
-        el.dataset.tint = tint;
+        el.classList.remove("board__calibration__countdown--red", "board__calibration__countdown--yellow", "board__calibration__countdown--green");
+        el.classList.add(`board__calibration__countdown--${tint}`);
         el.classList.remove("board__calibration__countdown--pop");
         void el.offsetWidth;
         el.classList.add("board__calibration__countdown--pop");

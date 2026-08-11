@@ -64,7 +64,7 @@
     background: color-mix(in oklch, var(--line) 30%, transparent);
 }
 
-.leaderboard__cell[data-field="rank"] {
+.leaderboard__cell--rank {
     color: var(--muted);
     user-select: none;
 }
@@ -105,7 +105,7 @@
     text-align: center;
 }
 
-[data-field="leaderboard"] {
+.leaderboard-container {
     overflow: auto;
 }
 

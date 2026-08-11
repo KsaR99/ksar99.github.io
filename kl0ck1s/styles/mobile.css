@@ -1,22 +1,22 @@
 .app:has(.board__overlay--visible) :where(
-    [data-role="next-piece-card"],
-    [data-role="difficulty-stat"],
-    [data-role="touch-controls"]
+    .card--next-piece,
+    .difficulty-indicator,
+    .touch-controls
 ) {
     display: none;
 }
 
-[data-role="options-group-advanced"],
-[data-role="reset-controls-button"],
-[data-role="options-group-mouse"] {
+.options__group--advanced,
+.options__preview-button--reset-controls,
+.options__group--mouse {
     display: none;
 }
 
-.options__row:has([data-role="keybind-reset-button"]) {
+.options__row:has(.options__preview-button--keybind-reset) {
     display: none;
 }
 
-details[data-role="options-group-keyboard"] {
+.options__group--keyboard {
     border: none;
     padding: 0;
 

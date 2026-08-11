@@ -38,34 +38,28 @@ export class MultiplayerSession extends EventTarget {
         return new MultiplayerSession({role: PEER_ROLE.GUEST, ...options});
     }
 
-    /** Host: creates the room and returns the base64 code to send to the guest. */
     async createRoom() {
         return this.peer.createOffer();
     }
 
-    /** Guest: joins a room from the host's code, returns the base64 answer code to send back to the host. */
     async joinRoom(hostCode) {
         return this.peer.createAnswer(hostCode);
     }
 
-    /** Host: finishes the handshake once the guest's answer code arrives. */
     async acceptGuest(guestCode) {
         return this.peer.acceptAnswer(guestCode);
     }
 
-    /** Marks the local side ready/unready and notifies the peer. Fires "ready"/"bothready" locally too. */
     setReady(isReady = true) {
         this.localReady = Boolean(isReady);
         this.peer.send({t: this.localReady ? PROTOCOL_MESSAGE_TYPE.READY : PROTOCOL_MESSAGE_TYPE.UNREADY});
         this._emitReady();
     }
 
-    /** Tells the peer to start the match. Typically called once bothReady is true. */
     sendStart(payload = {}) {
         this.peer.send({t: PROTOCOL_MESSAGE_TYPE.START, payload});
     }
 
-    /** Sends an arbitrary app payload; arrives on the peer as a "message" event. */
     send(payload) {
         this.peer.send({t: PROTOCOL_MESSAGE_TYPE.DATA, payload});
     }

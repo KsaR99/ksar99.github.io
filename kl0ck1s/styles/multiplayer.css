@@ -272,8 +272,6 @@
 }
 
 .mp-opponent-panel__canvas {
-    /* Mini render of the opponent's board — only worth the space on desktop,
-       where the sidebar has room; see desktop.css for the override. */
     display: none;
     width: 100%;
     max-width: 6.5rem;
@@ -327,11 +325,11 @@
     background: var(--progress-bar__fill-bg);
     transition: height 0.2s ease, background-color 0.2s ease;
 
-    &[data-state="winning"] {
+    &.mp-race-meter__fill--winning {
         background: var(--good);
     }
 
-    &[data-state="losing"] {
+    &.mp-race-meter__fill--losing {
         background: var(--danger);
     }
 }
@@ -360,8 +358,6 @@
     opacity: 1;
     transform: translate(-50%, 0);
 }
-
-/* --- Post-match result panel --- */
 
 .mp-result-panel {
     gap: 0.85rem;

@@ -122,17 +122,17 @@ export class MultiplayerController {
     }
 
     get panels() {
+        const root = this.overlayEl;
         return {
-            role: this.dom?.querySelector('[data-role="mp-panel-role"]') ?? null,
-            host: this.dom?.querySelector('[data-role="mp-panel-host"]') ?? null,
-            join: this.dom?.querySelector('[data-role="mp-panel-join"]') ?? null,
-            bot: this.dom?.querySelector('[data-role="mp-panel-bot"]') ?? null,
-            ready: this.dom?.querySelector('[data-role="mp-panel-ready"]') ?? null,
-            result: this.dom?.querySelector('[data-role="mp-panel-result"]') ?? null,
+            role: root?.querySelector('[data-role="mp-panel-role"]') ?? null,
+            host: root?.querySelector('[data-role="mp-panel-host"]') ?? null,
+            join: root?.querySelector('[data-role="mp-panel-join"]') ?? null,
+            bot: root?.querySelector('[data-role="mp-panel-bot"]') ?? null,
+            ready: root?.querySelector('[data-role="mp-panel-ready"]') ?? null,
+            result: root?.querySelector('[data-role="mp-panel-result"]') ?? null,
         };
     }
 
-    /** True while the post-match win/loss results panel is on screen. */
     get isResultPanelVisible() {
         return !!this._resultPanelEl;
     }
@@ -144,45 +144,47 @@ export class MultiplayerController {
             if (event.target.closest('[data-role="multiplayer-button"]')) this.open();
         });
 
-        this.dom.querySelector('[data-role="mp-close-button"]')?.addEventListener("click", () => this.close());
+        const root = this.overlayEl;
+
+        root?.querySelector('[data-role="mp-close-button"]')?.addEventListener("click", () => this.close());
         this.overlayEl?.addEventListener("click", (event) => {
             if (event.target === this.overlayEl) this.close();
         });
 
-        this.dom.querySelector('[data-role="mp-host-button"]')?.addEventListener("click", () => this._beginHost());
-        this.dom.querySelector('[data-role="mp-join-button"]')?.addEventListener("click", () => this._showPanel("join"));
-        this.dom.querySelector('[data-role="mp-bot-button"]')?.addEventListener("click", () => this._showPanel("bot"));
+        root?.querySelector('[data-role="mp-host-button"]')?.addEventListener("click", () => this._beginHost());
+        root?.querySelector('[data-role="mp-join-button"]')?.addEventListener("click", () => this._showPanel("join"));
+        root?.querySelector('[data-role="mp-bot-button"]')?.addEventListener("click", () => this._showPanel("bot"));
 
-        const botDifficultySlider = this.dom.querySelector('[data-role="mp-bot-difficulty-slider"]');
+        const botDifficultySlider = root?.querySelector('[data-role="mp-bot-difficulty-slider"]');
         botDifficultySlider?.addEventListener("input", () => this._syncBotDifficultySlider());
-        this.dom.querySelector('[data-role="mp-bot-difficulty-start"]')?.addEventListener("click", () => {
+        root?.querySelector('[data-role="mp-bot-difficulty-start"]')?.addEventListener("click", () => {
             const key = BOT_DIFFICULTY_ORDER[Number(botDifficultySlider?.value ?? 0)] ?? "easy";
             this._beginBot(key);
         });
         this._syncBotDifficultySlider();
 
-        this.dom.querySelector('[data-role="mp-bot-mode-prev"]')?.addEventListener("click", () => this._changeMatchMode(-1));
-        this.dom.querySelector('[data-role="mp-bot-mode-next"]')?.addEventListener("click", () => this._changeMatchMode(1));
-        this.dom.querySelector('[data-role="mp-bot-level-prev"]')?.addEventListener("click", () => this._changeBotLevel(-1));
-        this.dom.querySelector('[data-role="mp-bot-level-next"]')?.addEventListener("click", () => this._changeBotLevel(1));
-        this.dom.querySelector('[data-role="mp-ready-mode-prev"]')?.addEventListener("click", () => this._changeMatchMode(-1));
-        this.dom.querySelector('[data-role="mp-ready-mode-next"]')?.addEventListener("click", () => this._changeMatchMode(1));
-        this.dom.querySelector('[data-role="mp-ready-difficulty-prev"]')?.addEventListener("click", () => this._changeMatchDifficulty(-1));
-        this.dom.querySelector('[data-role="mp-ready-difficulty-next"]')?.addEventListener("click", () => this._changeMatchDifficulty(1));
+        root?.querySelector('[data-role="mp-bot-mode-prev"]')?.addEventListener("click", () => this._changeMatchMode(-1));
+        root?.querySelector('[data-role="mp-bot-mode-next"]')?.addEventListener("click", () => this._changeMatchMode(1));
+        root?.querySelector('[data-role="mp-bot-level-prev"]')?.addEventListener("click", () => this._changeBotLevel(-1));
+        root?.querySelector('[data-role="mp-bot-level-next"]')?.addEventListener("click", () => this._changeBotLevel(1));
+        root?.querySelector('[data-role="mp-ready-mode-prev"]')?.addEventListener("click", () => this._changeMatchMode(-1));
+        root?.querySelector('[data-role="mp-ready-mode-next"]')?.addEventListener("click", () => this._changeMatchMode(1));
+        root?.querySelector('[data-role="mp-ready-difficulty-prev"]')?.addEventListener("click", () => this._changeMatchDifficulty(-1));
+        root?.querySelector('[data-role="mp-ready-difficulty-next"]')?.addEventListener("click", () => this._changeMatchDifficulty(1));
 
-        this.dom.querySelector('[data-role="mp-host-copy-button"]')?.addEventListener("click", (event) =>
+        root?.querySelector('[data-role="mp-host-copy-button"]')?.addEventListener("click", (event) =>
             this._copyFrom('[data-role="mp-host-code"]', event.currentTarget));
-        this.dom.querySelector('[data-role="mp-host-connect-button"]')?.addEventListener("click", () => this._completeHost());
+        root?.querySelector('[data-role="mp-host-connect-button"]')?.addEventListener("click", () => this._completeHost());
 
-        this.dom.querySelector('[data-role="mp-join-connect-button"]')?.addEventListener("click", () => this._beginJoin());
-        this.dom.querySelector('[data-role="mp-join-copy-button"]')?.addEventListener("click", (event) =>
+        root?.querySelector('[data-role="mp-join-connect-button"]')?.addEventListener("click", () => this._beginJoin());
+        root?.querySelector('[data-role="mp-join-copy-button"]')?.addEventListener("click", (event) =>
             this._copyFrom('[data-role="mp-join-answer-code"]', event.currentTarget));
 
-        this.dom.querySelector('[data-role="mp-ready-button"]')?.addEventListener("click", () => this._toggleReady());
-        this.dom.querySelector('[data-role="mp-start-button"]')?.addEventListener("click", () => this._hostStart());
-        this.dom.querySelector('[data-role="mp-leave-button"]')?.addEventListener("click", () => this._leaveMatch());
-        this.dom.querySelector('[data-role="mp-result-rematch-button"]')?.addEventListener("click", () => this._rematch());
-        this.dom.querySelector('[data-role="mp-result-close-button"]')?.addEventListener("click", () => this._closeResult());
+        root?.querySelector('[data-role="mp-ready-button"]')?.addEventListener("click", () => this._toggleReady());
+        root?.querySelector('[data-role="mp-start-button"]')?.addEventListener("click", () => this._hostStart());
+        root?.querySelector('[data-role="mp-leave-button"]')?.addEventListener("click", () => this._leaveMatch());
+        root?.querySelector('[data-role="mp-result-rematch-button"]')?.addEventListener("click", () => this._rematch());
+        root?.querySelector('[data-role="mp-result-close-button"]')?.addEventListener("click", () => this._closeResult());
 
         this._startFrameLoop();
     }
@@ -248,8 +250,9 @@ export class MultiplayerController {
 
     _updateSteps(name) {
         const info = STEP_BY_PANEL[name];
-        const steps = this.dom.querySelector('[data-role="mp-steps"]');
-        const caption = this.dom.querySelector('[data-field="mp-step-caption"]');
+        const root = this.overlayEl;
+        const steps = root?.querySelector('[data-role="mp-steps"]');
+        const caption = root?.querySelector('[data-field="mp-step-caption"]');
 
         if (!info) {
             if (steps) steps.hidden = true;
@@ -260,7 +263,7 @@ export class MultiplayerController {
         if (steps) steps.hidden = false;
         if (caption) caption.hidden = false;
 
-        this.dom.querySelectorAll('[data-role="mp-step"]').forEach((el) => {
+        root?.querySelectorAll('[data-role="mp-step"]').forEach((el) => {
             const step = Number(el.dataset.step);
             el.classList.toggle("mp-step--active", step === info.step);
             el.classList.toggle("mp-step--done", step < info.step);
@@ -271,51 +274,53 @@ export class MultiplayerController {
 
     _renderConfigPanels() {
         const game = this.game;
+        const root = this.overlayEl;
 
-        const botModeLabel = this.dom.querySelector('[data-field="mp-bot-mode-label"]');
+        const botModeLabel = root?.querySelector('[data-field="mp-bot-mode-label"]');
         if (botModeLabel) botModeLabel.textContent = this._t(`modes.${game.mode}.name`);
-        const botModeDescription = this.dom.querySelector('[data-field="mp-bot-mode-description"]');
+        const botModeDescription = root?.querySelector('[data-field="mp-bot-mode-description"]');
         if (botModeDescription) botModeDescription.textContent = `💡 ${this._t(`modes.${game.mode}.description`)}`;
 
         const diffDefForBot = game.difficulties[game.difficulty];
-        const botLevelLabel = this.dom.querySelector('[data-field="mp-bot-level-label"]');
+        const botLevelLabel = root?.querySelector('[data-field="mp-bot-level-label"]');
         if (botLevelLabel) botLevelLabel.textContent = this._t(`difficulty.${game.difficulty}`);
-        const botLevelValue = this.dom.querySelector('[data-field="mp-bot-level-value"]');
+        const botLevelValue = root?.querySelector('[data-field="mp-bot-level-value"]');
         if (botLevelValue && diffDefForBot) {
             botLevelValue.textContent = this._t("difficulty.levelPrefix", {level: diffDefForBot.startLevel});
         }
 
         this._syncBotDifficultySlider();
 
-        const readyModeLabel = this.dom.querySelector('[data-field="mp-ready-mode-label"]');
+        const readyModeLabel = root?.querySelector('[data-field="mp-ready-mode-label"]');
         if (readyModeLabel) readyModeLabel.textContent = this._t(`modes.${game.mode}.name`);
 
         const diffDef = game.difficulties[game.difficulty];
-        const readyDifficultyLabel = this.dom.querySelector('[data-field="mp-ready-difficulty-label"]');
+        const readyDifficultyLabel = root?.querySelector('[data-field="mp-ready-difficulty-label"]');
         if (readyDifficultyLabel) readyDifficultyLabel.textContent = this._t(`difficulty.${game.difficulty}`);
-        const readyDifficultyLevel = this.dom.querySelector('[data-field="mp-ready-difficulty-level"]');
+        const readyDifficultyLevel = root?.querySelector('[data-field="mp-ready-difficulty-level"]');
         if (readyDifficultyLevel && diffDef) {
             readyDifficultyLevel.textContent = this._t("difficulty.levelPrefix", {level: diffDef.startLevel});
         }
 
         const isHost = this.role === "host";
-        this.dom.querySelectorAll(
+        root?.querySelectorAll(
             '[data-role="mp-ready-mode-prev"], [data-role="mp-ready-mode-next"], ' +
             '[data-role="mp-ready-difficulty-prev"], [data-role="mp-ready-difficulty-next"]'
         ).forEach((button) => {
             button.disabled = !isHost;
         });
 
-        const hint = this.dom.querySelector('[data-field="mp-config-hint"]');
+        const hint = root?.querySelector('[data-field="mp-config-hint"]');
         if (hint) hint.textContent = this._t(isHost ? "multiplayer.configHostHint" : "multiplayer.configGuestHint");
     }
 
     _syncBotDifficultySlider() {
-        const slider = this.dom?.querySelector('[data-role="mp-bot-difficulty-slider"]');
+        const root = this.overlayEl;
+        const slider = root?.querySelector('[data-role="mp-bot-difficulty-slider"]');
         if (!slider) return;
         const key = BOT_DIFFICULTY_ORDER[Number(slider.value)] ?? "easy";
         slider.setAttribute("aria-valuetext", this._t(`difficulty.${key}`));
-        this.dom.querySelectorAll('[data-role="mp-bot-difficulty-tick"]').forEach((tick) => {
+        root.querySelectorAll('[data-role="mp-bot-difficulty-tick"]').forEach((tick) => {
             tick.classList.toggle("bot-difficulty-slider__tick--active", tick.dataset.difficulty === key);
         });
     }
@@ -375,9 +380,10 @@ export class MultiplayerController {
         this._bindSessionEvents();
         this._showPanel("host");
 
-        const codeEl = this.dom.querySelector('[data-role="mp-host-code"]');
-        const copyButton = this.dom.querySelector('[data-role="mp-host-copy-button"]');
-        const answerWrap = this.dom.querySelector('[data-role="mp-host-answer-wrap"]');
+        const root = this.overlayEl;
+        const codeEl = root?.querySelector('[data-role="mp-host-code"]');
+        const copyButton = root?.querySelector('[data-role="mp-host-copy-button"]');
+        const answerWrap = root?.querySelector('[data-role="mp-host-answer-wrap"]');
         if (codeEl) codeEl.value = "";
         if (copyButton) copyButton.disabled = true;
         if (answerWrap) answerWrap.hidden = true;
@@ -394,7 +400,7 @@ export class MultiplayerController {
 
     async _completeHost() {
         this._clearError();
-        const input = this.dom.querySelector('[data-role="mp-host-answer-input"]');
+        const input = this.overlayEl?.querySelector('[data-role="mp-host-answer-input"]');
         const code = input?.value ?? "";
 
         try {
@@ -411,10 +417,11 @@ export class MultiplayerController {
         this.session = MultiplayerSession.createGuest();
         this._bindSessionEvents();
 
-        const hostCodeInput = this.dom.querySelector('[data-role="mp-join-code-input"]');
-        const answerWrap = this.dom.querySelector('[data-role="mp-join-answer-wrap"]');
-        const answerEl = this.dom.querySelector('[data-role="mp-join-answer-code"]');
-        const copyButton = this.dom.querySelector('[data-role="mp-join-copy-button"]');
+        const root = this.overlayEl;
+        const hostCodeInput = root?.querySelector('[data-role="mp-join-code-input"]');
+        const answerWrap = root?.querySelector('[data-role="mp-join-answer-wrap"]');
+        const answerEl = root?.querySelector('[data-role="mp-join-answer-code"]');
+        const copyButton = root?.querySelector('[data-role="mp-join-copy-button"]');
 
         if (answerEl) answerEl.value = "";
         if (copyButton) copyButton.disabled = true;
@@ -430,7 +437,6 @@ export class MultiplayerController {
         }
     }
 
-    /** Starts a local bot match: no session, no handshake - straight into the game. */
     _beginBot(difficultyKey) {
         if (!BOT_DIFFICULTIES[difficultyKey]) return;
         this._clearError();
@@ -492,7 +498,7 @@ export class MultiplayerController {
     }
 
     _copyFrom(selector, button) {
-        const el = this.dom.querySelector(selector);
+        const el = this.overlayEl?.querySelector(selector);
         if (!el?.value) return;
         copyTextToClipboard(el.value).then((ok) => {
             if (!ok || !button) return;
@@ -518,7 +524,7 @@ export class MultiplayerController {
             this._setStatus(this._t(this.role === "host"
                 ? "multiplayer.statusBothReadyHost"
                 : "multiplayer.statusBothReadyGuest"));
-            const startButton = this.dom.querySelector('[data-role="mp-start-button"]');
+            const startButton = this.overlayEl?.querySelector('[data-role="mp-start-button"]');
             if (startButton) startButton.hidden = this.role !== "host";
         });
         session.addEventListener("start", (event) => {
@@ -543,8 +549,9 @@ export class MultiplayerController {
     }
 
     _updateReadyBadges() {
-        const local = this.dom.querySelector('[data-role="mp-local-ready-badge"]');
-        const remote = this.dom.querySelector('[data-role="mp-remote-ready-badge"]');
+        const root = this.overlayEl;
+        const local = root?.querySelector('[data-role="mp-local-ready-badge"]');
+        const remote = root?.querySelector('[data-role="mp-remote-ready-badge"]');
         if (local) {
             local.textContent = this._t(this.session.localReady ? "multiplayer.youReady" : "multiplayer.youNotReady");
             local.classList.toggle("mp-ready-badge--on", this.session.localReady);
@@ -562,7 +569,7 @@ export class MultiplayerController {
     _toggleReady() {
         if (!this.session) return;
         this.session.setReady(!this.session.localReady);
-        const button = this.dom.querySelector('[data-role="mp-ready-button"]');
+        const button = this.overlayEl?.querySelector('[data-role="mp-ready-button"]');
         if (button) button.classList.toggle("button--accent", !this.session.localReady);
     }
 
@@ -907,20 +914,15 @@ export class MultiplayerController {
         game.screenFlow.showIdleScreen().then();
     }
 
-    /** Public entry point for leaving a match mid-game (e.g. the exitToMenu/"X" action) -
-     *  cleans up the session/bot and opponent UI instead of just switching screens. */
     leaveMatch() {
         this._leaveMatch();
     }
 
-    /** Public entry point for restarting a running bot match (e.g. the restart/"R" action). */
     restartBotMatch() {
         if (this.role !== "bot" || !this._botDifficultyKey) return;
         this._beginBot(this._botDifficultyKey);
     }
 
-    /** Public entry point for the rematch action (e.g. the confirm/"Enter" action while
-     *  the result panel is visible). */
     rematch() {
         if (!this.isResultPanelVisible) return;
         this._rematch();
@@ -1037,7 +1039,7 @@ export class MultiplayerController {
         const remoteStats = this._lastRemoteStats;
         if (!remoteStats) {
             fill.style.height = "50%";
-            fill.dataset.state = "even";
+            fill.classList.remove("mp-race-meter__fill--winning", "mp-race-meter__fill--losing");
             return;
         }
         const local = this._raceMetric(localStats);
@@ -1045,7 +1047,8 @@ export class MultiplayerController {
         const total = local + remote;
         const percent = total === 0 ? 50 : 50 + 50 * (local - remote) / total;
         fill.style.height = `${Math.max(0, Math.min(100, percent))}%`;
-        fill.dataset.state = percent > 50 ? "winning" : percent < 50 ? "losing" : "even";
+        fill.classList.toggle("mp-race-meter__fill--winning", percent > 50);
+        fill.classList.toggle("mp-race-meter__fill--losing", percent < 50);
     }
 
     _showOpponentBoard() {
@@ -1095,8 +1098,7 @@ export class MultiplayerController {
         canvas.dataset.role = "mp-opponent-canvas";
 
         const filterEl = this.dom.createElement("div");
-        filterEl.className = "board__filter";
-        filterEl.dataset.theme = "none";
+        filterEl.className = "board__filter board__filter--none";
 
         const filterCanvas = this.dom.createElement("canvas");
         filterCanvas.className = "board__filter-canvas";
@@ -1406,7 +1408,7 @@ export class MultiplayerController {
     }
 
     _setStatus(text) {
-        const el = this.dom.querySelector('[data-field="mp-status-text"]');
+        const el = this.overlayEl?.querySelector('[data-field="mp-status-text"]');
         if (el) el.textContent = text;
     }
 
@@ -1431,14 +1433,14 @@ export class MultiplayerController {
     }
 
     _showError(err) {
-        const el = this.dom.querySelector('[data-field="mp-error-text"]');
+        const el = this.overlayEl?.querySelector('[data-field="mp-error-text"]');
         if (!el) return;
         el.textContent = err?.message || this._t("multiplayer.genericError");
         el.hidden = false;
     }
 
     _clearError() {
-        const el = this.dom.querySelector('[data-field="mp-error-text"]');
+        const el = this.overlayEl?.querySelector('[data-field="mp-error-text"]');
         if (el) el.hidden = true;
     }
 

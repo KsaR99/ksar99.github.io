@@ -8,7 +8,8 @@ import {
     FALL_TRAIL_MAX_LENGTH,
     fallTrailLengthForInterval,
     HARD_DROP_TRAIL_DURATION_MS,
-    HARD_DROP_TRAIL_STEP
+    HARD_DROP_TRAIL_STEP,
+    HUD_UPDATE_INTERVAL_MS
 } from "./game-constants.js";
 import {InputController} from "../controllers/input-controller.js";
 import {PieceController} from "../controllers/piece-controller.js";
@@ -318,7 +319,13 @@ export class Game {
 
         if (this.state === "running" || this.state === "clearing") {
             this.elapsedMs += delta;
-            this.hud.update(this.stats);
+
+            this._hudUpdateAcc = (this._hudUpdateAcc ?? 0) + delta;
+            if (this._hudUpdateAcc >= HUD_UPDATE_INTERVAL_MS) {
+                this._hudUpdateAcc = 0;
+                this.hud.update(this.stats);
+            }
+
             this.musicDirector.update(this.board, delta);
         }
 

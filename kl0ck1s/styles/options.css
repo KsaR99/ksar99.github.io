@@ -27,56 +27,56 @@
         color: var(--text);
     }
 
-    &[data-i18n="screens.options.generalTitle"]:before {
+    &.options__title--general:before {
         content: '⚙️';
     }
 
-    &[data-i18n="screens.options.controlsTitle"] {
+    &.options__title--controls {
         list-style-type: '🎮';
     }
 
-    &[data-i18n="screens.options.gameplayTitle"] {
+    &.options__title--gameplay {
         list-style-type: '💡';
     }
 
-    &[data-i18n="screens.options.soundTitle"] {
+    &.options__title--sound {
         list-style-type: '🔉';
     }
 
-    &[data-i18n="screens.options.graphicsTitle"] {
+    &.options__title--graphics {
         list-style-type: '🖼️';
     }
 }
 
-.options__group-summary[data-i18n="screens.options.keyboardTitle"] { /** @todo desktop only */
+.options__group-summary.options__group-summary--keyboard {
     list-style-type: '⌨️';
 }
 
-.options__group-summary[data-i18n="screens.options.mouseTitle"] { /** @todo desktop only */
+.options__group-summary.options__group-summary--mouse {
     list-style-type: '🖱️';
 }
 
-[data-i18n="screens.options.sfxTitle"] {
+.options__group-summary--sfx {
     list-style-type: '💥';
 }
 
-[data-i18n="screens.options.musicTitle"] {
+.options__group-summary--music {
     list-style-type: '🎼';
 }
 
-[data-i18n="screens.options.voicesTitle"] {
+.options__group-summary--voices {
     list-style-type: '🗣️';
 }
 
-[data-i18n="screens.options.performanceTitle"] {
+.options__group-summary--performance {
     list-style-type: '🚀';
 }
 
-[data-i18n="screens.options.countdownTitle"] {
+.options__group-summary--countdown {
     list-style-type: '⌛';
 }
 
-[data-i18n="screens.options.advancedTitle"] {
+.options__group-summary--advanced {
     list-style-type: '🤔';
 }
 

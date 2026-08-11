@@ -467,7 +467,8 @@ export const Screens = {
 
     countdown(number, tint, dom = document) {
         const screen = clone(dom, "tpl-screen-countdown");
-        screen.querySelector('[data-role="countdown-screen"]').dataset.tint = tint;
+        const countdownScreenEl = screen.querySelector('[data-role="countdown-screen"]');
+        if (tint) countdownScreenEl.classList.add(`screen--countdown--${tint}`);
         screen.querySelector('[data-field="number"]').textContent = number;
         return screen;
     },

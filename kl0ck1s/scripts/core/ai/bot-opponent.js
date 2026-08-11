@@ -131,7 +131,6 @@ function heuristicScore(occupancy, cols, rows, lines) {
         + WEIGHTS.bumpiness * bumpiness;
 }
 
-/** The 1-4 geometrically distinct rotation states for a piece type (dedupes O, etc.). */
 function distinctRotations(type) {
     const def = KLOCKOMINOS[type];
     const seen = new Set();
@@ -145,7 +144,6 @@ function distinctRotations(type) {
     return rotations;
 }
 
-/** Every legal resting placement for `type` on `occupancy`, with its resulting board. */
 function enumeratePlacements(type, occupancy, cols, rows) {
     const placements = [];
     for (const {state, mask, width, height} of distinctRotations(type)) {
@@ -258,7 +256,6 @@ export class BotOpponent extends EventTarget {
         this._scheduleCountdownTick();
     }
 
-    /** Mirrors StatsTracker#registerPieceSpawn - tracks the I-piece drought. */
     _registerPieceSpawn(type) {
         ++this.piecesSpawned;
         if (type === "I") {
@@ -414,7 +411,6 @@ export class BotOpponent extends EventTarget {
         rotateTick();
     }
 
-    /** Walks the piece left/right, one column per tick, from spawnX to its target column. */
     _animateSlide(placement, colorIndex, spawnX, onDone) {
         const startFall = () => this._animateFall(placement, colorIndex, onDone);
 
@@ -562,7 +558,6 @@ export class BotOpponent extends EventTarget {
         this._scheduleNext();
     }
 
-    /** Mirrors ModeController#checkObjectiveComplete for whichever mode this match is using. */
     _objectiveComplete() {
         const def = this.modeDef;
         if (this.mode === "sprint") return this.lines >= def.sprintTarget;

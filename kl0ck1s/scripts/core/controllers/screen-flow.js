@@ -81,8 +81,8 @@ export class ScreenFlow {
 
     bindLeaderboardActions() {
         const game = this.game;
-        if (!game.dom) return;
-        const shareButton = game.dom.querySelector('[data-role="leaderboard-share-button"]');
+        if (!game.hud.overlayEl) return;
+        const shareButton = game.hud.overlayEl.querySelector('[data-role="leaderboard-share-button"]');
         game.shareService.bindIconButton(shareButton, () => game.shareService.shareLeaderboard(game.mode));
     }
 
@@ -162,20 +162,20 @@ export class ScreenFlow {
 
     isCreatingNewProfile() {
         const game = this.game;
-        if (!game.dom) return true;
-        const select = game.dom.querySelector('[data-role="profile-select"]');
+        if (!game.hud.overlayEl) return true;
+        const select = game.hud.overlayEl.querySelector('[data-role="profile-select"]');
         return !select || select.value === "";
     }
 
     bindProfileSelect() {
         const game = this.game;
-        if (!game.dom) return;
-        const select = game.dom.querySelector('[data-role="profile-select"]');
+        if (!game.hud.overlayEl) return;
+        const select = game.hud.overlayEl.querySelector('[data-role="profile-select"]');
         if (select) {
             select.addEventListener("change", () => {
                 const value = select.value;
                 if (!value) {
-                    const input = game.dom.querySelector('[data-role="name-input"]');
+                    const input = game.hud.overlayEl.querySelector('[data-role="name-input"]');
                     game.playerName = "";
                     if (input) {
                         input.value = "";
@@ -197,8 +197,8 @@ export class ScreenFlow {
 
     bindDeleteProfileButton() {
         const game = this.game;
-        if (!game.dom) return;
-        const button = game.dom.querySelector('[data-role="delete-profile-button"]');
+        if (!game.hud.overlayEl) return;
+        const button = game.hud.overlayEl.querySelector('[data-role="delete-profile-button"]');
         if (!button) return;
         button.addEventListener("click", () => this.deleteProfile());
         this.updateDeleteProfileButtonState();
@@ -206,8 +206,8 @@ export class ScreenFlow {
 
     updateDeleteProfileButtonState() {
         const game = this.game;
-        if (!game.dom) return;
-        const button = game.dom.querySelector('[data-role="delete-profile-button"]');
+        if (!game.hud.overlayEl) return;
+        const button = game.hud.overlayEl.querySelector('[data-role="delete-profile-button"]');
         if (button) button.disabled = !game.playerName;
     }
 
@@ -226,10 +226,10 @@ export class ScreenFlow {
 
     updateMenuSelectorFocus() {
         const game = this.game;
-        if (!game.dom) return;
-        const difficultyEl = game.dom.querySelector('[data-role="difficulty-select"]');
-        const modeEl = game.dom.querySelector('[data-role="mode-select"]');
-        const nameInput = game.dom.querySelector('[data-role="name-input"]');
+        if (!game.hud.overlayEl) return;
+        const difficultyEl = game.hud.overlayEl.querySelector('[data-role="difficulty-select"]');
+        const modeEl = game.hud.overlayEl.querySelector('[data-role="mode-select"]');
+        const nameInput = game.hud.overlayEl.querySelector('[data-role="name-input"]');
         if (difficultyEl) difficultyEl.classList.toggle("difficulty--focused", game.menuSelector === "difficulty");
         if (modeEl) modeEl.classList.toggle("difficulty--focused", game.menuSelector === "mode");
         if (nameInput && game.menuSelector === "nickname" && game.dom.activeElement !== nameInput) {
@@ -239,16 +239,16 @@ export class ScreenFlow {
 
     bindStartButton() {
         const game = this.game;
-        if (!game.dom) return;
-        const button = game.dom.querySelector('[data-role="start-button"]');
+        if (!game.hud.overlayEl) return;
+        const button = game.hud.overlayEl.querySelector('[data-role="start-button"]');
         if (!button) return;
         button.addEventListener("click", () => this.handleEnter());
     }
 
     bindNameInput() {
         const game = this.game;
-        if (!game.dom) return;
-        const input = game.dom.querySelector('[data-role="name-input"]');
+        if (!game.hud.overlayEl) return;
+        const input = game.hud.overlayEl.querySelector('[data-role="name-input"]');
         if (!input) return;
 
         input.addEventListener("keydown", (e) => {
@@ -294,8 +294,8 @@ export class ScreenFlow {
 
     bindModeInfoContinue() {
         const game = this.game;
-        if (!game.dom) return;
-        const button = game.dom.querySelector('[data-role="mode-info-continue-button"]');
+        if (!game.hud.overlayEl) return;
+        const button = game.hud.overlayEl.querySelector('[data-role="mode-info-continue-button"]');
         if (!button) return;
         button.addEventListener("click", () => this.startCountdown(), {once: true});
     }
@@ -328,8 +328,8 @@ export class ScreenFlow {
 
     updateCountdownBar(reset = false) {
         const game = this.game;
-        if (!game.dom) return;
-        const bar = game.dom.querySelector('[data-role="countdown-progress-bar"]');
+        if (!game.hud.overlayEl) return;
+        const bar = game.hud.overlayEl.querySelector('[data-role="countdown-progress-bar"]');
         if (!bar) return;
 
         const targetPercent = ((game.countdownIndex + 1) / COUNTDOWN_STEPS.length) * 100;
@@ -361,7 +361,7 @@ export class ScreenFlow {
             {transparentOverlay: true}
         );
 
-        const bar = game.dom?.querySelector('[data-role="countdown-progress-bar"]');
+        const bar = game.hud.overlayEl?.querySelector('[data-role="countdown-progress-bar"]');
         if (bar) {
             bar.style.transition = "none";
             bar.style.width = `${(game.countdownIndex / COUNTDOWN_STEPS.length) * 100}%`;
@@ -470,15 +470,15 @@ export class ScreenFlow {
 
     bindGameOverShare() {
         const game = this.game;
-        if (!game.dom) return;
-        const button = game.dom.querySelector('[data-role="gameover-share-button"]');
+        if (!game.hud.overlayEl) return;
+        const button = game.hud.overlayEl.querySelector('[data-role="gameover-share-button"]');
         game.shareService.bindLabeledButton(button, () => game.shareService.shareRun());
     }
 
     bindGameOverContinue() {
         const game = this.game;
-        if (!game.dom) return;
-        const button = game.dom.querySelector('[data-role="gameover-continue-button"]');
+        if (!game.hud.overlayEl) return;
+        const button = game.hud.overlayEl.querySelector('[data-role="gameover-continue-button"]');
         if (!button) return;
         button.addEventListener("click", () => this.continueFromGameOverEntry(), {once: true});
     }
@@ -534,8 +534,6 @@ export class ScreenFlow {
         }
     }
 
-    /** Shown when pausing, opening options, or restarting is blocked mid-multiplayer-match
-     *  (see toggleOptions()/restart()) - defaults to the pause-blocked message. */
     _showMultiplayerBlockedHint(messageKey = "multiplayer.pauseBlocked") {
         const game = this.game;
         if (!game.dom) return;
@@ -623,8 +621,8 @@ export class ScreenFlow {
 
     isNicknameValid() {
         const game = this.game;
-        if (!game.dom) return true;
-        const input = game.dom.querySelector('[data-role="name-input"]');
+        if (!game.hud.overlayEl) return true;
+        const input = game.hud.overlayEl.querySelector('[data-role="name-input"]');
         if (!input) return true;
 
         const valid = NICKNAME_PATTERN.test(game.playerName || "");
@@ -660,8 +658,8 @@ export class ScreenFlow {
 
     bindLangSelect() {
         const game = this.game;
-        if (!game.dom) return;
-        const select = game.dom.querySelector('[data-role="lang-select"]');
+        if (!game.hud.overlayEl) return;
+        const select = game.hud.overlayEl.querySelector('[data-role="lang-select"]');
         if (!select) return;
 
         select.addEventListener("change", async () => {
@@ -714,14 +712,14 @@ export class ScreenFlow {
     renderOptionsMenu() {
         const game = this.game;
         const openRoles = new Set();
-        game.dom?.querySelectorAll("details[data-role][open]").forEach((el) => {
+        game.hud.overlayEl?.querySelectorAll("details[data-role][open]").forEach((el) => {
             openRoles.add(el.dataset.role);
         });
 
         game.hud.showScreen(game.screens.options(game.settings, game.dom, game.i18n, game.soundManager));
         this.bindOptionsMenu();
 
-        game.dom?.querySelectorAll("details[data-role]").forEach((el) => {
+        game.hud.overlayEl?.querySelectorAll("details[data-role]").forEach((el) => {
             if (openRoles.has(el.dataset.role)) el.open = true;
         });
     }
@@ -752,30 +750,31 @@ export class ScreenFlow {
 
     bindOptionsMenu() {
         const game = this.game;
-        if (!game.dom) return;
+        if (!game.hud.overlayEl) return;
         const settingsController = game.settingsController;
+        const root = game.hud.overlayEl;
 
-        const optionsMuteToggle = game.dom.querySelector('[data-role="options-mute-toggle"]');
-        const volumeSlider = game.dom.querySelector('[data-role="volume-slider"]');
-        const hudRightCheckbox = game.dom.querySelector('[data-role="hud-right-checkbox"]');
-        const ghostCheckbox = game.dom.querySelector('[data-role="ghost-checkbox"]');
-        const gridCheckbox = game.dom.querySelector('[data-role="grid-checkbox"]');
-        const screenShakeCheckbox = game.dom.querySelector('[data-role="screen-shake-checkbox"]');
-        const heightSaturationCheckbox = game.dom.querySelector('[data-role="height-saturation-checkbox"]');
-        const glowCheckbox = game.dom.querySelector('[data-role="glow-checkbox"]');
-        const transparencyCheckbox = game.dom.querySelector('[data-role="transparency-checkbox"]');
-        const fallTrailCheckbox = game.dom.querySelector('[data-role="fall-trail-checkbox"]');
-        const themeSelect = game.dom.querySelector('[data-role="theme-select"]');
-        const skipCountdownCheckbox = game.dom.querySelector('[data-role="skip-countdown-checkbox"]');
-        const mouseControlCheckbox = game.dom.querySelector('[data-role="mouse-control-checkbox"]');
-        const mouseSensitivityInput = game.dom.querySelector('[data-role="mouse-sensitivity-input"]');
-        const touchSensitivityInput = game.dom.querySelector('[data-role="touch-sensitivity-input"]');
-        const keyboardDasInput = game.dom.querySelector('[data-role="keyboard-das-input"]');
-        const keyboardArrInput = game.dom.querySelector('[data-role="keyboard-arr-input"]');
-        const calibrateSensitivityButton = game.dom.querySelector('[data-role="calibrate-sensitivity-button"]');
-        const calibrateKeyboardButton = game.dom.querySelector('[data-role="calibrate-keyboard-button"]');
-        const closeButton = game.dom.querySelector('[data-role="options-close-button"]');
-        const closeKey = game.dom.querySelector('[data-role="options-close-key"]');
+        const optionsMuteToggle = root.querySelector('[data-role="options-mute-toggle"]');
+        const volumeSlider = root.querySelector('[data-role="volume-slider"]');
+        const hudRightCheckbox = root.querySelector('[data-role="hud-right-checkbox"]');
+        const ghostCheckbox = root.querySelector('[data-role="ghost-checkbox"]');
+        const gridCheckbox = root.querySelector('[data-role="grid-checkbox"]');
+        const screenShakeCheckbox = root.querySelector('[data-role="screen-shake-checkbox"]');
+        const heightSaturationCheckbox = root.querySelector('[data-role="height-saturation-checkbox"]');
+        const glowCheckbox = root.querySelector('[data-role="glow-checkbox"]');
+        const transparencyCheckbox = root.querySelector('[data-role="transparency-checkbox"]');
+        const fallTrailCheckbox = root.querySelector('[data-role="fall-trail-checkbox"]');
+        const themeSelect = root.querySelector('[data-role="theme-select"]');
+        const skipCountdownCheckbox = root.querySelector('[data-role="skip-countdown-checkbox"]');
+        const mouseControlCheckbox = root.querySelector('[data-role="mouse-control-checkbox"]');
+        const mouseSensitivityInput = root.querySelector('[data-role="mouse-sensitivity-input"]');
+        const touchSensitivityInput = root.querySelector('[data-role="touch-sensitivity-input"]');
+        const keyboardDasInput = root.querySelector('[data-role="keyboard-das-input"]');
+        const keyboardArrInput = root.querySelector('[data-role="keyboard-arr-input"]');
+        const calibrateSensitivityButton = root.querySelector('[data-role="calibrate-sensitivity-button"]');
+        const calibrateKeyboardButton = root.querySelector('[data-role="calibrate-keyboard-button"]');
+        const closeButton = root.querySelector('[data-role="options-close-button"]');
+        const closeKey = root.querySelector('[data-role="options-close-key"]');
 
         if (optionsMuteToggle) {
             optionsMuteToggle.addEventListener("click", () => {
@@ -885,7 +884,7 @@ export class ScreenFlow {
             });
         }
 
-        const skipModeInfoCheckbox = game.dom.querySelector('[data-role="skip-mode-info-checkbox"]');
+        const skipModeInfoCheckbox = root.querySelector('[data-role="skip-mode-info-checkbox"]');
         if (skipModeInfoCheckbox) {
             skipModeInfoCheckbox.addEventListener("change", () => {
                 game.settings.skipModeInfo = skipModeInfoCheckbox.checked;
@@ -997,7 +996,7 @@ export class ScreenFlow {
             });
         }
 
-        game.dom.querySelectorAll('[data-role="category-volume-slider"]').forEach((slider) => {
+        root.querySelectorAll('[data-role="category-volume-slider"]').forEach((slider) => {
             slider.addEventListener("input", () => {
                 const category = slider.dataset.category;
                 const volume = slider.value / 100;
@@ -1009,7 +1008,7 @@ export class ScreenFlow {
             });
         });
 
-        game.dom.querySelectorAll('[data-role="category-mute-toggle"]').forEach((button) => {
+        root.querySelectorAll('[data-role="category-mute-toggle"]').forEach((button) => {
             button.addEventListener("click", () => {
                 const category = button.dataset.category;
                 settingsController.toggleCategoryMuted(category);
@@ -1018,7 +1017,7 @@ export class ScreenFlow {
             });
         });
 
-        game.dom.querySelectorAll('[data-role="sound-list"], [data-role="sound-list-countdown"]').forEach((list) => {
+        root.querySelectorAll('[data-role="sound-list"], [data-role="sound-list-countdown"]').forEach((list) => {
             list.addEventListener("input", (event) => {
                 const slider = event.target.closest('[data-role="sound-volume-slider"]');
                 if (!slider) return;
@@ -1084,7 +1083,7 @@ export class ScreenFlow {
         const settingsController = game.settingsController;
 
         Object.entries(this.categoryResetGroups()).forEach(([role, keys]) => {
-            const button = game.dom.querySelector(`[data-role="${role}"]`);
+            const button = game.hud.overlayEl?.querySelector(`[data-role="${role}"]`);
             if (!button) return;
             button.addEventListener("click", () => {
                 settingsController.resetSettingsForKeys(keys);
@@ -1095,11 +1094,11 @@ export class ScreenFlow {
 
     syncCategoryResetButtons() {
         const game = this.game;
-        if (!game.dom) return;
+        if (!game.hud.overlayEl) return;
         const settingsController = game.settingsController;
 
         Object.entries(this.categoryResetGroups()).forEach(([role, keys]) => {
-            const button = game.dom.querySelector(`[data-role="${role}"]`);
+            const button = game.hud.overlayEl.querySelector(`[data-role="${role}"]`);
             if (!button) return;
             button.hidden = !settingsController.isSettingsGroupModified(keys);
         });
@@ -1110,7 +1109,7 @@ export class ScreenFlow {
         const settingsController = game.settingsController;
 
         ["sfx", "music", "voices"].forEach((category) => {
-            const button = game.dom.querySelector(`[data-role="reset-${category}-button"]`);
+            const button = game.hud.overlayEl?.querySelector(`[data-role="reset-${category}-button"]`);
             if (!button) return;
             button.addEventListener("click", () => {
                 const keys = game.soundManager.keysInCategory(category);
@@ -1122,11 +1121,11 @@ export class ScreenFlow {
 
     syncSoundCategoryResetButtons() {
         const game = this.game;
-        if (!game.dom) return;
+        if (!game.hud.overlayEl) return;
         const settingsController = game.settingsController;
 
         ["sfx", "music", "voices"].forEach((category) => {
-            const button = game.dom.querySelector(`[data-role="reset-${category}-button"]`);
+            const button = game.hud.overlayEl.querySelector(`[data-role="reset-${category}-button"]`);
             if (!button) return;
             const keys = game.soundManager.keysInCategory(category);
             button.hidden = !settingsController.isSoundCategoryModified(category, keys);
@@ -1135,10 +1134,10 @@ export class ScreenFlow {
 
     bindBenchmark() {
         const game = this.game;
-        const button = game.dom.querySelector('[data-role="benchmark-run-button"]');
-        const statusEl = game.dom.querySelector('[data-role="benchmark-status"]');
-        const resultsEl = game.dom.querySelector('[data-role="benchmark-results"]');
-        const copyButton = game.dom.querySelector('[data-role="benchmark-copy-button"]');
+        const button = game.hud.overlayEl?.querySelector('[data-role="benchmark-run-button"]');
+        const statusEl = game.hud.overlayEl?.querySelector('[data-role="benchmark-status"]');
+        const resultsEl = game.hud.overlayEl?.querySelector('[data-role="benchmark-results"]');
+        const copyButton = game.hud.overlayEl?.querySelector('[data-role="benchmark-copy-button"]');
 
         game.benchmarkController.ensurePreviewCanvasSized();
 
@@ -1216,9 +1215,9 @@ export class ScreenFlow {
 
     bindKeybindList() {
         const game = this.game;
-        if (!game.dom) return;
-        const list = game.dom.querySelector('[data-role="keybind-list"]');
-        const resetButton = game.dom.querySelector('[data-role="keybind-reset-button"]');
+        if (!game.hud.overlayEl) return;
+        const list = game.hud.overlayEl.querySelector('[data-role="keybind-list"]');
+        const resetButton = game.hud.overlayEl.querySelector('[data-role="keybind-reset-button"]');
         if (!list) return;
 
         const settingsController = game.settingsController;
@@ -1272,9 +1271,9 @@ export class ScreenFlow {
 
     syncKeybindResetButton() {
         const game = this.game;
-        if (!game.dom) return;
-        const resetButton = game.dom.querySelector('[data-role="keybind-reset-button"]');
-        const resetLabel = game.dom.querySelector('[data-role="keybind-reset-label"]');
+        if (!game.hud.overlayEl) return;
+        const resetButton = game.hud.overlayEl.querySelector('[data-role="keybind-reset-button"]');
+        const resetLabel = game.hud.overlayEl.querySelector('[data-role="keybind-reset-label"]');
         if (!resetButton) return;
         const defaults = defaultKeyBindings();
         const bindings = game.settings.keyBindings ?? {};
@@ -1286,10 +1285,10 @@ export class ScreenFlow {
 
     bindOptionsSearch() {
         const game = this.game;
-        if (!game.dom) return;
-        const input = game.dom.querySelector('[data-role="options-search-input"]');
-        const panels = game.dom.querySelector('[data-role="options-panels"]');
-        const emptyState = game.dom.querySelector('[data-role="options-search-empty"]');
+        if (!game.hud.overlayEl) return;
+        const input = game.hud.overlayEl.querySelector('[data-role="options-search-input"]');
+        const panels = game.hud.overlayEl.querySelector('[data-role="options-panels"]');
+        const emptyState = game.hud.overlayEl.querySelector('[data-role="options-search-empty"]');
         if (!input || !panels) return;
 
         const rowSelector = ".options__row, .controls__item";
@@ -1379,10 +1378,10 @@ export class ScreenFlow {
 
     setImportReviewVisible(visible) {
         const game = this.game;
-        if (!game.dom) return;
-        const panels = game.dom.querySelector('[data-role="options-panels"]');
-        const review = game.dom.querySelector('[data-role="options-import-review"]');
-        const closeButton = game.dom.querySelector('[data-role="options-close-button"]');
+        if (!game.hud.overlayEl) return;
+        const panels = game.hud.overlayEl.querySelector('[data-role="options-panels"]');
+        const review = game.hud.overlayEl.querySelector('[data-role="options-import-review"]');
+        const closeButton = game.hud.overlayEl.querySelector('[data-role="options-close-button"]');
         if (panels) panels.hidden = visible;
         if (review) review.hidden = !visible;
         if (closeButton) closeButton.hidden = visible;
@@ -1390,15 +1389,15 @@ export class ScreenFlow {
 
     showImportMessage(kind) {
         const game = this.game;
-        if (!game.dom) return;
+        if (!game.hud.overlayEl) return;
         this.setImportReviewVisible(true);
-        const subtitle = game.dom.querySelector('[data-role="options-import-subtitle"]');
-        const emptyMsg = game.dom.querySelector('[data-role="options-import-empty"]');
-        const invalidMsg = game.dom.querySelector('[data-role="options-import-invalid"]');
-        const selectAllRow = game.dom.querySelector('[data-role="options-import-select-all-row"]');
-        const list = game.dom.querySelector('[data-role="options-import-list"]');
-        const actions = game.dom.querySelector('[data-role="options-import-actions"]');
-        const closeButton = game.dom.querySelector('[data-role="options-import-close"]');
+        const subtitle = game.hud.overlayEl.querySelector('[data-role="options-import-subtitle"]');
+        const emptyMsg = game.hud.overlayEl.querySelector('[data-role="options-import-empty"]');
+        const invalidMsg = game.hud.overlayEl.querySelector('[data-role="options-import-invalid"]');
+        const selectAllRow = game.hud.overlayEl.querySelector('[data-role="options-import-select-all-row"]');
+        const list = game.hud.overlayEl.querySelector('[data-role="options-import-list"]');
+        const actions = game.hud.overlayEl.querySelector('[data-role="options-import-actions"]');
+        const closeButton = game.hud.overlayEl.querySelector('[data-role="options-import-close"]');
 
         if (subtitle) subtitle.hidden = true;
         if (selectAllRow) selectAllRow.hidden = true;
@@ -1414,7 +1413,7 @@ export class ScreenFlow {
 
     showImportReview(changes) {
         const game = this.game;
-        if (!game.dom) return;
+        if (!game.hud.overlayEl) return;
 
         if (changes.length === 0) {
             this.showImportMessage("empty");
@@ -1422,14 +1421,14 @@ export class ScreenFlow {
         }
 
         this.setImportReviewVisible(true);
-        const subtitle = game.dom.querySelector('[data-role="options-import-subtitle"]');
-        const emptyMsg = game.dom.querySelector('[data-role="options-import-empty"]');
-        const invalidMsg = game.dom.querySelector('[data-role="options-import-invalid"]');
-        const selectAllRow = game.dom.querySelector('[data-role="options-import-select-all-row"]');
-        const selectAllCheckbox = game.dom.querySelector('[data-role="options-import-select-all"]');
-        const list = game.dom.querySelector('[data-role="options-import-list"]');
-        const actions = game.dom.querySelector('[data-role="options-import-actions"]');
-        const closeButton = game.dom.querySelector('[data-role="options-import-close"]');
+        const subtitle = game.hud.overlayEl.querySelector('[data-role="options-import-subtitle"]');
+        const emptyMsg = game.hud.overlayEl.querySelector('[data-role="options-import-empty"]');
+        const invalidMsg = game.hud.overlayEl.querySelector('[data-role="options-import-invalid"]');
+        const selectAllRow = game.hud.overlayEl.querySelector('[data-role="options-import-select-all-row"]');
+        const selectAllCheckbox = game.hud.overlayEl.querySelector('[data-role="options-import-select-all"]');
+        const list = game.hud.overlayEl.querySelector('[data-role="options-import-list"]');
+        const actions = game.hud.overlayEl.querySelector('[data-role="options-import-actions"]');
+        const closeButton = game.hud.overlayEl.querySelector('[data-role="options-import-close"]');
 
         if (emptyMsg) emptyMsg.hidden = true;
         if (invalidMsg) invalidMsg.hidden = true;
@@ -1451,15 +1450,15 @@ export class ScreenFlow {
 
     bindOptionsDataMenu() {
         const game = this.game;
-        if (!game.dom) return;
+        if (!game.hud.overlayEl) return;
 
-        const exportButton = game.dom.querySelector('[data-role="options-export-button"]');
-        const importButton = game.dom.querySelector('[data-role="options-import-button"]');
-        const importFile = game.dom.querySelector('[data-role="options-import-file"]');
-        const selectAllCheckbox = game.dom.querySelector('[data-role="options-import-select-all"]');
-        const list = game.dom.querySelector('[data-role="options-import-list"]');
-        const cancelButton = game.dom.querySelector('[data-role="options-import-cancel"]');
-        const applyButton = game.dom.querySelector('[data-role="options-import-apply"]');
+        const exportButton = game.hud.overlayEl.querySelector('[data-role="options-export-button"]');
+        const importButton = game.hud.overlayEl.querySelector('[data-role="options-import-button"]');
+        const importFile = game.hud.overlayEl.querySelector('[data-role="options-import-file"]');
+        const selectAllCheckbox = game.hud.overlayEl.querySelector('[data-role="options-import-select-all"]');
+        const list = game.hud.overlayEl.querySelector('[data-role="options-import-list"]');
+        const cancelButton = game.hud.overlayEl.querySelector('[data-role="options-import-cancel"]');
+        const applyButton = game.hud.overlayEl.querySelector('[data-role="options-import-apply"]');
 
         if (exportButton) {
             exportButton.addEventListener("click", () => {

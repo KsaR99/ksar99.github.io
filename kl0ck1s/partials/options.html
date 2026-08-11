@@ -10,7 +10,8 @@
 
         <div class="options__panels" data-role="options-panels">
             <div class="options" data-role="options-group-general">
-                <h3 class="options__title options__title--static" data-i18n="screens.options.generalTitle">General</h3>
+                <h3 class="options__title options__title--static options__title--general"
+                    data-i18n="screens.options.generalTitle">General</h3>
                 <label class="options__row">
                     <span data-i18n="screens.options.language">Language</span>
                     <select class="options__input options__input--select" data-role="lang-select"></select>
@@ -57,7 +58,9 @@
             </div>
 
             <details class="options" data-role="options-group-gameplay">
-                <summary class="options__title" data-i18n="screens.options.gameplayTitle">Gameplay</summary>
+                <summary class="options__title options__title--gameplay" data-i18n="screens.options.gameplayTitle">
+                    Gameplay
+                </summary>
                 <label class="options__row">
                     <span data-i18n="screens.options.skipCountdown">Skip countdown</span>
                     <input class="options__input options__input--checkbox" data-role="skip-countdown-checkbox"
@@ -91,15 +94,19 @@
             </details>
 
             <details class="options" data-role="options-group-graphics">
-                <summary class="options__title" data-i18n="screens.options.graphicsTitle">Graphics</summary>
+                <summary class="options__title options__title--graphics" data-i18n="screens.options.graphicsTitle">
+                    Graphics
+                </summary>
                 <label class="options__row">
                     <span data-i18n="screens.options.screenShake">Screen shake</span>
-                    <input class="options__input options__input--checkbox" data-role="screen-shake-checkbox"
+                    <input class="options__input options__input--checkbox options__input--desktop-only"
+                           data-role="screen-shake-checkbox"
                            type="checkbox">
                 </label>
 
                 <details class="options__group" data-role="options-group-performance">
-                    <summary class="options__group-summary" data-i18n="screens.options.performanceTitle">Performance
+                    <summary class="options__group-summary options__group-summary--performance"
+                             data-i18n="screens.options.performanceTitle">Performance
                     </summary>
                     <label class="options__row">
                         <span data-i18n="screens.options.glow">Glow (blur)</span>
@@ -126,10 +133,13 @@
             </details>
 
             <details class="options" data-role="options-group-sound">
-                <summary class="options__title" data-i18n="screens.options.soundTitle">Sound</summary>
+                <summary class="options__title options__title--sound" data-i18n="screens.options.soundTitle">Sound
+                </summary>
 
                 <details class="options__group" data-role="sound-group-sfx">
-                    <summary class="options__group-summary" data-i18n="screens.options.sfxTitle">SFX</summary>
+                    <summary class="options__group-summary options__group-summary--sfx"
+                             data-i18n="screens.options.sfxTitle">SFX
+                    </summary>
                     <div class="options__row">
                         <span data-i18n="screens.options.categoryVolume">Category volume</span>
                         <div class="options__volume-control">
@@ -152,7 +162,9 @@
                 </details>
 
                 <details class="options__group" data-role="sound-group-music">
-                    <summary class="options__group-summary" data-i18n="screens.options.musicTitle">Music</summary>
+                    <summary class="options__group-summary options__group-summary--music"
+                             data-i18n="screens.options.musicTitle">Music
+                    </summary>
                     <div class="options__row">
                         <span data-i18n="screens.options.categoryVolume">Category volume</span>
                         <div class="options__volume-control">
@@ -175,7 +187,9 @@
                 </details>
 
                 <details class="options__group" data-role="sound-group-voices">
-                    <summary class="options__group-summary" data-i18n="screens.options.voicesTitle">Voices</summary>
+                    <summary class="options__group-summary options__group-summary--voices"
+                             data-i18n="screens.options.voicesTitle">Voices
+                    </summary>
                     <div class="options__row">
                         <span data-i18n="screens.options.categoryVolume">Category volume</span>
                         <div class="options__volume-control">
@@ -191,7 +205,8 @@
                     <div class="options__sound-list" data-role="sound-list"></div>
 
                     <details class="options__group" data-role="sound-group-voices-countdown">
-                        <summary class="options__group-summary" data-i18n="screens.options.countdownTitle">Countdown
+                        <summary class="options__group-summary options__group-summary--countdown"
+                                 data-i18n="screens.options.countdownTitle">Countdown
                         </summary>
                         <div class="options__sound-list" data-role="sound-list-countdown"></div>
                     </details>
@@ -206,46 +221,56 @@
             </details>
 
             <details class="options" data-role="options-group-controls">
-                <summary class="options__title" data-i18n="screens.options.controlsTitle">Controls</summary>
+                <summary class="options__title options__title--controls" data-i18n="screens.options.controlsTitle">
+                    Controls
+                </summary>
                 <label class="options__row">
                     <span data-i18n="screens.options.touchSensitivity">Touch sensitivity</span>
-                    <input class="options__input options__input--number" data-i18n-placeholder="screens.options.autoValue"
+                    <input class="options__input options__input--number"
+                           data-i18n-placeholder="screens.options.autoValue"
                            data-role="touch-sensitivity-input"
                            inputmode="decimal"
                            max="2" min="0.5" placeholder="auto" step="0.05" type="number">
                 </label>
                 <div class="options__row options__row--end">
-                    <button class="options__preview-button options__preview-button--wide"
-                            data-i18n="screens.options.resetDefaults"
-                            data-role="reset-controls-button" hidden type="button">Reset to defaults
+                    <button
+                        class="options__preview-button options__preview-button--wide options__preview-button--reset-controls"
+                        data-i18n="screens.options.resetDefaults"
+                        data-role="reset-controls-button" hidden type="button">Reset to defaults
                     </button>
                 </div>
 
-                <details class="options__group" data-role="options-group-mouse">
-                    <summary class="options__group-summary" data-i18n="screens.options.mouseTitle">Mouse</summary>
+                <details class="options__group options__group--mouse" data-role="options-group-mouse">
+                    <summary class="options__group-summary options__group-summary--mouse"
+                             data-i18n="screens.options.mouseTitle">Mouse
+                    </summary>
                     <label class="options__row">
                         <span data-i18n="screens.options.mouseControl">Mouse control</span>
-                        <input class="options__input options__input--checkbox" data-role="mouse-control-checkbox"
+                        <input class="options__input options__input--checkbox options__input--desktop-only"
+                               data-role="mouse-control-checkbox"
                                type="checkbox">
                     </label>
                     <label class="options__row">
                         <span data-i18n="screens.options.mouseSensitivity">Mouse sensitivity</span>
-                        <input class="options__input options__input--number" data-role="mouse-sensitivity-input"
+                        <input class="options__input options__input--number options__input--desktop-only"
+                               data-role="mouse-sensitivity-input"
                                inputmode="decimal"
                                type="number">
                     </label>
                     <div class="options__row">
                         <span data-i18n="screens.options.calibrateSensitivity">Calibrate sensitivity</span>
-                        <button class="options__preview-button options__preview-button--wide"
-                                data-i18n="screens.options.calibrateSensitivityButton"
-                                data-role="calibrate-sensitivity-button"
-                                type="button">Calibrate
+                        <button
+                            class="options__preview-button options__preview-button--wide options__input--desktop-only"
+                            data-i18n="screens.options.calibrateSensitivityButton"
+                            data-role="calibrate-sensitivity-button"
+                            type="button">Calibrate
                         </button>
                     </div>
                 </details>
 
-                <details class="options__group" data-role="options-group-keyboard">
-                    <summary class="options__group-summary" data-i18n="screens.options.keyboardTitle">Keyboard
+                <details class="options__group options__group--keyboard" data-role="options-group-keyboard">
+                    <summary class="options__group-summary options__group-summary--keyboard"
+                             data-i18n="screens.options.keyboardTitle">Keyboard
                     </summary>
                     <p class="options__hint" data-i18n="screens.options.keyboardHint">Click a key to reassign it</p>
                     <ul class="controls__list controls__list--keys" data-role="keybind-list"></ul>
@@ -273,14 +298,16 @@
                     </ul>
                     <div class="options__row">
                         <span data-i18n="screens.options.keyboardReset" data-role="keybind-reset-label" hidden>Reset keys</span>
-                        <button class="options__preview-button options__preview-button--wide"
-                                data-i18n="screens.options.keyboardResetButton"
-                                data-role="keybind-reset-button" hidden type="button">Reset to defaults
+                        <button
+                            class="options__preview-button options__preview-button--wide options__preview-button--keybind-reset"
+                            data-i18n="screens.options.keyboardResetButton"
+                            data-role="keybind-reset-button" hidden type="button">Reset to defaults
                         </button>
                     </div>
 
-                    <details class="options__group" data-role="options-group-advanced">
-                        <summary class="options__group-summary" data-i18n="screens.options.advancedTitle">Advanced
+                    <details class="options__group options__group--advanced" data-role="options-group-advanced">
+                        <summary class="options__group-summary options__group-summary--advanced"
+                                 data-i18n="screens.options.advancedTitle">Advanced
                         </summary>
                         <label class="options__row">
                             <span data-i18n="screens.options.keyboardDas">Keyboard DAS (ms)</span>

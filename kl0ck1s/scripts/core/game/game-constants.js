@@ -61,6 +61,8 @@ export const COUNTDOWN_STEPS = [
 
 export const PIECE_CONTROLLABLE_STATES = new Set(["running", "calibrating", "calibrating-keyboard"]);
 
+export const HUD_UPDATE_INTERVAL_MS = 100;
+
 export const SENSITIVITY_CALIBRATION_ROUNDS = 5;
 export const SENSITIVITY_CALIBRATION_STEPS = [
     "tutorialLeft", "tutorialRight", "dragToLeftEdge", "dragToRightEdge",

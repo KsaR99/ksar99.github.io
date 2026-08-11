@@ -32,15 +32,6 @@ function waitForIceGatheringComplete(pc, timeoutMs) {
     });
 }
 
-/**
- * Thin, UI-agnostic wrapper around RTCPeerConnection + a single RTCDataChannel,
- * using manual (non-trickle) ICE: the whole local description — candidates
- * already embedded in the SDP once gathering completes — is exchanged as one
- * base64 "code" the two peers swap out-of-band (chat, QR, etc).
- *
- * Events (via EventTarget): "statechange" ({detail: CONNECTION_STATE}),
- * "channelopen", "channelclose", "message" ({detail: parsed payload}), "error".
- */
 export class RtcPeerConnection extends EventTarget {
     constructor({role, iceGatheringTimeoutMs = ICE_GATHERING_TIMEOUT_MS, rtcConfiguration = RTC_CONFIGURATION} = {}) {
         super();
@@ -66,7 +57,6 @@ export class RtcPeerConnection extends EventTarget {
         return this.channel?.readyState === "open";
     }
 
-    /** Host only: creates the offer, waits out ICE gathering, returns a base64 code to share with the guest. */
     async createOffer() {
         this._assertRole(PEER_ROLE.HOST);
         this._setState(CONNECTION_STATE.GATHERING);
@@ -81,7 +71,6 @@ export class RtcPeerConnection extends EventTarget {
         return encodeSignal({type: "offer", sdp: this._pc.localDescription.sdp});
     }
 
-    /** Guest only: consumes the host's offer code, waits out ICE gathering, returns a base64 answer code. */
     async createAnswer(offerCode) {
         this._assertRole(PEER_ROLE.GUEST);
         const {sdp} = decodeSignal(offerCode, "offer");
@@ -97,7 +86,6 @@ export class RtcPeerConnection extends EventTarget {
         return encodeSignal({type: "answer", sdp: this._pc.localDescription.sdp});
     }
 
-    /** Host only: consumes the guest's answer code to complete the handshake. */
     async acceptAnswer(answerCode) {
         this._assertRole(PEER_ROLE.HOST);
         const {sdp} = decodeSignal(answerCode, "answer");
@@ -106,7 +94,6 @@ export class RtcPeerConnection extends EventTarget {
         await this._pc.setRemoteDescription({type: "answer", sdp});
     }
 
-    /** Sends a JSON-serializable payload to the peer over the data channel. */
     send(payload) {
         if (!this.isOpen) {
             throw new Error("Data channel is not open.");

@@ -11,13 +11,13 @@
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+Mono:wght@100..900&display=swap"
         rel="stylesheet"
     >
-    <link href="styles/main.css?v=47" rel="stylesheet">
-    <link href="styles/options.css?v=47" rel="stylesheet">
-    <link href="styles/menu.css?v=47" rel="stylesheet">
-    <link href="styles/leaderboard.css?v=47" rel="stylesheet">
-    <link href="styles/multiplayer.css?v=47" rel="stylesheet">
-    <link href="styles/mobile.css?v=47" media="(width < 48rem)" rel="stylesheet">
-    <link href="styles/desktop.css?v=47" media="(width >= 48rem)" rel="stylesheet">
+    <link href="styles/main.css?v=48" rel="stylesheet">
+    <link href="styles/options.css?v=48" rel="stylesheet">
+    <link href="styles/menu.css?v=48" rel="stylesheet">
+    <link href="styles/leaderboard.css?v=48" rel="stylesheet">
+    <link href="styles/multiplayer.css?v=48" rel="stylesheet">
+    <link href="styles/mobile.css?v=48" media="(width < 48rem)" rel="stylesheet">
+    <link href="styles/desktop.css?v=48" media="(width >= 48rem)" rel="stylesheet">
     <meta content="notranslate" name="google">
     <meta content="https://github.com/KsaR99" name="author">
     <meta content="index, follow" name="robots">
@@ -118,7 +118,7 @@
                     <div class="progress-bar__label" id="objective-value">-</div>
                 </div>
             </div>
-            <div data-role="difficulty-stat">
+            <div class="difficulty-indicator" data-role="difficulty-stat">
                 <div class="progress-bar progress-bar--difficulty">
                     <div class="progress-bar__fill" id="difficulty-bar"></div>
                     <div class="progress-bar__label" id="difficulty-value">-</div>
@@ -126,17 +126,17 @@
             </div>
         </div>
 
-        <div class="card" data-role="next-piece-card">
-            <h3 class="card__title" data-i18n="sidebar.nextPiece">Next piece</h3>
+        <div class="card card--next-piece" data-role="next-piece-card">
+            <h3 class="card__title card__title--next-piece" data-i18n="sidebar.nextPiece">Next piece</h3>
             <canvas class="next-piece__canvas" height="120" id="next-piece-canvas" width="120"></canvas>
         </div>
     </div>
 
-    <div class="app__board" data-theme="none">
+    <div class="app__board">
         <div class="board">
             <div class="board__stage">
                 <canvas class="board__canvas" height="920" id="klockis-board" width="460"></canvas>
-                <div class="board__filter" data-theme="none" id="filter-overlay">
+                <div class="board__filter board__filter--none" id="filter-overlay">
                     <canvas class="board__filter-canvas" id="filter-canvas"></canvas>
                 </div>
                 <div class="board__overlay" id="overlay"></div>
@@ -359,6 +359,6 @@
         window.addEventListener("orientationchange", notifyResize);
     })();
 </script>
-<script src="scripts/app/main.js?v=47" type="module"></script>
+<script src="scripts/app/main.js?v=48" type="module"></script>
 </body>
 </html>

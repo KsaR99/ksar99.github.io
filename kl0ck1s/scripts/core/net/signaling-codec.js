@@ -10,7 +10,6 @@ export class SignalCodecError extends Error {
     }
 }
 
-/** Encodes a signaling payload (e.g. {type: "offer", sdp}) as a compact, copy-pasteable base64 string. */
 export function encodeSignal(payload) {
     const json = JSON.stringify({v: SIGNAL_CODE_VERSION, ...payload});
     const bytes = new TextEncoder().encode(json);

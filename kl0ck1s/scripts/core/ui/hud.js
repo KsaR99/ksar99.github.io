@@ -156,11 +156,9 @@ export class HUD {
 
             if (this.objectiveBarTrackEl && this._cache.objectiveUrgency !== objectiveUrgency) {
                 this._cache.objectiveUrgency = objectiveUrgency;
-                if (objectiveUrgency) {
-                    this.objectiveBarTrackEl.dataset.urgency = objectiveUrgency;
-                } else {
-                    delete this.objectiveBarTrackEl.dataset.urgency;
-                }
+                const urgencyClasses = this.objectiveBarTrackEl.classList;
+                urgencyClasses.remove("progress-bar--warning", "progress-bar--danger");
+                if (objectiveUrgency) urgencyClasses.add(`progress-bar--${objectiveUrgency}`);
             }
         }
     }
@@ -175,7 +173,9 @@ export class HUD {
         const screen = this.overlayEl.querySelector('[data-role="countdown-screen"]');
         if (!screen) return false;
 
-        screen.dataset.tint = tint;
+        const tintClasses = screen.classList;
+        tintClasses.remove("screen--countdown--red", "screen--countdown--yellow", "screen--countdown--green");
+        if (tint) tintClasses.add(`screen--countdown--${tint}`);
 
         const numberEl = screen.querySelector('[data-field="number"]');
         if (numberEl) {

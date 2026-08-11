@@ -43,7 +43,7 @@
 }
 
 body {
-    &[data-theme="none"] {
+    &.body--theme-none {
         --body-bg: radial-gradient(circle at 50% 100%, oklch(0.89 0 0) 0, oklch(0.26 0.04 283.84) 60%);
         --app-bg: oklch(0.18 0.02 254.93 / 0.9);
         --board-bg: oklch(0.18 0 0);
@@ -51,7 +51,7 @@ body {
         --stats__status--live-color: oklch(0.84 0.11 151.71);
     }
 
-    &[data-theme="matrix"] {
+    &.body--theme-matrix {
         --app-bg: linear-gradient(oklch(0.58 0.17 135.05 / 0.81), oklch(0.12 0.04 159.56 / 0.95) 40%);
         --body-bg: radial-gradient(circle at 50% 100%, oklch(0.65 0.2 146.47) 0, oklch(0.12 0.05 146.9) 50%);
         --line: oklch(0.39 0.16 143.63);
@@ -69,7 +69,7 @@ body {
     }
 
 
-    &[data-theme="rain"] {
+    &.body--theme-rain {
         --app-bg: oklch(0.13 0.04 233.93 / 0.9);
         --body-bg: radial-gradient(circle at 50% 100%, oklch(0.39 0.16 269.55) 0, var(--bg) 50%);
         --line: oklch(0.33 0.13 268.31);
@@ -87,7 +87,7 @@ body {
         --progress-bar__fill-bg: oklch(0.31 0.08 268.33);
     }
 
-    &[data-theme="snow"] {
+    &.body--theme-snow {
         --app-bg: oklch(0.18 0.03 265.27 / 0.9);;
         --body-bg: radial-gradient(circle at 50% 100%, oklch(0.89 0.07 227.94) 0, oklch(0.11 0.03 261.36) 50%);
         --line: oklch(0.5 0.06 241.98);
@@ -106,7 +106,7 @@ body {
         --progress-bar__fill-bg: oklch(0.38 0.06 215.86);
     }
 
-    &[data-theme="vhs"] {
+    &.body--theme-vhs {
         --app-bg: linear-gradient(oklch(0.37 0.17 331.19 / 0.9), oklch(0.14 0.07 331.35 / 0.9) 40%);
         --body-bg: radial-gradient(circle at 50% 100%, oklch(0.52 0.25 333.31) 0, oklch(0.22 0.06 326.54) 50%);
         --line: oklch(0.42 0.17 326.9);
@@ -407,6 +407,8 @@ body.hud-right .card[data-role="next-piece-card"] {
 .board__stage {
     position: relative;
     will-change: translate;
+    translate: 0 0;
+    transition: translate var(--shake-duration, 120ms) ease-out;
 }
 
 body.perf-no-glow .board {
@@ -542,15 +544,15 @@ body.perf-no-transparency .board__overlay--transparent {
     opacity: 1;
 }
 
-.board__filter--active[data-theme="vhs"] {
+.board__filter--active.board__filter--vhs {
     animation: vhs-flicker 5s infinite steps(40);
 }
 
-.board__stage:has(.board__filter--active[data-theme="vhs"]) .board__canvas {
+.board__stage:has(.board__filter--active.board__filter--vhs) .board__canvas {
     z-index: unset;
 }
 
-.board__filter--active[data-theme="vhs"]::after {
+.board__filter--active.board__filter--vhs::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -560,12 +562,12 @@ body.perf-no-transparency .board__overlay--transparent {
     animation: vhs-roll 7s linear infinite;
 }
 
-body.perf-no-glow .board__filter--active[data-theme="vhs"] {
+body.perf-no-glow .board__filter--active.board__filter--vhs {
     animation: none;
     opacity: 0.55;
 }
 
-body.perf-no-glow .board__filter--active[data-theme="vhs"]::after {
+body.perf-no-glow .board__filter--active.board__filter--vhs::after {
     animation: none;
 }
 
@@ -600,8 +602,8 @@ body.perf-no-glow .board__filter--active[data-theme="vhs"]::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .board__filter--active[data-theme="vhs"],
-    .board__filter--active[data-theme="vhs"]::after {
+    .board__filter--active.board__filter--vhs,
+    .board__filter--active.board__filter--vhs::after {
         animation: none !important;
     }
 }
