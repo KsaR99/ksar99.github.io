@@ -57,19 +57,22 @@ export class ThemeOverlay {
     setActive(theme) {
         this.game.activeTheme = theme ?? "none";
         this.game.renderer.setTheme(this.game.activeTheme);
+        this._updateBodyTheme();
         this.update();
     }
 
     update() {
-        this._updateBodyTheme();
         for (const key of this._targets.keys()) this._updateTarget(key);
     }
 
     _updateBodyTheme() {
         const body = this.game.dom?.body;
         if (!body) return;
+        const theme = this.game.activeTheme;
+        if (this._appliedBodyTheme === theme) return;
+        this._appliedBodyTheme = theme;
         body.classList.remove(...THEME_BODY_CLASSES);
-        body.classList.add(`body--theme-${this.game.activeTheme}`);
+        body.classList.add(`body--theme-${theme}`);
     }
 
     _updateTarget(key) {
@@ -83,8 +86,11 @@ export class ThemeOverlay {
         if (target.overlayEl) {
             const overlayClasses = target.overlayEl.classList;
             overlayClasses.toggle("board__filter--active", active);
-            overlayClasses.remove(...THEME_MODIFIER_CLASSES);
-            overlayClasses.add(`board__filter--${theme}`);
+            if (target._appliedTheme !== theme) {
+                target._appliedTheme = theme;
+                overlayClasses.remove(...THEME_MODIFIER_CLASSES);
+                overlayClasses.add(`board__filter--${theme}`);
+            }
         }
 
         for (const [name, instance] of Object.entries(target.themes)) {
