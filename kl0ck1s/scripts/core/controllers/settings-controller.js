@@ -136,6 +136,7 @@ export class SettingsController {
         game.renderer.setGridEnabled(gridLines);
         game.renderer.setShakeEnabled(screenShake && !isMobileViewport());
         game.renderer.setHeightSaturationEnabled(heightSaturation);
+        game.renderer.setParticlesEnabled(!isMobileViewport());
 
         if (!fallTrail) {
             game.resetFallTrail();

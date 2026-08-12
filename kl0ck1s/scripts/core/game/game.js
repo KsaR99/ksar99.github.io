@@ -7,8 +7,8 @@ import {
     FALL_TRAIL_FRAME_MS,
     FALL_TRAIL_MAX_LENGTH,
     fallTrailLengthForInterval,
+    HARD_DROP_TRAIL_ALPHAS,
     HARD_DROP_TRAIL_DURATION_MS,
-    HARD_DROP_TRAIL_STEP,
     HUD_UPDATE_INTERVAL_MS
 } from "./game-constants.js";
 import {InputController} from "../controllers/input-controller.js";
@@ -257,9 +257,12 @@ export class Game {
             return;
         }
 
+        const count = Math.min(HARD_DROP_TRAIL_ALPHAS.length, Math.floor(cellsDropped) + 1);
+        const step = count > 1 ? cellsDropped / (count - 1) : 0;
+
         const entries = [];
-        for (let step = 0; step <= cellsDropped; step += HARD_DROP_TRAIL_STEP) {
-            const y = piece.y - step;
+        for (let i = 0; i < count; i++) {
+            const y = piece.y - i * step;
             entries.push({
                 x: piece.x,
                 y,
@@ -371,15 +374,18 @@ export class Game {
         if (this.state !== "running") return;
 
         if (this.isGrounded) {
-            this.lockDelayTimer += delta;
-            this.groundedTime += delta;
-            const maxGroundedTime = this.getMaxGroundedTime();
-
             const stillResting = this.board.collides(this.current, 0, 1);
-            if (stillResting && (this.lockDelayTimer >= this.scoring.LOCK_DELAY || this.groundedTime >= maxGroundedTime)) {
-                this.pieceController.lockCurrentPiece();
+
+            if (stillResting) {
+                this.lockDelayTimer += delta;
+                this.groundedTime += delta;
+                const maxGroundedTime = this.getMaxGroundedTime();
+
+                if (this.lockDelayTimer >= this.scoring.LOCK_DELAY || this.groundedTime >= maxGroundedTime) {
+                    this.pieceController.lockCurrentPiece();
+                }
+                return;
             }
-            return;
         }
 
         this.lockDelayTimer = 0;

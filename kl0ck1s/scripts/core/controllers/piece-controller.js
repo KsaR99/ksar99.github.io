@@ -279,6 +279,7 @@ export class PieceController {
         game.sensitivityCalibrationController?.notify("hardDrop", {});
         game.renderer.shakeHardDrop();
         game.beginHardDropTrail(game.current, cellsDropped);
+        game.multiplayerController?.notifyHardDropTrail();
         this.lockCurrentPiece();
         game.dropCounter = 0;
     }

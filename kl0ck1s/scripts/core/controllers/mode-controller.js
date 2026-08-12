@@ -1,6 +1,6 @@
 "use strict";
 
-import {formatDuration} from "../shared/utils.js";
+import {formatDuration, rollSurvivalGarbageCount} from "../shared/utils.js";
 
 export class ModeController {
     constructor(game) {
@@ -210,8 +210,7 @@ export class ModeController {
             game.modeState.garbageTimer += delta;
             if (game.modeState.garbageTimer >= def.garbageIntervalMs) {
                 game.modeState.garbageTimer = 0;
-                const span = def.garbageLinesMax - def.garbageLinesMin + 1;
-                const count = def.garbageLinesMin + Math.floor(Math.random() * span);
+                const count = rollSurvivalGarbageCount(def);
                 const {toppedOut} = game.board.addGarbageLines(count);
                 if (game.current) game.current.y -= count;
                 if (toppedOut) {

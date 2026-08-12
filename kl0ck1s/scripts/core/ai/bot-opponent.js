@@ -2,10 +2,11 @@
 
 import {KLOCKOMINOS, LINE_CLEAR_ANIMATION_DURATION_MS} from "../shared/config.js";
 import {Board} from "../game/board.js";
+import {HARD_DROP_TRAIL_ALPHAS, HARD_DROP_TRAIL_DURATION_MS} from "../game/game-constants.js";
 import {PieceBag} from "../game/piece-bag.js";
 import {levelForLines, pointsForLineClear} from "../game/scoring.js";
 import {mulberry32} from "../shared/seeded-random.js";
-import {formatNumber} from "../shared/utils.js";
+import {formatNumber, rollSurvivalGarbageCount} from "../shared/utils.js";
 
 export const BOT_DIFFICULTIES = Object.freeze({
     easy: Object.freeze({
@@ -15,6 +16,7 @@ export const BOT_DIFFICULTIES = Object.freeze({
         mistakeChance: 0.35,
         lookahead: false,
         reactionMs: 300,
+        hardDropChance: 0.15,
     }),
     medium: Object.freeze({
         startLevel: 3,
@@ -23,6 +25,7 @@ export const BOT_DIFFICULTIES = Object.freeze({
         mistakeChance: 0.14,
         lookahead: true,
         reactionMs: 210,
+        hardDropChance: 0.45,
     }),
     hard: Object.freeze({
         startLevel: 6,
@@ -31,8 +34,19 @@ export const BOT_DIFFICULTIES = Object.freeze({
         mistakeChance: 0.03,
         lookahead: true,
         reactionMs: 90,
+        hardDropChance: 0.8,
     }),
 });
+
+/**
+ * Free-fall (non-hard-drop) descent timing: short and roughly distance-based,
+ * but capped so it always reads as a brief drop rather than a held-down key.
+ */
+const FREE_FALL_MS_PER_ROW = 12;
+const FREE_FALL_MIN_MS = 60;
+const FREE_FALL_MAX_MS = 180;
+const FREE_FALL_STEP_MS = 40;
+const HARD_DROP_COMMIT_MS = 20;
 
 const WEIGHTS = Object.freeze({
     aggregateHeight: -0.510066,
@@ -242,6 +256,7 @@ export class BotOpponent extends EventTarget {
         this._dropTimer = null;
         this._clearTimer = null;
         this._pendingClear = null;
+        this._pieceInFlight = false;
         this._paused = false;
     }
 
@@ -281,6 +296,7 @@ export class BotOpponent extends EventTarget {
         this._garbageTimer = null;
         if (this._countdownTimer) clearTimeout(this._countdownTimer);
         this._countdownTimer = null;
+        this._pieceInFlight = false;
     }
 
     pause() {
@@ -310,14 +326,12 @@ export class BotOpponent extends EventTarget {
 
     _addSurvivalGarbage() {
         if (this.finished) return;
-        if (this._dropTimer) {
+        if (this._pieceInFlight || this._pendingClear) {
             this._garbageTimer = setTimeout(() => this._addSurvivalGarbage(), 50);
             return;
         }
 
-        const {garbageLinesMin, garbageLinesMax} = this.modeDef;
-        const span = garbageLinesMax - garbageLinesMin + 1;
-        const count = garbageLinesMin + Math.floor(this.random() * span);
+        const count = rollSurvivalGarbageCount(this.modeDef, this.random);
         const {toppedOut} = this.board.addGarbageLines(count);
         this._sendBoard();
         if (toppedOut) {
@@ -371,6 +385,7 @@ export class BotOpponent extends EventTarget {
     }
 
     _animateDrop(placement, colorIndex, onDone) {
+        this._pieceInFlight = true;
         const def = KLOCKOMINOS[this.current];
         const spawnX = Math.floor((this.cols - def.width) / 2);
 
@@ -443,12 +458,18 @@ export class BotOpponent extends EventTarget {
         const startY = 0;
         const distance = Math.max(0, placement.y - startY);
 
-        const msPerRow = 35;
-        const minTotalMs = 60;
-        const maxTotalMs = Math.max(minTotalMs, this._intervalForLevel() * 0.8);
-        const totalMs = Math.min(maxTotalMs, Math.max(minTotalMs, distance * msPerRow));
-        const stepMs = 40;
-        const steps = Math.max(1, Math.round(totalMs / stepMs));
+        if (this.random() < this.profile.hardDropChance) {
+            this._sendHardDropTrail(placement, distance);
+            this._sendPiece({
+                x: placement.x, y: placement.y, mask: placement.mask,
+                width: placement.width, height: placement.height, colorIndex,
+            });
+            this._dropTimer = setTimeout(onDone, HARD_DROP_COMMIT_MS);
+            return;
+        }
+
+        const totalMs = Math.min(FREE_FALL_MAX_MS, Math.max(FREE_FALL_MIN_MS, distance * FREE_FALL_MS_PER_ROW));
+        const steps = Math.max(1, Math.round(totalMs / FREE_FALL_STEP_MS));
 
         let step = 0;
         const tick = () => {
@@ -465,12 +486,13 @@ export class BotOpponent extends EventTarget {
                 return;
             }
             step++;
-            this._dropTimer = setTimeout(tick, stepMs);
+            this._dropTimer = setTimeout(tick, FREE_FALL_STEP_MS);
         };
         tick();
     }
 
     _commitPlacement(placement, colorIndex) {
+        this._pieceInFlight = false;
         const piece = {
             type: this.current,
             colorIndex,
@@ -580,6 +602,27 @@ export class BotOpponent extends EventTarget {
 
     _sendPiece(piece) {
         this.dispatchEvent(new CustomEvent("message", {detail: {kind: "piece", ...piece}}));
+    }
+
+    _sendHardDropTrail(placement, cellsDropped) {
+        if (cellsDropped <= 0) return;
+
+        const count = Math.min(HARD_DROP_TRAIL_ALPHAS.length, Math.floor(cellsDropped) + 1);
+        const step = count > 1 ? cellsDropped / (count - 1) : 0;
+        const color = KLOCKOMINOS[this.current].color;
+
+        const entries = [];
+        for (let i = 0; i < count; i++) {
+            entries.push({
+                x: placement.x, y: placement.y - i * step,
+                mask: placement.mask, width: placement.width, height: placement.height,
+                color,
+            });
+        }
+
+        this.dispatchEvent(new CustomEvent("message", {
+            detail: {kind: "hardDropTrail", entries, duration: HARD_DROP_TRAIL_DURATION_MS},
+        }));
     }
 
     _sendStats() {

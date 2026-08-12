@@ -3,7 +3,6 @@
 import {Board} from "../game/board.js";
 import {Piece} from "../game/piece.js";
 import {PieceBag} from "../game/piece-bag.js";
-import {Renderer} from "../rendering/renderer.js";
 import {PieceController} from "./piece-controller.js";
 import {ModeController} from "./mode-controller.js";
 import {StatsTracker} from "./stats-tracker.js";
@@ -14,7 +13,12 @@ import {Rain} from "../ui/themes/rain.js";
 import {Snow} from "../ui/themes/snow.js";
 import {pointsForHardDrop, pointsForLineClear} from "../game/scoring.js";
 import {dropIntervalForLevel, nowMs, smoothedInterval, tierForLevel} from "../shared/utils.js";
-import {FALL_TRAIL_MAX_LENGTH, fallTrailLengthForInterval, HARD_DROP_TRAIL_DURATION_MS} from "../game/game-constants.js";
+import {
+    FALL_TRAIL_MAX_LENGTH,
+    fallTrailLengthForInterval,
+    HARD_DROP_TRAIL_ALPHAS,
+    HARD_DROP_TRAIL_DURATION_MS,
+} from "../game/game-constants.js";
 
 const CATEGORY_KEYS = [
     "pieceGeneration", "movement", "rotation",
@@ -114,13 +118,16 @@ class BenchmarkShadowGame {
             return;
         }
 
+        const count = Math.min(HARD_DROP_TRAIL_ALPHAS.length, Math.floor(cellsDropped) + 1);
+        const step = count > 1 ? cellsDropped / (count - 1) : 0;
+
         const entries = [];
-        for (let step = 0; step <= cellsDropped; step++) {
-            const y = piece.y - step;
+        for (let i = 0; i < count; i++) {
+            const y = piece.y - i * step;
             entries.push({
                 x: piece.x, y, mask: piece.mask,
                 width: piece.width, height: piece.height, color: piece.color,
-                level: this.renderer.saturationLevelForRow(y, this.board.rows),
+                level: this.renderer.saturationLevelForRow(Math.round(y), this.board.rows),
             });
         }
 
@@ -195,26 +202,32 @@ export class BenchmarkController {
         const nextCanvas = document.createElement("canvas");
         const nextCtx = nextCanvas.getContext("2d");
 
-        this._offscreenRenderer = new Renderer({
-            bodyEl: document.body,
-            boardEl: document.createElement("div"),
-            ctx,
-            boardCanvas,
-            nextCtx,
-            nextCanvas,
-            spriteCache: liveRenderer.spriteCache,
-            nextSpriteCache: liveRenderer.nextSpriteCache,
-            boardConfig: liveRenderer.boardConfig,
-            klockominos: liveRenderer.klockominos,
-            colorPalette: liveRenderer.colorPalette,
-            nextPreviewCellSize: liveRenderer.nextPreviewCellSize,
-        });
+        this._offscreenRenderer = Object.assign(
+            Object.create(Object.getPrototypeOf(liveRenderer)),
+            liveRenderer.createSurface(ctx, boardCanvas),
+            {
+                bodyEl: document.body,
+                boardEl: document.createElement("div"),
+                nextCtx,
+                nextCanvas,
+                spriteCache: liveRenderer.spriteCache,
+                nextSpriteCache: liveRenderer.nextSpriteCache,
+                boardConfig: liveRenderer.boardConfig,
+                klockominos: liveRenderer.klockominos,
+                colorPalette: liveRenderer.colorPalette,
+                nextPreviewCellSize: liveRenderer.nextPreviewCellSize,
+                i18n: liveRenderer.i18n,
+            },
+        );
 
-        this._offscreenRenderer.setGlowEnabled(liveRenderer.glowEnabled);
-        this._offscreenRenderer.setTransparencyEnabled(liveRenderer.transparencyEnabled);
-        this._offscreenRenderer.setGhostEnabled(liveRenderer.ghostEnabled);
-        this._offscreenRenderer.setGridEnabled(liveRenderer.gridEnabled);
-        this._offscreenRenderer.setHeightSaturationEnabled(liveRenderer.heightSaturationEnabled);
+        Object.defineProperties(this._offscreenRenderer, {
+            glowEnabled: {get: () => liveRenderer.glowEnabled},
+            transparencyEnabled: {get: () => liveRenderer.transparencyEnabled},
+            ghostEnabled: {get: () => liveRenderer.ghostEnabled},
+            gridEnabled: {get: () => liveRenderer.gridEnabled},
+            shakeEnabled: {get: () => liveRenderer.shakeEnabled},
+            heightSaturationEnabled: {get: () => liveRenderer.heightSaturationEnabled},
+        });
 
         return this._offscreenRenderer;
     }

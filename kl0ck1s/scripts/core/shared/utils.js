@@ -27,6 +27,16 @@ export function forEachShapeCell(mask, width, height, cb) {
     }
 }
 
+/**
+ * Rolls how many garbage lines to add for a Survival-mode tick, using the
+ * mode definition's [garbageLinesMin, garbageLinesMax] range. Shared by
+ * ModeController (local player) and BotOpponent so both apply the same rule.
+ */
+export function rollSurvivalGarbageCount(def, random = Math.random) {
+    const span = def.garbageLinesMax - def.garbageLinesMin + 1;
+    return def.garbageLinesMin + Math.floor(random() * span);
+}
+
 export function getTightBounds(mask, width, height) {
     let minX = width, maxX = -1, minY = height, maxY = -1;
 

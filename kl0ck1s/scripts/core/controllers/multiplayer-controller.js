@@ -4,8 +4,8 @@ import {MultiplayerSession} from "../net/multiplayer-session.js";
 import {BOT_DIFFICULTIES, BotOpponent} from "../ai/bot-opponent.js";
 import {PieceBag} from "../game/piece-bag.js";
 import {mulberry32, randomSeed} from "../shared/seeded-random.js";
-import {copyTextToClipboard, forEachShapeCell, formatNumber} from "../shared/utils.js";
-import {BOARD_CONFIG, COLOR_PALETTE, KLOCKOMINO_TYPES, LINE_CLEAR_FLASH_PHASE_FRACTION} from "../shared/config.js";
+import {copyTextToClipboard, formatNumber} from "../shared/utils.js";
+import {BOARD_CONFIG, KLOCKOMINO_TYPES} from "../shared/config.js";
 
 const SCORE_POLL_MS = 200;
 const RUNNING_STATES = new Set(["countdown", "running", "clearing", "paused", "options"]);
@@ -81,8 +81,11 @@ export class MultiplayerController {
         this._lastRemoteScore = 0;
         this._lastRemoteStats = null;
         this._lastRemoteCells = null;
+        this._remoteBoardVersion = 0;
+        this._remoteClearingVersion = 0;
         this._remoteLivePiece = null;
         this._remoteClearing = null;
+        this._remoteHardDropTrail = null;
         this._wasLocalClearing = false;
         this._frameLoopRaf = null;
         this._opponentBadgeEl = null;
@@ -214,6 +217,13 @@ export class MultiplayerController {
         this._wasLocalClearing = isClearing;
 
         if (this._remoteClearing) this._renderRemoteClearingFrame();
+        else if (this._remoteHardDropTrail && this.game.settings.fallTrail) this._renderRemoteHardDropTrail();
+    }
+
+    notifyHardDropTrail() {
+        const trail = this.game.hardDropTrail;
+        if (!trail || !this.session?.isConnected) return;
+        this._sendToPeer({kind: "hardDropTrail", entries: trail.entries, duration: trail.duration});
     }
 
     open() {
@@ -737,17 +747,27 @@ export class MultiplayerController {
             if (this._opponentNameBadgeEl) this._opponentNameBadgeEl.textContent = this._remoteDisplayName();
             if (this._lastRemoteStats) this._updateOpponentStats(this._lastRemoteStats);
         } else if (payload.kind === "board") {
-            this._lastRemoteCells = payload.cells;
+            this._setRemoteCells(payload.cells);
             this._remoteLivePiece = null;
-            if (!this._remoteClearing) this._drawOpponentBoard(this._lastRemoteCells, null);
+            if (!this._remoteClearing) {
+                this._drawOpponentBoard(this._lastRemoteCells, null, this._currentHardDropTrailForDraw());
+            }
         } else if (payload.kind === "piece") {
             this._remoteLivePiece = payload.cleared ? null : payload;
-            if (!this._remoteClearing) this._drawOpponentBoard(this._lastRemoteCells, this._remoteLivePiece);
+            if (!this._remoteClearing) {
+                this._drawOpponentBoard(this._lastRemoteCells, this._remoteLivePiece, this._currentHardDropTrailForDraw());
+            }
+        } else if (payload.kind === "hardDropTrail") {
+            this._remoteHardDropTrail = {
+                entries: payload.entries || [],
+                duration: payload.duration || 260,
+                startTime: performance.now(),
+            };
         } else if (payload.kind === "clearing") {
             if (this._remoteClearing) {
                 this._drawOpponentClearingFrame(this._remoteClearing, 1);
             }
-            this._lastRemoteCells = payload.cells;
+            this._setRemoteCells(payload.cells);
             this._remoteLivePiece = null;
             const lines = payload.lines || [];
             this._remoteClearing = {
@@ -757,8 +777,14 @@ export class MultiplayerController {
                 duration: payload.duration || 260,
                 startTime: performance.now(),
                 fragments: this._buildOpponentClearFragments(payload.cells, lines),
+                version: ++this._remoteClearingVersion,
             };
         }
+    }
+
+    _setRemoteCells(cells) {
+        this._lastRemoteCells = cells;
+        this._remoteBoardVersion++;
     }
 
     _maybeShowResult() {
@@ -1127,6 +1153,7 @@ export class MultiplayerController {
         this._raceMeterFillEl = raceMeterFill;
         this._opponentCanvasEl = canvas;
         this._opponentCanvasCtx = canvas.getContext("2d");
+        this._opponentSurface = this.game.renderer?.createSurface(this._opponentCanvasCtx, canvas) ?? null;
         this.game.themeOverlay.registerTarget("opponent", {overlayEl: filterEl, canvas: filterCanvas});
 
         this._notifyLayoutResize();
@@ -1168,6 +1195,7 @@ export class MultiplayerController {
         }
         this._opponentCanvasEl = null;
         this._opponentCanvasCtx = null;
+        this._opponentSurface = null;
         if (this._handleOpponentWindowResize) {
             const resizeTarget = globalThis.visualViewport ?? globalThis.window ?? null;
             resizeTarget?.removeEventListener("resize", this._handleOpponentWindowResize);
@@ -1191,8 +1219,8 @@ export class MultiplayerController {
 
     _buildOpponentClearFragments(cells, lineIndices) {
         const renderer = this.game.renderer;
-        const canvas = this._opponentCanvasEl;
-        if (!renderer || !canvas || !cells || lineIndices.length === 0) return [];
+        const surface = this._opponentSurface;
+        if (!renderer || !surface || !cells || lineIndices.length === 0) return [];
 
         const {COLS, ROWS} = BOARD_CONFIG;
         return renderer.buildClearFragments({
@@ -1200,65 +1228,63 @@ export class MultiplayerController {
             cols: COLS,
             rows: ROWS,
             lineIndices,
-            size: canvas.width / COLS,
+            size: renderer.boardConfig.CELL_SIZE,
         });
     }
 
-    _drawOpponentBoard(cells, livePiece = null) {
-        const ctx = this._opponentCanvasCtx;
-        const canvas = this._opponentCanvasEl;
-        const renderer = this.game.renderer;
-        if (!ctx || !canvas) return;
-
+    _remoteBoardView(cells) {
         const {COLS, ROWS} = BOARD_CONFIG;
-        const size = canvas.width / COLS;
+        if (!this._emptyRemoteCells) this._emptyRemoteCells = new Uint8Array(COLS * ROWS);
+        return {cols: COLS, rows: ROWS, colors: cells || this._emptyRemoteCells, version: this._remoteBoardVersion};
+    }
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    _drawOpponentBoard(cells, livePiece = null, hardDropTrail = null) {
+        const surface = this._opponentSurface;
+        const renderer = this.game.renderer;
+        if (!surface || !renderer) return;
 
-        if (!renderer) {
-            const drawFlat = (x, y, colorIndex) => {
-                if (!colorIndex) return;
-                ctx.fillStyle = COLOR_PALETTE[colorIndex] ?? "#888";
-                ctx.fillRect(x * size, y * size, size, size);
-            };
-            if (cells) {
-                for (let y = 0; y < ROWS; y++) {
-                    for (let x = 0; x < COLS; x++) drawFlat(x, y, cells[y * COLS + x]);
-                }
-            }
-            if (livePiece) {
-                forEachShapeCell(livePiece.mask, livePiece.width, livePiece.height, (r, c) => {
-                    const y = livePiece.y + r;
-                    if (y < 0) return;
-                    drawFlat(livePiece.x + c, y, livePiece.colorIndex);
-                });
-            }
-            return;
-        }
+        const board = this._remoteBoardView(cells);
+        renderer.drawBoard(board, surface);
 
-        const board = {cols: COLS, rows: ROWS};
-        if (renderer.gridEnabled) renderer.drawGrid(board, ctx);
-
-        if (cells) {
-            for (let y = 0; y < ROWS; y++) {
-                const level = renderer.saturationLevelForRow(y, ROWS);
-                for (let x = 0; x < COLS; x++) {
-                    const colorIndex = cells[y * COLS + x];
-                    if (!colorIndex) continue;
-                    renderer.drawCell(ctx, x, y, COLOR_PALETTE[colorIndex] ?? "#888", size, {level});
-                }
-            }
+        if (hardDropTrail) {
+            renderer.drawHardDropTrail(hardDropTrail.entries, hardDropTrail.progress, surface);
         }
 
         if (livePiece) {
-            const color = COLOR_PALETTE[livePiece.colorIndex] ?? "#888";
-            forEachShapeCell(livePiece.mask, livePiece.width, livePiece.height, (r, c) => {
-                const y = livePiece.y + r;
-                if (y < 0) return;
-                const level = renderer.saturationLevelForRow(y, ROWS);
-                renderer.drawCell(ctx, livePiece.x + c, y, color, size, {glow: true, level});
-            });
+            const piece = {
+                x: livePiece.x,
+                y: livePiece.y,
+                mask: livePiece.mask,
+                width: livePiece.width,
+                height: livePiece.height,
+                color: renderer.colorPalette[livePiece.colorIndex],
+            };
+            renderer.drawPiece(piece, board, surface);
         }
+    }
+
+    _currentHardDropTrailForDraw() {
+        const trail = this._remoteHardDropTrail;
+        if (!trail || !this.game.settings.fallTrail) return null;
+
+        const progress = (performance.now() - trail.startTime) / trail.duration;
+        if (progress >= 1) {
+            this._remoteHardDropTrail = null;
+            return null;
+        }
+
+        const renderer = this.game.renderer;
+        const entries = trail.entries.map((entry) => ({
+            ...entry,
+            level: renderer.saturationLevelForRow(Math.round(entry.y), BOARD_CONFIG.ROWS),
+        }));
+
+        return {entries, progress};
+    }
+
+    _renderRemoteHardDropTrail() {
+        const trail = this._currentHardDropTrailForDraw();
+        this._drawOpponentBoard(this._lastRemoteCells, this._remoteLivePiece, trail);
     }
 
     _renderRemoteClearingFrame() {
@@ -1266,7 +1292,7 @@ export class MultiplayerController {
         const progress = (performance.now() - rc.startTime) / rc.duration;
 
         if (progress >= 1) {
-            this._lastRemoteCells = this._computeOpponentPostClearCells(rc);
+            this._setRemoteCells(this._computeOpponentPostClearCells(rc));
             this._remoteClearing = null;
             this._drawOpponentBoard(this._lastRemoteCells, this._remoteLivePiece);
             return;
@@ -1292,105 +1318,14 @@ export class MultiplayerController {
         return result;
     }
 
-    _ensureOpponentAboveCache(rc, size) {
-        if (rc._aboveCache && rc._aboveCache.size === size) return rc._aboveCache;
-
-        const {COLS, ROWS} = BOARD_CONFIG;
-        const renderer = this.game.renderer;
-        const lineSet = new Set(rc.lines);
-
-        const canvas = this.dom.createElement("canvas");
-        canvas.width = COLS * size;
-        canvas.height = ROWS * size;
-        const ctx = canvas.getContext("2d");
-
-        const segments = [];
-        let runStart = -1;
-        let runDrop = 0;
-        const flushRun = (endExclusive) => {
-            if (runStart === -1) return;
-            segments.push({top: runStart, height: endExclusive - runStart, dropAmount: runDrop});
-            runStart = -1;
-        };
-
-        for (let y = 0; y < ROWS; y++) {
-            if (lineSet.has(y)) {
-                flushRun(y);
-                continue;
-            }
-
-            const drop = rc.dropRows[y] || 0;
-            if (runStart === -1) {
-                runStart = y;
-                runDrop = drop;
-            } else if (drop !== runDrop) {
-                flushRun(y);
-                runStart = y;
-                runDrop = drop;
-            }
-
-            const level = renderer.saturationLevelForRow(y, ROWS);
-            for (let x = 0; x < COLS; x++) {
-                const colorIndex = rc.cells[y * COLS + x];
-                if (!colorIndex) continue;
-                renderer.drawCell(ctx, x, y, COLOR_PALETTE[colorIndex] ?? "#888", size, {level});
-            }
-        }
-        flushRun(ROWS);
-
-        rc._aboveCache = {canvas, segments, size};
-        return rc._aboveCache;
-    }
-
     _drawOpponentClearingFrame(rc, progress) {
-        const ctx = this._opponentCanvasCtx;
-        const canvas = this._opponentCanvasEl;
+        const surface = this._opponentSurface;
         const renderer = this.game.renderer;
-        if (!ctx || !canvas || !renderer || !rc?.cells) return;
+        if (!surface || !renderer || !rc?.cells) return;
 
         const {COLS, ROWS} = BOARD_CONFIG;
-        const size = canvas.width / COLS;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        const p = Math.min(1, progress);
-        const flashEnd = LINE_CLEAR_FLASH_PHASE_FRACTION;
-        const maskStart = flashEnd * 0.5;
-        const fallProgress = p < maskStart ? 0 : Math.min(1, (p - maskStart) / (1 - maskStart));
-        const rowsGone = p >= maskStart;
-
-        const board = {cols: COLS, rows: ROWS};
-        if (renderer.gridEnabled) renderer.drawGrid(board, ctx);
-
-        const above = this._ensureOpponentAboveCache(rc, size);
-        const width = COLS * size;
-        for (const segment of above.segments) {
-            const dy = segment.top * size + segment.dropAmount * size * fallProgress;
-            const segHeight = segment.height * size;
-            ctx.drawImage(
-                above.canvas,
-                0, segment.top * size, width, segHeight,
-                0, dy, width, segHeight,
-            );
-        }
-
-        if (!rowsGone) {
-            for (const y of rc.lines) {
-                const level = renderer.saturationLevelForRow(y, ROWS);
-                for (let x = 0; x < COLS; x++) {
-                    const colorIndex = rc.cells[y * COLS + x];
-                    if (!colorIndex) continue;
-                    renderer.drawCell(ctx, x, y, COLOR_PALETTE[colorIndex] ?? "#888", size, {level});
-                }
-            }
-        }
-
-        if (rowsGone) renderer.drawFragments(ctx, rc.fragments || [], fallProgress);
-
-        if (p < flashEnd) {
-            const flashProgress = p < maskStart ? 0 : (p - maskStart) / (flashEnd - maskStart);
-            renderer.drawClearingFlash(rc.lines, flashProgress, {ctx, size, cols: COLS});
-        }
+        const board = {cols: COLS, rows: ROWS, colors: rc.cells, version: rc.version};
+        renderer.drawClearingFrame(board, rc.lines, rc.dropRows, rc.fragments || [], progress, surface);
     }
 
     _sendToPeer(payload) {
@@ -1473,6 +1408,7 @@ export class MultiplayerController {
         this._lastRemoteCells = null;
         this._remoteLivePiece = null;
         this._remoteClearing = null;
+        this._remoteHardDropTrail = null;
         this._wasLocalClearing = false;
         this._lastSentBoardVersion = -1;
     }
