@@ -673,7 +673,7 @@ export class Renderer {
         forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
             const y = piece.y + r;
             if (y < 0) return;
-            const level = board ? this.saturationLevelForRow(y, board.rows) : 0;
+            const level = board ? this.saturationLevelForRow(Math.round(y), board.rows) : 0;
             this.drawCell(surface.ctx, piece.x + c, y, piece.color, size, {glow: true, level});
         });
     }

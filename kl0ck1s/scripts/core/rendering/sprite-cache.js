@@ -303,9 +303,10 @@ export class SpriteCache {
 
     getGlow(color, currentSize, level = 0) {
         if (this.size !== currentSize) this.rebuild(currentSize);
-        const key = level ? `${color}|${level}` : color;
+        const resolvedLevel = Math.min(SATURATION_LEVELS - 1, Math.max(0, Math.round(level)));
+        const key = resolvedLevel ? `${color}|${resolvedLevel}` : color;
         if (!this.glowSprites.has(key)) {
-            const resolvedColor = level ? colorForLevel(color, level) : color;
+            const resolvedColor = resolvedLevel ? colorForLevel(color, resolvedLevel) : color;
             this.glowSprites.set(key, createGlowSprite(resolvedColor, this.size, this.canvasFactory));
         }
         return this.glowSprites.get(key);
