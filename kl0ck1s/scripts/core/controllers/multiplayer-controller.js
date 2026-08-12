@@ -1273,13 +1273,7 @@ export class MultiplayerController {
             return null;
         }
 
-        const renderer = this.game.renderer;
-        const entries = trail.entries.map((entry) => ({
-            ...entry,
-            level: renderer.saturationLevelForRow(Math.round(entry.y), BOARD_CONFIG.ROWS),
-        }));
-
-        return {entries, progress};
+        return {entries: trail.entries, progress};
     }
 
     _renderRemoteHardDropTrail() {

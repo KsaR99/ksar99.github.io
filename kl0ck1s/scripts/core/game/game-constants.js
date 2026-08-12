@@ -84,11 +84,6 @@ export const FALL_TRAIL_FAST_INTERVAL_MS = 16;
 export const FALL_TRAIL_MAX_LENGTH = 10;
 export const FALL_TRAIL_MAX_ALPHA = 0.20;
 export const HARD_DROP_TRAIL_DURATION_MS = 150;
-/**
- * Per-layer opacity for hard-drop trail entries, closest to farthest from
- * the piece's resting position. At most this many layers are drawn,
- * evenly spaced (with gaps) across the drop distance.
- */
 export const HARD_DROP_TRAIL_ALPHAS = [0.9, 0.75, 0.6, 0.5, 0.25];
 
 export function fallTrailLengthForInterval(dropIntervalMs) {

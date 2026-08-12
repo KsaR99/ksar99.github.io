@@ -127,7 +127,6 @@ class BenchmarkShadowGame {
             entries.push({
                 x: piece.x, y, mask: piece.mask,
                 width: piece.width, height: piece.height, color: piece.color,
-                level: this.renderer.saturationLevelForRow(Math.round(y), this.board.rows),
             });
         }
 
@@ -320,6 +319,7 @@ export class BenchmarkController {
         shadow.lockDelayResets = 0;
         shadow.groundedTime = 0;
         shadow.isGrounded = false;
+        shadow.rawGrounded = false;
         shadow.groundedGraceTimer = 0;
         shadow.groundedSoundRate = 1;
         shadow.groundedSoundId = null;

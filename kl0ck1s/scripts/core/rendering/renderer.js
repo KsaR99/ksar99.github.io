@@ -716,6 +716,7 @@ export class Renderer {
         if (!entries || entries.length === 0) return;
 
         const size = this.boardConfig.CELL_SIZE;
+        const rows = this.boardConfig.ROWS;
         const {ctx} = surface;
         const count = entries.length;
         const fade = 1 - Math.min(1, progress);
@@ -729,15 +730,16 @@ export class Renderer {
             if (alpha <= 0.02) break;
 
             ctx.globalAlpha = alpha;
-            const sprite = this.spriteCache.getHardDropTrail(entry.color, size, entry.level ?? 0);
             forEachShapeCell(entry.mask, entry.width, entry.height, (r, c) => {
                 const x = entry.x + c;
                 const y = entry.y + r;
                 if (y < 0) return;
+                const level = this.saturationLevelForRow(Math.round(y), rows);
+                const sprite = this.spriteCache.getHardDropTrail(entry.color, size, level);
                 if (sprite) {
                     ctx.drawImage(sprite, x * size, y * size, size, size);
                 } else {
-                    ctx.fillStyle = hardDropTrailColor(entry.color, entry.level ?? 0);
+                    ctx.fillStyle = hardDropTrailColor(entry.color, level);
                     ctx.fillRect(x * size, y * size, size, size);
                 }
             });

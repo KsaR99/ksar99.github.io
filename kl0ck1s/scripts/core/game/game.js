@@ -103,6 +103,7 @@ export class Game {
         this.groundedTime = 0;
         this.hardDropUsed = false;
         this.isGrounded = false;
+        this.rawGrounded = false;
         this.groundedSoundId = null;
         this.groundedGraceTimer = 0;
         this.groundedSoundRate = 1;
@@ -187,16 +188,6 @@ export class Game {
         return 1;
     }
 
-    /**
-     * @param {object} [boot]
-     * @param {(step: "settings"|"sprites"|"audio"|"finalize") => void} [boot.onStep] - fired
-     *   right before each boot phase starts, so a loading screen can update its status text.
-     * @param {(loaded: number, total: number) => void} [boot.onAudioProgress] - fired as each
-     *   sound finishes decoding, for a fine-grained progress bar during the audio phase.
-     * @param {number} [boot.minStepMs] - each phase is held visible for at least this long
-     *   (after letting the browser paint its status text) so fast phases like "settings" or
-     *   "sprites" don't flash by in under a frame and go unnoticed.
-     */
     async init({onStep = null, onAudioProgress = null, minStepMs = 200} = {}) {
         const runStep = async (name, work) => {
             onStep?.(name);
@@ -270,7 +261,6 @@ export class Game {
                 width: piece.width,
                 height: piece.height,
                 color: piece.color,
-                level: this.renderer.saturationLevelForRow(Math.round(y), this.board.rows),
             });
         }
 
@@ -334,14 +324,14 @@ export class Game {
 
         if (this.state === "countdown") {
             this.countdownTimer += delta;
-            if (this.countdownTimer >= this.countdownStepDuration) {
-                this.countdownTimer = 0;
+            while (this.countdownTimer >= this.countdownStepDuration) {
+                this.countdownTimer -= this.countdownStepDuration;
                 ++this.countdownIndex;
                 if (this.countdownIndex >= COUNTDOWN_STEPS.length) {
                     this.screenFlow.start();
-                } else {
-                    this.screenFlow.advanceCountdownStep();
+                    break;
                 }
+                this.screenFlow.advanceCountdownStep();
             }
             return;
         }
@@ -367,6 +357,8 @@ export class Game {
         if (this.state !== "running") return;
 
         const resting = this.board.collides(this.current, 0, 1);
+        this.rawGrounded = resting;
+        if (resting) this.dropCounter = 0;
         this.pieceController.updateGrounded(resting, delta);
         this.pieceController.updateFalling();
 
@@ -391,9 +383,15 @@ export class Game {
         this.lockDelayTimer = 0;
         this.dropCounter += delta;
         if (this.dropCounter > this.dropInterval) {
+            this.dropCounter -= this.dropInterval;
             ++this.current.y;
-            this.dropCounter = 0;
             this.noteRowStep();
+            this.shiftAnim = null;
+
+            if (this.board.collides(this.current, 0, 1)) {
+                this.rawGrounded = true;
+                this.dropCounter = 0;
+            }
         }
     }
 
@@ -415,7 +413,7 @@ export class Game {
                 const {fromX, toX} = this.shiftAnim;
                 x = fromX + (toX - fromX) * t;
             }
-            if (this.state === "running" && this.dropInterval > 0 && !this.isGrounded) {
+            if (this.state === "running" && this.dropInterval > 0 && !this.rawGrounded) {
                 y = base.y + Math.min(1, this.dropCounter / this.dropInterval);
             }
         }

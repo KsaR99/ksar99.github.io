@@ -1,7 +1,13 @@
 "use strict";
 
 import {formatNumber} from "../shared/utils.js";
-import {DEV_MODE, SOUND_FILES, VOICE_COUNTING_KEYS_ALL, VOICE_ORDINAL_KEYS_ALL, voiceNumberKeysForLang} from "../shared/config.js";
+import {
+    DEV_MODE,
+    SOUND_FILES,
+    VOICE_COUNTING_KEYS_ALL,
+    VOICE_ORDINAL_KEYS_ALL,
+    voiceNumberKeysForLang
+} from "../shared/config.js";
 import {defaultKeyBindings, formatKeyCode, KEY_BIND_SLOTS} from "../shared/key-bindings.js";
 
 const ALL_VOICE_NUMBER_KEYS = new Set([...VOICE_COUNTING_KEYS_ALL, ...VOICE_ORDINAL_KEYS_ALL]);

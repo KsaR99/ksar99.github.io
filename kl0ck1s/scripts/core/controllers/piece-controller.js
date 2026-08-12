@@ -6,10 +6,7 @@ import {getKickTable, PIECE_CONTROLLABLE_STATES, T_FRONT_CORNERS} from "../game/
 import {getTightBounds} from "../shared/utils.js";
 import {LINE_CLEAR_SOUND_PLAYBACK_RATE} from "../shared/config.js";
 
-/** Grace window (ms) absorbing single-frame grounded/airborne flicker from in-place rotation before the "grounded" cue actually stops. */
 const GROUNDED_GRACE_MS = 100;
-
-/** Fallback duration (ms) for groundedSoundPlaybackRate() before the "grounded" clip has finished decoding - see SoundManager.getDuration(). */
 const GROUNDED_SOUND_REFERENCE_DURATION_MS = 1500;
 
 export class PieceController {
@@ -56,6 +53,7 @@ export class PieceController {
         game.groundedTime = 0;
         this.stopGameplaySounds();
         game.isGrounded = false;
+        game.rawGrounded = false;
         game.groundedGraceTimer = 0;
         game.groundedSoundRate = 1;
         game.lastAction = null;
@@ -188,7 +186,11 @@ export class PieceController {
             game.shiftAnim = game.settings.fallTrail
                 ? {fromX, toX: game.current.x, elapsed: 0, duration: 60}
                 : null;
-            if (game.board.collides(game.current, 0, 1)) this.resetLockDelay();
+            if (game.board.collides(game.current, 0, 1)) {
+                this.resetLockDelay();
+                game.rawGrounded = true;
+                game.dropCounter = 0;
+            }
             game.sensitivityCalibrationController?.notify("move", {x: game.current.x, via: "step"});
         }
     }
@@ -247,6 +249,8 @@ export class PieceController {
 
         if (game.board.collides(game.current, 0, 1)) {
             this.resetLockDelay();
+            game.rawGrounded = true;
+            game.dropCounter = 0;
         }
 
         game.sensitivityCalibrationController?.notify("move", {x: game.current.x, via: "drag"});
@@ -262,6 +266,7 @@ export class PieceController {
         game.statsTracker.addScore(pointsForSoftDrop(game.scoring));
         game.dropCounter = 0;
         game.noteRowStep();
+        game.shiftAnim = null;
         game.sensitivityCalibrationController?.notify("softDrop", {});
     }
 

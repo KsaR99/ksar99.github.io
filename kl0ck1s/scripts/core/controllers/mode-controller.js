@@ -209,7 +209,7 @@ export class ModeController {
         if (game.mode === "survival" && def.garbage) {
             game.modeState.garbageTimer += delta;
             if (game.modeState.garbageTimer >= def.garbageIntervalMs) {
-                game.modeState.garbageTimer = 0;
+                game.modeState.garbageTimer -= def.garbageIntervalMs;
                 const count = rollSurvivalGarbageCount(def);
                 const {toppedOut} = game.board.addGarbageLines(count);
                 if (game.current) game.current.y -= count;

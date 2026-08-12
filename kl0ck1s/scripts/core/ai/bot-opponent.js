@@ -38,10 +38,6 @@ export const BOT_DIFFICULTIES = Object.freeze({
     }),
 });
 
-/**
- * Free-fall (non-hard-drop) descent timing: short and roughly distance-based,
- * but capped so it always reads as a brief drop rather than a held-down key.
- */
 const FREE_FALL_MS_PER_ROW = 12;
 const FREE_FALL_MIN_MS = 60;
 const FREE_FALL_MAX_MS = 180;

@@ -124,17 +124,18 @@ export class SensitivityCalibrationController {
         if (this.armed) return;
 
         this.countdownTimer += delta;
-        if (this.countdownTimer < this.game.countdownStepDuration) return;
-        this.countdownTimer = 0;
-        this.countdownIndex++;
+        while (this.countdownTimer >= this.game.countdownStepDuration) {
+            this.countdownTimer -= this.game.countdownStepDuration;
+            this.countdownIndex++;
 
-        if (this.countdownIndex >= COUNTDOWN_STEPS.length) {
-            this.game.soundManager.play("voiceLetsGo");
-            this._armRound();
-            return;
+            if (this.countdownIndex >= COUNTDOWN_STEPS.length) {
+                this.game.soundManager.play("voiceLetsGo");
+                this._armRound();
+                return;
+            }
+
+            this._updateCountdownDisplay();
         }
-
-        this._updateCountdownDisplay();
     }
 
     notify(kind, payload) {
