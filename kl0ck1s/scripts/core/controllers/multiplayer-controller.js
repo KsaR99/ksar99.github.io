@@ -2,10 +2,11 @@
 
 import {MultiplayerSession} from "../net/multiplayer-session.js";
 import {MESSAGE_KIND} from "../net/net-constants.js";
+import {browseLobby, hostOpenLobby, requestJoinRoom, SupabaseSignalError} from "../net/supabase-signaling.js";
 import {BOT_DIFFICULTIES, BotOpponent} from "../ai/bot-opponent.js";
 import {PieceBag} from "../game/piece-bag.js";
 import {mulberry32, randomSeed} from "../shared/seeded-random.js";
-import {copyTextToClipboard, formatNumber} from "../shared/utils.js";
+import {formatNumber} from "../shared/utils.js";
 import {BOARD_CONFIG, KLOCKOMINO_TYPES} from "../shared/config.js";
 
 const SCORE_POLL_MS = 200;
@@ -69,6 +70,10 @@ export class MultiplayerController {
         this.session = null;
         this.role = null;
 
+        this._lobbyHost = null;
+        this._lobbyBrowse = null;
+        this._joinedRoomId = null;
+
         this._defaultBag = game.bag;
         this.botOpponent = null;
 
@@ -118,6 +123,7 @@ export class MultiplayerController {
         this._activePanelName = null;
         this._negotiationRetryCount = 0;
         this._negotiationRetryTimer = null;
+        this._connectInFlight = false;
 
         this._onKeydown = this._onKeydown.bind(this);
     }
@@ -161,7 +167,7 @@ export class MultiplayerController {
         });
 
         root?.querySelector('[data-role="mp-host-button"]')?.addEventListener("click", () => this._beginHost());
-        root?.querySelector('[data-role="mp-join-button"]')?.addEventListener("click", () => this._showPanel("join"));
+        root?.querySelector('[data-role="mp-join-button"]')?.addEventListener("click", () => this._beginJoin());
         root?.querySelector('[data-role="mp-bot-button"]')?.addEventListener("click", () => this._showPanel("bot"));
 
         const botDifficultySlider = root?.querySelector('[data-role="mp-bot-difficulty-slider"]');
@@ -180,14 +186,6 @@ export class MultiplayerController {
         root?.querySelector('[data-role="mp-ready-mode-next"]')?.addEventListener("click", () => this._changeMatchMode(1));
         root?.querySelector('[data-role="mp-ready-difficulty-prev"]')?.addEventListener("click", () => this._changeMatchDifficulty(-1));
         root?.querySelector('[data-role="mp-ready-difficulty-next"]')?.addEventListener("click", () => this._changeMatchDifficulty(1));
-
-        root?.querySelector('[data-role="mp-host-copy-button"]')?.addEventListener("click", (event) =>
-            this._copyFrom('[data-role="mp-host-code"]', event.currentTarget));
-        root?.querySelector('[data-role="mp-host-connect-button"]')?.addEventListener("click", () => this._completeHost());
-
-        root?.querySelector('[data-role="mp-join-connect-button"]')?.addEventListener("click", () => this._beginJoin());
-        root?.querySelector('[data-role="mp-join-copy-button"]')?.addEventListener("click", (event) =>
-            this._copyFrom('[data-role="mp-join-answer-code"]', event.currentTarget));
 
         root?.querySelector('[data-role="mp-ready-button"]')?.addEventListener("click", () => this._toggleReady());
         root?.querySelector('[data-role="mp-start-button"]')?.addEventListener("click", () => this._hostStart());
@@ -415,48 +413,97 @@ export class MultiplayerController {
         this._showPanel("host");
 
         const root = this.overlayEl;
-        const codeEl = root?.querySelector('[data-role="mp-host-code"]');
-        const copyButton = root?.querySelector('[data-role="mp-host-copy-button"]');
-        const answerWrap = root?.querySelector('[data-role="mp-host-answer-wrap"]');
-        if (codeEl) codeEl.value = "";
-        if (copyButton) copyButton.disabled = true;
-        if (answerWrap) answerWrap.hidden = true;
+        const waitText = root?.querySelector('[data-field="mp-host-wait-text"]');
+        const list = root?.querySelector('[data-role="mp-host-requests-list"]');
+        const empty = root?.querySelector('[data-field="mp-host-requests-empty"]');
+        if (list) list.innerHTML = "";
+        if (empty) empty.hidden = false;
+        if (waitText) {
+            waitText.textContent = this._t("multiplayer.waitingForGuest");
+            waitText.hidden = false;
+        }
         if (hostButton) hostButton.disabled = true;
 
+        this._connectInFlight = true;
         try {
-            const code = await this.session.createRoom();
-            if (codeEl) codeEl.value = code;
-            if (copyButton) copyButton.disabled = false;
-            if (answerWrap) answerWrap.hidden = false;
+            this._lobbyHost = await hostOpenLobby(this.game.playerName || "", {
+                onJoinRequest: (req) => this._onJoinRequestReceived(req),
+            });
         } catch (err) {
-            this._onNegotiationFailed(err);
+            this._onNegotiationFailed(this._mapSignalError(err));
         } finally {
+            this._connectInFlight = false;
             if (hostButton) hostButton.disabled = false;
         }
     }
 
-    async _completeHost() {
-        const button = this.overlayEl?.querySelector('[data-role="mp-host-connect-button"]');
-        if (button?.disabled) return;
+    _onJoinRequestReceived(req) {
+        const list = this.overlayEl?.querySelector('[data-role="mp-host-requests-list"]');
+        if (!list || list.querySelector(`[data-request-id="${req.requestId}"]`)) return;
 
-        this._clearError();
-        const input = this.overlayEl?.querySelector('[data-role="mp-host-answer-input"]');
-        const code = input?.value ?? "";
+        const empty = this.overlayEl?.querySelector('[data-field="mp-host-requests-empty"]');
+        if (empty) empty.hidden = true;
 
-        if (button) button.disabled = true;
+        const item = this.dom.createElement("li");
+        item.className = "mp-request-item";
+        item.dataset.requestId = req.requestId;
+
+        const name = this.dom.createElement("span");
+        name.className = "mp-request-item__name";
+        name.textContent = req.guestName || this._t("multiplayer.guestFallback");
+        item.appendChild(name);
+
+        const actions = this.dom.createElement("span");
+        actions.className = "mp-request-item__actions";
+
+        const acceptButton = this.dom.createElement("button");
+        acceptButton.type = "button";
+        acceptButton.className = "button button--accent mp-request-item__accept";
+        acceptButton.textContent = this._t("multiplayer.acceptButton");
+        acceptButton.addEventListener("click", () => this._onAcceptRequest(req.requestId));
+
+        const declineButton = this.dom.createElement("button");
+        declineButton.type = "button";
+        declineButton.className = "button button--primary mp-request-item__decline";
+        declineButton.textContent = this._t("multiplayer.declineButton");
+        declineButton.addEventListener("click", () => this._onDeclineRequest(req.requestId));
+
+        actions.appendChild(acceptButton);
+        actions.appendChild(declineButton);
+        item.appendChild(actions);
+        list.appendChild(item);
+    }
+
+    _onDeclineRequest(requestId) {
+        this._lobbyHost?.decline(requestId).catch(() => {
+        });
+        this.overlayEl?.querySelector(`[data-request-id="${requestId}"]`)?.remove();
+    }
+
+    async _onAcceptRequest(requestId) {
+        if (!this._lobbyHost || this._connectInFlight) return;
+
+        const root = this.overlayEl;
+        const waitText = root?.querySelector('[data-field="mp-host-wait-text"]');
+        root?.querySelectorAll('[data-role="mp-host-requests-list"] button')
+            .forEach((button) => (button.disabled = true));
+        if (waitText) waitText.textContent = this._t("multiplayer.statusConnecting");
+
+        const lobbyHost = this._lobbyHost;
+        this._connectInFlight = true;
         try {
-            await this.session.acceptGuest(code);
+            const answerCode = await lobbyHost.accept(requestId, () => this.session.createRoom());
+            this._lobbyHost = null;
+            await this.session.acceptGuest(answerCode);
         } catch (err) {
-            this._onNegotiationFailed(err);
+            this._lobbyHost = null;
+            this._onNegotiationFailed(this._mapSignalError(err));
         } finally {
-            if (button) button.disabled = false;
+            this._connectInFlight = false;
         }
     }
 
     async _beginJoin() {
-        const joinButton = this.overlayEl?.querySelector('[data-role="mp-join-connect-button"]');
-        if (joinButton?.disabled) return;
-
         clearTimeout(this._negotiationRetryTimer);
         this._negotiationRetryTimer = null;
         this._negotiationRetryCount = 0;
@@ -465,36 +512,110 @@ export class MultiplayerController {
     }
 
     async _beginJoinAttempt() {
-        const joinButton = this.overlayEl?.querySelector('[data-role="mp-join-connect-button"]');
-
         this._clearError();
         this._resetSession();
         this.role = "guest";
         this.session = MultiplayerSession.createGuest();
         this._bindSessionEvents();
         this._showPanel("join");
+        this._joinedRoomId = null;
 
         const root = this.overlayEl;
-        const hostCodeInput = root?.querySelector('[data-role="mp-join-code-input"]');
-        const answerWrap = root?.querySelector('[data-role="mp-join-answer-wrap"]');
-        const answerEl = root?.querySelector('[data-role="mp-join-answer-code"]');
-        const copyButton = root?.querySelector('[data-role="mp-join-copy-button"]');
+        const list = root?.querySelector('[data-role="mp-join-rooms-list"]');
+        const empty = root?.querySelector('[data-field="mp-join-rooms-empty"]');
+        const listWrap = root?.querySelector('[data-role="mp-join-rooms-wrap"]');
+        const waitText = root?.querySelector('[data-field="mp-join-wait-text"]');
+        if (list) list.innerHTML = "";
+        if (empty) empty.hidden = false;
+        if (listWrap) listWrap.hidden = false;
+        if (waitText) waitText.hidden = true;
 
-        if (answerEl) answerEl.value = "";
-        if (copyButton) copyButton.disabled = true;
-        if (answerWrap) answerWrap.hidden = false;
-        if (joinButton) joinButton.disabled = true;
-
+        this._connectInFlight = true;
         try {
-            const answerCode = await this.session.joinRoom(hostCodeInput?.value ?? "");
-            if (answerEl) answerEl.value = answerCode;
-            if (copyButton) copyButton.disabled = false;
+            this._lobbyBrowse = await browseLobby({
+                onRoomOpened: (room) => this._onRoomOpened(room),
+                onRoomClosed: (roomId) => this._onRoomClosed(roomId),
+            });
         } catch (err) {
-            if (answerWrap) answerWrap.hidden = true;
-            this._onNegotiationFailed(err);
+            this._onNegotiationFailed(this._mapSignalError(err));
         } finally {
-            if (joinButton) joinButton.disabled = false;
+            this._connectInFlight = false;
         }
+    }
+
+    _onRoomOpened(room) {
+        if (this._joinedRoomId) return;
+        const list = this.overlayEl?.querySelector('[data-role="mp-join-rooms-list"]');
+        if (!list || list.querySelector(`[data-room-id="${room.roomId}"]`)) return;
+
+        const empty = this.overlayEl?.querySelector('[data-field="mp-join-rooms-empty"]');
+        if (empty) empty.hidden = true;
+
+        const item = this.dom.createElement("li");
+        item.className = "mp-room-item";
+        item.dataset.roomId = room.roomId;
+
+        const name = this.dom.createElement("span");
+        name.className = "mp-room-item__name";
+        name.textContent = room.hostName || this._t("multiplayer.hostFallback");
+        item.appendChild(name);
+
+        const joinButton = this.dom.createElement("button");
+        joinButton.type = "button";
+        joinButton.className = "button button--accent mp-room-item__join";
+        joinButton.textContent = this._t("multiplayer.requestJoinButton");
+        joinButton.addEventListener("click", () => this._onRequestJoin(room.roomId, room.hostName));
+        item.appendChild(joinButton);
+
+        list.appendChild(item);
+    }
+
+    _onRoomClosed(roomId) {
+        this.overlayEl?.querySelector(`[data-room-id="${roomId}"]`)?.remove();
+        const list = this.overlayEl?.querySelector('[data-role="mp-join-rooms-list"]');
+        const empty = this.overlayEl?.querySelector('[data-field="mp-join-rooms-empty"]');
+        if (list && empty) empty.hidden = list.children.length > 0;
+    }
+
+    async _onRequestJoin(roomId, hostName) {
+        if (this._joinedRoomId || this._connectInFlight) return;
+        this._joinedRoomId = roomId;
+
+        const root = this.overlayEl;
+        const listWrap = root?.querySelector('[data-role="mp-join-rooms-wrap"]');
+        if (listWrap) listWrap.hidden = true;
+        const waitText = root?.querySelector('[data-field="mp-join-wait-text"]');
+        if (waitText) {
+            waitText.textContent = this._t("multiplayer.waitingForHost", {
+                name: hostName || this._t("multiplayer.hostFallback"),
+            });
+            waitText.hidden = false;
+        }
+
+        await this._lobbyBrowse?.close().catch(() => {
+        });
+        this._lobbyBrowse = null;
+
+        this._connectInFlight = true;
+        try {
+            await requestJoinRoom(roomId, this.game.playerName || "", (offerCode) => this.session.joinRoom(offerCode), {
+                onAccepted: () => {
+                    if (waitText) waitText.textContent = this._t("multiplayer.statusConnecting");
+                },
+            });
+        } catch (err) {
+            this._joinedRoomId = null;
+            this._onNegotiationFailed(this._mapSignalError(err));
+        } finally {
+            this._connectInFlight = false;
+        }
+    }
+
+    _mapSignalError(err) {
+        if (!(err instanceof SupabaseSignalError)) return err;
+        if (err.code === "declined") return new Error(this._t("multiplayer.hostDeclined"));
+        if (err.code === "timeout" && this.role === "guest") return new Error(this._t("multiplayer.hostNoResponse"));
+        return new Error(this._t("multiplayer.genericError"));
     }
 
     _beginBot(difficultyKey) {
@@ -555,17 +676,6 @@ export class MultiplayerController {
         this.botOpponent = null;
         this.game.bag = this._defaultBag;
         this.role = null;
-    }
-
-    _copyFrom(selector, button) {
-        const el = this.overlayEl?.querySelector(selector);
-        if (!el?.value) return;
-        copyTextToClipboard(el.value).then((ok) => {
-            if (!ok || !button) return;
-            const original = button.textContent;
-            button.textContent = "✓";
-            setTimeout(() => (button.textContent = original), 1200);
-        });
     }
 
     _bindSessionEvents() {
@@ -1444,13 +1554,8 @@ export class MultiplayerController {
             clearTimeout(this._negotiationRetryTimer);
             this._negotiationRetryTimer = setTimeout(() => {
                 if (this._activePanelName !== panel) return;
-                if (role === "guest") {
-                    const hostCodeInput = this.overlayEl?.querySelector('[data-role="mp-join-code-input"]');
-                    if (!hostCodeInput?.value) return;
-                    this._beginJoinAttempt();
-                } else {
-                    this._beginHostAttempt();
-                }
+                if (role === "guest") this._beginJoinAttempt();
+                else this._beginHostAttempt();
             }, NEGOTIATION_RETRY_DELAY_MS);
             return;
         }
@@ -1467,6 +1572,21 @@ export class MultiplayerController {
         this._teardownBotMode();
         this.session?.close();
         this.session = null;
+
+        if (this._lobbyHost) {
+            const lobbyHost = this._lobbyHost;
+            this._lobbyHost = null;
+            lobbyHost.cancel().catch(() => {
+            });
+        }
+        if (this._lobbyBrowse) {
+            const lobbyBrowse = this._lobbyBrowse;
+            this._lobbyBrowse = null;
+            lobbyBrowse.close().catch(() => {
+            });
+        }
+        this._joinedRoomId = null;
+
         if (this.role === "guest" && (this._guestOriginalMode !== null || this._guestOriginalDifficulty !== null)) {
             const game = this.game;
             if (this._guestOriginalMode !== null) {
