@@ -14,6 +14,11 @@ export class PieceController {
         this.game = game;
     }
 
+    canControlPiece() {
+        const game = this.game;
+        return PIECE_CONTROLLABLE_STATES.has(game.state) && !game.multiplayerOptionsOverlayOpen;
+    }
+
     reset() {
         const game = this.game;
         game.dropCounter = 0;
@@ -176,7 +181,7 @@ export class PieceController {
 
     moveHorizontal(dir, isRepeat = false) {
         const game = this.game;
-        if (!PIECE_CONTROLLABLE_STATES.has(game.state)) return;
+        if (!this.canControlPiece()) return;
         if (!game.board.collides(game.current, dir, 0)) {
             const fromX = game.getShiftDisplayX();
             game.current.x += dir;
@@ -210,7 +215,7 @@ export class PieceController {
 
     moveToColumn(targetColumn) {
         const game = this.game;
-        if (!PIECE_CONTROLLABLE_STATES.has(game.state)) return;
+        if (!this.canControlPiece()) return;
 
         const bounds = getTightBounds(game.current.mask, game.current.width, game.current.height);
         const offsetX = bounds.minX || 0;
@@ -258,7 +263,7 @@ export class PieceController {
 
     softDrop() {
         const game = this.game;
-        if (!PIECE_CONTROLLABLE_STATES.has(game.state)) return;
+        if (!this.canControlPiece()) return;
         if (game.board.collides(game.current, 0, 1)) return;
 
         ++game.current.y;
@@ -272,7 +277,7 @@ export class PieceController {
 
     hardDrop() {
         const game = this.game;
-        if (!PIECE_CONTROLLABLE_STATES.has(game.state)) return;
+        if (!this.canControlPiece()) return;
         if (game.hardDropUsed) return;
 
         game.hardDropUsed = true;
@@ -304,7 +309,7 @@ export class PieceController {
      */
     rotate(dir = 1) {
         const game = this.game;
-        if (!PIECE_CONTROLLABLE_STATES.has(game.state)) return;
+        if (!this.canControlPiece()) return;
 
         const rotatedMask = game.current.rotated(dir);
         const fromState = game.current.rotationState;

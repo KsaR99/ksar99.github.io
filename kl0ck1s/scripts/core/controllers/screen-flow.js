@@ -39,6 +39,7 @@ export class ScreenFlow {
         game.state = "idle";
         game.menuSelector = "mode";
         game.isPlayingSession = false;
+        game.multiplayerOptionsOverlayOpen = false;
         game.hud.setPlaying(false);
         game.hud.setHasPlayedBefore(false);
         game.modeController.restoreSelectedMode();
@@ -518,9 +519,13 @@ export class ScreenFlow {
 
     togglePause() {
         const game = this.game;
+        if (game.multiplayerOptionsOverlayOpen) {
+            this.toggleMultiplayerLiveOptions();
+            return;
+        }
         if (game.state === "running") {
             if (game.multiplayerConnected && !game.multiplayerVsBot) {
-                this.toggleOptions();
+                this.toggleMultiplayerLiveOptions();
                 return;
             }
             game.state = "paused";
@@ -532,6 +537,19 @@ export class ScreenFlow {
             game.hud.hideOverlay();
             game.musicDirector.resume();
         }
+    }
+
+    toggleMultiplayerLiveOptions() {
+        const game = this.game;
+        if (game.multiplayerOptionsOverlayOpen) {
+            game.soundManager.stopPreview();
+            game.multiplayerOptionsOverlayOpen = false;
+            game.hud.hideOverlay();
+            return;
+        }
+        if (game.state !== "running") return;
+        game.multiplayerOptionsOverlayOpen = true;
+        this.renderOptionsMenu();
     }
 
     _showMultiplayerBlockedHint(messageKey = "multiplayer.pauseBlocked") {
@@ -578,7 +596,9 @@ export class ScreenFlow {
     }
 
     handleEscape() {
-        if (this.game.state === "options") {
+        if (this.game.multiplayerOptionsOverlayOpen) {
+            this.toggleMultiplayerLiveOptions();
+        } else if (this.game.state === "options") {
             this.toggleOptions();
         } else if (this.game.state === "calibrating" || this.game.state === "calibrating-result") {
             this.game.sensitivityCalibrationController.cancel();
@@ -596,7 +616,8 @@ export class ScreenFlow {
     }
 
     closeOptionsOrPause() {
-        if (this.game.state === "paused") this.togglePause();
+        if (this.game.multiplayerOptionsOverlayOpen) this.toggleMultiplayerLiveOptions();
+        else if (this.game.state === "paused") this.togglePause();
         else this.toggleOptions();
     }
 
@@ -636,7 +657,9 @@ export class ScreenFlow {
 
     refreshCurrentScreen() {
         const game = this.game;
-        if (game.state === "idle") {
+        if (game.multiplayerOptionsOverlayOpen) {
+            this.renderOptionsMenu();
+        } else if (game.state === "idle") {
             this.renderIdleScreen(game.currentIdleList ?? []);
         } else if (game.state === "paused") {
             this.renderPauseMenu();
@@ -674,6 +697,14 @@ export class ScreenFlow {
 
     toggleOptions() {
         const game = this.game;
+        if (game.multiplayerOptionsOverlayOpen) {
+            this.toggleMultiplayerLiveOptions();
+            return;
+        }
+        if (game.state === "running" && game.multiplayerConnected && !game.multiplayerVsBot) {
+            this.toggleMultiplayerLiveOptions();
+            return;
+        }
         if (game.state === "options") {
             game.soundManager.stopPreview();
             const previousState = game.previousStateBeforeOptions ?? "idle";

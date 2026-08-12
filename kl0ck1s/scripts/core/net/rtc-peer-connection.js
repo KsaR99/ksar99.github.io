@@ -21,14 +21,19 @@ function waitForIceGatheringComplete(pc, timeoutMs) {
             if (settled) return;
             settled = true;
             pc.removeEventListener("icegatheringstatechange", onChange);
+            document.removeEventListener("visibilitychange", onVisible);
             clearTimeout(timer);
             resolve();
         };
         const onChange = () => {
             if (pc.iceGatheringState === "complete") finish();
         };
+        const onVisible = () => {
+            if (!document.hidden) onChange();
+        };
 
         pc.addEventListener("icegatheringstatechange", onChange);
+        document.addEventListener("visibilitychange", onVisible);
 
         const timer = setTimeout(finish, timeoutMs);
     });
@@ -96,7 +101,9 @@ export class RtcPeerConnection extends EventTarget {
     async acceptAnswer(answerCode) {
         this._assertRole(PEER_ROLE.HOST);
 
-        if (this._pc.signalingState !== "have-local-offer") return;
+        if (this._pc.signalingState !== "have-local-offer") {
+            throw new Error();
+        }
 
         const {sdp} = await decodeSignal(answerCode, "answer");
 

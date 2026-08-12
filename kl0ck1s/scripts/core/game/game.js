@@ -81,6 +81,7 @@ export class Game {
         this.activeTheme = "none";
         this.previousStateBeforeOptions = null;
         this.isPlayingSession = false;
+        this.multiplayerOptionsOverlayOpen = false;
 
         this.state = "idle";
         this.menuSelector = "mode";
@@ -91,6 +92,7 @@ export class Game {
         this.currentGameOverEntry = null;
         this.currentGameOverSaved = null;
         this.pointerClientX = null;
+        this.pointerClientY = null;
 
         this.current = null;
         this.next = null;
@@ -275,6 +277,19 @@ export class Game {
     noteColStep() {
         ({lastTime: this.lastColStepTime, effectiveMs: this.effectiveShiftIntervalMs} =
             smoothedInterval(this.lastColStepTime, this.effectiveShiftIntervalMs, nowMs()));
+    }
+
+    _forceCursorRepaint() {
+        if (!globalThis.window || this.pointerClientX == null || this.pointerClientY == null) return;
+        const target = this.dom?.body ?? globalThis.document?.body;
+        if (!target) return;
+
+        target.dispatchEvent(new MouseEvent("mousemove", {
+            clientX: this.pointerClientX,
+            clientY: this.pointerClientY,
+            bubbles: true,
+            cancelable: true,
+        }));
     }
 
     getShiftDisplayX() {
@@ -477,10 +492,14 @@ export class Game {
 
         const body = this.dom?.body;
         if (body) {
-            body.classList.toggle(
-                "cursor-hidden",
-                ["running", "clearing", "countdown"].includes(this.state) && !this.settings.mouseControl
-            );
+            const shouldHideCursor = ["running", "clearing", "countdown"].includes(this.state)
+                && !this.settings.mouseControl
+                && !this.multiplayerOptionsOverlayOpen;
+
+            if (shouldHideCursor !== body.classList.contains("cursor-hidden")) {
+                body.classList.toggle("cursor-hidden", shouldHideCursor);
+                this._forceCursorRepaint();
+            }
         }
 
         const showPieceBehindOptions = this.state === "options"

@@ -16,6 +16,9 @@ const OPPONENT_BOARD_FALLBACK_CELL_PX = 24;
 
 const BOT_DIFFICULTY_ORDER = ["easy", "medium", "hard"];
 
+const MAX_NEGOTIATION_AUTO_RETRIES = 2;
+const NEGOTIATION_RETRY_DELAY_MS = 600;
+
 const STEP_BY_PANEL = {
     role: {step: 1, labelKey: "multiplayer.step1Label"},
     host: {step: 2, labelKey: "multiplayer.step2Label"},
@@ -113,6 +116,8 @@ export class MultiplayerController {
         this._guestOriginalMode = null;
         this._guestOriginalDifficulty = null;
         this._activePanelName = null;
+        this._negotiationRetryCount = 0;
+        this._negotiationRetryTimer = null;
 
         this._onKeydown = this._onKeydown.bind(this);
     }
@@ -241,6 +246,9 @@ export class MultiplayerController {
         this.overlayEl.classList.remove("mp-overlay--visible");
         this.overlayEl.hidden = true;
         this.dom.removeEventListener("keydown", this._onKeydown);
+        clearTimeout(this._negotiationRetryTimer);
+        this._negotiationRetryTimer = null;
+        this._negotiationRetryCount = 0;
 
         if (this._connectInFlight) return;
 
@@ -389,6 +397,16 @@ export class MultiplayerController {
         const hostButton = this.overlayEl?.querySelector('[data-role="mp-host-button"]');
         if (hostButton?.disabled) return;
 
+        clearTimeout(this._negotiationRetryTimer);
+        this._negotiationRetryTimer = null;
+        this._negotiationRetryCount = 0;
+
+        await this._beginHostAttempt();
+    }
+
+    async _beginHostAttempt() {
+        const hostButton = this.overlayEl?.querySelector('[data-role="mp-host-button"]');
+
         this._clearError();
         this._resetSession();
         this.role = "host";
@@ -411,7 +429,7 @@ export class MultiplayerController {
             if (copyButton) copyButton.disabled = false;
             if (answerWrap) answerWrap.hidden = false;
         } catch (err) {
-            this._showError(err);
+            this._onNegotiationFailed(err);
         } finally {
             if (hostButton) hostButton.disabled = false;
         }
@@ -429,7 +447,7 @@ export class MultiplayerController {
         try {
             await this.session.acceptGuest(code);
         } catch (err) {
-            this._showError(err);
+            this._onNegotiationFailed(err);
         } finally {
             if (button) button.disabled = false;
         }
@@ -439,11 +457,22 @@ export class MultiplayerController {
         const joinButton = this.overlayEl?.querySelector('[data-role="mp-join-connect-button"]');
         if (joinButton?.disabled) return;
 
+        clearTimeout(this._negotiationRetryTimer);
+        this._negotiationRetryTimer = null;
+        this._negotiationRetryCount = 0;
+
+        await this._beginJoinAttempt();
+    }
+
+    async _beginJoinAttempt() {
+        const joinButton = this.overlayEl?.querySelector('[data-role="mp-join-connect-button"]');
+
         this._clearError();
         this._resetSession();
         this.role = "guest";
         this.session = MultiplayerSession.createGuest();
         this._bindSessionEvents();
+        this._showPanel("join");
 
         const root = this.overlayEl;
         const hostCodeInput = root?.querySelector('[data-role="mp-join-code-input"]');
@@ -462,7 +491,7 @@ export class MultiplayerController {
             if (copyButton) copyButton.disabled = false;
         } catch (err) {
             if (answerWrap) answerWrap.hidden = true;
-            this._showError(err);
+            this._onNegotiationFailed(err);
         } finally {
             if (joinButton) joinButton.disabled = false;
         }
@@ -575,8 +604,12 @@ export class MultiplayerController {
             this._hideOpponentUI();
             this.game.multiplayerConnected = false;
             if (wasInMatch) this._showDisconnectToast();
+            else if (!this.session?.isConnected) this._onNegotiationFailed();
         });
-        session.addEventListener("error", () => this._setStatus(this._t("multiplayer.statusError")));
+        session.addEventListener("error", (event) => {
+            this._setStatus(this._t("multiplayer.statusError"));
+            if (!this.session?.isConnected) this._onNegotiationFailed(event.detail);
+        });
     }
 
     _updateReadyBadges() {
@@ -1392,6 +1425,40 @@ export class MultiplayerController {
     _clearError() {
         const el = this.overlayEl?.querySelector('[data-field="mp-error-text"]');
         if (el) el.hidden = true;
+    }
+
+    _onNegotiationFailed(err) {
+        if (this._activePanelName === "ready" || this._activePanelName === "result") return;
+
+        const role = this.role;
+        const panel = role === "guest" ? "join" : role === "host" ? "host" : "role";
+
+        if ((role === "host" || role === "guest") && this._negotiationRetryCount < MAX_NEGOTIATION_AUTO_RETRIES) {
+            this._negotiationRetryCount += 1;
+            this._resetSession();
+            this._showPanel(panel);
+            this._showError(new Error(this._t("multiplayer.statusRetrying", {
+                attempt: this._negotiationRetryCount,
+                max: MAX_NEGOTIATION_AUTO_RETRIES,
+            })));
+            clearTimeout(this._negotiationRetryTimer);
+            this._negotiationRetryTimer = setTimeout(() => {
+                if (this._activePanelName !== panel) return;
+                if (role === "guest") {
+                    const hostCodeInput = this.overlayEl?.querySelector('[data-role="mp-join-code-input"]');
+                    if (!hostCodeInput?.value) return;
+                    this._beginJoinAttempt();
+                } else {
+                    this._beginHostAttempt();
+                }
+            }, NEGOTIATION_RETRY_DELAY_MS);
+            return;
+        }
+
+        this._negotiationRetryCount = 0;
+        this._resetSession();
+        this._showPanel(panel);
+        this._showError(err instanceof Error ? err : new Error(this._t("multiplayer.negotiationFailed")));
     }
 
     _resetSession() {
