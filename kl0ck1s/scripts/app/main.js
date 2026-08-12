@@ -171,7 +171,7 @@ const hud = new HUD({
     objectiveBarTrackEl: statsCardEl.querySelector("#objective-bar-track"),
 });
 
-const soundManager = new SoundManager(SOUND_FILES);
+const soundManager = new SoundManager(SOUND_FILES, {lang: i18n.lang});
 const store = new PersistentStore();
 const leaderboard = new Leaderboard(store, document, i18n);
 const board = new Board(BOARD_CONFIG.COLS, BOARD_CONFIG.ROWS);

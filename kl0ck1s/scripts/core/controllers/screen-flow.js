@@ -381,7 +381,7 @@ export class ScreenFlow {
             game.soundManager.playSequence([
                 "voiceLetsGo",
                 "voiceLevel",
-                ...numberToVoiceKeys(game.level),
+                ...numberToVoiceKeys(game.level, game.i18n.lang),
             ]);
         }
     }
@@ -667,6 +667,7 @@ export class ScreenFlow {
             if (lang === game.i18n.lang) return;
 
             await game.i18n.setLanguage(lang);
+            await game.soundManager.setLanguage(lang);
             this.refreshLanguage();
         });
     }

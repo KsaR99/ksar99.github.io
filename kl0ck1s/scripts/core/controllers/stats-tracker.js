@@ -135,7 +135,7 @@ export class StatsTracker {
             }
 
             game.soundManager.play("levelUp");
-            game.soundManager.playSequence(["voiceLevel", ...numberToVoiceKeys(game.level)]);
+            game.soundManager.playSequence(["voiceLevel", ...numberToVoiceKeys(game.level, game.i18n.lang)]);
             game.levelUpLevel = game.level;
             game.levelUpTimer = game.levelUpBannerDuration;
         }

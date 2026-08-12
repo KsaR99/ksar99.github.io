@@ -1,10 +1,10 @@
 "use strict";
 
 import {formatNumber} from "../shared/utils.js";
-import {DEV_MODE, SOUND_FILES, VOICE_COUNTING_NUMBERS, voiceCountingKey} from "../shared/config.js";
+import {DEV_MODE, SOUND_FILES, VOICE_COUNTING_KEYS_ALL, VOICE_ORDINAL_KEYS_ALL, voiceNumberKeysForLang} from "../shared/config.js";
 import {defaultKeyBindings, formatKeyCode, KEY_BIND_SLOTS} from "../shared/key-bindings.js";
 
-const VOICE_COUNTING_KEYS = new Set(VOICE_COUNTING_NUMBERS.map(voiceCountingKey));
+const ALL_VOICE_NUMBER_KEYS = new Set([...VOICE_COUNTING_KEYS_ALL, ...VOICE_ORDINAL_KEYS_ALL]);
 
 function setMuteToggleState(button, muted, i18n, effectiveMuted = muted) {
     if (!button) return;
@@ -279,8 +279,9 @@ export const Screens = {
                 );
 
                 if (category === "voices") {
-                    const countdownKeys = keys.filter((key) => VOICE_COUNTING_KEYS.has(key));
-                    const otherKeys = keys.filter((key) => !VOICE_COUNTING_KEYS.has(key));
+                    const activeNumberKeys = new Set(voiceNumberKeysForLang(i18n.lang));
+                    const countdownKeys = keys.filter((key) => activeNumberKeys.has(key));
+                    const otherKeys = keys.filter((key) => !ALL_VOICE_NUMBER_KEYS.has(key));
 
                     const list = group.querySelector('[data-role="sound-list"]');
                     if (list) fillSoundRows(dom, list, otherKeys, soundVolumes, soundMuted, i18n);

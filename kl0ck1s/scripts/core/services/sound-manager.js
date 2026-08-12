@@ -26,10 +26,12 @@ export class SoundManager {
     constructor(soundFiles, {
         AudioContextCtor = globalThis.AudioContext ?? globalThis.webkitAudioContext ?? null,
         fetchImpl = globalThis.fetch?.bind(globalThis) ?? null,
+        lang = "en",
     } = {}) {
         this.soundFiles = soundFiles;
         this.AudioContextCtor = AudioContextCtor;
         this.fetchImpl = fetchImpl;
+        this.lang = lang;
 
         this.context = null;
         this.masterGain = null;
@@ -58,9 +60,19 @@ export class SoundManager {
         return this.soundVolumes[key] ?? 1;
     }
 
+    isLocalizedSrc(key) {
+        const def = this.soundFiles[key];
+        const src = typeof def === "string" ? def : def?.src;
+        return Boolean(src) && typeof src === "object" && !Array.isArray(src);
+    }
+
     srcFor(key) {
         const def = this.soundFiles[key];
-        return typeof def === "string" ? def : def?.src;
+        const src = typeof def === "string" ? def : def?.src;
+        if (src && typeof src === "object" && !Array.isArray(src)) {
+            return src[this.lang] ?? src.en ?? Object.values(src)[0];
+        }
+        return src;
     }
 
     srcListFor(key) {
@@ -96,6 +108,55 @@ export class SoundManager {
         return this.context;
     }
 
+    async _decode(src) {
+        return withTimeout(
+            (async () => {
+                const response = await this.fetchImpl(src);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const arrayBuffer = await response.arrayBuffer();
+                return await this.context.decodeAudioData(arrayBuffer);
+            })().catch((err) => {
+                console.warn(`[SoundManager] Failed to load "${src}":`, err?.message ?? err);
+                return null;
+            }),
+            SOUND_LOAD_TIMEOUT_MS
+        );
+    }
+
+    async _loadKey(key) {
+        const def = this.soundFiles[key];
+        const rawSrc = typeof def === "string" ? def : def?.src;
+
+        if (rawSrc && typeof rawSrc === "object" && !Array.isArray(rawSrc)) {
+            const primary = rawSrc[this.lang];
+            const fallback = rawSrc.en;
+            const candidates = [...new Set([primary, fallback].filter(Boolean))];
+
+            for (const src of candidates) {
+                const buffer = await this._decode(src);
+                if (buffer) {
+                    this.buffers[key] = [buffer];
+                    if (src !== primary) {
+                        console.warn(
+                            `[SoundManager] Missing "${this.lang}" audio for "${key}" (expected "${primary}"), using "${src}" instead.`
+                        );
+                    }
+                    return;
+                }
+            }
+
+            console.warn(`[SoundManager] No playable audio found for "${key}".`);
+            return;
+        }
+
+        const sources = this.srcListFor(key);
+        if (sources.length === 0) return;
+
+        const decoded = await Promise.all(sources.map((src) => this._decode(src)));
+        const buffers = decoded.filter(Boolean);
+        if (buffers.length > 0) this.buffers[key] = buffers;
+    }
+
     init(onProgress = null) {
         if (this._ready) return this._ready;
 
@@ -114,29 +175,19 @@ export class SoundManager {
         const reportProgress = () => onProgress?.(++loaded, total);
 
         this._ready = Promise.all(
-            keys.map(async (key) => {
-                const sources = this.srcListFor(key);
-                if (sources.length === 0) {
-                    reportProgress();
-                    return;
-                }
-
-                const decoded = await Promise.all(sources.map((src) => withTimeout(
-                    (async () => {
-                        const response = await this.fetchImpl(src);
-                        const arrayBuffer = await response.arrayBuffer();
-                        return await this.context.decodeAudioData(arrayBuffer);
-                    })().catch(() => null),
-                    SOUND_LOAD_TIMEOUT_MS
-                )));
-
-                const buffers = decoded.filter(Boolean);
-                if (buffers.length > 0) this.buffers[key] = buffers;
-                reportProgress();
-            })
+            keys.map((key) => this._loadKey(key).then(reportProgress))
         ).then(() => undefined);
 
         return this._ready;
+    }
+
+    async setLanguage(lang) {
+        if (this.lang === lang) return;
+        this.lang = lang;
+        if (!this.context) return;
+
+        const keys = Object.keys(this.soundFiles).filter((key) => this.isLocalizedSrc(key));
+        await Promise.all(keys.map((key) => this._loadKey(key)));
     }
 
     _applyMasterGain() {

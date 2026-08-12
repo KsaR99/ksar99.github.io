@@ -353,6 +353,7 @@ export class SettingsController {
 
         if (languageChange) {
             await game.i18n.setLanguage(languageChange);
+            await game.soundManager.setLanguage(languageChange);
         }
     }
 

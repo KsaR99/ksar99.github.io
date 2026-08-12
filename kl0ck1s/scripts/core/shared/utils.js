@@ -1,10 +1,14 @@
 "use strict";
 
-import {SCORING, VOICE_COUNTING_NUMBERS, voiceCountingKey} from "./config.js";
+import {SCORING, VOICE_COUNTING_NUMBERS, voiceCountingKey, voiceOrdinalKey} from "./config.js";
 
 export function numberToCountingParts(number) {
     if (!Number.isInteger(number) || number <= 0) return [];
     if (VOICE_COUNTING_NUMBERS.includes(number)) return [number];
+    if (number > 100 && number < 200) {
+        const rest = numberToCountingParts(number - 100);
+        return rest.length > 0 ? [100, ...rest] : [100];
+    }
     if (number > 0 && number < 100) {
         const tens = Math.floor(number / 10) * 10;
         const ones = number % 10;
@@ -15,8 +19,14 @@ export function numberToCountingParts(number) {
     return [];
 }
 
-export function numberToVoiceKeys(number) {
-    return numberToCountingParts(number).map(voiceCountingKey);
+export function numberToVoiceKeys(number, lang = "en") {
+    const parts = numberToCountingParts(number);
+    if (lang !== "pl") return parts.map(voiceCountingKey);
+
+    return parts.map((part, index) => {
+        const isHundredPrefix = part === 100 && index < parts.length - 1;
+        return isHundredPrefix ? voiceCountingKey(part) : voiceOrdinalKey(part);
+    });
 }
 
 export function forEachShapeCell(mask, width, height, cb) {

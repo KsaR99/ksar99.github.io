@@ -217,12 +217,50 @@ export function voiceCountingKey(number) {
     return `voiceCount${number}`;
 }
 
+export function voiceOrdinalKey(number) {
+    return `voiceOrdinal${number}`;
+}
+
+const VOICE_COUNTING_PL_OVERRIDES = Object.freeze({
+    1: "assets/audio/voices/pl/counting/1.opus",
+    2: "assets/audio/voices/pl/counting/2.opus",
+    3: "assets/audio/voices/pl/counting/3.opus",
+    100: "assets/audio/voices/pl/counting/100.opus",
+});
+
 const VOICE_COUNTING_SOUND_FILES = Object.fromEntries(
+    VOICE_COUNTING_NUMBERS.map((number) => {
+        const en = `assets/audio/voices/counting/${number}.opus`;
+        const pl = VOICE_COUNTING_PL_OVERRIDES[number];
+        return [
+            voiceCountingKey(number),
+            Object.freeze({src: pl ? Object.freeze({en, pl}) : en, category: "voices", label: String(number)}),
+        ];
+    })
+);
+
+const VOICE_ORDINAL_SOUND_FILES = Object.fromEntries(
     VOICE_COUNTING_NUMBERS.map((number) => [
-        voiceCountingKey(number),
-        Object.freeze({src: `assets/audio/voices/counting/${number}.opus`, category: "voices", label: String(number)}),
+        voiceOrdinalKey(number),
+        Object.freeze({
+            src: `assets/audio/voices/pl/ordinal/${number}.opus`,
+            category: "voices",
+            label: `${number}.`,
+        }),
     ])
 );
+
+export const VOICE_COUNTING_KEYS_ALL = Object.freeze(VOICE_COUNTING_NUMBERS.map(voiceCountingKey));
+export const VOICE_ORDINAL_KEYS_ALL = Object.freeze(VOICE_COUNTING_NUMBERS.map(voiceOrdinalKey));
+
+const VOICE_NUMBER_KEYS_PL = Object.freeze([
+    voiceCountingKey(1), voiceCountingKey(2), voiceCountingKey(3), voiceCountingKey(100),
+    ...VOICE_ORDINAL_KEYS_ALL,
+]);
+
+export function voiceNumberKeysForLang(lang) {
+    return lang === "pl" ? VOICE_NUMBER_KEYS_PL : VOICE_COUNTING_KEYS_ALL;
+}
 
 export const SOUND_FILES = Object.freeze({
     // sounds / sfx
@@ -238,10 +276,23 @@ export const SOUND_FILES = Object.freeze({
     falling: Object.freeze({src: "assets/audio/sounds/falling.opus", category: "sfx"}),
     pieceLock: Object.freeze({src: "assets/audio/sounds/piece-lock.opus", category: "sfx"}),
     // voices
-    voiceGameOver: Object.freeze({src: "assets/audio/voices/game-over.opus", category: "voices", label: "Game over"}),
-    voiceLetsGo: Object.freeze({src: "assets/audio/voices/lets-go.opus", category: "voices", label: "Let's go"}),
-    voiceLevel: Object.freeze({src: "assets/audio/voices/level.opus", category: "voices", label: "Level"}),
+    voiceGameOver: Object.freeze({
+        src: Object.freeze({en: "assets/audio/voices/game-over.opus", pl: "assets/audio/voices/pl/game-over.opus"}),
+        category: "voices",
+        label: "Game over",
+    }),
+    voiceLetsGo: Object.freeze({
+        src: Object.freeze({en: "assets/audio/voices/lets-go.opus", pl: "assets/audio/voices/pl/lets-go.opus"}),
+        category: "voices",
+        label: "Let's go",
+    }),
+    voiceLevel: Object.freeze({
+        src: Object.freeze({en: "assets/audio/voices/level.opus", pl: "assets/audio/voices/pl/level.opus"}),
+        category: "voices",
+        label: "Level",
+    }),
     ...VOICE_COUNTING_SOUND_FILES,
+    ...VOICE_ORDINAL_SOUND_FILES,
     // music
     tetrisowyShvt: Object.freeze({
         src: "assets/audio/music/tetrisowy-shvt-1.opus",
