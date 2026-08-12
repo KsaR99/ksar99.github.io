@@ -242,6 +242,8 @@ export class MultiplayerController {
         this.overlayEl.hidden = true;
         this.dom.removeEventListener("keydown", this._onKeydown);
 
+        if (this._connectInFlight) return;
+
         if (this.session && !this.session.isConnected) this._resetSession();
     }
 
@@ -384,6 +386,9 @@ export class MultiplayerController {
     }
 
     async _beginHost() {
+        const hostButton = this.overlayEl?.querySelector('[data-role="mp-host-button"]');
+        if (hostButton?.disabled) return;
+
         this._clearError();
         this._resetSession();
         this.role = "host";
@@ -398,6 +403,7 @@ export class MultiplayerController {
         if (codeEl) codeEl.value = "";
         if (copyButton) copyButton.disabled = true;
         if (answerWrap) answerWrap.hidden = true;
+        if (hostButton) hostButton.disabled = true;
 
         try {
             const code = await this.session.createRoom();
@@ -406,22 +412,33 @@ export class MultiplayerController {
             if (answerWrap) answerWrap.hidden = false;
         } catch (err) {
             this._showError(err);
+        } finally {
+            if (hostButton) hostButton.disabled = false;
         }
     }
 
     async _completeHost() {
+        const button = this.overlayEl?.querySelector('[data-role="mp-host-connect-button"]');
+        if (button?.disabled) return;
+
         this._clearError();
         const input = this.overlayEl?.querySelector('[data-role="mp-host-answer-input"]');
         const code = input?.value ?? "";
 
+        if (button) button.disabled = true;
         try {
             await this.session.acceptGuest(code);
         } catch (err) {
             this._showError(err);
+        } finally {
+            if (button) button.disabled = false;
         }
     }
 
     async _beginJoin() {
+        const joinButton = this.overlayEl?.querySelector('[data-role="mp-join-connect-button"]');
+        if (joinButton?.disabled) return;
+
         this._clearError();
         this._resetSession();
         this.role = "guest";
@@ -437,6 +454,7 @@ export class MultiplayerController {
         if (answerEl) answerEl.value = "";
         if (copyButton) copyButton.disabled = true;
         if (answerWrap) answerWrap.hidden = false;
+        if (joinButton) joinButton.disabled = true;
 
         try {
             const answerCode = await this.session.joinRoom(hostCodeInput?.value ?? "");
@@ -445,6 +463,8 @@ export class MultiplayerController {
         } catch (err) {
             if (answerWrap) answerWrap.hidden = true;
             this._showError(err);
+        } finally {
+            if (joinButton) joinButton.disabled = false;
         }
     }
 

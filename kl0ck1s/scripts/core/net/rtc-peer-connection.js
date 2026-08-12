@@ -76,6 +76,9 @@ export class RtcPeerConnection extends EventTarget {
 
     async createAnswer(offerCode) {
         this._assertRole(PEER_ROLE.GUEST);
+
+        if (this._pc.signalingState !== "stable") return this._lastAnswerCode ?? "";
+
         const {sdp} = await decodeSignal(offerCode, "offer");
 
         this._setState(CONNECTION_STATE.GATHERING);
@@ -86,11 +89,15 @@ export class RtcPeerConnection extends EventTarget {
         await waitForIceGatheringComplete(this._pc, this._iceGatheringTimeoutMs);
 
         this._setState(CONNECTION_STATE.CONNECTING);
-        return await encodeSignal({type: "answer", sdp: toCompactSdp(this._pc.localDescription.sdp)});
+        this._lastAnswerCode = await encodeSignal({type: "answer", sdp: toCompactSdp(this._pc.localDescription.sdp)});
+        return this._lastAnswerCode;
     }
 
     async acceptAnswer(answerCode) {
         this._assertRole(PEER_ROLE.HOST);
+
+        if (this._pc.signalingState !== "have-local-offer") return;
+
         const {sdp} = await decodeSignal(answerCode, "answer");
 
         this._setState(CONNECTION_STATE.CONNECTING);
