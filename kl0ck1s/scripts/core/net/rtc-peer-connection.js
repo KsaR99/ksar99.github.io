@@ -9,6 +9,8 @@ import {
     PEER_ROLE,
 } from "./net-constants.js";
 import {decodeSignal, encodeSignal} from "./signaling-codec.js";
+import {fromCompactSdp, toCompactSdp} from "./sdp-codec.js";
+import {decodeFrame, encodeFrame} from "./wire-codec.js";
 
 function waitForIceGatheringComplete(pc, timeoutMs) {
     if (pc.iceGatheringState === "complete") return Promise.resolve();
@@ -44,6 +46,7 @@ export class RtcPeerConnection extends EventTarget {
         this.channel = null;
 
         this._iceGatheringTimeoutMs = iceGatheringTimeoutMs;
+        this._sendQueue = Promise.resolve();
         this._pc = new RTCPeerConnection(rtcConfiguration);
         this._pc.addEventListener("connectionstatechange", () => this._onConnectionStateChange());
         this._pc.addEventListener("datachannel", (event) => this._bindChannel(event.channel));
@@ -68,37 +71,48 @@ export class RtcPeerConnection extends EventTarget {
         await waitForIceGatheringComplete(this._pc, this._iceGatheringTimeoutMs);
 
         this._setState(CONNECTION_STATE.AWAITING_ANSWER);
-        return encodeSignal({type: "offer", sdp: this._pc.localDescription.sdp});
+        return await encodeSignal({type: "offer", sdp: toCompactSdp(this._pc.localDescription.sdp)});
     }
 
     async createAnswer(offerCode) {
         this._assertRole(PEER_ROLE.GUEST);
-        const {sdp} = decodeSignal(offerCode, "offer");
+        const {sdp} = await decodeSignal(offerCode, "offer");
 
         this._setState(CONNECTION_STATE.GATHERING);
-        await this._pc.setRemoteDescription({type: "offer", sdp});
+        await this._pc.setRemoteDescription({type: "offer", sdp: fromCompactSdp(sdp)});
 
         const answer = await this._pc.createAnswer();
         await this._pc.setLocalDescription(answer);
         await waitForIceGatheringComplete(this._pc, this._iceGatheringTimeoutMs);
 
         this._setState(CONNECTION_STATE.CONNECTING);
-        return encodeSignal({type: "answer", sdp: this._pc.localDescription.sdp});
+        return await encodeSignal({type: "answer", sdp: toCompactSdp(this._pc.localDescription.sdp)});
     }
 
     async acceptAnswer(answerCode) {
         this._assertRole(PEER_ROLE.HOST);
-        const {sdp} = decodeSignal(answerCode, "answer");
+        const {sdp} = await decodeSignal(answerCode, "answer");
 
         this._setState(CONNECTION_STATE.CONNECTING);
-        await this._pc.setRemoteDescription({type: "answer", sdp});
+        await this._pc.setRemoteDescription({type: "answer", sdp: fromCompactSdp(sdp)});
     }
 
     send(payload) {
         if (!this.isOpen) {
             throw new Error("Data channel is not open.");
         }
-        this.channel.send(JSON.stringify(payload));
+
+        const channel = this.channel;
+        this._sendQueue = this._sendQueue
+            .then(() => encodeFrame(payload))
+            .then((frame) => {
+                if (channel.readyState === "open") channel.send(frame);
+            })
+            .catch((error) => {
+                this.dispatchEvent(new CustomEvent("error", {detail: error}));
+            });
+
+        return this._sendQueue;
     }
 
     close() {
@@ -123,6 +137,8 @@ export class RtcPeerConnection extends EventTarget {
 
     _bindChannel(channel) {
         this.channel = channel;
+        this.channel.binaryType = "arraybuffer";
+        this._sendQueue = Promise.resolve();
 
         channel.addEventListener("open", () => {
             this._setState(CONNECTION_STATE.CONNECTED);
@@ -136,13 +152,13 @@ export class RtcPeerConnection extends EventTarget {
             this.dispatchEvent(new CustomEvent("error", {detail: event}));
         });
         channel.addEventListener("message", (event) => {
-            let payload = event.data;
-            try {
-                payload = JSON.parse(event.data);
-            } catch {
-                // not JSON — pass the raw string through as-is
-            }
-            this.dispatchEvent(new CustomEvent("message", {detail: payload}));
+            decodeFrame(event.data)
+                .then((payload) => {
+                    this.dispatchEvent(new CustomEvent("message", {detail: payload}));
+                })
+                .catch((error) => {
+                    this.dispatchEvent(new CustomEvent("error", {detail: error}));
+                });
         });
     }
 

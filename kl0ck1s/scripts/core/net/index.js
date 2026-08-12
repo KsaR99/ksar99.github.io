@@ -8,7 +8,12 @@ export {
     PEER_ROLE,
     PROTOCOL_MESSAGE_TYPE,
     SIGNAL_CODE_VERSION,
+    WIRE_COMPRESSION_MIN_BYTES,
+    WIRE_FLAGS,
+    WIRE_VERSION,
 } from "./net-constants.js";
 export {SignalCodecError, decodeSignal, encodeSignal} from "./signaling-codec.js";
+export {decodeFrame, encodeFrame} from "./wire-codec.js";
+export {base64Decode, base64Encode, deflateRaw, inflateRaw, isCompressionSupported} from "./binary-codec.js";
 export {RtcPeerConnection} from "./rtc-peer-connection.js";
 export {MultiplayerSession} from "./multiplayer-session.js";

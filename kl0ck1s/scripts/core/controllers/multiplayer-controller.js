@@ -1,6 +1,7 @@
 "use strict";
 
 import {MultiplayerSession} from "../net/multiplayer-session.js";
+import {MESSAGE_KIND} from "../net/net-constants.js";
 import {BOT_DIFFICULTIES, BotOpponent} from "../ai/bot-opponent.js";
 import {PieceBag} from "../game/piece-bag.js";
 import {mulberry32, randomSeed} from "../shared/seeded-random.js";
@@ -205,7 +206,7 @@ export class MultiplayerController {
         const isClearing = game.state === "clearing";
         if (isClearing && !this._wasLocalClearing && this.session?.isConnected) {
             this._sendToPeer({
-                kind: "clearing",
+                kind: MESSAGE_KIND.CLEARING,
                 cells: Array.from(game.board.colors),
                 lines: game.clearingLines,
                 dropRows: game.clearingDropRows,
@@ -223,7 +224,7 @@ export class MultiplayerController {
     notifyHardDropTrail() {
         const trail = this.game.hardDropTrail;
         if (!trail || !this.session?.isConnected) return;
-        this._sendToPeer({kind: "hardDropTrail", entries: trail.entries, duration: trail.duration});
+        this._sendToPeer({kind: MESSAGE_KIND.HARD_DROP_TRAIL, entries: trail.entries, duration: trail.duration});
     }
 
     open() {
@@ -356,7 +357,7 @@ export class MultiplayerController {
 
     _sendConfigIfHost() {
         if (this.role !== "host" || !this.session?.isConnected) return;
-        this._sendToPeer({kind: "config", mode: this.game.mode, difficulty: this.game.difficulty});
+        this._sendToPeer({kind: MESSAGE_KIND.CONFIG, mode: this.game.mode, difficulty: this.game.difficulty});
     }
 
     _applyRemoteConfig(mode, difficulty) {
@@ -526,7 +527,7 @@ export class MultiplayerController {
             this._setStatus(this._t("multiplayer.statusConnected"));
             this.game.multiplayerConnected = true;
             this.game.multiplayerVsBot = false;
-            this._sendToPeer({kind: "name", name: this.game.playerName || ""});
+            this._sendToPeer({kind: MESSAGE_KIND.NAME, name: this.game.playerName || ""});
             this._sendConfigIfHost();
         });
         session.addEventListener("ready", () => this._updateReadyBadges());
@@ -639,18 +640,18 @@ export class MultiplayerController {
             this._wasInMatch = true;
             const statsSnapshot = this._localStatsSnapshot();
             this._lastSentScore = statsSnapshot.score;
-            this._sendToPeer({kind: "stats", ...statsSnapshot});
+            this._sendToPeer({kind: MESSAGE_KIND.STATS, ...statsSnapshot});
             this._updateRaceMeter(statsSnapshot);
 
             if (game.board && game.state !== "clearing" && game.board.version !== this._lastSentBoardVersion) {
                 this._lastSentBoardVersion = game.board.version;
-                this._sendToPeer({kind: "board", cells: Array.from(game.board.colors)});
+                this._sendToPeer({kind: MESSAGE_KIND.BOARD, cells: Array.from(game.board.colors)});
             }
 
             if (game.state === "running" && game.current) {
                 const p = game.current;
                 this._sendToPeer({
-                    kind: "piece",
+                    kind: MESSAGE_KIND.PIECE,
                     x: p.x, y: p.y, mask: p.mask, width: p.width, height: p.height, colorIndex: p.colorIndex,
                 });
             }
@@ -661,7 +662,7 @@ export class MultiplayerController {
             const finalSnapshot = this._localStatsSnapshot();
             this._localFinalScore = finalSnapshot.score;
             this._localFinalStats = finalSnapshot;
-            this._sendToPeer({kind: "final", ...finalSnapshot});
+            this._sendToPeer({kind: MESSAGE_KIND.FINAL, ...finalSnapshot});
             this.botOpponent?.finish();
             this._maybeShowResult();
         }
@@ -728,9 +729,9 @@ export class MultiplayerController {
     _onPeerMessage(payload) {
         if (!payload || typeof payload !== "object") return;
 
-        if (payload.kind === "stats") {
+        if (payload.kind === MESSAGE_KIND.STATS) {
             this._updateOpponentStats(payload);
-        } else if (payload.kind === "final") {
+        } else if (payload.kind === MESSAGE_KIND.FINAL) {
             this._remoteFinalScore = payload.score;
             this._remoteFinalStats = payload;
             this._updateOpponentStats(payload);
@@ -738,32 +739,32 @@ export class MultiplayerController {
                 this.game.screenFlow.endRound("topOut");
             }
             this._maybeShowResult();
-        } else if (payload.kind === "config") {
+        } else if (payload.kind === MESSAGE_KIND.CONFIG) {
             this._applyRemoteConfig(payload.mode, payload.difficulty);
-        } else if (payload.kind === "name") {
+        } else if (payload.kind === MESSAGE_KIND.NAME) {
             this._remoteName = (payload.name || "").trim() || null;
             this._updateReadyBadges();
             if (this._opponentNameEl) this._opponentNameEl.textContent = this._remoteDisplayName();
             if (this._opponentNameBadgeEl) this._opponentNameBadgeEl.textContent = this._remoteDisplayName();
             if (this._lastRemoteStats) this._updateOpponentStats(this._lastRemoteStats);
-        } else if (payload.kind === "board") {
+        } else if (payload.kind === MESSAGE_KIND.BOARD) {
             this._setRemoteCells(payload.cells);
             this._remoteLivePiece = null;
             if (!this._remoteClearing) {
                 this._drawOpponentBoard(this._lastRemoteCells, null, this._currentHardDropTrailForDraw());
             }
-        } else if (payload.kind === "piece") {
+        } else if (payload.kind === MESSAGE_KIND.PIECE) {
             this._remoteLivePiece = payload.cleared ? null : payload;
             if (!this._remoteClearing) {
                 this._drawOpponentBoard(this._lastRemoteCells, this._remoteLivePiece, this._currentHardDropTrailForDraw());
             }
-        } else if (payload.kind === "hardDropTrail") {
+        } else if (payload.kind === MESSAGE_KIND.HARD_DROP_TRAIL) {
             this._remoteHardDropTrail = {
                 entries: payload.entries || [],
                 duration: payload.duration || 260,
                 startTime: performance.now(),
             };
-        } else if (payload.kind === "clearing") {
+        } else if (payload.kind === MESSAGE_KIND.CLEARING) {
             if (this._remoteClearing) {
                 this._drawOpponentClearingFrame(this._remoteClearing, 1);
             }

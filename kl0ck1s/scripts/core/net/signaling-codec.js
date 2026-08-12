@@ -1,6 +1,12 @@
 "use strict";
 
+import {base64Decode, base64Encode, deflateRaw, inflateRaw, isCompressionSupported} from "./binary-codec.js";
 import {SIGNAL_CODE_VERSION} from "./net-constants.js";
+
+const SIGNAL_FLAG_COMPRESSED = 1;
+
+const textEncoder = new TextEncoder();
+const textDecoder = new TextDecoder();
 
 export class SignalCodecError extends Error {
     constructor(code, message) {
@@ -10,21 +16,27 @@ export class SignalCodecError extends Error {
     }
 }
 
-export function encodeSignal(payload) {
-    const json = JSON.stringify({v: SIGNAL_CODE_VERSION, ...payload});
-    const bytes = new TextEncoder().encode(json);
-    let binary = "";
-    for (const byte of bytes) binary += String.fromCharCode(byte);
-    return btoa(binary);
+export async function encodeSignal(payload) {
+    const json = textEncoder.encode(JSON.stringify({v: SIGNAL_CODE_VERSION, ...payload}));
+
+    let body = json;
+    let flag = 0;
+
+    if (isCompressionSupported()) {
+        const compressed = await deflateRaw(json);
+        if (compressed.byteLength < json.byteLength) {
+            body = compressed;
+            flag = SIGNAL_FLAG_COMPRESSED;
+        }
+    }
+
+    const frame = new Uint8Array(1 + body.byteLength);
+    frame[0] = flag;
+    frame.set(body, 1);
+    return base64Encode(frame);
 }
 
-/**
- * Decodes a base64 signaling code back into its payload.
- * @param {string} code
- * @param {string|null} [expectedType] - if provided, throws a "type-mismatch" error unless payload.type matches.
- * @returns {{v: number, type: string, sdp: string}}
- */
-export function decodeSignal(code, expectedType = null) {
+export async function decodeSignal(code, expectedType = null) {
     const trimmed = (code ?? "").trim();
     if (!trimmed) {
         throw new SignalCodecError("empty", "Signal code is empty.");
@@ -32,10 +44,21 @@ export function decodeSignal(code, expectedType = null) {
 
     let payload;
     try {
-        const binary = atob(trimmed);
-        const bytes = Uint8Array.from(binary, (ch) => ch.charCodeAt(0));
-        const json = new TextDecoder().decode(bytes);
-        payload = JSON.parse(json);
+        const frame = base64Decode(trimmed);
+        if (frame.byteLength < 1) {
+            throw new Error("empty frame");
+        }
+
+        const flag = frame[0];
+        let body = frame.subarray(1);
+        if (flag & SIGNAL_FLAG_COMPRESSED) {
+            if (!isCompressionSupported()) {
+                throw new Error("compressed code but deflate-raw unsupported");
+            }
+            body = await inflateRaw(body);
+        }
+
+        payload = JSON.parse(textDecoder.decode(body));
     } catch {
         throw new SignalCodecError("malformed", "Signal code could not be decoded.");
     }

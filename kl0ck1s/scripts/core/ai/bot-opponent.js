@@ -1,6 +1,7 @@
 "use strict";
 
 import {KLOCKOMINOS, LINE_CLEAR_ANIMATION_DURATION_MS} from "../shared/config.js";
+import {MESSAGE_KIND} from "../net/net-constants.js";
 import {Board} from "../game/board.js";
 import {HARD_DROP_TRAIL_ALPHAS, HARD_DROP_TRAIL_DURATION_MS} from "../game/game-constants.js";
 import {PieceBag} from "../game/piece-bag.js";
@@ -508,7 +509,7 @@ export class BotOpponent extends EventTarget {
 
         this.dispatchEvent(new CustomEvent("message", {
             detail: {
-                kind: "clearing",
+                kind: MESSAGE_KIND.CLEARING,
                 cells: Array.from(this.board.colors),
                 lines: fullRows,
                 dropRows: buildDropRows(fullRows, this.rows),
@@ -593,11 +594,11 @@ export class BotOpponent extends EventTarget {
         this.finished = true;
         this._finishedAt = Date.now();
         this.stop();
-        this.dispatchEvent(new CustomEvent("message", {detail: {kind: "final", ...this._statsSnapshot()}}));
+        this.dispatchEvent(new CustomEvent("message", {detail: {kind: MESSAGE_KIND.FINAL, ...this._statsSnapshot()}}));
     }
 
     _sendPiece(piece) {
-        this.dispatchEvent(new CustomEvent("message", {detail: {kind: "piece", ...piece}}));
+        this.dispatchEvent(new CustomEvent("message", {detail: {kind: MESSAGE_KIND.PIECE, ...piece}}));
     }
 
     _sendHardDropTrail(placement, cellsDropped) {
@@ -617,12 +618,12 @@ export class BotOpponent extends EventTarget {
         }
 
         this.dispatchEvent(new CustomEvent("message", {
-            detail: {kind: "hardDropTrail", entries, duration: HARD_DROP_TRAIL_DURATION_MS},
+            detail: {kind: MESSAGE_KIND.HARD_DROP_TRAIL, entries, duration: HARD_DROP_TRAIL_DURATION_MS},
         }));
     }
 
     _sendStats() {
-        this.dispatchEvent(new CustomEvent("message", {detail: {kind: "stats", ...this._statsSnapshot()}}));
+        this.dispatchEvent(new CustomEvent("message", {detail: {kind: MESSAGE_KIND.STATS, ...this._statsSnapshot()}}));
     }
 
     _statsSnapshot() {
@@ -669,6 +670,11 @@ export class BotOpponent extends EventTarget {
     }
 
     _sendBoard() {
-        this.dispatchEvent(new CustomEvent("message", {detail: {kind: "board", cells: Array.from(this.board.colors)}}));
+        this.dispatchEvent(new CustomEvent("message", {
+            detail: {
+                kind: MESSAGE_KIND.BOARD,
+                cells: Array.from(this.board.colors)
+            }
+        }));
     }
 }
