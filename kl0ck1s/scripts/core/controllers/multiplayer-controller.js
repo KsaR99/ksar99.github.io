@@ -1,6 +1,6 @@
 "use strict";
 
-import {MultiplayerSession} from "../net/multiplayer-session.js";
+import {MultiplayerSession} from "../net/index.js";
 import {
     CELL_COLOR_MASK,
     CELL_INDEX_SHIFT,
@@ -1183,6 +1183,9 @@ export class MultiplayerController {
             if (el && key !== "result") el.hidden = true;
         });
 
+        const rematchButton = panel.querySelector('[data-role="mp-result-rematch-button"]');
+        if (rematchButton) rematchButton.hidden = false;
+
         panel.hidden = false;
         this._resultPanelEl = panel;
 
@@ -1665,6 +1668,9 @@ export class MultiplayerController {
 
         toast.textContent = this._t("multiplayer.opponentDisconnected");
         toast.classList.add("mp-pause-blocked-toast--visible");
+
+        const rematchButton = this.dom.querySelector('[data-role="mp-result-rematch-button"]');
+        if (rematchButton) rematchButton.hidden = true;
 
         clearTimeout(this._disconnectToastTimer);
         this._disconnectToastTimer = setTimeout(() => {
