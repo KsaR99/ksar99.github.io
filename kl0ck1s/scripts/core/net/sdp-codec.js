@@ -61,7 +61,7 @@ function parseSdp(sdpText) {
     };
 }
 
-function filterCandidates(candidates, {maxPerType = 1} = {}) {
+function filterCandidates(candidates, {maxPerType = 3} = {}) {
     const hasRoutableRemote = candidates.some((c) => c.type === "srflx" || c.type === "relay");
     let pool = hasRoutableRemote ? candidates.filter((c) => !isMdnsHost(c)) : candidates;
 

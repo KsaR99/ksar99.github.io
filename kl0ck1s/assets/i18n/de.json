@@ -367,6 +367,7 @@
         "statusDisconnected": "Die Verbindung zum Gegner wurde unterbrochen.",
         "statusError": "Es ist ein Verbindungsfehler aufgetreten.",
         "negotiationFailed": "Die Verbindung konnte nicht hergestellt werden — das kann passieren, wenn der Codeaustausch zu lange gedauert hat. Versuch es noch einmal.",
+        "iceFailed": "Die direkte Verbindung zum Gegner konnte nicht hergestellt werden — das kann an einem Netzwerk oder einer Firewall auf einer der beiden Seiten liegen. Versuch es erneut oder nutze ein anderes Netzwerk.",
         "statusRetrying": "Verbindung fehlgeschlagen, neuer Versuch ({attempt}/{max})…",
         "opponentDisconnected": "Dein Gegner hat die Verbindung getrennt.",
         "configHostHint": "Du kannst Modus und Level unten ändern",

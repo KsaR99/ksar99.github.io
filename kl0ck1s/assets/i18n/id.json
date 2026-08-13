@@ -367,6 +367,7 @@
         "statusDisconnected": "Koneksi dengan lawan terputus.",
         "statusError": "Terjadi kesalahan koneksi.",
         "negotiationFailed": "Koneksi tidak dapat dibuat — ini bisa terjadi jika pertukaran kode memakan waktu terlalu lama. Coba lagi.",
+        "iceFailed": "Tidak dapat membuat koneksi langsung dengan lawan — ini bisa terjadi karena jaringan atau firewall di salah satu sisi. Coba lagi atau ganti jaringan.",
         "statusRetrying": "Koneksi gagal, mencoba lagi (percobaan {attempt}/{max})…",
         "opponentDisconnected": "Lawanmu telah terputus.",
         "configHostHint": "Anda dapat mengubah mode dan level di bawah",

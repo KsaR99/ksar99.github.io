@@ -367,6 +367,7 @@
         "statusDisconnected": "Spojení s protihráčem bylo přerušeno.",
         "statusError": "Došlo k chybě připojení.",
         "negotiationFailed": "Spojení se nepodařilo navázat — může se to stát, když výměna kódu trvala příliš dlouho. Zkus to znovu.",
+        "iceFailed": "Nepodařilo se navázat přímé spojení s protihráčem — může to být kvůli síti nebo firewallu na jedné ze stran. Zkus to znovu nebo použij jinou síť.",
         "statusRetrying": "Spojení selhalo, zkouším znovu ({attempt}/{max})…",
         "opponentDisconnected": "Protihráč se odpojil.",
         "configHostHint": "Režim a úroveň můžete změnit níže",

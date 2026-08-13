@@ -367,6 +367,7 @@
         "statusDisconnected": "La connessione con l'avversario è stata interrotta.",
         "statusError": "Si è verificato un errore di connessione.",
         "negotiationFailed": "Non è stato possibile stabilire la connessione: può succedere se lo scambio del codice ha richiesto troppo tempo. Riprova.",
+        "iceFailed": "Non è stato possibile stabilire una connessione diretta con l'avversario: può dipendere dalla rete o dal firewall di una delle due parti. Riprova o cambia rete.",
         "statusRetrying": "Connessione non riuscita, nuovo tentativo ({attempt}/{max})…",
         "opponentDisconnected": "Il tuo avversario si è disconnesso.",
         "configHostHint": "Puoi cambiare modalità e livello qui sotto",

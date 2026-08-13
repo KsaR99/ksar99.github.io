@@ -70,16 +70,17 @@ async function hostSdpExchange(code, createOfferCode, callbacks) {
     const sb = client();
     const channel = privateChannel(sb, ROOM_TOPIC_PREFIX + code);
     try {
+        const helloPromise = waitForEvent(channel, "guest-hello", HELLO_TIMEOUT_MS);
         await subscribe(channel);
 
-        const helloPromise = waitForEvent(channel, "guest-hello", HELLO_TIMEOUT_MS);
         const offerCode = await createOfferCode();
         await helloPromise;
         callbacks.onGuestJoined?.();
 
+        const answerPromise = waitForEvent(channel, "guest-answer", ANSWER_TIMEOUT_MS);
         await channel.send({type: "broadcast", event: "host-offer", payload: {sdp: offerCode}});
 
-        const {sdp: answerCode} = await waitForEvent(channel, "guest-answer", ANSWER_TIMEOUT_MS);
+        const {sdp: answerCode} = await answerPromise;
         await channel.send({type: "broadcast", event: "host-ack", payload: {}});
 
         return answerCode;
@@ -93,9 +94,11 @@ async function guestSdpExchange(code, createAnswerCode, callbacks) {
     const sb = client();
     const channel = privateChannel(sb, ROOM_TOPIC_PREFIX + code);
     try {
+        const offerPromise = waitForEvent(channel, "host-offer", OFFER_TIMEOUT_MS);
+        const ackPromise = waitForEvent(channel, "host-ack", ANSWER_TIMEOUT_MS).catch(() => {
+        });
         await subscribe(channel);
 
-        const offerPromise = waitForEvent(channel, "host-offer", OFFER_TIMEOUT_MS);
         await channel.send({type: "broadcast", event: "guest-hello", payload: {}});
 
         const {sdp: offerCode} = await offerPromise;
@@ -103,8 +106,7 @@ async function guestSdpExchange(code, createAnswerCode, callbacks) {
         const answerCode = await createAnswerCode(offerCode);
 
         await channel.send({type: "broadcast", event: "guest-answer", payload: {sdp: answerCode}});
-        await waitForEvent(channel, "host-ack", ANSWER_TIMEOUT_MS).catch(() => {
-        });
+        await ackPromise;
     } finally {
         await sb.removeChannel(channel).catch(() => {
         });
@@ -219,8 +221,6 @@ export async function requestJoinRoom(roomId, guestName, createAnswerCode, callb
     const channel = privateChannel(sb, LOBBY_ROOM_TOPIC_PREFIX + roomId);
 
     try {
-        await subscribe(channel);
-
         const decisionPromise = new Promise((resolve, reject) => {
             channel.on("broadcast", {event: "join-accepted"}, ({payload}) => {
                 if (payload?.requestId === requestId) resolve(payload);
@@ -231,6 +231,8 @@ export async function requestJoinRoom(roomId, guestName, createAnswerCode, callb
                 }
             });
         });
+
+        await subscribe(channel);
 
         await channel.send({
             type: "broadcast",

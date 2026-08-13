@@ -385,6 +385,7 @@
         "statusDisconnected": "Connection with the opponent was lost.",
         "statusError": "A connection error occurred.",
         "negotiationFailed": "The connection couldn't be established — this can happen if the code exchange took too long. Try again.",
+        "iceFailed": "Couldn't establish a direct connection with your opponent — this can happen because of a network or firewall on either side. Try again or switch networks.",
         "statusRetrying": "Connection failed, retrying (attempt {attempt}/{max})…",
         "opponentDisconnected": "Your opponent has disconnected.",
         "configHostHint": "You can change the mode and level below",
