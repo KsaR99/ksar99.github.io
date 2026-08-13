@@ -72,6 +72,7 @@ async function hostSdpExchange(code, createOfferCode, callbacks) {
     try {
         const helloPromise = waitForEvent(channel, "guest-hello", HELLO_TIMEOUT_MS);
         await subscribe(channel);
+        await callbacks.onChannelReady?.();
 
         const offerCode = await createOfferCode();
         await helloPromise;
@@ -165,11 +166,14 @@ export async function hostOpenLobby(hostName, callbacks = {}) {
                 throw new SupabaseSignalError("match-failed", matchErr?.message ?? "Nie udało się dopasować gracza.");
             }
 
-            await roomChannel.send({type: "broadcast", event: "join-accepted", payload: {requestId, code}});
-            await leaveLobby();
-
             try {
-                return await hostSdpExchange(code, createOfferCode, hooks);
+                return await hostSdpExchange(code, createOfferCode, {
+                    ...hooks,
+                    onChannelReady: async () => {
+                        await roomChannel.send({type: "broadcast", event: "join-accepted", payload: {requestId, code}});
+                        await leaveLobby();
+                    },
+                });
             } finally {
                 await sb.rpc("mp_close_room", {p_code: code}).catch(() => {
                 });
