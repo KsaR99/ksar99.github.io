@@ -1,12 +1,19 @@
 "use strict";
 
-const GLOW_BLUR_RATIO = 0.1;
+const GLOW_BLUR_RATIO = 0.8;
+const GLOW_TOP_ROWS = 5;
+
 export const GHOST_ALPHA = 0.3;
 
 export const SATURATION_STEP = 0.05;
 export const SATURATION_LEVELS = Math.round(1 / SATURATION_STEP) + 1; // 21
 
 const MAX_DYNAMIC_ATLAS_ROWS = 32;
+
+
+export function isGlowRow(row) {
+    return row < GLOW_TOP_ROWS;
+}
 
 export function factorForLevel(level) {
     return Math.max(0, 1 - level * SATURATION_STEP);
@@ -301,8 +308,10 @@ export class SpriteCache {
         return {image, sx: 0, sy: 0, sw: this.size, sh: this.size};
     }
 
-    getGlow(color, currentSize, level = 0) {
+    getGlow(color, currentSize, level = 0, row = 0) {
         if (this.size !== currentSize) this.rebuild(currentSize);
+        if (!isGlowRow(row)) return this.getRegion(color, currentSize, level).image;
+
         const resolvedLevel = Math.min(SATURATION_LEVELS - 1, Math.max(0, Math.round(level)));
         const key = resolvedLevel ? `${color}|${resolvedLevel}` : color;
         if (!this.glowSprites.has(key)) {

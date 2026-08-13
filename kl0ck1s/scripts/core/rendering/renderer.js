@@ -5,6 +5,8 @@ import {FALL_TRAIL_ALPHA_CACHE, HARD_DROP_TRAIL_ALPHAS} from "../game/game-const
 import {LINE_CLEAR_FLASH_PHASE_FRACTION} from "../shared/config.js";
 import {fallTrailColor, GHOST_ALPHA, hardDropTrailColor, SATURATION_LEVELS} from "./sprite-cache.js";
 
+const GHOST_MIN_DROP_ROWS = 3;
+
 export class Renderer {
     /**
      * @param {object} deps
@@ -366,7 +368,7 @@ export class Renderer {
         glow = glow && this.glowEnabled;
 
         if (glow) {
-            const sprite = cache.getGlow(color, size, level);
+            const sprite = cache.getGlow(color, size, level, y);
             if (sprite) {
                 const offset = (sprite.width - size) / 2;
                 context.drawImage(sprite, x * size - offset, y * size - offset);
@@ -751,7 +753,7 @@ export class Renderer {
         if (!this.ghostEnabled) return;
 
         const offset = board.getDropOffset(piece);
-        if (offset === 0) return;
+        if (offset <= GHOST_MIN_DROP_ROWS) return;
 
         const size = this.boardConfig.CELL_SIZE;
         const {ctx} = surface;
