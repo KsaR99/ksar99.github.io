@@ -14,6 +14,7 @@ const OFFER_TIMEOUT_MS = 15000;
 const ANSWER_TIMEOUT_MS = 20000;
 const JOIN_DECISION_TIMEOUT_MS = 60000;
 
+/** @type {any} */
 let _client = null;
 
 function client() {
@@ -219,6 +220,16 @@ export async function browseLobby(callbacks = {}) {
     };
 }
 
+/**
+ * @param {string} roomId
+ * @param {string} guestName
+ * @param {(offerCode: string) => Promise<string>} createAnswerCode
+ * @param {{
+ *   onRequestSent?: () => void,
+ *   onAccepted?: () => void,
+ *   onOfferReceived?: () => void,
+ * }} [callbacks]
+ */
 export async function requestJoinRoom(roomId, guestName, createAnswerCode, callbacks = {}) {
     const sb = client();
     const requestId = randomId();

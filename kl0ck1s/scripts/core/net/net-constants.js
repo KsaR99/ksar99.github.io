@@ -1,7 +1,5 @@
 "use strict";
 
-export const SIGNAL_CODE_VERSION = 3;
-
 export const ICE_GATHERING_TIMEOUT_MS = 8000;
 
 export const DATA_CHANNEL_LABEL = "kl0ck1s-mp";

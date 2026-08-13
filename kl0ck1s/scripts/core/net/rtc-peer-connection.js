@@ -9,7 +9,6 @@ import {
     PEER_ROLE,
 } from "./net-constants.js";
 import {decodeSignal, encodeSignal} from "./signaling-codec.js";
-import {fromCompactSdp, toCompactSdp} from "./sdp-codec.js";
 import {decodeFrame, encodeFrame} from "./wire-codec.js";
 
 function waitForIceGatheringComplete(pc, timeoutMs) {
@@ -52,7 +51,7 @@ export class RtcPeerConnection extends EventTarget {
 
         this._iceGatheringTimeoutMs = iceGatheringTimeoutMs;
         this._sendQueue = Promise.resolve();
-        this._pc = new RTCPeerConnection(rtcConfiguration);
+        this._pc = new RTCPeerConnection({...rtcConfiguration, iceServers: [...rtcConfiguration.iceServers]});
         this._pc.addEventListener("connectionstatechange", () => this._onConnectionStateChange());
         this._pc.addEventListener("datachannel", (event) => this._bindChannel(event.channel));
     }
@@ -76,7 +75,7 @@ export class RtcPeerConnection extends EventTarget {
         await waitForIceGatheringComplete(this._pc, this._iceGatheringTimeoutMs);
 
         this._setState(CONNECTION_STATE.AWAITING_ANSWER);
-        return await encodeSignal({type: "offer", sdp: toCompactSdp(this._pc.localDescription.sdp)});
+        return await encodeSignal({type: "offer", sdp: this._pc.localDescription.sdp});
     }
 
     async createAnswer(offerCode) {
@@ -87,14 +86,14 @@ export class RtcPeerConnection extends EventTarget {
         const {sdp} = await decodeSignal(offerCode, "offer");
 
         this._setState(CONNECTION_STATE.GATHERING);
-        await this._pc.setRemoteDescription({type: "offer", sdp: fromCompactSdp(sdp)});
+        await this._pc.setRemoteDescription({type: "offer", sdp});
 
         const answer = await this._pc.createAnswer();
         await this._pc.setLocalDescription(answer);
         await waitForIceGatheringComplete(this._pc, this._iceGatheringTimeoutMs);
 
         this._setState(CONNECTION_STATE.CONNECTING);
-        this._lastAnswerCode = await encodeSignal({type: "answer", sdp: toCompactSdp(this._pc.localDescription.sdp)});
+        this._lastAnswerCode = await encodeSignal({type: "answer", sdp: this._pc.localDescription.sdp});
         return this._lastAnswerCode;
     }
 
@@ -108,7 +107,7 @@ export class RtcPeerConnection extends EventTarget {
         const {sdp} = await decodeSignal(answerCode, "answer");
 
         this._setState(CONNECTION_STATE.CONNECTING);
-        await this._pc.setRemoteDescription({type: "answer", sdp: fromCompactSdp(sdp)});
+        await this._pc.setRemoteDescription({type: "answer", sdp});
     }
 
     send(payload) {
