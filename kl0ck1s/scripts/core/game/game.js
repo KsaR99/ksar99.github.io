@@ -78,10 +78,19 @@ export class Game {
         this.dom = dom;
         this.i18n = i18n;
         this.lastTime = 0;
+        this._backgroundTicker = null;
         this.activeTheme = "none";
         this.previousStateBeforeOptions = null;
         this.isPlayingSession = false;
         this.multiplayerOptionsOverlayOpen = false;
+
+        this.dom?.addEventListener("visibilitychange", () => {
+            if (this.dom.hidden) {
+                if (this.multiplayerConnected) this._startBackgroundTicker();
+            } else {
+                this._stopBackgroundTicker();
+            }
+        });
 
         this.state = "idle";
         this.menuSelector = "mode";
@@ -540,6 +549,23 @@ export class Game {
 
         if (this.levelUpTimer > 0) {
             this.renderer.drawLevelUpBanner(this.levelUpLevel);
+        }
+    }
+
+    _startBackgroundTicker() {
+        if (this._backgroundTicker) return;
+        this._backgroundTicker = setInterval(() => {
+            const now = performance.now();
+            const delta = Math.min(now - this.lastTime, 1000);
+            this.lastTime = now;
+            this.update(delta);
+        }, 200);
+    }
+
+    _stopBackgroundTicker() {
+        if (this._backgroundTicker) {
+            clearInterval(this._backgroundTicker);
+            this._backgroundTicker = null;
         }
     }
 

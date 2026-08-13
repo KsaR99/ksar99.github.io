@@ -173,12 +173,9 @@ export class RtcPeerConnection extends EventTarget {
             .then((frame) => {
                 if (channel.readyState === "open") {
                     channel.send(frame);
-                } else {
-                    console.warn("[rtc] frame dropped, channel not open", {role: this.role, readyState: channel.readyState});
                 }
             })
             .catch((error) => {
-                console.error("[rtc] frame send failed", {role: this.role, error: error?.message});
                 this.dispatchEvent(new CustomEvent("error", {detail: error}));
             });
 
@@ -239,7 +236,6 @@ export class RtcPeerConnection extends EventTarget {
                     this.dispatchEvent(new CustomEvent("message", {detail: payload}));
                 })
                 .catch((error) => {
-                    console.error("[rtc] frame decode failed", {role: this.role, byteLength: event.data?.byteLength, error: error?.message});
                     this.dispatchEvent(new CustomEvent("error", {detail: error}));
                 });
         });

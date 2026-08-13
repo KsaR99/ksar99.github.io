@@ -716,7 +716,6 @@ export class MultiplayerController {
             else if (!this.session?.isConnected) this._onNegotiationFailed(new Error(this._t("multiplayer.iceFailed")));
         });
         session.addEventListener("error", (event) => {
-            console.error("[mp] session error", event.detail);
             this._setStatus(this._t("multiplayer.statusError"));
             if (!this.session?.isConnected) this._onNegotiationFailed(event.detail);
         });
@@ -890,10 +889,7 @@ export class MultiplayerController {
     }
 
     _onPeerMessage(payload) {
-        if (!payload || typeof payload !== "object") {
-            console.warn("[mp] received invalid peer payload", payload);
-            return;
-        }
+        if (!payload || typeof payload !== "object") return;
 
         if (payload.kind === MESSAGE_KIND.STATS) {
             this._updateOpponentStats(payload);
@@ -1493,8 +1489,9 @@ export class MultiplayerController {
         if (!this.session?.isConnected) return;
         try {
             this.session.send(payload);
-        } catch (error) {
-            console.error("[mp] _sendToPeer threw", {kind: payload?.kind, error: error?.message});
+        } catch {
+            // peer likely dropped between the isConnected check and send(); the
+            // "disconnected" event (already bound) will handle cleanup.
         }
     }
 
@@ -1607,6 +1604,7 @@ export class MultiplayerController {
         this.role = null;
         this.game.multiplayerConnected = false;
         this.game.multiplayerVsBot = false;
+        this.game._stopBackgroundTicker?.();
         this._remoteName = null;
         this._lastRemoteScore = 0;
         this._lastRemoteCells = null;

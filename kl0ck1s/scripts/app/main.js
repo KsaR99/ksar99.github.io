@@ -255,7 +255,7 @@ function handleViewportResize() {
 
 document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
-        if (game.state === "running") game.screenFlow.togglePause();
+        if (game.state === "running" && !game.multiplayerConnected) game.screenFlow.togglePause();
     } else {
         game.soundManager.unlock();
     }
