@@ -29,10 +29,11 @@ function parseCandidateLine(line) {
 
     const [foundation, component, protocol, priority, ip, port, typLiteral, type] = tokens;
     if (typLiteral !== "typ" || !type) return null;
-    if (protocol.toLowerCase() !== "udp") return null;
+    const normalizedProtocol = protocol.toLowerCase();
+    if (normalizedProtocol !== "udp" && normalizedProtocol !== "tcp") return null;
     if (!/^\d+$/.test(priority) || !/^\d+$/.test(port)) return null;
 
-    return {foundation, component, protocol: "udp", priority: Number(priority), ip, port: Number(port), type};
+    return {foundation, component, protocol: normalizedProtocol, priority: Number(priority), ip, port: Number(port), type};
 }
 
 function parseSdp(sdpText) {
@@ -93,7 +94,7 @@ function filterCandidates(candidates, {maxPerType = 3} = {}) {
 }
 
 function encodeCandidate(candidate) {
-    return `${candidate.ip}:${candidate.port}:${candidate.priority}:${candidate.type}`;
+    return `${candidate.protocol ?? "udp"}:${candidate.ip}:${candidate.port}:${candidate.priority}:${candidate.type}`;
 }
 
 function decodeCandidate(compact, index) {
@@ -101,12 +102,13 @@ function decodeCandidate(compact, index) {
     const type = parts.pop();
     const priority = Number(parts.pop());
     const port = Number(parts.pop());
+    const protocol = parts.shift() ?? "udp";
     const ip = parts.join(":");
-    return {foundation: String(index + 1), component: "1", ip, port, priority, type};
+    return {foundation: String(index + 1), component: "1", protocol, ip, port, priority, type};
 }
 
 function buildCandidateLine(candidate) {
-    const base = `a=candidate:${candidate.foundation} ${candidate.component ?? "1"} udp ${candidate.priority} ${candidate.ip} ${candidate.port} typ ${candidate.type}`;
+    const base = `a=candidate:${candidate.foundation} ${candidate.component ?? "1"} ${candidate.protocol ?? "udp"} ${candidate.priority} ${candidate.ip} ${candidate.port} typ ${candidate.type}`;
     if (candidate.type === "srflx" || candidate.type === "relay") {
         return `${base} raddr 0.0.0.0 rport 0`;
     }
