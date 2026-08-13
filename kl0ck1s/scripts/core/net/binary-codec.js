@@ -25,23 +25,25 @@ export async function inflateRaw(bytes) {
 }
 
 
-export function hexEncode(bytes) {
-    let output = "";
-    for (const byte of bytes) {
-        output += byte.toString(16).padStart(2, "0");
-    }
-    return output;
+    return btoa(binary);
 }
 
-export function hexDecode(text) {
+export function base64Decode(text) {
     const clean = text.trim();
-    if (!/^[0-9a-fA-F]*$/.test(clean) || (clean.length & 1)) {
-        throw new Error("Invalid hexadecimal signal code.");
+    if (!clean || !/^[A-Za-z0-9+/]*={0,2}$/.test(clean) || (clean.length & 3)) {
+        throw new Error("Invalid Base64 signal code.");
     }
 
-    const bytes = new Uint8Array(clean.length / 2);
-    for (let i = 0; i < bytes.length; i++) {
-        bytes[i] = Number.parseInt(clean.slice(i * 2, i * 2 + 2), 16);
+    let binary;
+    try {
+        binary = atob(clean);
+    } catch {
+        throw new Error("Invalid Base64 signal code.");
+    }
+
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
     }
     return bytes;
 }

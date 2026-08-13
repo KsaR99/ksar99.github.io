@@ -14,6 +14,6 @@ export {
 } from "./net-constants.js";
 export {SignalCodecError, decodeSignal, encodeSignal} from "./signaling-codec.js";
 export {decodeFrame, encodeFrame} from "./wire-codec.js";
-export {base64Decode, base64Encode, deflateRaw, inflateRaw, isCompressionSupported} from "./binary-codec.js";
+export {deflateRaw, inflateRaw, isCompressionSupported} from "./binary-codec.js";
 export {RtcPeerConnection} from "./rtc-peer-connection.js";
 export {MultiplayerSession} from "./multiplayer-session.js";

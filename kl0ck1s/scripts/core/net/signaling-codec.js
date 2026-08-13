@@ -1,6 +1,6 @@
 "use strict";
 
-import {base64Decode, base64Encode, deflateRaw, inflateRaw, isCompressionSupported} from "./binary-codec.js";
+import {deflateRaw, inflateRaw, isCompressionSupported} from "./binary-codec.js";
 import {SIGNAL_CODE_VERSION} from "./net-constants.js";
 
 const SIGNAL_FLAG_COMPRESSED = 1;
@@ -51,7 +51,7 @@ export async function encodeSignal(payload) {
     frame.set(typeBytes, 3);
     frame.set(body, 3 + typeBytes.length);
 
-    return base64Encode(frame);
+    return frame;
 }
 
 export async function decodeSignal(code, expectedType = null) {
@@ -61,7 +61,7 @@ export async function decodeSignal(code, expectedType = null) {
     }
 
     try {
-        const frame = base64Decode(trimmed);
+        const frame = trimmed;
         if (frame.byteLength < 3) {
             throw new Error("short frame");
         }
