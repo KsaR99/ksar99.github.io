@@ -1,6 +1,6 @@
 "use strict";
 
-import {base64Decode, base64Encode, deflateRaw, inflateRaw, isCompressionSupported} from "./binary-codec.js";
+import {deflateRaw, hexDecode, hexEncode, inflateRaw, isCompressionSupported} from "./binary-codec.js";
 import {SIGNAL_CODE_VERSION} from "./net-constants.js";
 
 const SIGNAL_FLAG_COMPRESSED = 1;
@@ -33,7 +33,7 @@ export async function encodeSignal(payload) {
     const frame = new Uint8Array(1 + body.byteLength);
     frame[0] = flag;
     frame.set(body, 1);
-    return base64Encode(frame);
+    return hexEncode(frame);
 }
 
 export async function decodeSignal(code, expectedType = null) {
@@ -44,7 +44,7 @@ export async function decodeSignal(code, expectedType = null) {
 
     let payload;
     try {
-        const frame = base64Decode(trimmed);
+        const frame = hexDecode(trimmed);
         if (frame.byteLength < 1) {
             throw new Error("empty frame");
         }

@@ -1,8 +1,8 @@
 "use strict";
 
-export const SIGNAL_CODE_VERSION = 1;
+export const SIGNAL_CODE_VERSION = 2;
 
-export const ICE_GATHERING_TIMEOUT_MS = 15000;
+export const ICE_GATHERING_TIMEOUT_MS = 8000;
 
 export const DATA_CHANNEL_LABEL = "kl0ck1s-mp";
 export const DATA_CHANNEL_OPTIONS = Object.freeze({ordered: true});
