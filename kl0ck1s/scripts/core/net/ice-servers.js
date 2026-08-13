@@ -33,6 +33,5 @@ export const ICE_SERVERS = Object.freeze([
 ]);
 
 export const RTC_CONFIGURATION = Object.freeze({
-    iceServers: ICE_SERVERS,
-    iceCandidatePoolSize: 4,
+    iceServers: ICE_SERVERS
 });

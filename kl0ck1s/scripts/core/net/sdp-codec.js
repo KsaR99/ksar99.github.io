@@ -1,9 +1,15 @@
 "use strict";
 
-export function toCompactSdp(sdp) {
-    return sdp;
+export function toCompactSdp(sdpText) {
+    if (typeof sdpText !== "string" || !sdpText) {
+        throw new Error("Invalid SDP.");
+    }
+    return sdpText;
 }
 
-export function fromCompactSdp(sdp) {
-    return sdp;
+export function fromCompactSdp(sdpText) {
+    if (typeof sdpText !== "string" || !sdpText) {
+        throw new Error("Invalid SDP.");
+    }
+    return sdpText;
 }
