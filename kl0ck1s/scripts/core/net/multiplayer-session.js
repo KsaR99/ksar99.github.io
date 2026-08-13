@@ -14,7 +14,7 @@ export class MultiplayerSession extends EventTarget {
         this.peer.addEventListener("channelopen", () => this.dispatchEvent(new Event("connected")));
         this.peer.addEventListener("channelclose", () => this._onDisconnected());
         this.peer.addEventListener("statechange", (event) => {
-            if (event.detail === "failed" || event.detail === "disconnected") this._onDisconnected(event.detail);
+            if (event.detail === "failed" || event.detail === "disconnected") this._onDisconnected();
         });
         this.peer.addEventListener("error", (event) => {
             this.dispatchEvent(new CustomEvent("error", {detail: event.detail}));
@@ -97,9 +97,9 @@ export class MultiplayerSession extends EventTarget {
         if (this.bothReady) this.dispatchEvent(new Event("bothready"));
     }
 
-    _onDisconnected(reason = null) {
+    _onDisconnected() {
         this.localReady = false;
         this.remoteReady = false;
-        this.dispatchEvent(new CustomEvent("disconnected", {detail: {reason}}));
+        this.dispatchEvent(new CustomEvent("disconnected", {detail: {reason: this.peer.connectionState}}));
     }
 }

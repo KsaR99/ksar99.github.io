@@ -706,7 +706,7 @@ export class MultiplayerController {
             this._launchMatch();
         });
         session.addEventListener("message", (event) => this._onPeerMessage(event.detail));
-        session.addEventListener("disconnected", (event) => {
+        session.addEventListener("disconnected", () => {
             this._setStatus(this._t("multiplayer.statusDisconnected"));
 
             const wasInMatch = RUNNING_STATES.has(this.game.state) || FINISHED_STATES.has(this.game.state);
@@ -714,10 +714,7 @@ export class MultiplayerController {
             this._hideOpponentUI();
             this.game.multiplayerConnected = false;
             if (wasInMatch) this._showDisconnectToast();
-            else if (!this.session?.isConnected) {
-                const err = event.detail?.reason === "failed" ? new Error(this._t("multiplayer.iceFailed")) : undefined;
-                this._onNegotiationFailed(err);
-            }
+            else if (!this.session?.isConnected) this._onNegotiationFailed(new Error(this._t("multiplayer.iceFailed")));
         });
         session.addEventListener("error", (event) => {
             this._setStatus(this._t("multiplayer.statusError"));
