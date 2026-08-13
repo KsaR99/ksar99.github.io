@@ -279,7 +279,7 @@ export class MultiplayerController {
 
         if (this._connectInFlight) return;
 
-        if (this.session && !this.session.isConnected) this._resetSession();
+        if (this.session) this._resetSession();
     }
 
     _onKeydown(event) {
