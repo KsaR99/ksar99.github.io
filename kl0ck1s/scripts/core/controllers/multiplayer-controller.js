@@ -492,9 +492,8 @@ export class MultiplayerController {
         const lobbyHost = this._lobbyHost;
         this._connectInFlight = true;
         try {
-            const answerCode = await lobbyHost.accept(requestId, () => this.session.createRoom());
+            await lobbyHost.accept(requestId, this.session);
             this._lobbyHost = null;
-            await this.session.acceptGuest(answerCode);
         } catch (err) {
             this._lobbyHost = null;
             this._onNegotiationFailed(this._mapSignalError(err));
@@ -598,7 +597,7 @@ export class MultiplayerController {
 
         this._connectInFlight = true;
         try {
-            await requestJoinRoom(roomId, this.game.playerName || "", (offerCode) => this.session.joinRoom(offerCode), {
+            await requestJoinRoom(roomId, this.game.playerName || "", this.session, {
                 onAccepted: () => {
                     if (waitText) waitText.textContent = this._t("multiplayer.statusConnecting");
                 },

@@ -5,41 +5,10 @@ import {
     CONNECTION_STATE,
     DATA_CHANNEL_LABEL,
     DATA_CHANNEL_OPTIONS,
-    ICE_GATHERING_TIMEOUT_MS,
     PEER_ROLE,
 } from "./net-constants.js";
 import {decodeSignal, encodeSignal} from "./signaling-codec.js";
 import {decodeFrame, encodeFrame} from "./wire-codec.js";
-
-function waitForIceGatheringComplete(pc, timeoutMs) {
-    if (pc.iceGatheringState === "complete") return Promise.resolve();
-
-    return new Promise((resolve) => {
-        let settled = false;
-        const finish = () => {
-            if (settled) return;
-            settled = true;
-            pc.removeEventListener("icegatheringstatechange", onChange);
-            document.removeEventListener("visibilitychange", onVisible);
-            clearTimeout(timer);
-            resolve();
-        };
-        const onChange = () => {
-            if (pc.iceGatheringState === "complete") finish();
-        };
-        const onVisible = () => {
-            if (!document.hidden) onChange();
-        };
-
-        pc.addEventListener("icegatheringstatechange", onChange);
-        document.addEventListener("visibilitychange", onVisible);
-
-        const timer = setTimeout(() => {
-            console.warn("[rtc] ICE gathering timed out", {timeoutMs, iceGatheringState: pc.iceGatheringState});
-            finish();
-        }, timeoutMs);
-    });
-}
 
 function candidateTypeOf(candidateString) {
     const match = /typ (\w+)/.exec(candidateString ?? "");
@@ -87,7 +56,7 @@ async function logIceDiagnostics(pc, role, reason) {
 }
 
 export class RtcPeerConnection extends EventTarget {
-    constructor({role, iceGatheringTimeoutMs = ICE_GATHERING_TIMEOUT_MS, rtcConfiguration = RTC_CONFIGURATION} = {}) {
+    constructor({role, rtcConfiguration = RTC_CONFIGURATION} = {}) {
         super();
         if (role !== PEER_ROLE.HOST && role !== PEER_ROLE.GUEST) {
             throw new Error(`Invalid peer role: ${role}`);
@@ -97,8 +66,8 @@ export class RtcPeerConnection extends EventTarget {
         this.state = CONNECTION_STATE.IDLE;
         this.channel = null;
 
-        this._iceGatheringTimeoutMs = iceGatheringTimeoutMs;
         this._sendQueue = Promise.resolve();
+        this._pendingCandidates = [];
         this._pc = new RTCPeerConnection({...rtcConfiguration, iceServers: [...rtcConfiguration.iceServers]});
 
         console.log("[rtc] created", {role, iceServerCount: rtcConfiguration.iceServers.length});
@@ -129,6 +98,7 @@ export class RtcPeerConnection extends EventTarget {
                 address: event.candidate.address,
                 port: event.candidate.port,
             });
+            this.dispatchEvent(new CustomEvent("localcandidate", {detail: event.candidate.toJSON()}));
         });
         this._pc.addEventListener("icecandidateerror", (event) => {
             console.warn("[rtc] icecandidateerror", {
@@ -158,9 +128,7 @@ export class RtcPeerConnection extends EventTarget {
 
         const offer = await this._pc.createOffer();
         await this._pc.setLocalDescription(offer);
-        console.log("[rtc] local offer set, gathering ICE", {role: this.role});
-        await waitForIceGatheringComplete(this._pc, this._iceGatheringTimeoutMs);
-        console.log("[rtc] ICE gathering finished for offer", {role: this.role, state: this._pc.iceGatheringState});
+        console.log("[rtc] local offer set", {role: this.role, sdpLength: this._pc.localDescription.sdp.length});
 
         this._setState(CONNECTION_STATE.AWAITING_ANSWER);
         return await encodeSignal({type: "offer", sdp: this._pc.localDescription.sdp});
@@ -176,12 +144,11 @@ export class RtcPeerConnection extends EventTarget {
 
         this._setState(CONNECTION_STATE.GATHERING);
         await this._pc.setRemoteDescription({type: "offer", sdp});
+        this._flushPendingCandidates();
 
         const answer = await this._pc.createAnswer();
         await this._pc.setLocalDescription(answer);
-        console.log("[rtc] local answer set, gathering ICE", {role: this.role});
-        await waitForIceGatheringComplete(this._pc, this._iceGatheringTimeoutMs);
-        console.log("[rtc] ICE gathering finished for answer", {role: this.role, state: this._pc.iceGatheringState});
+        console.log("[rtc] local answer set", {role: this.role, sdpLength: this._pc.localDescription.sdp.length});
 
         this._setState(CONNECTION_STATE.CONNECTING);
         this._lastAnswerCode = await encodeSignal({type: "answer", sdp: this._pc.localDescription.sdp});
@@ -200,6 +167,24 @@ export class RtcPeerConnection extends EventTarget {
 
         this._setState(CONNECTION_STATE.CONNECTING);
         await this._pc.setRemoteDescription({type: "answer", sdp});
+        this._flushPendingCandidates();
+    }
+
+    async addRemoteCandidate(candidateInit) {
+        if (!candidateInit) return;
+
+        if (!this._pc.remoteDescription) {
+            this._pendingCandidates.push(candidateInit);
+            console.log("[rtc] remote candidate queued", {role: this.role, queued: this._pendingCandidates.length});
+            return;
+        }
+
+        try {
+            await this._pc.addIceCandidate(candidateInit);
+            console.log("[rtc] remote candidate added", {role: this.role});
+        } catch (error) {
+            console.warn("[rtc] addIceCandidate failed", {role: this.role, error: error?.message});
+        }
     }
 
     send(payload) {
@@ -237,6 +222,19 @@ export class RtcPeerConnection extends EventTarget {
     _assertRole(expected) {
         if (this.role !== expected) {
             throw new Error(`This operation requires role "${expected}", peer is "${this.role}".`);
+        }
+    }
+
+    _flushPendingCandidates() {
+        const pending = this._pendingCandidates;
+        this._pendingCandidates = [];
+        if (!pending.length) return;
+
+        console.log("[rtc] flushing queued remote candidates", {role: this.role, count: pending.length});
+        for (const candidateInit of pending) {
+            this._pc.addIceCandidate(candidateInit).catch((error) => {
+                console.warn("[rtc] addIceCandidate (queued) failed", {role: this.role, error: error?.message});
+            });
         }
     }
 

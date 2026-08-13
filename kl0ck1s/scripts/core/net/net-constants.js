@@ -1,6 +1,6 @@
 "use strict";
 
-export const ICE_GATHERING_TIMEOUT_MS = 8000;
+export const ICE_CONNECT_TIMEOUT_MS = 25000;
 
 export const DATA_CHANNEL_LABEL = "kl0ck1s-mp";
 export const DATA_CHANNEL_OPTIONS = Object.freeze({ordered: true});

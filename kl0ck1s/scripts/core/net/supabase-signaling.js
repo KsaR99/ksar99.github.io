@@ -1,6 +1,7 @@
 "use strict";
 
 import {createClient} from "https://esm.sh/@supabase/supabase-js@2";
+import {CONNECTION_STATE, ICE_CONNECT_TIMEOUT_MS} from "./net-constants.js";
 
 const SUPABASE_URL = "https://ouchbmglcngapxizcrph.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_kepSL5FbNXwSRtkSUc1qpQ_Y7vJjCue";
@@ -65,20 +66,63 @@ function waitForEvent(channel, event, timeoutMs) {
     });
 }
 
+function waitForPeerSettled(peer, timeoutMs) {
+    const settledStates = new Set([CONNECTION_STATE.CONNECTED, CONNECTION_STATE.FAILED, CONNECTION_STATE.CLOSED]);
+    if (settledStates.has(peer.state)) return Promise.resolve(peer.state);
+
+    return new Promise((resolve) => {
+        const finish = (reason) => {
+            peer.removeEventListener("statechange", onChange);
+            clearTimeout(timer);
+            resolve(reason);
+        };
+        const onChange = (event) => {
+            if (settledStates.has(event.detail)) finish(event.detail);
+        };
+        peer.addEventListener("statechange", onChange);
+        const timer = setTimeout(() => finish("timeout"), timeoutMs);
+    });
+}
+
+function relayLocalCandidates(peer, channel, event) {
+    const onLocalCandidate = (candidateEvent) => {
+        channel.send({type: "broadcast", event, payload: {candidate: candidateEvent.detail}}).catch((error) => {
+            console.warn("[signaling] failed to send local candidate", {event, error: error?.message});
+        });
+    };
+    peer.addEventListener("localcandidate", onLocalCandidate);
+    return () => peer.removeEventListener("localcandidate", onLocalCandidate);
+}
+
+function relayRemoteCandidates(channel, event, peer) {
+    channel.on("broadcast", {event}, ({payload}) => {
+        if (!payload?.candidate) return;
+        console.log("[signaling] remote candidate received", {event});
+        peer.addRemoteCandidate(payload.candidate).catch((error) => {
+            console.warn("[signaling] failed to add remote candidate", {event, error: error?.message});
+        });
+    });
+}
+
 function privateChannel(sb, topic) {
     return sb.channel(topic, {config: {private: true, broadcast: {self: false, ack: true}}});
 }
 
-async function hostSdpExchange(code, createOfferCode, callbacks) {
+async function hostSdpExchange(code, session, callbacks) {
     const sb = client();
     const channel = privateChannel(sb, ROOM_TOPIC_PREFIX + code);
+    const peer = session.peer;
+    let stopRelayingLocalCandidates = () => {
+    };
     try {
         const helloPromise = waitForEvent(channel, "guest-hello", HELLO_TIMEOUT_MS);
+        relayRemoteCandidates(channel, "guest-candidate", peer);
         await subscribe(channel);
         console.log("[signaling] host channel subscribed", {code});
         await callbacks.onChannelReady?.();
 
-        const offerCode = await createOfferCode();
+        stopRelayingLocalCandidates = relayLocalCandidates(peer, channel, "host-candidate");
+        const offerCode = await session.createRoom();
         console.log("[signaling] host offer ready, waiting for guest-hello", {code, sdpLength: offerCode.length});
         await helloPromise;
         console.log("[signaling] guest-hello received", {code});
@@ -90,25 +134,32 @@ async function hostSdpExchange(code, createOfferCode, callbacks) {
 
         const {sdp: answerCode} = await answerPromise;
         console.log("[signaling] guest-answer received", {code, sdpLength: answerCode?.length});
+        await session.acceptGuest(answerCode);
         await channel.send({type: "broadcast", event: "host-ack", payload: {}});
 
-        return answerCode;
+        const settled = await waitForPeerSettled(peer, ICE_CONNECT_TIMEOUT_MS);
+        console.log("[signaling] host connection settled", {code, settled});
     } catch (error) {
         console.warn("[signaling] host exchange failed", {code, error: error?.message});
         throw error;
     } finally {
+        stopRelayingLocalCandidates();
         await sb.removeChannel(channel).catch(() => {
         });
     }
 }
 
-async function guestSdpExchange(code, createAnswerCode, callbacks) {
+async function guestSdpExchange(code, session, callbacks) {
     const sb = client();
     const channel = privateChannel(sb, ROOM_TOPIC_PREFIX + code);
+    const peer = session.peer;
+    let stopRelayingLocalCandidates = () => {
+    };
     try {
         const offerPromise = waitForEvent(channel, "host-offer", OFFER_TIMEOUT_MS);
         const ackPromise = waitForEvent(channel, "host-ack", ANSWER_TIMEOUT_MS).catch(() => {
         });
+        relayRemoteCandidates(channel, "host-candidate", peer);
         await subscribe(channel);
         console.log("[signaling] guest channel subscribed", {code});
 
@@ -118,16 +169,22 @@ async function guestSdpExchange(code, createAnswerCode, callbacks) {
         const {sdp: offerCode} = await offerPromise;
         console.log("[signaling] host-offer received", {code, sdpLength: offerCode?.length});
         callbacks.onOfferReceived?.();
-        const answerCode = await createAnswerCode(offerCode);
+
+        stopRelayingLocalCandidates = relayLocalCandidates(peer, channel, "guest-candidate");
+        const answerCode = await session.joinRoom(offerCode);
 
         await channel.send({type: "broadcast", event: "guest-answer", payload: {sdp: answerCode}});
         console.log("[signaling] guest-answer sent", {code});
         await ackPromise;
         console.log("[signaling] host-ack received or timed out", {code});
+
+        const settled = await waitForPeerSettled(peer, ICE_CONNECT_TIMEOUT_MS);
+        console.log("[signaling] guest connection settled", {code, settled});
     } catch (error) {
         console.warn("[signaling] guest exchange failed", {code, error: error?.message});
         throw error;
     } finally {
+        stopRelayingLocalCandidates();
         await sb.removeChannel(channel).catch(() => {
         });
     }
@@ -176,7 +233,7 @@ export async function hostOpenLobby(hostName, callbacks = {}) {
     return {
         roomId,
 
-        async accept(requestId, createOfferCode, hooks = {}) {
+        async accept(requestId, session, hooks = {}) {
             const {data: matched, error: matchErr} = await sb.rpc("mp_match_room", {
                 p_code: code,
                 p_room_id: roomId,
@@ -186,7 +243,7 @@ export async function hostOpenLobby(hostName, callbacks = {}) {
             }
 
             try {
-                return await hostSdpExchange(code, createOfferCode, {
+                await hostSdpExchange(code, session, {
                     ...hooks,
                     onChannelReady: async () => {
                         await roomChannel.send({type: "broadcast", event: "join-accepted", payload: {requestId, code}});
@@ -241,14 +298,14 @@ export async function browseLobby(callbacks = {}) {
 /**
  * @param {string} roomId
  * @param {string} guestName
- * @param {(offerCode: string) => Promise<string>} createAnswerCode
+ * @param {import("./multiplayer-session.js").MultiplayerSession} session
  * @param {{
  *   onRequestSent?: () => void,
  *   onAccepted?: () => void,
  *   onOfferReceived?: () => void,
  * }} [callbacks]
  */
-export async function requestJoinRoom(roomId, guestName, createAnswerCode, callbacks = {}) {
+export async function requestJoinRoom(roomId, guestName, session, callbacks = {}) {
     const sb = client();
     const requestId = randomId();
     const channel = privateChannel(sb, LOBBY_ROOM_TOPIC_PREFIX + roomId);
@@ -281,7 +338,7 @@ export async function requestJoinRoom(roomId, guestName, createAnswerCode, callb
         const {code} = await Promise.race([decisionPromise, timeoutPromise]);
         callbacks.onAccepted?.();
 
-        await guestSdpExchange(code, createAnswerCode, callbacks);
+        await guestSdpExchange(code, session, callbacks);
     } finally {
         await sb.removeChannel(channel).catch(() => {
         });
