@@ -26,9 +26,12 @@ export async function encodeSignal(payload) {
 }
 
 export async function decodeSignal(code, expectedType = null) {
-    const sdp = (code ?? "").trim();
+    let sdp = (code ?? "").trim();
     if (!sdp) {
         throw new SignalCodecError("empty", "Signal code is empty.");
+    }
+    if (!sdp.endsWith("\r\n")) {
+        sdp += "\r\n";
     }
 
     return {type: expectedType, sdp};
