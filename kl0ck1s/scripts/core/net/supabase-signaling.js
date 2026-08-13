@@ -59,7 +59,6 @@ function waitForEvent(channel, event, timeoutMs) {
         }, timeoutMs);
 
         channel.on("broadcast", {event}, ({payload}) => {
-            console.log("[signaling] received event", {event});
             clearTimeout(timer);
             resolve(payload);
         });
@@ -97,7 +96,6 @@ function relayLocalCandidates(peer, channel, event) {
 function relayRemoteCandidates(channel, event, peer) {
     channel.on("broadcast", {event}, ({payload}) => {
         if (!payload?.candidate) return;
-        console.log("[signaling] remote candidate received", {event});
         peer.addRemoteCandidate(payload.candidate).catch((error) => {
             console.warn("[signaling] failed to add remote candidate", {event, error: error?.message});
         });
@@ -118,27 +116,21 @@ async function hostSdpExchange(code, session, callbacks) {
         const helloPromise = waitForEvent(channel, "guest-hello", HELLO_TIMEOUT_MS);
         relayRemoteCandidates(channel, "guest-candidate", peer);
         await subscribe(channel);
-        console.log("[signaling] host channel subscribed", {code});
         await callbacks.onChannelReady?.();
 
         stopRelayingLocalCandidates = relayLocalCandidates(peer, channel, "host-candidate");
         const offerCode = await session.createRoom();
-        console.log("[signaling] host offer ready, waiting for guest-hello", {code, sdpLength: offerCode.length});
         await helloPromise;
-        console.log("[signaling] guest-hello received", {code});
         callbacks.onGuestJoined?.();
 
         const answerPromise = waitForEvent(channel, "guest-answer", ANSWER_TIMEOUT_MS);
         await channel.send({type: "broadcast", event: "host-offer", payload: {sdp: offerCode}});
-        console.log("[signaling] host-offer sent", {code});
 
         const {sdp: answerCode} = await answerPromise;
-        console.log("[signaling] guest-answer received", {code, sdpLength: answerCode?.length});
         await session.acceptGuest(answerCode);
         await channel.send({type: "broadcast", event: "host-ack", payload: {}});
 
         const settled = await waitForPeerSettled(peer, ICE_CONNECT_TIMEOUT_MS);
-        console.log("[signaling] host connection settled", {code, settled});
     } catch (error) {
         console.warn("[signaling] host exchange failed", {code, error: error?.message});
         throw error;
@@ -161,25 +153,19 @@ async function guestSdpExchange(code, session, callbacks) {
         });
         relayRemoteCandidates(channel, "host-candidate", peer);
         await subscribe(channel);
-        console.log("[signaling] guest channel subscribed", {code});
 
         await channel.send({type: "broadcast", event: "guest-hello", payload: {}});
-        console.log("[signaling] guest-hello sent", {code});
 
         const {sdp: offerCode} = await offerPromise;
-        console.log("[signaling] host-offer received", {code, sdpLength: offerCode?.length});
         callbacks.onOfferReceived?.();
 
         stopRelayingLocalCandidates = relayLocalCandidates(peer, channel, "guest-candidate");
         const answerCode = await session.joinRoom(offerCode);
 
         await channel.send({type: "broadcast", event: "guest-answer", payload: {sdp: answerCode}});
-        console.log("[signaling] guest-answer sent", {code});
         await ackPromise;
-        console.log("[signaling] host-ack received or timed out", {code});
 
         const settled = await waitForPeerSettled(peer, ICE_CONNECT_TIMEOUT_MS);
-        console.log("[signaling] guest connection settled", {code, settled});
     } catch (error) {
         console.warn("[signaling] guest exchange failed", {code, error: error?.message});
         throw error;

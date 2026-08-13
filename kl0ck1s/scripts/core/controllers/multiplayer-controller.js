@@ -716,6 +716,7 @@ export class MultiplayerController {
             else if (!this.session?.isConnected) this._onNegotiationFailed(new Error(this._t("multiplayer.iceFailed")));
         });
         session.addEventListener("error", (event) => {
+            console.error("[mp] session error", event.detail);
             this._setStatus(this._t("multiplayer.statusError"));
             if (!this.session?.isConnected) this._onNegotiationFailed(event.detail);
         });
@@ -802,11 +803,13 @@ export class MultiplayerController {
             this._wasInMatch = true;
             const statsSnapshot = this._localStatsSnapshot();
             this._lastSentScore = statsSnapshot.score;
+            console.log("[mp] sending STATS", {connected: this.session?.isConnected, score: statsSnapshot.score});
             this._sendToPeer({kind: MESSAGE_KIND.STATS, ...statsSnapshot});
             this._updateRaceMeter(statsSnapshot);
 
             if (game.board && game.state !== "clearing" && game.board.version !== this._lastSentBoardVersion) {
                 this._lastSentBoardVersion = game.board.version;
+                console.log("[mp] sending BOARD", {connected: this.session?.isConnected, version: game.board.version});
                 this._sendToPeer({kind: MESSAGE_KIND.BOARD, cells: Array.from(game.board.colors)});
             }
 
@@ -889,7 +892,11 @@ export class MultiplayerController {
     }
 
     _onPeerMessage(payload) {
-        if (!payload || typeof payload !== "object") return;
+        if (!payload || typeof payload !== "object") {
+            console.warn("[mp] received invalid peer payload", payload);
+            return;
+        }
+        console.log("[mp] received", {kind: payload.kind});
 
         if (payload.kind === MESSAGE_KIND.STATS) {
             this._updateOpponentStats(payload);
