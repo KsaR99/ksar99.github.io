@@ -19,7 +19,7 @@ import {BOARD_CONFIG, KLOCKOMINO_TYPES} from "../shared/config.js";
 
 const SCORE_POLL_MS = 200;
 const REMOTE_PIECE_LERP_MIN_MS = 16;
-const REMOTE_PIECE_LERP_MAX_MS = 800;
+const REMOTE_PIECE_LERP_MAX_MS = 1600;
 const RUNNING_STATES = new Set(["countdown", "running", "clearing", "paused", "options"]);
 const FINISHED_STATES = new Set(["gameOver-entry", "gameOver-saved"]);
 
@@ -1058,10 +1058,6 @@ export class MultiplayerController {
             sinceLastUpdateMs = now - prevAnim.startTime;
         }
 
-        // Positions only arrive when the piece's grid cell actually changes, so the gap
-        // between updates already reflects the real fall/shift speed. Animate the float
-        // position across that same gap instead of a fixed interval, keeping the motion
-        // smooth (rather than snapping cell-to-cell) without needing per-tick traffic.
         const duration = samePiece
             ? Math.min(Math.max(sinceLastUpdateMs, REMOTE_PIECE_LERP_MIN_MS), REMOTE_PIECE_LERP_MAX_MS)
             : 0;
