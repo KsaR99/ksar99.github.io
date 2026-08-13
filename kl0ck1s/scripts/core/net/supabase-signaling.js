@@ -54,7 +54,6 @@ function subscribe(channel) {
 function waitForEvent(channel, event, timeoutMs) {
     return new Promise((resolve, reject) => {
         const timer = setTimeout(() => {
-            console.warn("[signaling] timed out waiting for event", {event, timeoutMs});
             reject(new SupabaseSignalError("timeout", `Timed out waiting for "${event}".`));
         }, timeoutMs);
 
@@ -85,8 +84,7 @@ function waitForPeerSettled(peer, timeoutMs) {
 
 function relayLocalCandidates(peer, channel, event) {
     const onLocalCandidate = (candidateEvent) => {
-        channel.send({type: "broadcast", event, payload: {candidate: candidateEvent.detail}}).catch((error) => {
-            console.warn("[signaling] failed to send local candidate", {event, error: error?.message});
+        channel.send({type: "broadcast", event, payload: {candidate: candidateEvent.detail}}).catch(() => {
         });
     };
     peer.addEventListener("localcandidate", onLocalCandidate);
@@ -96,8 +94,7 @@ function relayLocalCandidates(peer, channel, event) {
 function relayRemoteCandidates(channel, event, peer) {
     channel.on("broadcast", {event}, ({payload}) => {
         if (!payload?.candidate) return;
-        peer.addRemoteCandidate(payload.candidate).catch((error) => {
-            console.warn("[signaling] failed to add remote candidate", {event, error: error?.message});
+        peer.addRemoteCandidate(payload.candidate).catch(() => {
         });
     });
 }
@@ -132,7 +129,6 @@ async function hostSdpExchange(code, session, callbacks) {
 
         const settled = await waitForPeerSettled(peer, ICE_CONNECT_TIMEOUT_MS);
     } catch (error) {
-        console.warn("[signaling] host exchange failed", {code, error: error?.message});
         throw error;
     } finally {
         stopRelayingLocalCandidates();
@@ -167,7 +163,6 @@ async function guestSdpExchange(code, session, callbacks) {
 
         const settled = await waitForPeerSettled(peer, ICE_CONNECT_TIMEOUT_MS);
     } catch (error) {
-        console.warn("[signaling] guest exchange failed", {code, error: error?.message});
         throw error;
     } finally {
         stopRelayingLocalCandidates();

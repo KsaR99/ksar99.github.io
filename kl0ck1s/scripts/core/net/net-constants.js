@@ -37,6 +37,7 @@ export const MESSAGE_KIND = Object.freeze({
     PIECE: 0b00100000,
     HARD_DROP_TRAIL: 0b01000000,
     CLEARING: 0b10000000,
+    THEME: 0b100000000,
 });
 
 export const WIRE_VERSION = 1;
@@ -46,3 +47,11 @@ export const WIRE_FLAGS = Object.freeze({
 });
 
 export const WIRE_COMPRESSION_MIN_BYTES = 256;
+
+// Board cell diffs are packed as a single int: (cellIndex << CELL_INDEX_SHIFT) | colorIndex.
+export const CELL_INDEX_SHIFT = 4;
+export const CELL_COLOR_MASK = 0b1111;
+
+// Piece position updates pack x/y as a single int: (x << PIECE_Y_BITS) | y.
+export const PIECE_Y_BITS = 5;
+export const PIECE_Y_MASK = 0b11111;

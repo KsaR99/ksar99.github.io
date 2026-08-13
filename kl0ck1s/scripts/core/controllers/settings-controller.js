@@ -151,6 +151,7 @@ export class SettingsController {
         }
 
         game.themeOverlay.setActive(theme);
+        game.multiplayerController?.notifyThemeChanged?.();
     }
 
     settingsKeys() {

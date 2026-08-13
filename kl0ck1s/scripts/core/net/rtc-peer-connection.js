@@ -1,59 +1,9 @@
 "use strict";
 
 import {RTC_CONFIGURATION} from "./ice-servers.js";
-import {
-    CONNECTION_STATE,
-    DATA_CHANNEL_LABEL,
-    DATA_CHANNEL_OPTIONS,
-    PEER_ROLE,
-} from "./net-constants.js";
+import {CONNECTION_STATE, DATA_CHANNEL_LABEL, DATA_CHANNEL_OPTIONS, PEER_ROLE,} from "./net-constants.js";
 import {decodeSignal, encodeSignal} from "./signaling-codec.js";
 import {decodeFrame, encodeFrame} from "./wire-codec.js";
-
-function candidateTypeOf(candidateString) {
-    const match = /typ (\w+)/.exec(candidateString ?? "");
-    return match ? match[1] : "unknown";
-}
-
-async function logIceDiagnostics(pc, role, reason) {
-    console.warn("[rtc] diagnostics", {
-        role,
-        reason,
-        connectionState: pc.connectionState,
-        iceConnectionState: pc.iceConnectionState,
-        iceGatheringState: pc.iceGatheringState,
-        signalingState: pc.signalingState,
-    });
-
-    try {
-        const stats = await pc.getStats();
-        const pairs = [];
-        const candidates = new Map();
-        stats.forEach((entry) => {
-            if (entry.type === "local-candidate" || entry.type === "remote-candidate") {
-                candidates.set(entry.id, entry);
-            }
-        });
-        stats.forEach((entry) => {
-            if (entry.type !== "candidate-pair") return;
-            const local = candidates.get(entry.localCandidateId);
-            const remote = candidates.get(entry.remoteCandidateId);
-            pairs.push({
-                state: entry.state,
-                nominated: entry.nominated,
-                localType: local?.candidateType,
-                localProtocol: local?.protocol,
-                remoteType: remote?.candidateType,
-                remoteProtocol: remote?.protocol,
-                bytesSent: entry.bytesSent,
-                bytesReceived: entry.bytesReceived,
-            });
-        });
-        console.warn("[rtc] candidate pairs", {role, pairs});
-    } catch (error) {
-        console.warn("[rtc] getStats failed", {role, error: error?.message});
-    }
-}
 
 export class RtcPeerConnection extends EventTarget {
     constructor({role, rtcConfiguration = RTC_CONFIGURATION} = {}) {
@@ -73,9 +23,6 @@ export class RtcPeerConnection extends EventTarget {
         this._pc.addEventListener("connectionstatechange", () => this._onConnectionStateChange());
         this._pc.addEventListener("datachannel", (event) => this._bindChannel(event.channel));
         this._pc.addEventListener("iceconnectionstatechange", () => {
-            if (this._pc.iceConnectionState === "failed" || this._pc.iceConnectionState === "disconnected") {
-                logIceDiagnostics(this._pc, this.role, `iceConnectionState:${this._pc.iceConnectionState}`);
-            }
         });
         this._pc.addEventListener("icegatheringstatechange", () => {
         });
@@ -86,14 +33,6 @@ export class RtcPeerConnection extends EventTarget {
             this.dispatchEvent(new CustomEvent("localcandidate", {detail: event.candidate.toJSON()}));
         });
         this._pc.addEventListener("icecandidateerror", (event) => {
-            console.warn("[rtc] icecandidateerror", {
-                role: this.role,
-                errorCode: event.errorCode,
-                errorText: event.errorText,
-                url: event.url,
-                address: event.address,
-                port: event.port,
-            });
         });
     }
 
@@ -158,7 +97,6 @@ export class RtcPeerConnection extends EventTarget {
         try {
             await this._pc.addIceCandidate(candidateInit);
         } catch (error) {
-            console.warn("[rtc] addIceCandidate failed", {role: this.role, error: error?.message});
         }
     }
 
@@ -208,8 +146,7 @@ export class RtcPeerConnection extends EventTarget {
         if (!pending.length) return;
 
         for (const candidateInit of pending) {
-            this._pc.addIceCandidate(candidateInit).catch((error) => {
-                console.warn("[rtc] addIceCandidate (queued) failed", {role: this.role, error: error?.message});
+            this._pc.addIceCandidate(candidateInit).catch(() => {
             });
         }
     }
@@ -244,7 +181,6 @@ export class RtcPeerConnection extends EventTarget {
     _onConnectionStateChange() {
         const pcState = this._pc.connectionState;
         if (pcState === "failed") {
-            logIceDiagnostics(this._pc, this.role, "connectionState:failed");
             this._setState(CONNECTION_STATE.FAILED);
         } else if (pcState === "disconnected") {
             this._setState(CONNECTION_STATE.DISCONNECTED);

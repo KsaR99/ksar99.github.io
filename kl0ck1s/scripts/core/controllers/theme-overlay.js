@@ -13,6 +13,7 @@ export class ThemeOverlay {
     constructor(game, {canvas = null, ctx = null} = {}) {
         this.game = game;
         this._targets = new Map();
+        this._targetThemeOverrides = new Map();
         if (canvas && ctx) {
             this._targets.set("main", {
                 overlayEl: game.dom?.getElementById("filter-overlay") ?? null,
@@ -44,6 +45,17 @@ export class ThemeOverlay {
         if (!target) return;
         for (const instance of Object.values(target.themes)) instance?.stop();
         this._targets.delete(key);
+        this._targetThemeOverrides.delete(key);
+    }
+
+    setTargetTheme(key, theme) {
+        this._targetThemeOverrides.set(key, theme ?? "none");
+        this._updateTarget(key);
+    }
+
+    clearTargetTheme(key) {
+        this._targetThemeOverrides.delete(key);
+        this._updateTarget(key);
     }
 
     resize(width, height, key = "main") {
@@ -80,7 +92,7 @@ export class ThemeOverlay {
         if (!target) return;
 
         const game = this.game;
-        const theme = game.activeTheme;
+        const theme = this._targetThemeOverrides.get(key) ?? game.activeTheme;
         const active = theme !== "none" && (game.state === "running" || game.state === "clearing");
 
         if (target.overlayEl) {

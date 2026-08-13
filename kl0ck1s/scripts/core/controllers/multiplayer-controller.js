@@ -1,15 +1,16 @@
 "use strict";
 
 import {MultiplayerSession} from "../net/multiplayer-session.js";
-import {MESSAGE_KIND} from "../net/net-constants.js";
+import {CELL_COLOR_MASK, CELL_INDEX_SHIFT, MESSAGE_KIND, PIECE_Y_BITS, PIECE_Y_MASK} from "../net/net-constants.js";
 import {browseLobby, hostOpenLobby, requestJoinRoom, SupabaseSignalError} from "../net/supabase-signaling.js";
 import {BOT_DIFFICULTIES, BotOpponent} from "../ai/bot-opponent.js";
 import {PieceBag} from "../game/piece-bag.js";
 import {mulberry32, randomSeed} from "../shared/seeded-random.js";
-import {formatNumber} from "../shared/utils.js";
+import {formatDurationPrecise, formatNumber} from "../shared/utils.js";
 import {BOARD_CONFIG, KLOCKOMINO_TYPES} from "../shared/config.js";
 
 const SCORE_POLL_MS = 200;
+const REMOTE_PIECE_LERP_MS = SCORE_POLL_MS;
 const RUNNING_STATES = new Set(["countdown", "running", "clearing", "paused", "options"]);
 const FINISHED_STATES = new Set(["gameOver-entry", "gameOver-saved"]);
 
@@ -29,36 +30,36 @@ const STEP_BY_PANEL = {
 
 export class MultiplayerController {
     static RESULT_STAT_ROWS = [
-        {role: "lines", raw: (s) => s.lines ?? 0, display: (s, raw) => s.display?.lines ?? String(raw)},
+        {role: "lines", raw: (s) => s.lines ?? 0, display: (s, raw) => String(raw)},
         {
             role: "trt",
             raw: (s) => s.tetrisRatePercent ?? 0,
-            display: (s, raw) => s.display?.tetrisRate ?? `${raw.toFixed(1)}%`
+            display: (s, raw) => `${raw.toFixed(1)}%`
         },
-        {role: "pps", raw: (s) => s.pps ?? 0, display: (s, raw) => s.display?.pps ?? raw.toFixed(2)},
+        {role: "pps", raw: (s) => s.pps ?? 0, display: (s, raw) => raw.toFixed(2)},
         {
             role: "efficiency",
             raw: (s) => s.efficiency ?? 0,
-            display: (s, raw) => s.display?.efficiency ?? formatNumber(Math.round(raw))
+            display: (s, raw) => formatNumber(Math.round(raw))
         },
-        {role: "combo", raw: (s) => s.maxCombo ?? 0, display: (s, raw) => s.display?.maxCombo ?? String(raw)},
-        {role: "burn", raw: (s) => s.burn ?? 0, display: (s, raw) => s.display?.burn ?? String(raw), lowerBetter: true},
+        {role: "combo", raw: (s) => s.maxCombo ?? 0, display: (s, raw) => String(raw)},
+        {role: "burn", raw: (s) => s.burn ?? 0, display: (s, raw) => String(raw), lowerBetter: true},
         {
             role: "drought-max",
             raw: (s) => s.maxDrought ?? 0,
-            display: (s, raw) => s.display?.maxDrought ?? String(raw),
+            display: (s, raw) => String(raw),
             lowerBetter: true
         },
         {
             role: "drought-total",
             raw: (s) => s.droughtTotal ?? 0,
-            display: (s, raw) => s.display?.droughtTotal ?? String(raw),
+            display: (s, raw) => String(raw),
             lowerBetter: true
         },
         {
             role: "drought-avg",
             raw: (s) => s.droughtAvg ?? 0,
-            display: (s, raw) => s.display?.droughtAvg ?? raw.toFixed(1),
+            display: (s, raw) => raw.toFixed(1),
             lowerBetter: true
         },
     ];
@@ -81,18 +82,26 @@ export class MultiplayerController {
         this._disconnectToastTimer = null;
         this._lastSentScore = -1;
         this._lastSentBoardVersion = -1;
+        this._lastSentBoardCells = null;
+        this._lastSentPieceIndex = -1;
+        this._lastSentPieceX = null;
+        this._lastSentPieceY = null;
+        this._lastSentPieceRotation = null;
         this._localFinalScore = null;
         this._remoteFinalScore = null;
         this._localFinalStats = null;
         this._remoteFinalStats = null;
         this._wasInMatch = false;
         this._remoteName = null;
+        this._remoteTheme = null;
+        this._lastSentTheme = null;
         this._lastRemoteScore = 0;
         this._lastRemoteStats = null;
         this._lastRemoteCells = null;
         this._remoteBoardVersion = 0;
         this._remoteClearingVersion = 0;
         this._remoteLivePiece = null;
+        this._remoteLivePieceAnim = null;
         this._remoteClearing = null;
         this._remoteHardDropTrail = null;
         this._wasLocalClearing = false;
@@ -217,17 +226,28 @@ export class MultiplayerController {
             });
 
             this._lastSentBoardVersion = game.board.version;
+            this._lastSentBoardCells = Uint8Array.from(game.board.colors);
         }
         this._wasLocalClearing = isClearing;
 
-        if (this._remoteClearing) this._renderRemoteClearingFrame();
-        else if (this._remoteHardDropTrail && this.game.settings.fallTrail) this._renderRemoteHardDropTrail();
+        if (this._remoteClearing) {
+            this._renderRemoteClearingFrame();
+        } else if (this._remoteLivePiece || (this._remoteHardDropTrail && this.game.settings.fallTrail)) {
+            this._drawOpponentBoard(this._lastRemoteCells, this._currentRemoteLivePieceForDraw(), this._currentHardDropTrailForDraw());
+        }
     }
 
     notifyHardDropTrail() {
         const trail = this.game.hardDropTrail;
         if (!trail || !this.session?.isConnected) return;
         this._sendToPeer({kind: MESSAGE_KIND.HARD_DROP_TRAIL, entries: trail.entries, duration: trail.duration});
+    }
+
+    notifyThemeChanged() {
+        const theme = this.game.settings.theme ?? "none";
+        if (!this.session?.isConnected || theme === this._lastSentTheme) return;
+        this._lastSentTheme = theme;
+        this._sendToPeer({kind: MESSAGE_KIND.THEME, theme});
     }
 
     open() {
@@ -686,6 +706,8 @@ export class MultiplayerController {
             this.game.multiplayerConnected = true;
             this.game.multiplayerVsBot = false;
             this._sendToPeer({kind: MESSAGE_KIND.NAME, name: this.game.playerName || ""});
+            this._sendToPeer({kind: MESSAGE_KIND.THEME, theme: this.game.settings.theme});
+            this._lastSentTheme = this.game.settings.theme;
             this._sendConfigIfHost();
         });
         session.addEventListener("ready", () => this._updateReadyBadges());
@@ -764,6 +786,11 @@ export class MultiplayerController {
         this._remoteFinalStats = null;
         this._lastSentScore = -1;
         this._lastSentBoardVersion = -1;
+        this._lastSentBoardCells = null;
+        this._lastSentPieceIndex = -1;
+        this._lastSentPieceX = null;
+        this._lastSentPieceY = null;
+        this._lastSentPieceRotation = null;
         this._wasInMatch = false;
         this._showOpponentUI();
 
@@ -789,6 +816,33 @@ export class MultiplayerController {
         this._pollTimer = null;
     }
 
+    _buildBoardPacket(cells) {
+        const prev = this._lastSentBoardCells;
+        if (prev && prev.length === cells.length) {
+            const changes = [];
+            for (let i = 0; i < cells.length; i++) {
+                if (cells[i] !== prev[i]) changes.push((i << CELL_INDEX_SHIFT) | cells[i]);
+            }
+            if (changes.length * 2 < cells.length) {
+                this._lastSentBoardCells = Uint8Array.from(cells);
+                return {kind: MESSAGE_KIND.BOARD, d: changes};
+            }
+        }
+        this._lastSentBoardCells = Uint8Array.from(cells);
+        return {kind: MESSAGE_KIND.BOARD, cells: Array.from(cells)};
+    }
+
+    _decodeBoardPacket(payload) {
+        if (payload.cells) return payload.cells;
+        const cells = this._lastRemoteCells
+            ? Uint8Array.from(this._lastRemoteCells)
+            : new Uint8Array(BOARD_CONFIG.COLS * BOARD_CONFIG.ROWS);
+        for (const packed of payload.d || []) {
+            cells[packed >> CELL_INDEX_SHIFT] = packed & CELL_COLOR_MASK;
+        }
+        return cells;
+    }
+
     _pollMatchState() {
         const game = this.game;
         const inMatch = RUNNING_STATES.has(game.state);
@@ -807,15 +861,31 @@ export class MultiplayerController {
 
             if (game.board && game.state !== "clearing" && game.board.version !== this._lastSentBoardVersion) {
                 this._lastSentBoardVersion = game.board.version;
-                this._sendToPeer({kind: MESSAGE_KIND.BOARD, cells: Array.from(game.board.colors)});
+                this._sendToPeer(this._buildBoardPacket(game.board.colors));
             }
 
             if (game.state === "running" && game.current) {
                 const p = game.current;
-                this._sendToPeer({
-                    kind: MESSAGE_KIND.PIECE,
-                    x: p.x, y: p.y, mask: p.mask, width: p.width, height: p.height, colorIndex: p.colorIndex,
-                });
+                const isNewPiece = game.piecesSpawned !== this._lastSentPieceIndex;
+                const rotationChanged = !isNewPiece && p.rotationState !== this._lastSentPieceRotation;
+                const moved = p.x !== this._lastSentPieceX || p.y !== this._lastSentPieceY;
+                const xy = (p.x << PIECE_Y_BITS) | p.y;
+
+                if (isNewPiece || rotationChanged) {
+                    this._sendToPeer({
+                        kind: MESSAGE_KIND.PIECE,
+                        xy, mask: p.mask, width: p.width, height: p.height, colorIndex: p.colorIndex,
+                        pieceIndex: game.piecesSpawned,
+                    });
+                    this._lastSentPieceIndex = game.piecesSpawned;
+                    this._lastSentPieceRotation = p.rotationState;
+                    this._lastSentPieceX = p.x;
+                    this._lastSentPieceY = p.y;
+                } else if (moved) {
+                    this._sendToPeer({kind: MESSAGE_KIND.PIECE, xy});
+                    this._lastSentPieceX = p.x;
+                    this._lastSentPieceY = p.y;
+                }
             }
             return;
         }
@@ -838,7 +908,6 @@ export class MultiplayerController {
 
     _localStatsSnapshot() {
         const game = this.game;
-        const stats = game.stats;
         const totalClears = Object.values(game.clearCounts).reduce((sum, n) => sum + n, 0);
         const tetrisRatePercent = totalClears ? (game.clearCounts[4] / totalClears) * 100 : 0;
         const elapsedSeconds = game.elapsedMs / 1000;
@@ -871,20 +940,6 @@ export class MultiplayerController {
             pps,
             bestRaw,
             bestIsTime: isTimedRaceMode,
-            display: {
-                best: stats.best,
-                score: stats.score,
-                lines: String(stats.lines),
-                tetrisRate: stats.tetrisRate,
-                pps: stats.pps,
-                drought: String(stats.drought),
-                maxDrought: String(stats.maxDrought),
-                droughtTotal: String(stats.droughtTotal),
-                droughtAvg: stats.droughtAvg,
-                burn: String(stats.burn),
-                maxCombo: String(stats.maxCombo),
-                efficiency: stats.efficiency,
-            },
         };
     }
 
@@ -909,16 +964,25 @@ export class MultiplayerController {
             if (this._opponentNameEl) this._opponentNameEl.textContent = this._remoteDisplayName();
             if (this._opponentNameBadgeEl) this._opponentNameBadgeEl.textContent = this._remoteDisplayName();
             if (this._lastRemoteStats) this._updateOpponentStats(this._lastRemoteStats);
+        } else if (payload.kind === MESSAGE_KIND.THEME) {
+            this._remoteTheme = payload.theme || "none";
+            this.game.themeOverlay?.setTargetTheme("opponent", this._remoteTheme);
         } else if (payload.kind === MESSAGE_KIND.BOARD) {
-            this._setRemoteCells(payload.cells);
+            this._setRemoteCells(this._decodeBoardPacket(payload));
             this._remoteLivePiece = null;
+            this._remoteLivePieceAnim = null;
             if (!this._remoteClearing) {
                 this._drawOpponentBoard(this._lastRemoteCells, null, this._currentHardDropTrailForDraw());
             }
         } else if (payload.kind === MESSAGE_KIND.PIECE) {
-            this._remoteLivePiece = payload.cleared ? null : payload;
+            if (payload.cleared) {
+                this._remoteLivePiece = null;
+                this._remoteLivePieceAnim = null;
+            } else {
+                this._setRemoteLivePiece(payload);
+            }
             if (!this._remoteClearing) {
-                this._drawOpponentBoard(this._lastRemoteCells, this._remoteLivePiece, this._currentHardDropTrailForDraw());
+                this._drawOpponentBoard(this._lastRemoteCells, this._currentRemoteLivePieceForDraw(), this._currentHardDropTrailForDraw());
             }
         } else if (payload.kind === MESSAGE_KIND.HARD_DROP_TRAIL) {
             this._remoteHardDropTrail = {
@@ -932,6 +996,7 @@ export class MultiplayerController {
             }
             this._setRemoteCells(payload.cells);
             this._remoteLivePiece = null;
+            this._remoteLivePieceAnim = null;
             const lines = payload.lines || [];
             this._remoteClearing = {
                 cells: payload.cells,
@@ -943,6 +1008,53 @@ export class MultiplayerController {
                 version: ++this._remoteClearingVersion,
             };
         }
+    }
+
+    _setRemoteLivePiece(payload) {
+        const now = performance.now();
+        const prevTarget = this._remoteLivePiece;
+        const prevAnim = this._remoteLivePieceAnim;
+
+        const x = payload.xy >> PIECE_Y_BITS;
+        const y = payload.xy & PIECE_Y_MASK;
+        const mask = payload.mask ?? prevTarget?.mask;
+        const width = payload.width ?? prevTarget?.width;
+        const height = payload.height ?? prevTarget?.height;
+        const colorIndex = payload.colorIndex ?? prevTarget?.colorIndex;
+        const pieceIndex = payload.pieceIndex ?? prevTarget?.pieceIndex;
+        const samePiece = !!prevTarget && prevTarget.pieceIndex === pieceIndex;
+
+        let fromX = x;
+        let fromY = y;
+        if (samePiece && prevAnim) {
+            const t = Math.min(1, (now - prevAnim.startTime) / prevAnim.duration);
+            fromX = prevAnim.fromX + (prevAnim.toX - prevAnim.fromX) * t;
+            fromY = prevAnim.fromY + (prevAnim.toY - prevAnim.fromY) * t;
+        }
+
+        this._remoteLivePiece = {x, y, mask, width, height, colorIndex, pieceIndex};
+        this._remoteLivePieceAnim = {
+            fromX, fromY,
+            toX: x, toY: y,
+            mask, width, height, colorIndex,
+            startTime: now,
+            duration: samePiece ? REMOTE_PIECE_LERP_MS : 0,
+        };
+    }
+
+    _currentRemoteLivePieceForDraw() {
+        const anim = this._remoteLivePieceAnim;
+        if (!anim) return this._remoteLivePiece;
+
+        const t = anim.duration > 0 ? Math.min(1, (performance.now() - anim.startTime) / anim.duration) : 1;
+        return {
+            x: anim.fromX + (anim.toX - anim.fromX) * t,
+            y: anim.fromY + (anim.toY - anim.fromY) * t,
+            mask: anim.mask,
+            width: anim.width,
+            height: anim.height,
+            colorIndex: anim.colorIndex,
+        };
     }
 
     _setRemoteCells(cells) {
@@ -1020,8 +1132,8 @@ export class MultiplayerController {
         set("mp-result-local-name-mini", localName);
         set("mp-result-remote-name-mini", remoteName);
 
-        const localScoreEl = set("mp-result-local-score", local.display?.score ?? formatNumber(localScore));
-        const remoteScoreEl = set("mp-result-remote-score", remote.display?.score ?? formatNumber(remoteScore));
+        const localScoreEl = set("mp-result-local-score", formatNumber(localScore));
+        const remoteScoreEl = set("mp-result-remote-score", formatNumber(remoteScore));
         colorPair(localScoreEl, remoteScoreEl, localScore, remoteScore, false);
 
         for (const {role, raw, display, lowerBetter} of MultiplayerController.RESULT_STAT_ROWS) {
@@ -1059,8 +1171,14 @@ export class MultiplayerController {
         this._remoteFinalStats = null;
         this._lastSentScore = -1;
         this._lastSentBoardVersion = -1;
+        this._lastSentBoardCells = null;
+        this._lastSentPieceIndex = -1;
+        this._lastSentPieceX = null;
+        this._lastSentPieceY = null;
+        this._lastSentPieceRotation = null;
         this._lastRemoteCells = null;
         this._remoteLivePiece = null;
+        this._remoteLivePieceAnim = null;
         this._remoteClearing = null;
 
         if (this.game.state === "gameOver-entry") {
@@ -1120,6 +1238,7 @@ export class MultiplayerController {
     _showOpponentUI() {
         this._showOpponentBadge();
         this._showOpponentBoard();
+        if (this._remoteTheme) this.game.themeOverlay?.setTargetTheme("opponent", this._remoteTheme);
     }
 
     _hideOpponentUI() {
@@ -1206,15 +1325,19 @@ export class MultiplayerController {
     _updateOpponentStats(payload) {
         this._lastRemoteScore = payload.score ?? 0;
         this._lastRemoteStats = payload;
-        const display = payload.display || {};
         const bestRow = this._opponentBestBadgeEl?.closest(".stats__row");
         if (bestRow) bestRow.classList.toggle("stats__row--hidden", payload.bestRaw === null || payload.bestRaw === undefined);
-        if (this._opponentBestBadgeEl) this._opponentBestBadgeEl.textContent = display.best ?? "—";
-        if (this._opponentScoreBadgeEl) this._opponentScoreBadgeEl.textContent = display.score ?? formatNumber(payload.score ?? 0);
-        if (this._opponentLinesBadgeEl) this._opponentLinesBadgeEl.textContent = display.lines ?? String(payload.lines ?? 0);
-        if (this._opponentTrtBadgeEl) this._opponentTrtBadgeEl.textContent = display.tetrisRate ?? "0.0%";
-        if (this._opponentPpsBadgeEl) this._opponentPpsBadgeEl.textContent = display.pps ?? "0.00";
-        if (this._opponentDroughtBadgeEl) this._opponentDroughtBadgeEl.textContent = display.drought ?? String(payload.drought ?? 0);
+        if (this._opponentBestBadgeEl) this._opponentBestBadgeEl.textContent = this._formatBest(payload.bestRaw, payload.bestIsTime);
+        if (this._opponentScoreBadgeEl) this._opponentScoreBadgeEl.textContent = formatNumber(payload.score ?? 0);
+        if (this._opponentLinesBadgeEl) this._opponentLinesBadgeEl.textContent = String(payload.lines ?? 0);
+        if (this._opponentTrtBadgeEl) this._opponentTrtBadgeEl.textContent = `${(payload.tetrisRatePercent ?? 0).toFixed(1)}%`;
+        if (this._opponentPpsBadgeEl) this._opponentPpsBadgeEl.textContent = (payload.pps ?? 0).toFixed(2);
+        if (this._opponentDroughtBadgeEl) this._opponentDroughtBadgeEl.textContent = String(payload.drought ?? 0);
+    }
+
+    _formatBest(bestRaw, bestIsTime) {
+        if (bestRaw === null || bestRaw === undefined) return bestIsTime ? "—" : formatNumber(0);
+        return bestIsTime ? formatDurationPrecise(bestRaw) : formatNumber(bestRaw);
     }
 
     _raceMetric(stats) {
@@ -1439,11 +1562,6 @@ export class MultiplayerController {
         return {entries: trail.entries, progress};
     }
 
-    _renderRemoteHardDropTrail() {
-        const trail = this._currentHardDropTrailForDraw();
-        this._drawOpponentBoard(this._lastRemoteCells, this._remoteLivePiece, trail);
-    }
-
     _renderRemoteClearingFrame() {
         const rc = this._remoteClearing;
         const progress = (performance.now() - rc.startTime) / rc.duration;
@@ -1606,12 +1724,21 @@ export class MultiplayerController {
         this.game.multiplayerVsBot = false;
         this.game._stopBackgroundTicker?.();
         this._remoteName = null;
+        this._remoteTheme = null;
+        this._lastSentTheme = null;
+        this.game.themeOverlay?.clearTargetTheme("opponent");
         this._lastRemoteScore = 0;
         this._lastRemoteCells = null;
         this._remoteLivePiece = null;
+        this._remoteLivePieceAnim = null;
         this._remoteClearing = null;
         this._remoteHardDropTrail = null;
         this._wasLocalClearing = false;
         this._lastSentBoardVersion = -1;
+        this._lastSentBoardCells = null;
+        this._lastSentPieceIndex = -1;
+        this._lastSentPieceX = null;
+        this._lastSentPieceY = null;
+        this._lastSentPieceRotation = null;
     }
 }
