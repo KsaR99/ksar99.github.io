@@ -14,11 +14,8 @@ export const SCORING = Object.freeze({
     POINTS_PER_LINES: [0, 100, 300, 500, 800],
     SOFT_DROP_POINT: 1,
     HARD_DROP_POINT: 2,
-    // Official Tetris Guideline curve: time(level) = (0.8 - (level-1)*0.007)^(level-1) seconds.
     GUIDELINE_DROP_BASE: 0.8,
     GUIDELINE_DROP_STEP: 0.007,
-    // Floor so the drop timer stays meaningful once the curve goes sub-frame (~level 20+),
-    // instead of collapsing to 0ms and behaving unpredictably against a delta-time loop.
     MIN_DROP_INTERVAL: 16.67,
     LOCK_DELAY: 500,
     LOCK_DELAY_MAX_RESETS: 15,

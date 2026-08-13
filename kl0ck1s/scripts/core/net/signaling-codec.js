@@ -1,9 +1,5 @@
 "use strict";
 
-// Signaling travels over the Supabase Realtime broadcast channel, which is
-// JSON/UTF-8 already. SDP is text, so it goes across as a plain string —
-// no byte framing and no base64 layer to pack it into JSON.
-
 export class SignalCodecError extends Error {
     constructor(code, message) {
         super(message);

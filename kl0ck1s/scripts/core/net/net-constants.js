@@ -48,11 +48,10 @@ export const WIRE_FLAGS = Object.freeze({
 
 export const WIRE_COMPRESSION_MIN_BYTES = 256;
 
-// Board cell diffs are packed as a single int: (cellIndex << CELL_INDEX_SHIFT) | colorIndex.
 export const CELL_INDEX_SHIFT = 4;
 export const CELL_COLOR_MASK = 0b1111;
 
-// Piece position updates are sent as plain {x, y} numbers (y may be fractional,
-// carrying the same smooth in-between value the local renderer uses for the
-// single-player fall/shift animation) so the peer can interpolate continuously
-// instead of snapping once per grid row/column.
+export const PIECE_POS_FRAC_BITS = 6;
+export const PIECE_POS_AXIS_MAX = 31;
+export const PIECE_POS_SHIFT = 11;
+export const PIECE_POS_MASK = (1 << PIECE_POS_SHIFT) - 1;

@@ -1,7 +1,15 @@
 "use strict";
 
 import {MultiplayerSession} from "../net/multiplayer-session.js";
-import {CELL_COLOR_MASK, CELL_INDEX_SHIFT, MESSAGE_KIND} from "../net/net-constants.js";
+import {
+    CELL_COLOR_MASK,
+    CELL_INDEX_SHIFT,
+    MESSAGE_KIND,
+    PIECE_POS_AXIS_MAX,
+    PIECE_POS_FRAC_BITS,
+    PIECE_POS_MASK,
+    PIECE_POS_SHIFT,
+} from "../net/net-constants.js";
 import {browseLobby, hostOpenLobby, requestJoinRoom, SupabaseSignalError} from "../net/supabase-signaling.js";
 import {BOT_DIFFICULTIES, BotOpponent} from "../ai/bot-opponent.js";
 import {PieceBag} from "../game/piece-bag.js";
@@ -10,7 +18,8 @@ import {formatDurationPrecise, formatNumber} from "../shared/utils.js";
 import {BOARD_CONFIG, KLOCKOMINO_TYPES} from "../shared/config.js";
 
 const SCORE_POLL_MS = 200;
-const REMOTE_PIECE_LERP_MS = SCORE_POLL_MS;
+const REMOTE_PIECE_LERP_MIN_MS = 16;
+const REMOTE_PIECE_LERP_MAX_MS = 800;
 const RUNNING_STATES = new Set(["countdown", "running", "clearing", "paused", "options"]);
 const FINISHED_STATES = new Set(["gameOver-entry", "gameOver-saved"]);
 
@@ -832,6 +841,21 @@ export class MultiplayerController {
         return {kind: MESSAGE_KIND.BOARD, cells: Array.from(cells)};
     }
 
+    _packPiecePos(x, y) {
+        const scale = 1 << PIECE_POS_FRAC_BITS;
+        const xFixed = Math.round(Math.max(0, Math.min(PIECE_POS_AXIS_MAX, x)) * scale);
+        const yFixed = Math.round(Math.max(0, Math.min(PIECE_POS_AXIS_MAX, y)) * scale);
+        return (xFixed << PIECE_POS_SHIFT) | yFixed;
+    }
+
+    _unpackPiecePos(pos) {
+        const scale = 1 << PIECE_POS_FRAC_BITS;
+        return {
+            x: (pos >> PIECE_POS_SHIFT) / scale,
+            y: (pos & PIECE_POS_MASK) / scale,
+        };
+    }
+
     _decodeBoardPacket(payload) {
         if (payload.cells) return payload.cells;
         const cells = this._lastRemoteCells
@@ -868,30 +892,20 @@ export class MultiplayerController {
                 const p = game.current;
                 const isNewPiece = game.piecesSpawned !== this._lastSentPieceIndex;
                 const rotationChanged = !isNewPiece && p.rotationState !== this._lastSentPieceRotation;
-                // Use the fractional in-between position (same value the local renderer
-                // already computes for the smooth single-player fall/shift animation)
-                // instead of the integer grid cell, so the peer receives a continuously
-                // advancing target every poll tick rather than a value that only changes
-                // once per full row/column step.
-                const rendered = game.getRenderedPiece() || p;
-                const x = rendered.x;
-                const y = rendered.y;
+                const positionChanged = p.x !== this._lastSentPieceX || p.y !== this._lastSentPieceY;
 
                 if (isNewPiece || rotationChanged) {
                     this._sendToPeer({
                         kind: MESSAGE_KIND.PIECE,
-                        x, y, mask: p.mask, width: p.width, height: p.height, colorIndex: p.colorIndex,
-                        pieceIndex: game.piecesSpawned,
+                        p: this._packPiecePos(p.x, p.y), mask: p.mask, width: p.width, height: p.height,
+                        colorIndex: p.colorIndex, pieceIndex: game.piecesSpawned,
                     });
                     this._lastSentPieceIndex = game.piecesSpawned;
                     this._lastSentPieceRotation = p.rotationState;
                     this._lastSentPieceX = p.x;
                     this._lastSentPieceY = p.y;
-                } else {
-                    // Send every tick (not only when the integer cell changed) so the
-                    // receiver always has a fresh interpolation target and the opponent
-                    // piece animates continuously instead of snapping once per row.
-                    this._sendToPeer({kind: MESSAGE_KIND.PIECE, x, y});
+                } else if (positionChanged) {
+                    this._sendToPeer({kind: MESSAGE_KIND.PIECE, p: this._packPiecePos(p.x, p.y)});
                     this._lastSentPieceX = p.x;
                     this._lastSentPieceY = p.y;
                 }
@@ -1024,8 +1038,9 @@ export class MultiplayerController {
         const prevTarget = this._remoteLivePiece;
         const prevAnim = this._remoteLivePieceAnim;
 
-        const x = payload.x ?? prevTarget?.x ?? 0;
-        const y = payload.y ?? prevTarget?.y ?? 0;
+        const decoded = payload.p !== undefined ? this._unpackPiecePos(payload.p) : null;
+        const x = decoded?.x ?? prevTarget?.x ?? 0;
+        const y = decoded?.y ?? prevTarget?.y ?? 0;
         const mask = payload.mask ?? prevTarget?.mask;
         const width = payload.width ?? prevTarget?.width;
         const height = payload.height ?? prevTarget?.height;
@@ -1035,11 +1050,21 @@ export class MultiplayerController {
 
         let fromX = x;
         let fromY = y;
+        let sinceLastUpdateMs = 0;
         if (samePiece && prevAnim) {
-            const t = Math.min(1, (now - prevAnim.startTime) / prevAnim.duration);
+            const t = prevAnim.duration > 0 ? Math.min(1, (now - prevAnim.startTime) / prevAnim.duration) : 1;
             fromX = prevAnim.fromX + (prevAnim.toX - prevAnim.fromX) * t;
             fromY = prevAnim.fromY + (prevAnim.toY - prevAnim.fromY) * t;
+            sinceLastUpdateMs = now - prevAnim.startTime;
         }
+
+        // Positions only arrive when the piece's grid cell actually changes, so the gap
+        // between updates already reflects the real fall/shift speed. Animate the float
+        // position across that same gap instead of a fixed interval, keeping the motion
+        // smooth (rather than snapping cell-to-cell) without needing per-tick traffic.
+        const duration = samePiece
+            ? Math.min(Math.max(sinceLastUpdateMs, REMOTE_PIECE_LERP_MIN_MS), REMOTE_PIECE_LERP_MAX_MS)
+            : 0;
 
         this._remoteLivePiece = {x, y, mask, width, height, colorIndex, pieceIndex};
         this._remoteLivePieceAnim = {
@@ -1047,7 +1072,7 @@ export class MultiplayerController {
             toX: x, toY: y,
             mask, width, height, colorIndex,
             startTime: now,
-            duration: samePiece ? REMOTE_PIECE_LERP_MS : 0,
+            duration,
         };
     }
 
