@@ -172,7 +172,6 @@ export class RtcPeerConnection extends EventTarget {
             .then(() => encodeFrame(payload))
             .then((frame) => {
                 if (channel.readyState === "open") {
-                    console.log("[rtc] frame sent", {role: this.role, t: payload?.t, byteLength: frame.byteLength});
                     channel.send(frame);
                 } else {
                     console.warn("[rtc] frame dropped, channel not open", {role: this.role, readyState: channel.readyState});
@@ -237,7 +236,6 @@ export class RtcPeerConnection extends EventTarget {
         channel.addEventListener("message", (event) => {
             decodeFrame(event.data)
                 .then((payload) => {
-                    console.log("[rtc] frame received", {role: this.role, t: payload?.t, byteLength: event.data?.byteLength});
                     this.dispatchEvent(new CustomEvent("message", {detail: payload}));
                 })
                 .catch((error) => {

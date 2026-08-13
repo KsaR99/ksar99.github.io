@@ -803,13 +803,11 @@ export class MultiplayerController {
             this._wasInMatch = true;
             const statsSnapshot = this._localStatsSnapshot();
             this._lastSentScore = statsSnapshot.score;
-            console.log("[mp] sending STATS", {connected: this.session?.isConnected, score: statsSnapshot.score});
             this._sendToPeer({kind: MESSAGE_KIND.STATS, ...statsSnapshot});
             this._updateRaceMeter(statsSnapshot);
 
             if (game.board && game.state !== "clearing" && game.board.version !== this._lastSentBoardVersion) {
                 this._lastSentBoardVersion = game.board.version;
-                console.log("[mp] sending BOARD", {connected: this.session?.isConnected, version: game.board.version});
                 this._sendToPeer({kind: MESSAGE_KIND.BOARD, cells: Array.from(game.board.colors)});
             }
 
@@ -896,7 +894,6 @@ export class MultiplayerController {
             console.warn("[mp] received invalid peer payload", payload);
             return;
         }
-        console.log("[mp] received", {kind: payload.kind});
 
         if (payload.kind === MESSAGE_KIND.STATS) {
             this._updateOpponentStats(payload);

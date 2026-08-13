@@ -6,9 +6,11 @@ const canCompress = typeof CompressionStream === "function" && typeof Decompress
 async function runStream(Ctor, bytes) {
     const stream = new Ctor("deflate-raw");
     const writer = stream.writable.getWriter();
-    await writer.write(bytes);
-    await writer.close();
-    const buffer = await new Response(stream.readable).arrayBuffer();
+    const writeDone = writer.write(bytes).then(() => writer.close());
+    const [buffer] = await Promise.all([
+        new Response(stream.readable).arrayBuffer(),
+        writeDone,
+    ]);
     return new Uint8Array(buffer);
 }
 
