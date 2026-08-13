@@ -52,6 +52,7 @@ export const WIRE_COMPRESSION_MIN_BYTES = 256;
 export const CELL_INDEX_SHIFT = 4;
 export const CELL_COLOR_MASK = 0b1111;
 
-// Piece position updates pack x/y as a single int: (x << PIECE_Y_BITS) | y.
-export const PIECE_Y_BITS = 5;
-export const PIECE_Y_MASK = 0b11111;
+// Piece position updates are sent as plain {x, y} numbers (y may be fractional,
+// carrying the same smooth in-between value the local renderer uses for the
+// single-player fall/shift animation) so the peer can interpolate continuously
+// instead of snapping once per grid row/column.

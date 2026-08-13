@@ -598,7 +598,9 @@ export class BotOpponent extends EventTarget {
     }
 
     _sendPiece(piece) {
-        this.dispatchEvent(new CustomEvent("message", {detail: {kind: MESSAGE_KIND.PIECE, ...piece}}));
+        this.dispatchEvent(new CustomEvent("message", {
+            detail: {kind: MESSAGE_KIND.PIECE, pieceIndex: this.piecesSpawned, ...piece},
+        }));
     }
 
     _sendHardDropTrail(placement, cellsDropped) {
