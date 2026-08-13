@@ -2,13 +2,8 @@
 
 import {MultiplayerSession} from "../net/multiplayer-session.js";
 import {
-    CELL_COLOR_MASK,
-    CELL_INDEX_SHIFT,
-    MESSAGE_KIND,
-    PIECE_POS_AXIS_MAX,
-    PIECE_POS_FRAC_BITS,
-    PIECE_POS_MASK,
-    PIECE_POS_SHIFT,
+    CELL_COLOR_MASK, CELL_INDEX_SHIFT, MESSAGE_KIND,
+    PIECE_POS_AXIS_MAX, PIECE_POS_FRAC_BITS, PIECE_POS_MASK, PIECE_POS_SHIFT,
 } from "../net/net-constants.js";
 import {browseLobby, hostOpenLobby, requestJoinRoom, SupabaseSignalError} from "../net/supabase-signaling.js";
 import {BOT_DIFFICULTIES, BotOpponent} from "../ai/bot-opponent.js";
@@ -19,7 +14,11 @@ import {BOARD_CONFIG, KLOCKOMINO_TYPES} from "../shared/config.js";
 
 const SCORE_POLL_MS = 200;
 const REMOTE_PIECE_LERP_MIN_MS = 16;
-const REMOTE_PIECE_LERP_MAX_MS = 800;
+// Gaps up to this length are treated as a real fall/shift step and animated across their
+// own true duration (covers even the slowest guideline gravity, ~1000ms/row, plus poll
+// jitter). Anything longer (paused match, reconnect, tab backgrounded) is stale and gets
+// snapped instantly instead of a slow-motion catch-up.
+const REMOTE_PIECE_STALE_GAP_MS = 1500;
 const RUNNING_STATES = new Set(["countdown", "running", "clearing", "paused", "options"]);
 const FINISHED_STATES = new Set(["gameOver-entry", "gameOver-saved"]);
 
