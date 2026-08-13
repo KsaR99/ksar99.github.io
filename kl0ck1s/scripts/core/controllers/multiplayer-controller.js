@@ -1038,7 +1038,9 @@ export class MultiplayerController {
         const prevTarget = this._remoteLivePiece;
         const prevAnim = this._remoteLivePieceAnim;
 
-        const decoded = payload.p !== undefined ? this._unpackPiecePos(payload.p) : null;
+        const decoded = payload.p !== undefined
+            ? this._unpackPiecePos(payload.p)
+            : (payload.x !== undefined ? {x: payload.x, y: payload.y} : null);
         const x = decoded?.x ?? prevTarget?.x ?? 0;
         const y = decoded?.y ?? prevTarget?.y ?? 0;
         const mask = payload.mask ?? prevTarget?.mask;
