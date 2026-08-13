@@ -32,13 +32,16 @@ export class VHS {
         this.rafId = null;
         this.frameCount = 0;
 
-        this._staticTile = document.createElement("canvas");
-        this._staticTileCtx = this._staticTile.getContext("2d", {willReadFrequently: true});
-        this._staticImageData = null;
-        this._staticBuf32 = null;
+        this._scanCanvas = document.createElement("canvas");
+        this._scanCanvas.className = canvas.className;
+        this._scanCanvas.style.cssText = canvas.style.cssText;
+        this._scanCanvas.style.pointerEvents = "none";
+        canvas.insertAdjacentElement("afterend", this._scanCanvas);
+        this._scanCtx = this._scanCanvas.getContext("2d");
 
-        this._lineTile = document.createElement("canvas");
-        this._lineTileCtx = this._lineTile.getContext("2d", {willReadFrequently: true});
+        this._staticTile = document.createElement("canvas");
+        this._staticTileCtx = this._staticTile.getContext("2d");
+
         this._lineImageData = null;
         this._lineBuf32 = null;
 
@@ -51,7 +54,6 @@ export class VHS {
         this._noisePixel = new Uint32Array(NOISE_SIZE);
         this._noiseSkip = new Uint8Array(NOISE_SIZE);
         this._noiseScanColor = new Uint32Array(NOISE_SIZE);
-        this._noiseOffset = 0;
         this._regenNoise();
 
         this._loop = this.loop.bind(this);
@@ -67,6 +69,26 @@ export class VHS {
         }
     }
 
+    _drawStaticBase(width, height) {
+        const tileHeight = Math.max(TILE_HEIGHT_MIN, Math.min(height, Math.round(height / TILE_HEIGHT_DIVISOR)));
+        this._staticTile.width = width;
+        this._staticTile.height = tileHeight;
+
+        const staticImageData = this._staticTileCtx.createImageData(width, tileHeight);
+        const staticBuf32 = new Uint32Array(staticImageData.data.buffer);
+
+        let t = 0;
+        for (let i = 0; i < staticBuf32.length; i += 4) {
+            staticBuf32[i] = this._noisePixel[t];
+            t = (t + 1) & NOISE_MASK;
+        }
+        this._staticTileCtx.putImageData(staticImageData, 0, 0);
+
+        this.ctx.clearRect(0, 0, width, height);
+        this.ctx.fillStyle = this.ctx.createPattern(this._staticTile, "repeat");
+        this.ctx.fillRect(0, 0, width, height);
+    }
+
     resize(width, height) {
         const w = Math.max(1, Math.round(width));
         const h = Math.max(1, Math.round(height));
@@ -74,16 +96,12 @@ export class VHS {
 
         this.canvas.width = w;
         this.canvas.height = h;
+        this._scanCanvas.width = w;
+        this._scanCanvas.height = h;
 
-        const tileHeight = Math.max(TILE_HEIGHT_MIN, Math.min(h, Math.round(h / TILE_HEIGHT_DIVISOR)));
-        this._staticTile.width = w;
-        this._staticTile.height = tileHeight;
-        this._staticImageData = this._staticTileCtx.createImageData(w, tileHeight);
-        this._staticBuf32 = new Uint32Array(this._staticImageData.data.buffer);
+        this._drawStaticBase(w, h);
 
-        this._lineTile.width = w;
-        this._lineTile.height = LINE_ROWS;
-        this._lineImageData = this._lineTileCtx.createImageData(w, LINE_ROWS);
+        this._lineImageData = this._scanCtx.createImageData(w, LINE_ROWS);
         this._lineBuf32 = new Uint32Array(this._lineImageData.data.buffer);
 
         this.scanlines.forEach((line) => {
@@ -107,21 +125,7 @@ export class VHS {
         }
     }
 
-    _drawStaticTile(offset) {
-        const buf32 = this._staticBuf32;
-        buf32.fill(0);
-
-        const noisePixel = this._noisePixel;
-        let t = offset;
-        for (let i = 0; i < buf32.length; i += 4) {
-            buf32[i] = noisePixel[t];
-            t = (t + 1) & NOISE_MASK;
-        }
-
-        this._staticTileCtx.putImageData(this._staticImageData, 0, 0);
-    }
-
-    _drawScanline(line, offset, width, height) {
+    _drawScanline(line, width, height) {
         const y = Math.floor(line.y);
         const noiseSkip = this._noiseSkip;
         const noiseScanColor = this._noiseScanColor;
@@ -136,7 +140,7 @@ export class VHS {
             visible = true;
 
             let idx = yy * width;
-            let t2 = (offset + row) & NOISE_MASK;
+            let t2 = row & NOISE_MASK;
             for (let x = 0; x < width; x++, idx++, t2 = (t2 + 1) & NOISE_MASK) {
                 if (noiseSkip[t2]) continue;
                 lineBuf32[idx] = noiseScanColor[t2];
@@ -145,33 +149,23 @@ export class VHS {
 
         if (!visible) return;
 
-        this._lineTileCtx.putImageData(this._lineImageData, 0, 0);
-        this.ctx.drawImage(this._lineTile, 0, y);
+        this._scanCtx.putImageData(this._lineImageData, 0, y);
     }
 
     drawFrame() {
-        const {ctx, canvas} = this;
-        if (!this._staticBuf32 || canvas.width === 0 || canvas.height === 0) return;
+        const {canvas} = this;
+        if (!this._lineBuf32 || canvas.width === 0 || canvas.height === 0) return;
 
         const width = canvas.width;
         const height = canvas.height;
 
         this._regenNoise();
-        const offset = (this._noiseOffset + 1) & NOISE_MASK;
-        this._noiseOffset = offset;
-
-        this._drawStaticTile(offset);
-
-        const prevComposite = ctx.globalCompositeOperation;
-        ctx.globalCompositeOperation = "copy";
-        ctx.fillStyle = ctx.createPattern(this._staticTile, "repeat");
-        ctx.fillRect(0, 0, width, height);
-        ctx.globalCompositeOperation = prevComposite;
+        this._scanCtx.clearRect(0, 0, width, height);
 
         this.updateOverlaps();
 
         for (const line of this.scanlines) {
-            if (!line.hidden) this._drawScanline(line, offset, width, height);
+            if (!line.hidden) this._drawScanline(line, width, height);
             line.y += line.speed;
         }
 
@@ -204,5 +198,6 @@ export class VHS {
         if (this.rafId !== null) cancelAnimationFrame(this.rafId);
         this.rafId = null;
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this._scanCtx.clearRect(0, 0, this._scanCanvas.width, this._scanCanvas.height);
     }
 }
