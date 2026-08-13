@@ -1496,9 +1496,8 @@ export class MultiplayerController {
         if (!this.session?.isConnected) return;
         try {
             this.session.send(payload);
-        } catch {
-            // peer likely dropped between the isConnected check and send(); the
-            // "disconnected" event (already bound) will handle cleanup.
+        } catch (error) {
+            console.error("[mp] _sendToPeer threw", {kind: payload?.kind, error: error?.message});
         }
     }
 
