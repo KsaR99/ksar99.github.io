@@ -8,6 +8,7 @@ import {Snow} from "../ui/themes/snow.js";
 const THEME_NAMES = ["none", "matrix", "rain", "snow", "vhs"];
 const THEME_MODIFIER_CLASSES = THEME_NAMES.map((name) => `board__filter--${name}`);
 const THEME_BODY_CLASSES = THEME_NAMES.map((name) => `body--theme-${name}`);
+const THEME_BOARD_CLASSES = THEME_NAMES.map((name) => `board--theme-${name}`);
 
 export class ThemeOverlay {
     constructor(game, {canvas = null, ctx = null} = {}) {
@@ -31,16 +32,11 @@ export class ThemeOverlay {
         };
     }
 
-    registerTarget(key, {overlayEl, canvas, ctx = null}) {
-        const overrideBefore = this._targetThemeOverrides.get(key);
-        console.debug("[theme-debug] registerTarget: override BEFORE unregisterTarget", {key, overrideBefore});
+    registerTarget(key, {overlayEl, canvas, ctx = null, boardEl = null}) {
         this.unregisterTarget(key);
-        console.debug("[theme-debug] registerTarget: override AFTER unregisterTarget (should be gone)", {
-            key,
-            overrideAfter: this._targetThemeOverrides.get(key),
-        });
         this._targets.set(key, {
             overlayEl: overlayEl ?? null,
+            boardEl: boardEl ?? null,
             themes: this._buildThemes(canvas, ctx ?? canvas.getContext("2d")),
         });
         this._updateTarget(key);
@@ -50,20 +46,18 @@ export class ThemeOverlay {
         const target = this._targets.get(key);
         if (!target) return;
         for (const instance of Object.values(target.themes)) instance?.stop();
+        target.boardEl?.classList.remove(...THEME_BOARD_CLASSES);
         this._targets.delete(key);
         this._targetThemeOverrides.delete(key);
-        console.debug("[theme-debug] unregisterTarget: deleted target + override", {key});
     }
 
     setTargetTheme(key, theme) {
         this._targetThemeOverrides.set(key, theme ?? "none");
-        console.debug("[theme-debug] setTargetTheme", {key, theme: theme ?? "none"});
         this._updateTarget(key);
     }
 
     clearTargetTheme(key) {
         this._targetThemeOverrides.delete(key);
-        console.debug("[theme-debug] clearTargetTheme", {key});
         this._updateTarget(key);
     }
 
@@ -112,6 +106,12 @@ export class ThemeOverlay {
                 overlayClasses.remove(...THEME_MODIFIER_CLASSES);
                 overlayClasses.add(`board__filter--${theme}`);
             }
+        }
+
+        if (target.boardEl && target._appliedBoardTheme !== theme) {
+            target._appliedBoardTheme = theme;
+            target.boardEl.classList.remove(...THEME_BOARD_CLASSES);
+            target.boardEl.classList.add(`board--theme-${theme}`);
         }
 
         for (const [name, instance] of Object.entries(target.themes)) {

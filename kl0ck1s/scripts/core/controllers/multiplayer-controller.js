@@ -247,7 +247,6 @@ export class MultiplayerController {
         const theme = this.game.settings.theme ?? "none";
         if (!this.session?.isConnected || theme === this._lastSentTheme) return;
         this._lastSentTheme = theme;
-        console.debug("[theme-debug] notifyThemeChanged -> sending THEME", {theme});
         this._sendToPeer({kind: MESSAGE_KIND.THEME, theme});
     }
 
@@ -707,10 +706,6 @@ export class MultiplayerController {
             this.game.multiplayerConnected = true;
             this.game.multiplayerVsBot = false;
             this._sendToPeer({kind: MESSAGE_KIND.NAME, name: this.game.playerName || ""});
-            console.debug("[theme-debug] connected -> sending initial THEME", {
-                theme: this.game.settings.theme,
-                role: this.role,
-            });
             this._sendToPeer({kind: MESSAGE_KIND.THEME, theme: this.game.settings.theme});
             this._lastSentTheme = this.game.settings.theme;
             this._sendConfigIfHost();
@@ -971,12 +966,6 @@ export class MultiplayerController {
             if (this._lastRemoteStats) this._updateOpponentStats(this._lastRemoteStats);
         } else if (payload.kind === MESSAGE_KIND.THEME) {
             this._remoteTheme = payload.theme || "none";
-            console.debug("[theme-debug] received THEME from peer", {
-                rawPayloadTheme: payload.theme,
-                resolvedRemoteTheme: this._remoteTheme,
-                myLocalActiveTheme: this.game.activeTheme,
-                opponentTargetRegistered: Boolean(this.game.themeOverlay?._targets?.has?.("opponent")),
-            });
             this.game.themeOverlay?.setTargetTheme("opponent", this._remoteTheme);
         } else if (payload.kind === MESSAGE_KIND.BOARD) {
             this._setRemoteCells(this._decodeBoardPacket(payload));
@@ -1248,21 +1237,8 @@ export class MultiplayerController {
 
     _showOpponentUI() {
         this._showOpponentBadge();
-        console.debug("[theme-debug] _showOpponentUI: before board creation", {
-            remoteThemeKnown: this._remoteTheme,
-            myActiveTheme: this.game.activeTheme,
-        });
         this._showOpponentBoard();
-        console.debug("[theme-debug] _showOpponentUI: after board creation, restoring override?", {
-            remoteThemeKnown: this._remoteTheme,
-            willRestore: Boolean(this._remoteTheme),
-        });
         if (this._remoteTheme) this.game.themeOverlay?.setTargetTheme("opponent", this._remoteTheme);
-        console.debug("[theme-debug] _showOpponentUI: final dump", {
-            remoteTheme: this._remoteTheme,
-            myActiveTheme: this.game.activeTheme,
-            overrideForOpponent: this.game.themeOverlay?._targetThemeOverrides?.get?.("opponent"),
-        });
     }
 
     _hideOpponentUI() {
@@ -1464,7 +1440,7 @@ export class MultiplayerController {
         this._opponentCanvasEl = canvas;
         this._opponentCanvasCtx = canvas.getContext("2d");
         this._opponentSurface = this.game.renderer?.createSurface(this._opponentCanvasCtx, canvas) ?? null;
-        this.game.themeOverlay.registerTarget("opponent", {overlayEl: filterEl, canvas: filterCanvas});
+        this.game.themeOverlay.registerTarget("opponent", {overlayEl: filterEl, canvas: filterCanvas, boardEl});
 
         this._notifyLayoutResize();
         this._syncOpponentCanvasSize();
