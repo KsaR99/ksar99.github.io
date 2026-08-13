@@ -29,10 +29,10 @@ export const SPIN_POINTS = Object.freeze({
     OTHER: [100, 200, 400, 600],
 });
 
-export const LEVEL_UP_BANNER_DURATION_MS = 350;
+export const LEVEL_UP_BANNER_DURATION_MS = 320;
 export const LINE_CLEAR_ANIMATION_DURATION_MS = 260;
 export const LINE_CLEAR_SOUND_PLAYBACK_RATE = 0.6;
-export const LINE_CLEAR_FLASH_PHASE_FRACTION = 0.6;
+export const LINE_CLEAR_FLASH_PHASE_FRACTION = 0.75;
 
 export const DIFFICULTIES = Object.freeze({
     easy: {startLevel: 1, fallingSoundRate: 0.40}, // ~1000ms/row
@@ -80,8 +80,6 @@ function packState(rows) {
     return mask;
 }
 
-// Human-readable shape definitions. Only used at module-load time to build
-// the packed KLOCKOMINOS export below — nothing at runtime touches this.
 const KLOCKOMINOS_SOURCE = {
     I: {
         color: "oklch(0.905 0.154 194.7)",
@@ -160,7 +158,7 @@ export const KLOCKOMINOS = Object.freeze(
             type,
             Object.freeze({
                 color: def.color,
-                colorIndex: index + 1, // 0 is reserved for "empty" in Board.colors
+                colorIndex: index + 1,
                 width: def.states[0][0].length,
                 height: def.states[0].length,
                 states: def.states.map(packState),

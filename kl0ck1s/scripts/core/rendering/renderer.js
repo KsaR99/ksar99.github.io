@@ -227,6 +227,7 @@ export class Renderer {
         const fragSizeArr = new Float32Array(count).fill(fragSize);
         const halfSizeArr = new Float32Array(count).fill(halfFragSize);
         const colorIndex = new Uint16Array(count);
+        const colIndex = new Uint16Array(count);
         const colors = [];
         const colorSlot = new Map();
 
@@ -257,6 +258,7 @@ export class Renderer {
                         rotation0[i] = Math.random() * Math.PI * 2;
                         dRotation[i] = (Math.random() - 0.5) * Math.PI * 6;
                         colorIndex[i] = cIdx;
+                        colIndex[i] = x;
                     }
                 }
             }
@@ -269,6 +271,7 @@ export class Renderer {
             rotation0, dRotation,
             size: fragSizeArr, halfSize: halfSizeArr,
             colorIndex, colors,
+            colIndex,
         };
     }
 
@@ -277,23 +280,44 @@ export class Renderer {
      *
      * @param {CanvasRenderingContext2D} ctx
      * @param {ReturnType<Renderer["buildClearFragments"]>} fragments
-     * @param {number} particleProgress - 0..1
+     * @param {number|Float32Array} particleProgress - either a single 0..1 progress applied to every
+     *   fragment, or a Float32Array indexed by board column giving each column's own 0..1 progress.
+     *   A negative value for a column means "not revealed yet" - fragments in that column are skipped.
      */
     drawFragments(ctx, fragments, particleProgress) {
         if (!fragments || !fragments.count) return;
 
-        const {count, startX, startY, dx, dy, rotation0, dRotation, size, halfSize, colorIndex, colors} = fragments;
-        const fragmentAlpha = 0.75 * (1 - particleProgress);
+        const {
+            count,
+            startX,
+            startY,
+            dx,
+            dy,
+            rotation0,
+            dRotation,
+            size,
+            halfSize,
+            colorIndex,
+            colors,
+            colIndex
+        } = fragments;
+        const perColumn = particleProgress instanceof Float32Array;
 
         ctx.save();
-        ctx.globalAlpha = fragmentAlpha;
 
         for (let i = 0; i < count; i++) {
-            const x = startX[i] + dx[i] * particleProgress;
-            const y = startY[i] + dy[i] * particleProgress;
-            const rotation = rotation0[i] + dRotation[i] * particleProgress;
+            const progress = perColumn ? particleProgress[colIndex[i]] : particleProgress;
+            if (progress < 0) continue;
+
+            const fragmentAlpha = 0.75 * (1 - progress);
+            if (fragmentAlpha <= 0) continue;
+
+            const x = startX[i] + dx[i] * progress;
+            const y = startY[i] + dy[i] * progress;
+            const rotation = rotation0[i] + dRotation[i] * progress;
             const cos = Math.cos(rotation);
             const sin = Math.sin(rotation);
+            ctx.globalAlpha = fragmentAlpha;
             ctx.setTransform(cos, sin, -sin, cos, x, y);
             ctx.fillStyle = colors[colorIndex[i]];
             const half = halfSize[i];
@@ -623,10 +647,33 @@ export class Renderer {
         const {ctx, boardCanvas} = surface;
 
         const p = Math.min(1, progress);
-        const flashEnd = this.particlesEnabled ? LINE_CLEAR_FLASH_PHASE_FRACTION : 1;
+        const flashEnd = LINE_CLEAR_FLASH_PHASE_FRACTION;
         const maskStart = flashEnd * 0.5;
-        const fallProgress = p < maskStart ? 0 : Math.min(1, (p - maskStart) / (1 - maskStart));
-        const rowsGone = p >= maskStart;
+
+        const fallProgress = p < flashEnd
+            ? 0
+            : (flashEnd >= 1 ? 1 : Math.min(1, (p - flashEnd) / (1 - flashEnd)));
+
+        const cols = board.cols;
+        const halfCols = Math.ceil(cols / 2);
+        const wipeT = p <= maskStart ? 0 : Math.min(1, (p - maskStart) / (flashEnd - maskStart));
+        const colReached = new Uint8Array(cols);
+        const colFlash = new Float32Array(cols);
+        const colParticleProgress = new Float32Array(cols).fill(-1);
+        for (let x = 0; x < cols; x++) {
+            const d = Math.min(x, cols - 1 - x);
+            const reachStart = d / halfCols;
+            const reachEnd = (d + 1) / halfCols;
+            if (wipeT <= reachStart) continue;
+
+            colReached[x] = 1;
+            colFlash[x] = wipeT >= reachEnd ? 0 : 1 - (wipeT - reachStart) / (reachEnd - reachStart);
+
+            const reachEndAbsolute = maskStart + reachEnd * (flashEnd - maskStart);
+            colParticleProgress[x] = reachEndAbsolute >= 1
+                ? 1
+                : Math.max(0, Math.min(1, (p - reachEndAbsolute) / (1 - reachEndAbsolute)));
+        }
 
         const affectedMaxRow = lineIndices.length ? Math.max(...lineIndices) : -1;
         const staticFromRow = affectedMaxRow + 1;
@@ -649,25 +696,21 @@ export class Renderer {
             );
         }
 
-        if (!rowsGone) {
-            for (const y of lineIndices) {
-                for (let x = 0; x < board.cols; x++) {
-                    const colorIndex = board.colors[y * board.cols + x];
-                    if (!colorIndex) continue;
-                    const level = this.saturationLevelForRow(y, board.rows);
-                    this.drawCell(ctx, x, y, this.colorPalette[colorIndex], size, {level});
-                }
+        for (const y of lineIndices) {
+            for (let x = 0; x < cols; x++) {
+                if (colReached[x]) continue;
+                const colorIndex = board.colors[y * cols + x];
+                if (!colorIndex) continue;
+                const level = this.saturationLevelForRow(y, board.rows);
+                this.drawCell(ctx, x, y, this.colorPalette[colorIndex], size, {level});
             }
         }
 
         if (staticFromRow < board.rows) ctx.drawImage(surface._clearingStaticCanvas, 0, staticFromRow * size);
 
-        if (rowsGone && this.particlesEnabled) this.drawFragments(ctx, fragments, fallProgress);
+        if (this.particlesEnabled) this.drawFragments(ctx, fragments, colParticleProgress);
 
-        if (p < flashEnd) {
-            const flashProgress = p < maskStart ? 0 : (p - maskStart) / (flashEnd - maskStart);
-            this.drawClearingFlash(lineIndices, flashProgress, {ctx, size, cols: board.cols});
-        }
+        if (p < flashEnd) this.drawClearingFlash(lineIndices, colFlash, {ctx, size, cols});
     }
 
     drawPiece(piece, board, surface = this) {
@@ -789,32 +832,33 @@ export class Renderer {
         });
     }
 
-    drawClearingFlash(lineIndices, progress, {
+    /**
+     * Draws the sweeping line-clear flash: a bright column-wide band that runs in from both
+     * edges toward the middle. Columns it has already swept past are left dark (their block is
+     * already gone and particles are showing there instead).
+     *
+     * @param {number[]} lineIndices - rows being cleared
+     * @param {Float32Array} colFlash - per-column flash intensity, 0..1, indexed by board column
+     */
+    drawClearingFlash(lineIndices, colFlash, {
         ctx = this.ctx,
         size = this.boardConfig.CELL_SIZE,
         cols = this.boardConfig.COLS
     } = {}) {
-        const EXPAND_FRACTION = 0.45;
-        const expandT = Math.min(1, progress / EXPAND_FRACTION);
-        const fadeT = progress <= EXPAND_FRACTION ? 0 : (progress - EXPAND_FRACTION) / (1 - EXPAND_FRACTION);
-        const eased = 1 - (1 - expandT) ** 3;
-
-        const alpha = 1 - fadeT;
-        const totalWidth = cols * size;
-        const flashWidth = totalWidth * eased;
-        const flashX = (totalWidth - flashWidth) / 2;
-
         ctx.save();
-        if (this.glowEnabled) {
-            ctx.shadowColor = `oklch(1 0 0 / ${alpha})`;
-            ctx.shadowBlur = size * fadeT;
+
+        for (let x = 0; x < cols; x++) {
+            const alpha = colFlash[x];
+            if (alpha <= 0) continue;
+
+            ctx.shadowColor = this.glowEnabled ? `oklch(1 0 0 / ${alpha})` : "transparent";
+            ctx.shadowBlur = this.glowEnabled ? size * 0.6 : 0;
+            ctx.fillStyle = `oklch(1 0 0 / ${alpha})`;
+
+            lineIndices.forEach((y) => {
+                ctx.fillRect(x * size, y * size, size, size);
+            });
         }
-
-        ctx.fillStyle = `oklch(1 0 0 / ${alpha})`;
-
-        lineIndices.forEach((y) => {
-            ctx.fillRect(flashX, y * size, flashWidth, size);
-        });
 
         ctx.restore();
     }
