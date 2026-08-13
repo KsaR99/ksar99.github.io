@@ -1,6 +1,6 @@
 "use strict";
 
-export const SIGNAL_CODE_VERSION = 2;
+export const SIGNAL_CODE_VERSION = 3;
 
 export const ICE_GATHERING_TIMEOUT_MS = 8000;
 

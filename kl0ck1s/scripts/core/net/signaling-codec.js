@@ -1,79 +1,61 @@
 "use strict";
 
-import {deflateRaw, hexDecode, hexEncode, inflateRaw, isCompressionSupported} from "./binary-codec.js";
-import {SIGNAL_CODE_VERSION} from "./net-constants.js";
+import {
+    deflateRaw,
+    hexDecode,
+    hexEncode,
+    inflateRaw,
+    isCompressionSupported
+} from "./binary-codec.js";
 
-const SIGNAL_FLAG_COMPRESSED = 1;
+const TEXT_ENCODER = new TextEncoder();
+const TEXT_DECODER = new TextDecoder();
 
-const textEncoder = new TextEncoder();
-const textDecoder = new TextDecoder();
+const VERSION = 2;
+const FLAG_DEFLATE_RAW = 1;
 
-export class SignalCodecError extends Error {
-    constructor(code, message) {
-        super(message);
-        this.name = "SignalCodecError";
-        this.code = code;
+export async function encodeSignal(description) {
+    const sdp = typeof description === "string" ? description : description?.sdp;
+    if (typeof sdp !== "string" || !sdp) {
+        throw new Error("Invalid SDP.");
     }
-}
 
-export async function encodeSignal(payload) {
-    const json = textEncoder.encode(JSON.stringify({v: SIGNAL_CODE_VERSION, ...payload}));
-
-    let body = json;
-    let flag = 0;
+    const input = TEXT_ENCODER.encode(sdp);
 
     if (isCompressionSupported()) {
-        const compressed = await deflateRaw(json);
-        if (compressed.byteLength < json.byteLength) {
-            body = compressed;
-            flag = SIGNAL_FLAG_COMPRESSED;
-        }
+        const compressed = await deflateRaw(input);
+        const frame = new Uint8Array(2 + compressed.length);
+        frame[0] = VERSION;
+        frame[1] = FLAG_DEFLATE_RAW;
+        frame.set(compressed, 2);
+        return hexEncode(frame);
     }
 
-    const frame = new Uint8Array(1 + body.byteLength);
-    frame[0] = flag;
-    frame.set(body, 1);
+    const frame = new Uint8Array(2 + input.length);
+    frame[0] = VERSION;
+    frame[1] = 0;
+    frame.set(input, 2);
     return hexEncode(frame);
 }
 
-export async function decodeSignal(code, expectedType = null) {
-    const trimmed = (code ?? "").trim();
-    if (!trimmed) {
-        throw new SignalCodecError("empty", "Signal code is empty.");
+export async function decodeSignal(code) {
+    const frame = hexDecode(code);
+    if (frame.length < 2 || frame[0] !== VERSION) {
+        throw new Error("Invalid or unsupported signal code.");
     }
 
-    let payload;
-    try {
-        const frame = hexDecode(trimmed);
-        if (frame.byteLength < 1) {
-            throw new Error("empty frame");
-        }
+    const flags = frame[1];
+    const payload = frame.subarray(2);
+    const bytes = flags & FLAG_DEFLATE_RAW
+        ? await inflateRaw(payload)
+        : payload;
 
-        const flag = frame[0];
-        let body = frame.subarray(1);
-        if (flag & SIGNAL_FLAG_COMPRESSED) {
-            if (!isCompressionSupported()) {
-                throw new Error("compressed code but deflate-raw unsupported");
-            }
-            body = await inflateRaw(body);
-        }
-
-        payload = JSON.parse(textDecoder.decode(body));
-    } catch {
-        throw new SignalCodecError("malformed", "Signal code could not be decoded.");
+    const sdp = TEXT_DECODER.decode(bytes);
+    if (!sdp) {
+        throw new Error("Signal code contains empty SDP.");
     }
 
-    if (!payload || typeof payload !== "object") {
-        throw new SignalCodecError("malformed", "Signal code did not decode to an object.");
-    }
-
-    if (payload.v !== SIGNAL_CODE_VERSION) {
-        throw new SignalCodecError("version-mismatch", `Unsupported signal code version: ${payload.v}.`);
-    }
-
-    if (expectedType && payload.type !== expectedType) {
-        throw new SignalCodecError("type-mismatch", `Expected a "${expectedType}" code, got "${payload.type}".`);
-    }
-
-    return payload;
+    return sdp;
 }
+
+export { encodeSignal as encode, decodeSignal as decode };
