@@ -32,7 +32,13 @@ export class ThemeOverlay {
     }
 
     registerTarget(key, {overlayEl, canvas, ctx = null}) {
+        const overrideBefore = this._targetThemeOverrides.get(key);
+        console.debug("[theme-debug] registerTarget: override BEFORE unregisterTarget", {key, overrideBefore});
         this.unregisterTarget(key);
+        console.debug("[theme-debug] registerTarget: override AFTER unregisterTarget (should be gone)", {
+            key,
+            overrideAfter: this._targetThemeOverrides.get(key),
+        });
         this._targets.set(key, {
             overlayEl: overlayEl ?? null,
             themes: this._buildThemes(canvas, ctx ?? canvas.getContext("2d")),
@@ -46,15 +52,18 @@ export class ThemeOverlay {
         for (const instance of Object.values(target.themes)) instance?.stop();
         this._targets.delete(key);
         this._targetThemeOverrides.delete(key);
+        console.debug("[theme-debug] unregisterTarget: deleted target + override", {key});
     }
 
     setTargetTheme(key, theme) {
         this._targetThemeOverrides.set(key, theme ?? "none");
+        console.debug("[theme-debug] setTargetTheme", {key, theme: theme ?? "none"});
         this._updateTarget(key);
     }
 
     clearTargetTheme(key) {
         this._targetThemeOverrides.delete(key);
+        console.debug("[theme-debug] clearTargetTheme", {key});
         this._updateTarget(key);
     }
 
