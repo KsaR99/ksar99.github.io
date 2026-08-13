@@ -21,13 +21,18 @@ function isIPv6(ip) {
 }
 
 function parseCandidateLine(line) {
-    const match = /^a=candidate:(\S+) (\d+) (\S+) (\d+) (\S+) (\d+) typ (\S+)/.exec(line.trim());
-    if (!match) return null;
+    const trimmed = line.trim();
+    if (!trimmed.startsWith("a=candidate:")) return null;
 
-    const [, , , protocol, priority, ip, port, type] = match;
+    const tokens = trimmed.slice("a=candidate:".length).split(/\s+/).filter(Boolean);
+    if (tokens.length < 8) return null;
+
+    const [foundation, component, protocol, priority, ip, port, typLiteral, type] = tokens;
+    if (typLiteral !== "typ" || !type) return null;
     if (protocol.toLowerCase() !== "udp") return null;
+    if (!/^\d+$/.test(priority) || !/^\d+$/.test(port)) return null;
 
-    return {protocol: "udp", priority: Number(priority), ip, port: Number(port), type};
+    return {foundation, component, protocol: "udp", priority: Number(priority), ip, port: Number(port), type};
 }
 
 function parseSdp(sdpText) {
@@ -43,11 +48,15 @@ function parseSdp(sdpText) {
     }
 
     const [fingerprintAlgorithm, fingerprintHash] = fingerprintLine.trim().split(" ");
-    const candidates = sdpText
+
+    const rawCandidateLines = sdpText
         .split(/\r\n|\n/)
-        .filter((line) => line.startsWith("a=candidate:"))
-        .map(parseCandidateLine)
-        .filter(Boolean);
+        .filter((line) => line.trim().startsWith("a=candidate:"));
+    const candidates = rawCandidateLines.map(parseCandidateLine).filter(Boolean);
+
+    if (rawCandidateLines.length > 0 && candidates.length === 0) {
+        throw new Error("Found ICE candidate lines in the SDP but none of them could be parsed.");
+    }
 
     return {
         ufrag,
@@ -93,11 +102,11 @@ function decodeCandidate(compact, index) {
     const priority = Number(parts.pop());
     const port = Number(parts.pop());
     const ip = parts.join(":");
-    return {foundation: String(index + 1), ip, port, priority, type};
+    return {foundation: String(index + 1), component: "1", ip, port, priority, type};
 }
 
 function buildCandidateLine(candidate) {
-    const base = `a=candidate:${candidate.foundation} 1 udp ${candidate.priority} ${candidate.ip} ${candidate.port} typ ${candidate.type}`;
+    const base = `a=candidate:${candidate.foundation} ${candidate.component ?? "1"} udp ${candidate.priority} ${candidate.ip} ${candidate.port} typ ${candidate.type}`;
     if (candidate.type === "srflx" || candidate.type === "relay") {
         return `${base} raddr 0.0.0.0 rport 0`;
     }
