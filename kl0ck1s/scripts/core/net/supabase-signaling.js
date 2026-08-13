@@ -53,10 +53,12 @@ function subscribe(channel) {
 function waitForEvent(channel, event, timeoutMs) {
     return new Promise((resolve, reject) => {
         const timer = setTimeout(() => {
+            console.warn("[signaling] timed out waiting for event", {event, timeoutMs});
             reject(new SupabaseSignalError("timeout", `Timed out waiting for "${event}".`));
         }, timeoutMs);
 
         channel.on("broadcast", {event}, ({payload}) => {
+            console.log("[signaling] received event", {event});
             clearTimeout(timer);
             resolve(payload);
         });
@@ -73,19 +75,27 @@ async function hostSdpExchange(code, createOfferCode, callbacks) {
     try {
         const helloPromise = waitForEvent(channel, "guest-hello", HELLO_TIMEOUT_MS);
         await subscribe(channel);
+        console.log("[signaling] host channel subscribed", {code});
         await callbacks.onChannelReady?.();
 
         const offerCode = await createOfferCode();
+        console.log("[signaling] host offer ready, waiting for guest-hello", {code, sdpLength: offerCode.length});
         await helloPromise;
+        console.log("[signaling] guest-hello received", {code});
         callbacks.onGuestJoined?.();
 
         const answerPromise = waitForEvent(channel, "guest-answer", ANSWER_TIMEOUT_MS);
         await channel.send({type: "broadcast", event: "host-offer", payload: {sdp: offerCode}});
+        console.log("[signaling] host-offer sent", {code});
 
         const {sdp: answerCode} = await answerPromise;
+        console.log("[signaling] guest-answer received", {code, sdpLength: answerCode?.length});
         await channel.send({type: "broadcast", event: "host-ack", payload: {}});
 
         return answerCode;
+    } catch (error) {
+        console.warn("[signaling] host exchange failed", {code, error: error?.message});
+        throw error;
     } finally {
         await sb.removeChannel(channel).catch(() => {
         });
@@ -100,15 +110,23 @@ async function guestSdpExchange(code, createAnswerCode, callbacks) {
         const ackPromise = waitForEvent(channel, "host-ack", ANSWER_TIMEOUT_MS).catch(() => {
         });
         await subscribe(channel);
+        console.log("[signaling] guest channel subscribed", {code});
 
         await channel.send({type: "broadcast", event: "guest-hello", payload: {}});
+        console.log("[signaling] guest-hello sent", {code});
 
         const {sdp: offerCode} = await offerPromise;
+        console.log("[signaling] host-offer received", {code, sdpLength: offerCode?.length});
         callbacks.onOfferReceived?.();
         const answerCode = await createAnswerCode(offerCode);
 
         await channel.send({type: "broadcast", event: "guest-answer", payload: {sdp: answerCode}});
+        console.log("[signaling] guest-answer sent", {code});
         await ackPromise;
+        console.log("[signaling] host-ack received or timed out", {code});
+    } catch (error) {
+        console.warn("[signaling] guest exchange failed", {code, error: error?.message});
+        throw error;
     } finally {
         await sb.removeChannel(channel).catch(() => {
         });

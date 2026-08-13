@@ -11,9 +11,13 @@ export class MultiplayerSession extends EventTarget {
         this.remoteReady = false;
 
         this.peer = new RtcPeerConnection({role, ...peerOptions});
-        this.peer.addEventListener("channelopen", () => this.dispatchEvent(new Event("connected")));
+        this.peer.addEventListener("channelopen", () => {
+            console.log("[session] connected", {role});
+            this.dispatchEvent(new Event("connected"));
+        });
         this.peer.addEventListener("channelclose", () => this._onDisconnected());
         this.peer.addEventListener("statechange", (event) => {
+            console.log("[session] peer statechange", {role, state: event.detail});
             if (event.detail === "failed" || event.detail === "disconnected") this._onDisconnected();
         });
         this.peer.addEventListener("error", (event) => {
@@ -98,6 +102,7 @@ export class MultiplayerSession extends EventTarget {
     }
 
     _onDisconnected() {
+        console.log("[session] disconnected", {role: this.role, connectionState: this.peer.connectionState});
         this.localReady = false;
         this.remoteReady = false;
         this.dispatchEvent(new CustomEvent("disconnected", {detail: {reason: this.peer.connectionState}}));

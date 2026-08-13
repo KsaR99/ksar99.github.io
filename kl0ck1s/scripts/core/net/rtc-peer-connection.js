@@ -34,8 +34,56 @@ function waitForIceGatheringComplete(pc, timeoutMs) {
         pc.addEventListener("icegatheringstatechange", onChange);
         document.addEventListener("visibilitychange", onVisible);
 
-        const timer = setTimeout(finish, timeoutMs);
+        const timer = setTimeout(() => {
+            console.warn("[rtc] ICE gathering timed out", {timeoutMs, iceGatheringState: pc.iceGatheringState});
+            finish();
+        }, timeoutMs);
     });
+}
+
+function candidateTypeOf(candidateString) {
+    const match = /typ (\w+)/.exec(candidateString ?? "");
+    return match ? match[1] : "unknown";
+}
+
+async function logIceDiagnostics(pc, role, reason) {
+    console.warn("[rtc] diagnostics", {
+        role,
+        reason,
+        connectionState: pc.connectionState,
+        iceConnectionState: pc.iceConnectionState,
+        iceGatheringState: pc.iceGatheringState,
+        signalingState: pc.signalingState,
+    });
+
+    try {
+        const stats = await pc.getStats();
+        const pairs = [];
+        const candidates = new Map();
+        stats.forEach((entry) => {
+            if (entry.type === "local-candidate" || entry.type === "remote-candidate") {
+                candidates.set(entry.id, entry);
+            }
+        });
+        stats.forEach((entry) => {
+            if (entry.type !== "candidate-pair") return;
+            const local = candidates.get(entry.localCandidateId);
+            const remote = candidates.get(entry.remoteCandidateId);
+            pairs.push({
+                state: entry.state,
+                nominated: entry.nominated,
+                localType: local?.candidateType,
+                localProtocol: local?.protocol,
+                remoteType: remote?.candidateType,
+                remoteProtocol: remote?.protocol,
+                bytesSent: entry.bytesSent,
+                bytesReceived: entry.bytesReceived,
+            });
+        });
+        console.warn("[rtc] candidate pairs", {role, pairs});
+    } catch (error) {
+        console.warn("[rtc] getStats failed", {role, error: error?.message});
+    }
 }
 
 export class RtcPeerConnection extends EventTarget {
@@ -52,8 +100,46 @@ export class RtcPeerConnection extends EventTarget {
         this._iceGatheringTimeoutMs = iceGatheringTimeoutMs;
         this._sendQueue = Promise.resolve();
         this._pc = new RTCPeerConnection({...rtcConfiguration, iceServers: [...rtcConfiguration.iceServers]});
+
+        console.log("[rtc] created", {role, iceServerCount: rtcConfiguration.iceServers.length});
+
         this._pc.addEventListener("connectionstatechange", () => this._onConnectionStateChange());
         this._pc.addEventListener("datachannel", (event) => this._bindChannel(event.channel));
+        this._pc.addEventListener("iceconnectionstatechange", () => {
+            console.log("[rtc] iceConnectionState", {role: this.role, state: this._pc.iceConnectionState});
+            if (this._pc.iceConnectionState === "failed" || this._pc.iceConnectionState === "disconnected") {
+                logIceDiagnostics(this._pc, this.role, `iceConnectionState:${this._pc.iceConnectionState}`);
+            }
+        });
+        this._pc.addEventListener("icegatheringstatechange", () => {
+            console.log("[rtc] iceGatheringState", {role: this.role, state: this._pc.iceGatheringState});
+        });
+        this._pc.addEventListener("signalingstatechange", () => {
+            console.log("[rtc] signalingState", {role: this.role, state: this._pc.signalingState});
+        });
+        this._pc.addEventListener("icecandidate", (event) => {
+            if (!event.candidate) {
+                console.log("[rtc] icecandidate: null (gathering complete)", {role: this.role});
+                return;
+            }
+            console.log("[rtc] icecandidate", {
+                role: this.role,
+                type: candidateTypeOf(event.candidate.candidate),
+                protocol: event.candidate.protocol,
+                address: event.candidate.address,
+                port: event.candidate.port,
+            });
+        });
+        this._pc.addEventListener("icecandidateerror", (event) => {
+            console.warn("[rtc] icecandidateerror", {
+                role: this.role,
+                errorCode: event.errorCode,
+                errorText: event.errorText,
+                url: event.url,
+                address: event.address,
+                port: event.port,
+            });
+        });
     }
 
     get connectionState() {
@@ -72,7 +158,9 @@ export class RtcPeerConnection extends EventTarget {
 
         const offer = await this._pc.createOffer();
         await this._pc.setLocalDescription(offer);
+        console.log("[rtc] local offer set, gathering ICE", {role: this.role});
         await waitForIceGatheringComplete(this._pc, this._iceGatheringTimeoutMs);
+        console.log("[rtc] ICE gathering finished for offer", {role: this.role, state: this._pc.iceGatheringState});
 
         this._setState(CONNECTION_STATE.AWAITING_ANSWER);
         return await encodeSignal({type: "offer", sdp: this._pc.localDescription.sdp});
@@ -84,13 +172,16 @@ export class RtcPeerConnection extends EventTarget {
         if (this._pc.signalingState !== "stable") return this._lastAnswerCode ?? "";
 
         const {sdp} = await decodeSignal(offerCode, "offer");
+        console.log("[rtc] remote offer received", {role: this.role, sdpLength: sdp.length});
 
         this._setState(CONNECTION_STATE.GATHERING);
         await this._pc.setRemoteDescription({type: "offer", sdp});
 
         const answer = await this._pc.createAnswer();
         await this._pc.setLocalDescription(answer);
+        console.log("[rtc] local answer set, gathering ICE", {role: this.role});
         await waitForIceGatheringComplete(this._pc, this._iceGatheringTimeoutMs);
+        console.log("[rtc] ICE gathering finished for answer", {role: this.role, state: this._pc.iceGatheringState});
 
         this._setState(CONNECTION_STATE.CONNECTING);
         this._lastAnswerCode = await encodeSignal({type: "answer", sdp: this._pc.localDescription.sdp});
@@ -105,6 +196,7 @@ export class RtcPeerConnection extends EventTarget {
         }
 
         const {sdp} = await decodeSignal(answerCode, "answer");
+        console.log("[rtc] remote answer received", {role: this.role, sdpLength: sdp.length});
 
         this._setState(CONNECTION_STATE.CONNECTING);
         await this._pc.setRemoteDescription({type: "answer", sdp});
@@ -154,10 +246,12 @@ export class RtcPeerConnection extends EventTarget {
         this._sendQueue = Promise.resolve();
 
         channel.addEventListener("open", () => {
+            console.log("[rtc] data channel open", {role: this.role});
             this._setState(CONNECTION_STATE.CONNECTED);
             this.dispatchEvent(new Event("channelopen"));
         });
         channel.addEventListener("close", () => {
+            console.log("[rtc] data channel closed", {role: this.role, connectionState: this._pc.connectionState});
             this._setState(CONNECTION_STATE.DISCONNECTED);
             this.dispatchEvent(new Event("channelclose"));
         });
@@ -177,9 +271,15 @@ export class RtcPeerConnection extends EventTarget {
 
     _onConnectionStateChange() {
         const pcState = this._pc.connectionState;
-        if (pcState === "failed") this._setState(CONNECTION_STATE.FAILED);
-        else if (pcState === "disconnected") this._setState(CONNECTION_STATE.DISCONNECTED);
-        else if (pcState === "closed") this._setState(CONNECTION_STATE.CLOSED);
+        console.log("[rtc] connectionState", {role: this.role, state: pcState});
+        if (pcState === "failed") {
+            logIceDiagnostics(this._pc, this.role, "connectionState:failed");
+            this._setState(CONNECTION_STATE.FAILED);
+        } else if (pcState === "disconnected") {
+            this._setState(CONNECTION_STATE.DISCONNECTED);
+        } else if (pcState === "closed") {
+            this._setState(CONNECTION_STATE.CLOSED);
+        }
     }
 
     _setState(state) {
