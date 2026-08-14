@@ -11,6 +11,7 @@ import {VHS} from "../ui/themes/vhs.js";
 import {Matrix} from "../ui/themes/matrix.js";
 import {Rain} from "../ui/themes/rain.js";
 import {Snow} from "../ui/themes/snow.js";
+import {Volcano} from "../ui/themes/volcano.js";
 import {pointsForHardDrop, pointsForLineClear} from "../game/scoring.js";
 import {dropIntervalForLevel, nowMs, smoothedInterval, tierForLevel} from "../shared/utils.js";
 import {
@@ -249,6 +250,7 @@ export class BenchmarkController {
             matrix: new Matrix(canvas, ctx),
             rain: new Rain(canvas, ctx),
             snow: new Snow(canvas, ctx),
+            volcano: new Volcano(canvas, ctx),
         };
         for (const instance of Object.values(this._offscreenThemeEffects)) instance.resize(width, height);
         return this._offscreenThemeEffects;

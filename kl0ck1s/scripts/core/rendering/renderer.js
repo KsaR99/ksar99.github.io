@@ -384,7 +384,14 @@ export class Renderer {
 
     setTheme(theme) {
         const bodyClasses = this.bodyEl.classList;
-        bodyClasses.remove("body--theme-none", "body--theme-matrix", "body--theme-rain", "body--theme-snow", "body--theme-vhs");
+        bodyClasses.remove(
+            "body--theme-none",
+            "body--theme-matrix",
+            "body--theme-rain",
+            "body--theme-snow",
+            "body--theme-volcano",
+            "body--theme-vhs"
+        );
         bodyClasses.add(`body--theme-${theme || "none"}`);
     }
 

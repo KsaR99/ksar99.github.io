@@ -1139,6 +1139,7 @@ export class ScreenFlow {
             matrix: "screens.options.themeMatrix",
             rain: "screens.options.themeRain",
             snow: "screens.options.themeSnow",
+            volcano: "screens.options.themeVolcano",
         };
         themeGrid.querySelectorAll('[data-role="theme-option"]').forEach((card) => {
             card.setAttribute("aria-pressed", String(card.dataset.value === activeTheme));

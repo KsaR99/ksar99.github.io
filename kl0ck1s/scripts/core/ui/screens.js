@@ -195,6 +195,7 @@ const THEME_LABEL_KEYS = {
     matrix: "screens.options.themeMatrix",
     rain: "screens.options.themeRain",
     snow: "screens.options.themeSnow",
+    volcano: "screens.options.themeVolcano",
 };
 
 function formatSettingValue(key, value, i18n) {
@@ -349,6 +350,7 @@ export const Screens = {
                 matrix: "screens.options.themeMatrix",
                 rain: "screens.options.themeRain",
                 snow: "screens.options.themeSnow",
+                volcano: "screens.options.themeVolcano",
             };
             themeGrid.querySelectorAll('[data-role="theme-option"]').forEach((card) => {
                 card.setAttribute("aria-pressed", String(card.dataset.value === activeTheme));

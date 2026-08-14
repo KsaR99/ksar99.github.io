@@ -444,6 +444,10 @@ details.options[open] {
     --theme-preview-bg: radial-gradient(circle at 50% 100%, oklch(0.89 0.07 227.94) 0, oklch(0.11 0.03 261.36) 50%);
 }
 
+.options__theme-card--volcano {
+    --theme-preview-bg: radial-gradient(circle at 50% 100%, oklch(0.65 0.2 48.56) 0, oklch(0 0 0) 50%);
+}
+
 .options__theme-card--vhs {
     --theme-preview-bg: radial-gradient(circle at 50% 100%, oklch(0.52 0.25 333.31) 0, oklch(0.22 0.06 326.54) 50%);
 }

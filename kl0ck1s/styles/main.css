@@ -105,6 +105,25 @@ body {
         --progress-bar__fill-bg: oklch(0.38 0.06 215.86);
     }
 
+    &.body--theme-volcano {
+        --app-bg: oklch(0.09 0.02 76.87 / 0.9);
+        --body-bg: radial-gradient(circle at 50% 100%, oklch(0.65 0.2 48.56) 0, oklch(0 0 0) 50%);
+        --line: oklch(0.34 0.09 57.96);
+        --stats__status--live-color: oklch(0.51 0.15 44.9);
+        --nickname-form__input--bg: oklch(0.44 0.13 52.25);
+        --kbd-border-color: oklch(0.57 0.09 55.23);
+        --mode-description--text: oklch(0.78 0.04 77.21);
+        --board-bg: linear-gradient(180deg, oklch(0.36 0.06 62.2), oklch(0 0 0), oklch(0.25 0.02 62.13));
+        --board-accent: oklch(0.41 0.11 56.07 / 0.85);
+        --panel: oklch(0.1 0.02 77.13);
+        --accent: oklch(0.81 0.2 74.07 / 0.39);
+        --accent-2: oklch(0.71 0.15 52.11);
+        --muted: oklch(0.71 0.05 70.35);
+        --screen__title-color: oklch(0.78 0.2 61.88);
+        --screen__title-shadow: oklch(0.78 0.2 61.88);
+        --progress-bar__fill-bg: oklch(0.57 0.15 60.92);
+    }
+
     &.body--theme-vhs {
         --app-bg: linear-gradient(oklch(0.37 0.17 331.19 / 0.9), oklch(0.14 0.07 331.35 / 0.9) 40%);
         --body-bg: radial-gradient(circle at 50% 100%, oklch(0.52 0.25 333.31) 0, oklch(0.22 0.06 326.54) 50%);
@@ -415,12 +434,18 @@ body.hud-right .card[data-role="next-piece-card"] {
         --board-accent: oklch(0.4 0.09 250.08 / 0.85);
     }
 
+    &.board--theme-volcano {
+        --board-bg: linear-gradient(180deg, oklch(0.36 0.06 62.2), oklch(0 0 0), oklch(0.25 0.02 62.13));
+        --board-accent: oklch(0.41 0.11 56.07 / 0.85);
+    }
+
     &.board--theme-snow {
         --board-bg: linear-gradient(180deg, oklch(0.24 0.018 238), oklch(0.185 0.014 235), oklch(0.24 0.018 238));
         --board-accent: oklch(0.54 0.04 240.12 / 0.85);
     }
 
     &.board--theme-vhs {
+        background: red;
         --board-bg: linear-gradient(160deg, oklch(0.19 0.06 330), oklch(0.135 0.05 300), oklch(0.19 0.06 330));
         --board-accent: oklch(0.35 0.14 324.84 / 0.85);
     }

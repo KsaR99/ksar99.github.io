@@ -4,8 +4,9 @@ import {VHS} from "../ui/themes/vhs.js";
 import {Matrix} from "../ui/themes/matrix.js";
 import {Rain} from "../ui/themes/rain.js";
 import {Snow} from "../ui/themes/snow.js";
+import {Volcano} from "../ui/themes/volcano.js";
 
-const THEME_NAMES = ["none", "matrix", "rain", "snow", "vhs"];
+const THEME_NAMES = ["none", "matrix", "rain", "snow", "volcano", "vhs"];
 const THEME_MODIFIER_CLASSES = THEME_NAMES.map((name) => `board__filter--${name}`);
 const THEME_BODY_CLASSES = THEME_NAMES.map((name) => `body--theme-${name}`);
 const THEME_BOARD_CLASSES = THEME_NAMES.map((name) => `board--theme-${name}`);
@@ -29,6 +30,7 @@ export class ThemeOverlay {
             matrix: new Matrix(canvas, ctx),
             rain: new Rain(canvas, ctx),
             snow: new Snow(canvas, ctx),
+            volcano: new Volcano(canvas, ctx),
         };
     }
 
