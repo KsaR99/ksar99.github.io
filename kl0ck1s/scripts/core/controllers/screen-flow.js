@@ -797,6 +797,7 @@ export class ScreenFlow {
         const transparencyCheckbox = root.querySelector('[data-role="transparency-checkbox"]');
         const fallTrailCheckbox = root.querySelector('[data-role="fall-trail-checkbox"]');
         const hardDropFlashCheckbox = root.querySelector('[data-role="hard-drop-flash-checkbox"]');
+        const blockTypeSelect = root.querySelector('[data-role="block-type-select"]');
         const themeGrid = root.querySelector('[data-role="theme-grid"]');
         const skipCountdownCheckbox = root.querySelector('[data-role="skip-countdown-checkbox"]');
         const mouseControlCheckbox = root.querySelector('[data-role="mouse-control-checkbox"]');
@@ -873,6 +874,12 @@ export class ScreenFlow {
             });
         }
 
+        const syncHeightSaturationAvailability = () => {
+            if (!heightSaturationCheckbox) return;
+            heightSaturationCheckbox.checked = Boolean(game.settings.heightSaturation) && !game.settings.outlineBlocks;
+            heightSaturationCheckbox.disabled = Boolean(game.settings.outlineBlocks);
+        };
+
         if (glowCheckbox) {
             glowCheckbox.addEventListener("change", () => {
                 game.settings.glow = glowCheckbox.checked;
@@ -903,6 +910,16 @@ export class ScreenFlow {
         if (hardDropFlashCheckbox) {
             hardDropFlashCheckbox.addEventListener("change", () => {
                 game.settings.hardDropFlash = hardDropFlashCheckbox.checked;
+                settingsController.saveSettings();
+                this.syncCategoryResetButtons();
+            });
+        }
+
+        if (blockTypeSelect) {
+            blockTypeSelect.addEventListener("change", () => {
+                game.settings.outlineBlocks = blockTypeSelect.value === "radioactive";
+                syncHeightSaturationAvailability();
+                settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
                 this.syncCategoryResetButtons();
             });
@@ -1110,11 +1127,11 @@ export class ScreenFlow {
     }
 
     categoryResetGroups() {
-        const graphicsKeys = ["screenShake", "glow", "transparency", "fallTrail", "hardDropFlash"];
+        const graphicsKeys = ["screenShake", "outlineBlocks", "heightSaturation", "glow", "transparency", "fallTrail", "hardDropFlash"];
         return {
             "reset-general-button": ["volume", "muted", "hudRight", "theme"],
             "reset-controls-button": ["mouseControl", "mouseSensitivity", "touchSensitivity"],
-            "reset-gameplay-button": ["skipCountdown", "skipModeInfo", "ghost", "gridLines", "heightSaturation"],
+            "reset-gameplay-button": ["skipCountdown", "skipModeInfo", "ghost", "gridLines"],
             "reset-graphics-button": isMobileViewport()
                 ? graphicsKeys.filter((key) => key !== "screenShake")
                 : graphicsKeys,

@@ -67,7 +67,6 @@ export const GAME_MODES = Object.freeze({
 
 export const DEFAULT_MODE = "marathon";
 
-/** Packs a 2D 0/1 grid into a single integer bitmask, bit index = r*width + c. */
 function packState(rows) {
     const height = rows.length;
     const width = rows[0].length;
@@ -146,12 +145,6 @@ const KLOCKOMINOS_SOURCE = {
     },
 };
 
-/**
- * KLOCKOMINOS[type] = { color, colorIndex, width, height, states: [mask×4] }
- * Each `states[i]` is an int; bit (r*width+c) tells if that cell is filled.
- * width/height are constant across a piece's rotations (fixed bounding box),
- * only the mask changes — this is what keeps board.collides/lockPiece simple.
- */
 export const KLOCKOMINOS = Object.freeze(
     Object.fromEntries(
         Object.entries(KLOCKOMINOS_SOURCE).map(([type, def], index) => [
@@ -169,7 +162,6 @@ export const KLOCKOMINOS = Object.freeze(
 
 export const KLOCKOMINO_TYPES = Object.keys(KLOCKOMINOS);
 
-/** colorIndex -> CSS color; index 0 = empty cell (null). Used by Renderer to draw the locked board. */
 export const COLOR_PALETTE = [
     null,
     ...KLOCKOMINO_TYPES.map((type) => KLOCKOMINOS[type].color),

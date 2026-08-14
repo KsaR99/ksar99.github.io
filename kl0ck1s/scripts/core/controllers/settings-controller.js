@@ -30,6 +30,7 @@ export class SettingsController {
             keyboardARR: 16,
             fallTrail: true,
             hardDropFlash: true,
+            outlineBlocks: true,
             categoryVolumes: {
                 sfx: 1,
                 music: 0.1,
@@ -130,14 +131,25 @@ export class SettingsController {
 
     applyPerformanceSettings() {
         const game = this.game;
-        const {glow, transparency, theme, ghost, gridLines, fallTrail, screenShake, heightSaturation} = game.settings;
+        const {
+            glow,
+            transparency,
+            theme,
+            ghost,
+            gridLines,
+            fallTrail,
+            screenShake,
+            heightSaturation,
+            outlineBlocks
+        } = game.settings;
         game.renderer.setGlowEnabled(glow);
         game.renderer.setTransparencyEnabled(transparency);
         game.renderer.setGhostEnabled(ghost);
         game.renderer.setGridEnabled(gridLines);
         game.renderer.setShakeEnabled(screenShake && !isMobileViewport());
-        game.renderer.setHeightSaturationEnabled(heightSaturation);
+        game.renderer.setHeightSaturationEnabled(heightSaturation && !outlineBlocks);
         game.renderer.setParticlesEnabled(!isMobileViewport());
+        game.renderer.setOutlineBlocksEnabled(outlineBlocks);
 
         if (!fallTrail) {
             game.resetFallTrail();

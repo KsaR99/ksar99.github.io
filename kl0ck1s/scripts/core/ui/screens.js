@@ -165,6 +165,7 @@ const DIFF_LABEL_KEYS = {
     transparency: "screens.options.transparency",
     fallTrail: "screens.options.fallTrail",
     hardDropFlash: "screens.options.hardDropFlash",
+    outlineBlocks: "screens.options.blockType",
     keyboardDAS: "screens.options.keyboardDas",
     keyboardARR: "screens.options.keyboardArr",
     categoryVolumes: "screens.options.categoryVolume",
@@ -205,6 +206,9 @@ function formatSettingValue(key, value, i18n) {
     if (key === "touchSensitivity") return (value ?? 1) === 1 ? i18n.t("screens.options.autoValue") : `${Math.round(value * 100)}%`;
     if (key === "volume" || key === "mouseSensitivity") return `${Math.round(value * 100)}%`;
     if (key === "keyboardDAS" || key === "keyboardARR") return `${Math.round(value)} ms`;
+    if (key === "outlineBlocks") {
+        return i18n.t(value ? "screens.options.blockTypeRadioactive" : "screens.options.blockTypeColorful");
+    }
     if (typeof value === "boolean") return i18n.t(value ? "screens.options.valueOn" : "screens.options.valueOff");
     if (key === "categoryVolumes" || key === "soundVolumes") {
         return Object.entries(value ?? {}).map(([k, v]) => `${k}: ${Math.round(v * 100)}%`).join(", ") || "—";
@@ -322,8 +326,13 @@ export const Screens = {
         screen.querySelector('[data-role="grid-checkbox"]').checked = settings.gridLines;
         const screenShakeCheckbox = screen.querySelector('[data-role="screen-shake-checkbox"]');
         if (screenShakeCheckbox) screenShakeCheckbox.checked = Boolean(settings.screenShake);
+        const blockTypeSelect = screen.querySelector('[data-role="block-type-select"]');
+        if (blockTypeSelect) blockTypeSelect.value = settings.outlineBlocks ? "radioactive" : "colorful";
         const heightSaturationCheckbox = screen.querySelector('[data-role="height-saturation-checkbox"]');
-        if (heightSaturationCheckbox) heightSaturationCheckbox.checked = Boolean(settings.heightSaturation);
+        if (heightSaturationCheckbox) {
+            heightSaturationCheckbox.checked = Boolean(settings.heightSaturation) && !settings.outlineBlocks;
+            heightSaturationCheckbox.disabled = Boolean(settings.outlineBlocks);
+        }
         screen.querySelector('[data-role="glow-checkbox"]').checked = settings.glow;
         screen.querySelector('[data-role="transparency-checkbox"]').checked = settings.transparency;
         const fallTrailCheckbox = screen.querySelector('[data-role="fall-trail-checkbox"]');

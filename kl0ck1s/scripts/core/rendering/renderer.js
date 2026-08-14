@@ -63,6 +63,7 @@ export class Renderer {
         this.shakeEnabled = true;
         this.heightSaturationEnabled = true;
         this.particlesEnabled = true;
+        this.outlineBlocksEnabled = false;
         this._boardOffsetX = 0;
         this._boardOffsetY = 0;
         this.boardCanvasRect = null;
@@ -92,6 +93,7 @@ export class Renderer {
             _bgRows: 0,
             _bgCols: 0,
             _bgSat: null,
+            _bgOutline: null,
 
             _clearingStaticCanvas: clearingStaticCanvas,
             _clearingStaticCtx: clearingStaticCanvas.getContext("2d"),
@@ -99,12 +101,14 @@ export class Renderer {
             _clearingStaticSize: 0,
             _clearingStaticFromRow: -1,
             _clearingStaticSat: null,
+            _clearingStaticOutline: null,
 
             _clearingAboveCanvas: clearingAboveCanvas,
             _clearingAboveCtx: clearingAboveCanvas.getContext("2d"),
             _clearingAboveVersion: -1,
             _clearingAboveSize: 0,
             _clearingAboveSat: null,
+            _clearingAboveOutline: null,
             _clearingAboveLineIndicesRef: null,
             _clearingAboveDropRowsRef: null,
             _clearingAboveSegments: [],
@@ -164,6 +168,10 @@ export class Renderer {
             this.spriteCache.warmHardDropTrail(size, enabled);
             this.spriteCache.warmParticleColors(size, enabled);
         }
+    }
+
+    setOutlineBlocksEnabled(enabled) {
+        this.outlineBlocksEnabled = enabled;
     }
 
     warmSpriteCache() {
@@ -402,6 +410,25 @@ export class Renderer {
     }
 
     drawCell(context, x, y, color, size, {glow = false, ghost = false, level = 0, cache = this.spriteCache} = {}) {
+        if (this.outlineBlocksEnabled) {
+            const isGlow = glow && this.glowEnabled;
+            const sprite = isGlow
+                ? cache.getOutlineGlow(color, size, level, y)
+                : cache.getOutline(color, size, level);
+            const offset = (sprite.width - size) / 2;
+
+            context.save();
+            if (!isGlow) {
+                context.beginPath();
+                context.rect(x * size, y * size, size, size);
+                context.clip();
+            }
+            if (ghost) context.globalAlpha *= GHOST_ALPHA;
+            context.drawImage(sprite, x * size - offset, y * size - offset);
+            context.restore();
+            return;
+        }
+
         glow = glow && this.glowEnabled;
 
         if (glow) {
@@ -434,12 +461,12 @@ export class Renderer {
             context.restore();
     }
 
-    drawGrid(board, context = this.ctx, fromRow = 0, toRow = board.rows - 1) {
+    drawGrid(board, context = this.ctx, fromRow = 0, toRow = board.rows - 1, fromCol = 0, toCol = board.cols - 1) {
         const size = this.boardConfig.CELL_SIZE;
         const sprite = this.spriteCache.getGridCell(size);
 
         for (let y = fromRow; y <= toRow; y++) {
-            for (let x = 0; x < board.cols; x++) {
+            for (let x = fromCol; x <= toCol; x++) {
                 context.drawImage(sprite, x * size, y * size, size, size);
             }
         }
@@ -450,7 +477,8 @@ export class Renderer {
             && surface._bgGrid === this.gridEnabled
             && surface._bgRows === board.rows
             && surface._bgCols === board.cols
-            && surface._bgSat === this.heightSaturationEnabled;
+            && surface._bgSat === this.heightSaturationEnabled
+            && surface._bgOutline === this.outlineBlocksEnabled;
     }
 
     _stampBackgroundConfig(surface, board, size) {
@@ -459,6 +487,7 @@ export class Renderer {
         surface._bgRows = board.rows;
         surface._bgCols = board.cols;
         surface._bgSat = this.heightSaturationEnabled;
+        surface._bgOutline = this.outlineBlocksEnabled;
     }
 
     updateBoardBackground(board, size, surface = this) {
@@ -493,14 +522,43 @@ export class Renderer {
 
         this.spriteCache.warmGlow(size, this.heightSaturationEnabled);
 
-        const color = this.colorPalette[piece.colorIndex];
         const bgCtx = surface.backgroundCtx;
+        const pad = this.outlineBlocksEnabled
+            ? this.spriteCache.outlinePad
+            : (this.glowEnabled ? this.spriteCache.glowPad : 0);
+        const padCells = pad ? Math.ceil(pad / size) : 0;
+
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
         forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
             const y = piece.y + r;
             if (y < 0) return;
             const x = piece.x + c;
-            this.drawCell(bgCtx, x, y, color, size, {level: this.saturationLevelForRow(y, board.rows)});
+            minX = Math.min(minX, x);
+            maxX = Math.max(maxX, x);
+            minY = Math.min(minY, y);
+            maxY = Math.max(maxY, y);
         });
+
+        if (minX === Infinity) {
+            surface._bgVersion = board.version;
+            return;
+        }
+
+        const fromX = Math.max(0, minX - padCells);
+        const toX = Math.min(board.cols - 1, maxX + padCells);
+        const fromY = Math.max(0, minY - padCells);
+        const toY = Math.min(board.rows - 1, maxY + padCells);
+
+        bgCtx.clearRect(fromX * size, fromY * size, (toX - fromX + 1) * size, (toY - fromY + 1) * size);
+        if (this.gridEnabled) this.drawGrid(board, bgCtx, fromY, toY, fromX, toX);
+
+        for (let y = fromY; y <= toY; y++) {
+            for (let x = fromX; x <= toX; x++) {
+                const colorIndex = board.colors[y * board.cols + x];
+                if (!colorIndex) continue;
+                this.drawCell(bgCtx, x, y, this.colorPalette[colorIndex], size, {level: this.saturationLevelForRow(y, board.rows)});
+            }
+        }
 
         surface._bgVersion = board.version;
     }
@@ -515,7 +573,11 @@ export class Renderer {
 
         this.spriteCache.warmGlow(size, this.heightSaturationEnabled);
 
-        const affectedMaxRow = Math.max(...clearedRowIndices);
+        const pad = this.outlineBlocksEnabled
+            ? this.spriteCache.outlinePad
+            : (this.glowEnabled ? this.spriteCache.glowPad : 0);
+        const padRows = pad ? Math.ceil(pad / size) : 0;
+        const affectedMaxRow = Math.min(board.rows - 1, Math.max(...clearedRowIndices) + padRows);
         const width = board.cols * size;
         const bgCtx = surface.backgroundCtx;
 
@@ -536,7 +598,8 @@ export class Renderer {
         const dirty = surface._clearingStaticVersion !== board.version
             || surface._clearingStaticSize !== size
             || surface._clearingStaticFromRow !== staticFromRow
-            || surface._clearingStaticSat !== this.heightSaturationEnabled;
+            || surface._clearingStaticSat !== this.heightSaturationEnabled
+            || surface._clearingStaticOutline !== this.outlineBlocksEnabled;
 
         if (!dirty) return;
 
@@ -561,6 +624,7 @@ export class Renderer {
         surface._clearingStaticSize = size;
         surface._clearingStaticFromRow = staticFromRow;
         surface._clearingStaticSat = this.heightSaturationEnabled;
+        surface._clearingStaticOutline = this.outlineBlocksEnabled;
     }
 
     _ensureClearingGridCache(surface, board, size) {
@@ -599,7 +663,8 @@ export class Renderer {
             || surface._clearingAboveSize !== size
             || surface._clearingAboveLineIndicesRef !== lineIndices
             || surface._clearingAboveDropRowsRef !== dropRows
-            || surface._clearingAboveSat !== this.heightSaturationEnabled;
+            || surface._clearingAboveSat !== this.heightSaturationEnabled
+            || surface._clearingAboveOutline !== this.outlineBlocksEnabled;
 
         if (!dirty) return;
 
@@ -638,14 +703,24 @@ export class Renderer {
                 runStart = y;
                 runDrop = drop;
             }
-
-            for (let x = 0; x < board.cols; x++) {
-                const colorIndex = board.colors[y * board.cols + x];
-                if (!colorIndex) continue;
-                this.drawCell(ctx, x, y, this.colorPalette[colorIndex], size, {level: this.saturationLevelForRow(y, board.rows)});
-            }
         }
+
         flushRun(affectedMaxRow + 1);
+
+        for (const segment of segments) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(0, segment.top * size, width, segment.height * size);
+            ctx.clip();
+            for (let y = segment.top; y < segment.top + segment.height; y++) {
+                for (let x = 0; x < board.cols; x++) {
+                    const colorIndex = board.colors[y * board.cols + x];
+                    if (!colorIndex) continue;
+                    this.drawCell(ctx, x, y, this.colorPalette[colorIndex], size, {level: this.saturationLevelForRow(y, board.rows)});
+                }
+            }
+            ctx.restore();
+        }
 
         surface._clearingAboveSegments = segments;
         surface._clearingAboveVersion = board.version;
@@ -653,6 +728,7 @@ export class Renderer {
         surface._clearingAboveLineIndicesRef = lineIndices;
         surface._clearingAboveDropRowsRef = dropRows;
         surface._clearingAboveSat = this.heightSaturationEnabled;
+        surface._clearingAboveOutline = this.outlineBlocksEnabled;
     }
 
     drawClearingFrame(board, lineIndices, dropRows, fragments, progress, surface = this) {
@@ -754,13 +830,14 @@ export class Renderer {
             if (!snap.mask) continue;
 
             ctx.globalAlpha = alpha;
-            const sprite = this.spriteCache.getFallTrail(snap.color, size);
+            const sprite = this.spriteCache.getFallTrail(snap.color, size, this.outlineBlocksEnabled);
+            const offset = sprite ? (sprite.width - size) / 2 : 0;
             forEachShapeCell(snap.mask, snap.width, snap.height, (r, c) => {
                 const x = snap.x + c;
                 const y = snap.y + r;
                 if (y < 0) return;
                 if (sprite) {
-                    ctx.drawImage(sprite, x * size, y * size, size, size);
+                    ctx.drawImage(sprite, x * size - offset, y * size - offset);
                 } else {
                     ctx.fillStyle = fallTrailColor(snap.color);
                     ctx.fillRect(x * size, y * size, size, size);
@@ -793,9 +870,10 @@ export class Renderer {
                 const y = entry.y + r;
                 if (y < 0) return;
                 const level = this.saturationLevelForRow(Math.round(y), rows);
-                const sprite = this.spriteCache.getHardDropTrail(entry.color, size, level);
+                const sprite = this.spriteCache.getHardDropTrail(entry.color, size, level, this.outlineBlocksEnabled);
                 if (sprite) {
-                    ctx.drawImage(sprite, x * size, y * size, size, size);
+                    const offset = (sprite.width - size) / 2;
+                    ctx.drawImage(sprite, x * size - offset, y * size - offset);
                 } else {
                     ctx.fillStyle = hardDropTrailColor(entry.color, level);
                     ctx.fillRect(x * size, y * size, size, size);
@@ -855,6 +933,19 @@ export class Renderer {
 
         const size = this.boardConfig.CELL_SIZE;
         const {ctx} = surface;
+
+        if (this.outlineBlocksEnabled) {
+            forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
+                const y = piece.y + r + offset;
+                if (y < 0) return;
+                const level = this.saturationLevelForRow(y, board.rows);
+                const sprite = this.spriteCache.getOutlineGhost(piece.color, size, level);
+                const spriteOffset = (sprite.width - size) / 2;
+                ctx.drawImage(sprite, (piece.x + c) * size - spriteOffset, y * size - spriteOffset);
+            });
+            return;
+        }
+
         const strokeColor = withAlpha(piece.color, 0.6);
         const lightColor = lightenOklch(piece.color);
 

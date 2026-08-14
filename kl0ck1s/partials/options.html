@@ -114,11 +114,6 @@
                     <span data-i18n="screens.options.gridLines">Grid lines</span>
                     <input class="options__input options__input--checkbox" data-role="grid-checkbox" type="checkbox">
                 </label>
-                <label class="options__row">
-                    <span data-i18n="screens.options.heightSaturation">Height saturation</span>
-                    <input class="options__input options__input--checkbox" data-role="height-saturation-checkbox"
-                           type="checkbox">
-                </label>
                 <div class="options__row options__row--end">
                     <button class="options__preview-button options__preview-button--wide"
                             data-i18n="screens.options.resetDefaults"
@@ -135,6 +130,19 @@
                     <span data-i18n="screens.options.screenShake">Screen shake</span>
                     <input class="options__input options__input--checkbox options__input--desktop-only"
                            data-role="screen-shake-checkbox"
+                           type="checkbox">
+                </label>
+                <label class="options__row">
+                    <span data-i18n="screens.options.blockType">Block type</span>
+                    <select class="options__input options__input--select" data-role="block-type-select">
+                        <option data-i18n="screens.options.blockTypeRadioactive" value="radioactive">Radioactive
+                        </option>
+                        <option data-i18n="screens.options.blockTypeColorful" value="colorful">Colorful</option>
+                    </select>
+                </label>
+                <label class="options__row" data-role="height-saturation-row">
+                    <span data-i18n="screens.options.heightSaturation">Height saturation</span>
+                    <input class="options__input options__input--checkbox" data-role="height-saturation-checkbox"
                            type="checkbox">
                 </label>
 

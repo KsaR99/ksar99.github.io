@@ -70,9 +70,133 @@ export function createBlockSprite(color, size, canvasFactory = () => document.cr
     return sprite;
 }
 
+const OUTLINE_GLOW_BLUR_RATIO = 0.6;
+const OUTLINE_BLOCK_BORDER_WIDTH_RATIO = 0.05;
+const OUTLINE_GHOST_BORDER_WIDTH_RATIO = 0.05;
+const OUTLINE_TOP_GLOW_BLUR_RATIO = 1.1;
+
+function paintOutlineBlock(spriteCtx, ox, oy, size, color, borderWidth, blur) {
+    spriteCtx.fillStyle = "oklch(0 0 0)";
+    spriteCtx.fillRect(ox, oy, size, size);
+
+    paintOutlineBorder(spriteCtx, ox, oy, size, color, borderWidth, blur);
+}
+
+function paintOutlineBorder(spriteCtx, ox, oy, size, color, borderWidth, blur) {
+    const inset = borderWidth / 2;
+    spriteCtx.shadowColor = color;
+    spriteCtx.shadowBlur = blur;
+    spriteCtx.strokeStyle = color;
+    spriteCtx.lineWidth = borderWidth;
+    spriteCtx.strokeRect(ox + inset, oy + inset, size - borderWidth, size - borderWidth);
+    spriteCtx.shadowBlur = 0;
+    spriteCtx.strokeRect(ox + inset, oy + inset, size - borderWidth, size - borderWidth);
+}
+
+export function createOutlineBlockSprite(color, size, canvasFactory = () => document.createElement("canvas")) {
+    const blur = size * OUTLINE_GLOW_BLUR_RATIO;
+    const pad = Math.max(1, Math.ceil(blur));
+    const borderWidth = Math.max(1, Math.round(size * OUTLINE_BLOCK_BORDER_WIDTH_RATIO));
+
+    const sprite = canvasFactory();
+    sprite.width = size + pad * 2;
+    sprite.height = size + pad * 2;
+
+    const spriteCtx = sprite.getContext("2d");
+    spriteCtx.imageSmoothingEnabled = false;
+
+    paintOutlineBlock(spriteCtx, pad, pad, size, color, borderWidth, blur);
+
+    return sprite;
+}
+
+function paintOutlineTopGlowBlock(spriteCtx, ox, oy, size, color, borderWidth, blur) {
+    spriteCtx.fillStyle = "oklch(0 0 0)";
+    spriteCtx.fillRect(ox, oy, size, size);
+
+    const inset = borderWidth / 2;
+    const haloColor = `oklch(from ${color} calc(l + 0.15) c h)`;
+
+    spriteCtx.shadowColor = haloColor;
+    spriteCtx.shadowBlur = blur;
+    spriteCtx.strokeStyle = haloColor;
+    spriteCtx.lineWidth = borderWidth;
+    spriteCtx.strokeRect(ox + inset, oy + inset, size - borderWidth, size - borderWidth);
+
+    paintOutlineBorder(spriteCtx, ox, oy, size, color, borderWidth, blur * 0.5);
+}
+
+export function createOutlineGlowSprite(color, size, canvasFactory = () => document.createElement("canvas")) {
+    const blur = size * OUTLINE_TOP_GLOW_BLUR_RATIO;
+    const pad = Math.max(1, Math.ceil(blur));
+    const borderWidth = Math.max(1, Math.round(size * OUTLINE_BLOCK_BORDER_WIDTH_RATIO));
+
+    const sprite = canvasFactory();
+    sprite.width = size + pad * 2;
+    sprite.height = size + pad * 2;
+
+    const spriteCtx = sprite.getContext("2d");
+    spriteCtx.imageSmoothingEnabled = false;
+
+    paintOutlineTopGlowBlock(spriteCtx, pad, pad, size, color, borderWidth, blur);
+
+    return sprite;
+}
+
+export function createOutlineGhostSprite(color, size, canvasFactory = () => document.createElement("canvas")) {
+    const blur = size * OUTLINE_GLOW_BLUR_RATIO;
+    const pad = Math.max(1, Math.ceil(blur));
+    const borderWidth = Math.max(1.5, Math.round(size * OUTLINE_GHOST_BORDER_WIDTH_RATIO));
+
+    const sprite = canvasFactory();
+    sprite.width = size + pad * 2;
+    sprite.height = size + pad * 2;
+
+    const spriteCtx = sprite.getContext("2d");
+    spriteCtx.imageSmoothingEnabled = false;
+
+    paintOutlineBorder(spriteCtx, pad, pad, size, color, borderWidth, blur);
+
+    return sprite;
+}
+
+export function createOutlineFallTrailSprite(color, size, canvasFactory = () => document.createElement("canvas")) {
+    const blur = size * OUTLINE_GLOW_BLUR_RATIO;
+    const pad = Math.max(1, Math.ceil(blur));
+    const borderWidth = Math.max(1, Math.round(size * OUTLINE_BLOCK_BORDER_WIDTH_RATIO));
+
+    const sprite = canvasFactory();
+    sprite.width = size + pad * 2;
+    sprite.height = size + pad * 2;
+
+    const spriteCtx = sprite.getContext("2d");
+    spriteCtx.imageSmoothingEnabled = false;
+
+    paintOutlineBorder(spriteCtx, pad, pad, size, fallTrailColor(color), borderWidth, blur);
+
+    return sprite;
+}
+
 export function hardDropTrailColor(color, level = 0) {
     const resolvedColor = level ? colorForLevel(color, level) : color;
     return `oklch(from ${resolvedColor} calc(l + 0.3) c h / 0.7)`;
+}
+
+export function createOutlineHardDropTrailSprite(color, size, level = 0, canvasFactory = () => document.createElement("canvas")) {
+    const blur = size * OUTLINE_GLOW_BLUR_RATIO;
+    const pad = Math.max(1, Math.ceil(blur));
+    const borderWidth = Math.max(1, Math.round(size * OUTLINE_BLOCK_BORDER_WIDTH_RATIO));
+
+    const sprite = canvasFactory();
+    sprite.width = size + pad * 2;
+    sprite.height = size + pad * 2;
+
+    const spriteCtx = sprite.getContext("2d");
+    spriteCtx.imageSmoothingEnabled = false;
+
+    paintOutlineBorder(spriteCtx, pad, pad, size, hardDropTrailColor(color, level), borderWidth, blur);
+
+    return sprite;
 }
 
 export function fallTrailColor(color) {
@@ -177,8 +301,13 @@ export class SpriteCache {
         this.atlasRows = new Map();
         this.glowSprites = new Map();
         this.blockSprites = new Map();
+        this.outlineSprites = new Map();
+        this.outlineGlowSprites = new Map();
+        this.outlineGhostSprites = new Map();
         this.hardDropTrailSprites = new Map();
+        this.outlineHardDropTrailSprites = new Map();
         this.fallTrailSprites = new Map();
+        this.outlineFallTrailSprites = new Map();
         this.particleColors = new Map();
         this.gridCellSprite = null;
         this._warmedGlowLevels = 0;
@@ -192,10 +321,16 @@ export class SpriteCache {
         this.size = size;
         this.atlasCellSize = Math.max(1, Math.round(size));
         this.glowPad = Math.max(1, Math.ceil(size * GLOW_BLUR_RATIO * 2));
+        this.outlinePad = Math.max(1, Math.ceil(size * OUTLINE_GLOW_BLUR_RATIO));
         this.glowSprites.clear();
         this.blockSprites.clear();
+        this.outlineSprites.clear();
+        this.outlineGlowSprites.clear();
+        this.outlineGhostSprites.clear();
         this.hardDropTrailSprites.clear();
+        this.outlineHardDropTrailSprites.clear();
         this.fallTrailSprites.clear();
+        this.outlineFallTrailSprites.clear();
         this._warmedGlowLevels = 0;
         this._warmedHardDropTrailLevels = 0;
         this._warmedFallTrail = false;
@@ -268,10 +403,16 @@ export class SpriteCache {
         for (const color of this.atlasRows.keys()) {
             for (let level = this._warmedHardDropTrailLevels; level < levels; level++) {
                 const key = level ? `${color}|${level}` : color;
-                if (this.hardDropTrailSprites.has(key)) continue;
-                this.hardDropTrailSprites.set(
-                    key, createBlockSprite(hardDropTrailColor(color, level), this.size, this.canvasFactory)
-                );
+                if (!this.hardDropTrailSprites.has(key)) {
+                    this.hardDropTrailSprites.set(
+                        key, createBlockSprite(hardDropTrailColor(color, level), this.size, this.canvasFactory)
+                    );
+                }
+                if (!this.outlineHardDropTrailSprites.has(key)) {
+                    this.outlineHardDropTrailSprites.set(
+                        key, createOutlineHardDropTrailSprite(color, this.size, level, this.canvasFactory)
+                    );
+                }
             }
         }
         this._warmedHardDropTrailLevels = levels;
@@ -282,8 +423,12 @@ export class SpriteCache {
         if (this._warmedFallTrail) return;
 
         for (const color of this.atlasRows.keys()) {
-            if (this.fallTrailSprites.has(color)) continue;
-            this.fallTrailSprites.set(color, createBlockSprite(fallTrailColor(color), this.size, this.canvasFactory));
+            if (!this.fallTrailSprites.has(color)) {
+                this.fallTrailSprites.set(color, createBlockSprite(fallTrailColor(color), this.size, this.canvasFactory));
+            }
+            if (!this.outlineFallTrailSprites.has(color)) {
+                this.outlineFallTrailSprites.set(color, createOutlineFallTrailSprite(color, this.size, this.canvasFactory));
+            }
         }
         this._warmedFallTrail = true;
     }
@@ -343,9 +488,58 @@ export class SpriteCache {
         return this.glowSprites.get(key);
     }
 
-    getHardDropTrail(color, currentSize, level = 0) {
+    getOutline(color, currentSize, level = 0) {
+        if (this.size !== currentSize) this.rebuild(currentSize);
+        const resolvedLevel = Math.min(SATURATION_LEVELS - 1, Math.max(0, Math.floor(level)));
+        const key = resolvedLevel ? `${color}|${resolvedLevel}` : color;
+        let sprite = this.outlineSprites.get(key);
+        if (!sprite) {
+            const resolvedColor = resolvedLevel ? colorForLevel(color, resolvedLevel) : color;
+            sprite = createOutlineBlockSprite(resolvedColor, this.size, this.canvasFactory);
+            this.outlineSprites.set(key, sprite);
+        }
+        return sprite;
+    }
+
+    getOutlineGlow(color, currentSize, level = 0, row = 0) {
+        if (this.size !== currentSize) this.rebuild(currentSize);
+        if (!isGlowRow(row)) return this.getOutline(color, currentSize, level);
+
+        const resolvedLevel = Math.min(SATURATION_LEVELS - 1, Math.max(0, Math.round(level)));
+        const key = resolvedLevel ? `${color}|${resolvedLevel}` : color;
+        if (!this.outlineGlowSprites.has(key)) {
+            const resolvedColor = resolvedLevel ? colorForLevel(color, resolvedLevel) : color;
+            this.outlineGlowSprites.set(key, createOutlineGlowSprite(resolvedColor, this.size, this.canvasFactory));
+        }
+        return this.outlineGlowSprites.get(key);
+    }
+
+    getOutlineGhost(color, currentSize, level = 0) {
+        if (this.size !== currentSize) this.rebuild(currentSize);
+        const resolvedLevel = Math.min(SATURATION_LEVELS - 1, Math.max(0, Math.floor(level)));
+        const key = resolvedLevel ? `${color}|${resolvedLevel}` : color;
+        let sprite = this.outlineGhostSprites.get(key);
+        if (!sprite) {
+            const resolvedColor = resolvedLevel ? colorForLevel(color, resolvedLevel) : color;
+            sprite = createOutlineGhostSprite(resolvedColor, this.size, this.canvasFactory);
+            this.outlineGhostSprites.set(key, sprite);
+        }
+        return sprite;
+    }
+
+    getHardDropTrail(color, currentSize, level = 0, outline = false) {
         if (this.size !== currentSize) this.rebuild(currentSize);
         const key = level ? `${color}|${level}` : color;
+
+        if (outline) {
+            if (!this.outlineHardDropTrailSprites.has(key)) {
+                this.outlineHardDropTrailSprites.set(
+                    key, createOutlineHardDropTrailSprite(color, this.size, level, this.canvasFactory)
+                );
+            }
+            return this.outlineHardDropTrailSprites.get(key);
+        }
+
         if (!this.hardDropTrailSprites.has(key)) {
             this.hardDropTrailSprites.set(
                 key, createBlockSprite(hardDropTrailColor(color, level), this.size, this.canvasFactory)
@@ -354,8 +548,16 @@ export class SpriteCache {
         return this.hardDropTrailSprites.get(key);
     }
 
-    getFallTrail(color, currentSize) {
+    getFallTrail(color, currentSize, outline = false) {
         if (this.size !== currentSize) this.rebuild(currentSize);
+
+        if (outline) {
+            if (!this.outlineFallTrailSprites.has(color)) {
+                this.outlineFallTrailSprites.set(color, createOutlineFallTrailSprite(color, this.size, this.canvasFactory));
+            }
+            return this.outlineFallTrailSprites.get(color);
+        }
+
         if (!this.fallTrailSprites.has(color)) {
             this.fallTrailSprites.set(color, createBlockSprite(fallTrailColor(color), this.size, this.canvasFactory));
         }
