@@ -164,6 +164,7 @@ const DIFF_LABEL_KEYS = {
     glow: "screens.options.glow",
     transparency: "screens.options.transparency",
     fallTrail: "screens.options.fallTrail",
+    hardDropFlash: "screens.options.hardDropFlash",
     keyboardDAS: "screens.options.keyboardDas",
     keyboardARR: "screens.options.keyboardArr",
     categoryVolumes: "screens.options.categoryVolume",
@@ -327,6 +328,8 @@ export const Screens = {
         screen.querySelector('[data-role="transparency-checkbox"]').checked = settings.transparency;
         const fallTrailCheckbox = screen.querySelector('[data-role="fall-trail-checkbox"]');
         if (fallTrailCheckbox) fallTrailCheckbox.checked = Boolean(settings.fallTrail);
+        const hardDropFlashCheckbox = screen.querySelector('[data-role="hard-drop-flash-checkbox"]');
+        if (hardDropFlashCheckbox) hardDropFlashCheckbox.checked = Boolean(settings.hardDropFlash);
         const skipCountdownCheckbox = screen.querySelector('[data-role="skip-countdown-checkbox"]');
         if (skipCountdownCheckbox) skipCountdownCheckbox.checked = Boolean(settings.skipCountdown);
         const skipModeInfoCheckbox = screen.querySelector('[data-role="skip-mode-info-checkbox"]');

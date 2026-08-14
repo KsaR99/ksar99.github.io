@@ -101,6 +101,7 @@
             "glow": "Glow (blur)",
             "transparency": "Transparency",
             "fallTrail": "Fall trail",
+            "hardDropFlash": "Hard drop flash",
             "theme": "Theme",
             "themeNone": "None",
             "themeVHS": "VHS noise",

@@ -7,6 +7,7 @@ import {
     FALL_TRAIL_FRAME_MS,
     FALL_TRAIL_MAX_LENGTH,
     fallTrailLengthForInterval,
+    HARD_DROP_IMPACT_FLASH_DURATION_MS,
     HARD_DROP_TRAIL_ALPHAS,
     HARD_DROP_TRAIL_DURATION_MS,
     HUD_UPDATE_INTERVAL_MS
@@ -133,6 +134,7 @@ export class Game {
         this.fallTrailCount = 0;
         this._trailPieceRef = null;
         this.hardDropTrail = null;
+        this.hardDropImpactFlash = null;
 
         this.lastRowStepTime = 0;
         this.effectiveDropIntervalMs = Infinity;
@@ -263,7 +265,7 @@ export class Game {
         const step = count > 1 ? cellsDropped / (count - 1) : 0;
 
         const entries = [];
-        for (let i = 0; i < count; i++) {
+        for (let i = 1; i < count; i++) {
             const y = piece.y - i * step;
             entries.push({
                 x: piece.x,
@@ -275,7 +277,28 @@ export class Game {
             });
         }
 
-        this.hardDropTrail = {entries, elapsed: 0, duration: HARD_DROP_TRAIL_DURATION_MS};
+        this.hardDropTrail = entries.length > 0
+            ? {entries, elapsed: 0, duration: HARD_DROP_TRAIL_DURATION_MS}
+            : null;
+    }
+
+    beginHardDropImpactFlash(piece) {
+        if (!this.settings.hardDropFlash || !piece?.mask) {
+            this.hardDropImpactFlash = null;
+            return;
+        }
+
+        this.hardDropImpactFlash = {
+            entry: {
+                x: piece.x,
+                y: piece.y,
+                mask: piece.mask,
+                width: piece.width,
+                height: piece.height,
+            },
+            elapsed: 0,
+            duration: HARD_DROP_IMPACT_FLASH_DURATION_MS,
+        };
     }
 
     noteRowStep() {
@@ -327,6 +350,13 @@ export class Game {
             this.hardDropTrail.elapsed += delta;
             if (this.hardDropTrail.elapsed >= this.hardDropTrail.duration) {
                 this.hardDropTrail = null;
+            }
+        }
+
+        if (this.hardDropImpactFlash) {
+            this.hardDropImpactFlash.elapsed += delta;
+            if (this.hardDropImpactFlash.elapsed >= this.hardDropImpactFlash.duration) {
+                this.hardDropImpactFlash = null;
             }
         }
 
@@ -526,6 +556,11 @@ export class Game {
         if (this.hardDropTrail) {
             const progress = Math.min(1, this.hardDropTrail.elapsed / this.hardDropTrail.duration);
             this.renderer.drawHardDropTrail(this.hardDropTrail.entries, progress);
+        }
+
+        if (this.hardDropImpactFlash) {
+            const progress = Math.min(1, this.hardDropImpactFlash.elapsed / this.hardDropImpactFlash.duration);
+            this.renderer.drawHardDropImpactFlash(this.hardDropImpactFlash.entry, progress);
         }
 
         if (this.state === "running" || this.state === "paused" || this.state === "calibrating"

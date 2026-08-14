@@ -3,7 +3,13 @@
 import {forEachShapeCell, getTightBounds, lightenOklch, withAlpha} from "../shared/utils.js";
 import {FALL_TRAIL_ALPHA_CACHE, HARD_DROP_TRAIL_ALPHAS} from "../game/game-constants.js";
 import {LINE_CLEAR_FLASH_PHASE_FRACTION} from "../shared/config.js";
-import {fallTrailColor, GHOST_ALPHA, hardDropTrailColor, SATURATION_LEVELS} from "./sprite-cache.js";
+import {
+    fallTrailColor,
+    GHOST_ALPHA,
+    HARD_DROP_FLASH_SPRITE_HEIGHT,
+    hardDropTrailColor,
+    SATURATION_LEVELS
+} from "./sprite-cache.js";
 
 const GHOST_MIN_DROP_ROWS = 3;
 
@@ -796,6 +802,48 @@ export class Renderer {
                 }
             });
         }
+        ctx.restore();
+    }
+
+    /**
+     * Draws the hard-drop impact flash: a bright band that sweeps up through the piece that
+     * just slammed down, from its bottom edge to its top edge, fading out as it travels.
+     * Clipped to the piece's own cells so it only lights up the piece itself, not the board.
+     *
+     * @param {{x:number, y:number, mask, width:number, height:number}} entry - snapshot of the
+     *   piece at the moment it locked.
+     * @param {number} progress - 0 (band at the piece's bottom, fully bright) to 1 (band past
+     *   the piece's top, fully faded).
+     */
+    drawHardDropImpactFlash(entry, progress, surface = this) {
+        if (!entry || !entry.mask || progress >= 1) return;
+
+        const size = this.boardConfig.CELL_SIZE;
+        const {ctx} = surface;
+
+        const pieceTop = entry.y * size;
+        const pieceHeight = entry.height * size;
+        const bandHeight = Math.max(size * 1.8, pieceHeight * 1.4);
+        const travel = pieceHeight + bandHeight;
+        const centerY = pieceTop + pieceHeight - progress * travel + bandHeight / 2;
+        const alpha = 1 - progress;
+
+        ctx.save();
+
+        ctx.beginPath();
+        forEachShapeCell(entry.mask, entry.width, entry.height, (r, c) => {
+            ctx.rect((entry.x + c) * size, (entry.y + r) * size, size, size);
+        });
+        ctx.clip();
+
+        ctx.globalCompositeOperation = "lighter";
+        ctx.globalAlpha = alpha;
+
+        const sprite = this.spriteCache.getHardDropFlash();
+        ctx.drawImage(
+            sprite, 0, 0, 1, HARD_DROP_FLASH_SPRITE_HEIGHT,
+            entry.x * size, centerY - bandHeight / 2, entry.width * size, bandHeight,
+        );
         ctx.restore();
     }
 

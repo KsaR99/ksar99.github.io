@@ -29,6 +29,7 @@ export class SettingsController {
             keyboardDAS: 125,
             keyboardARR: 16,
             fallTrail: true,
+            hardDropFlash: true,
             categoryVolumes: {
                 sfx: 1,
                 music: 0.1,

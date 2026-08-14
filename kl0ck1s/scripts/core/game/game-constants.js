@@ -86,6 +86,8 @@ export const FALL_TRAIL_MAX_ALPHA = 0.20;
 export const HARD_DROP_TRAIL_DURATION_MS = 150;
 export const HARD_DROP_TRAIL_ALPHAS = [0.9, 0.75, 0.6, 0.5, 0.25];
 
+export const HARD_DROP_IMPACT_FLASH_DURATION_MS = 220;
+
 export function fallTrailLengthForInterval(dropIntervalMs) {
     if (!(dropIntervalMs < FALL_TRAIL_SLOW_INTERVAL_MS)) return 0;
 

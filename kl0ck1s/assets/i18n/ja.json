@@ -101,6 +101,7 @@
             "glow": "発光（ぼかし）",
             "transparency": "透明度",
             "fallTrail": "落下の軌跡",
+            "hardDropFlash": "ハードドロップの閃光",
             "theme": "テーマ",
             "themeNone": "なし",
             "themeVHS": "VHSノイズ",

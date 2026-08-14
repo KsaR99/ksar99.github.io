@@ -101,6 +101,7 @@
             "glow": "Brillo (desenfoque)",
             "transparency": "Transparencia",
             "fallTrail": "Estela de caída",
+            "hardDropFlash": "Destello de caída rápida",
             "theme": "Tema",
             "themeNone": "Ninguno",
             "themeVHS": "Ruido VHS",

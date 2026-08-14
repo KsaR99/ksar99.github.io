@@ -6,7 +6,7 @@ const GLOW_TOP_ROWS = 5;
 export const GHOST_ALPHA = 0.3;
 
 export const SATURATION_STEP = 0.05;
-export const SATURATION_LEVELS = Math.round(1 / SATURATION_STEP) + 1; // 21
+export const SATURATION_LEVELS = Math.round(1 / SATURATION_STEP) + 1;
 
 const MAX_DYNAMIC_ATLAS_ROWS = 32;
 
@@ -77,6 +77,27 @@ export function hardDropTrailColor(color, level = 0) {
 
 export function fallTrailColor(color) {
     return `oklch(from ${color} calc(l + 0.75) c h / 0.35)`;
+}
+
+const HARD_DROP_FLASH_SPRITE_HEIGHT = 128;
+export {HARD_DROP_FLASH_SPRITE_HEIGHT};
+
+function createHardDropFlashSprite(canvasFactory) {
+    const sprite = canvasFactory();
+    sprite.width = 1;
+    sprite.height = HARD_DROP_FLASH_SPRITE_HEIGHT;
+
+    const spriteCtx = sprite.getContext("2d");
+    const gradient = spriteCtx.createLinearGradient(0, 0, 0, HARD_DROP_FLASH_SPRITE_HEIGHT);
+    gradient.addColorStop(0, "oklch(1 0 0 / 0)");
+    gradient.addColorStop(0.35, "oklch(1 0 0 / 1)");
+    gradient.addColorStop(0.65, "oklch(1 0 0 / 1)");
+    gradient.addColorStop(1, "oklch(1 0 0 / 0)");
+
+    spriteCtx.fillStyle = gradient;
+    spriteCtx.fillRect(0, 0, 1, HARD_DROP_FLASH_SPRITE_HEIGHT);
+
+    return sprite;
 }
 
 export function particleColor(color, level = 0) {
@@ -164,6 +185,7 @@ export class SpriteCache {
         this._warmedHardDropTrailLevels = 0;
         this._warmedFallTrail = false;
         this._warmedParticleColorLevels = 0;
+        this.hardDropFlashSprite = null;
     }
 
     rebuild(size) {
@@ -338,5 +360,12 @@ export class SpriteCache {
             this.fallTrailSprites.set(color, createBlockSprite(fallTrailColor(color), this.size, this.canvasFactory));
         }
         return this.fallTrailSprites.get(color);
+    }
+
+    getHardDropFlash() {
+        if (!this.hardDropFlashSprite) {
+            this.hardDropFlashSprite = createHardDropFlashSprite(this.canvasFactory);
+        }
+        return this.hardDropFlashSprite;
     }
 }

@@ -101,6 +101,7 @@
             "glow": "Lueur (flou)",
             "transparency": "Transparence",
             "fallTrail": "Traînée de chute",
+            "hardDropFlash": "Flash de chute rapide",
             "theme": "Thème",
             "themeNone": "Aucun",
             "themeVHS": "Bruit VHS",

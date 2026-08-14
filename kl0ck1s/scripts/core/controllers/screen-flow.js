@@ -796,6 +796,7 @@ export class ScreenFlow {
         const glowCheckbox = root.querySelector('[data-role="glow-checkbox"]');
         const transparencyCheckbox = root.querySelector('[data-role="transparency-checkbox"]');
         const fallTrailCheckbox = root.querySelector('[data-role="fall-trail-checkbox"]');
+        const hardDropFlashCheckbox = root.querySelector('[data-role="hard-drop-flash-checkbox"]');
         const themeGrid = root.querySelector('[data-role="theme-grid"]');
         const skipCountdownCheckbox = root.querySelector('[data-role="skip-countdown-checkbox"]');
         const mouseControlCheckbox = root.querySelector('[data-role="mouse-control-checkbox"]');
@@ -894,6 +895,14 @@ export class ScreenFlow {
             fallTrailCheckbox.addEventListener("change", () => {
                 game.settings.fallTrail = fallTrailCheckbox.checked;
                 settingsController.applyPerformanceSettings();
+                settingsController.saveSettings();
+                this.syncCategoryResetButtons();
+            });
+        }
+
+        if (hardDropFlashCheckbox) {
+            hardDropFlashCheckbox.addEventListener("change", () => {
+                game.settings.hardDropFlash = hardDropFlashCheckbox.checked;
                 settingsController.saveSettings();
                 this.syncCategoryResetButtons();
             });
@@ -1101,7 +1110,7 @@ export class ScreenFlow {
     }
 
     categoryResetGroups() {
-        const graphicsKeys = ["screenShake", "glow", "transparency", "fallTrail"];
+        const graphicsKeys = ["screenShake", "glow", "transparency", "fallTrail", "hardDropFlash"];
         return {
             "reset-general-button": ["volume", "muted", "hudRight", "theme"],
             "reset-controls-button": ["mouseControl", "mouseSensitivity", "touchSensitivity"],

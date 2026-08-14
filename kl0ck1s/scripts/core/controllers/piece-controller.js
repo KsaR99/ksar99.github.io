@@ -3,7 +3,7 @@
 import {Piece} from "../game/piece.js";
 import {pointsForHardDrop, pointsForSoftDrop} from "../game/scoring.js";
 import {getKickTable, PIECE_CONTROLLABLE_STATES, T_FRONT_CORNERS} from "../game/game-constants.js";
-import {getTightBounds} from "../shared/utils.js";
+import {forEachShapeCell, getTightBounds} from "../shared/utils.js";
 import {LINE_CLEAR_SOUND_PLAYBACK_RATE} from "../shared/config.js";
 
 const GROUNDED_GRACE_MS = 100;
@@ -289,6 +289,7 @@ export class PieceController {
         game.sensitivityCalibrationController?.notify("hardDrop", {});
         game.renderer.shakeHardDrop();
         game.beginHardDropTrail(game.current, cellsDropped);
+        game.beginHardDropImpactFlash(game.current);
         game.multiplayerController?.notifyHardDropTrail();
         this.lockCurrentPiece();
         game.dropCounter = 0;
@@ -302,6 +303,22 @@ export class PieceController {
 
         return [[0, 0], [1, 0], [-1, 0], [0, -1], [0, 1]]
             .map(([nx, ny]) => [baseDx + nx, baseDy + ny]);
+    }
+
+    pieceFullyVisible(piece, offsetX, offsetY, mask) {
+        let fully = true;
+        forEachShapeCell(mask, piece.width, piece.height, (r) => {
+            if (piece.y + r + offsetY < 0) fully = false;
+        });
+        return fully;
+    }
+
+    pieceHasVisibleCell(piece, offsetX, offsetY, mask) {
+        let visible = false;
+        forEachShapeCell(mask, piece.width, piece.height, (r) => {
+            if (piece.y + r + offsetY >= 0) visible = true;
+        });
+        return visible;
     }
 
     /**
@@ -318,20 +335,24 @@ export class PieceController {
             ? this.get180Kicks(game.current, rotatedMask)
             : getKickTable(game.current.type)[`${fromState}>${toState}`] ?? [[0, 0]];
 
-        for (const [dx, dy] of kicks) {
-            if (!game.board.collides(game.current, dx, dy, rotatedMask)) {
-                game.current.mask = rotatedMask;
-                game.current.x += dx;
-                game.current.y += dy;
-                game.current.rotationState = toState;
-                game.lastAction = "rotate";
-                game.soundManager.play("rotate");
-                if (game.board.collides(game.current, 0, 1)) this.resetLockDelay();
+        const legalKicks = kicks.filter(([dx, dy]) => !game.board.collides(game.current, dx, dy, rotatedMask));
 
-                game.rotationAnim = null;
-                game.sensitivityCalibrationController?.notify("rotate", {});
-                return;
-            }
+        const chosen = legalKicks.find(([dx, dy]) => this.pieceFullyVisible(game.current, dx, dy, rotatedMask))
+            ?? legalKicks.find(([dx, dy]) => this.pieceHasVisibleCell(game.current, dx, dy, rotatedMask));
+
+        if (chosen) {
+            const [dx, dy] = chosen;
+            game.current.mask = rotatedMask;
+            game.current.x += dx;
+            game.current.y += dy;
+            game.current.rotationState = toState;
+            game.lastAction = "rotate";
+            game.soundManager.play("rotate");
+            if (game.board.collides(game.current, 0, 1)) this.resetLockDelay();
+
+            game.rotationAnim = null;
+            game.sensitivityCalibrationController?.notify("rotate", {});
+            return;
         }
     }
 
