@@ -1,5 +1,5 @@
 <template id="tpl-screen-idle">
-    <div class="screen">
+    <section class="screen">
         <h2 class="screen__title">Kl0ck1's</h2>
         <p class="screen__hint" data-i18n="screens.idle.modeHint">Choose mode</p>
         <div class="difficulty difficulty--modes difficulty--carousel" data-role="mode-select">
@@ -44,7 +44,7 @@
                 data-i18n="multiplayer.button">Multiplayer</span>
             </button>
         </div>
-        <div class="leaderboard">
+        <section aria-label="Leaderboard" class="leaderboard">
             <div class="leaderboard__header">
                 <h3 class="leaderboard__title" data-i18n="leaderboard.title">Leaderboard</h3>
                 <button aria-label="Share leaderboard" class="leaderboard__share-button"
@@ -53,12 +53,12 @@
                 </button>
             </div>
             <div data-field="leaderboard"></div>
-        </div>
-    </div>
+        </section>
+    </section>
 </template>
 
 <template id="tpl-screen-gameover-saved">
-    <div class="screen">
+    <section class="screen">
         <h2 class="screen__title" data-i18n="screens.gameOverSaved.title">SCORE SAVED</h2>
         <p class="screen__hint" data-i18n="screens.idle.modeHint">Choose mode</p>
         <div class="difficulty difficulty--modes difficulty--carousel" data-role="mode-select">
@@ -103,7 +103,7 @@
                 data-i18n="multiplayer.button">Multiplayer</span>
             </button>
         </div>
-        <div class="leaderboard">
+        <section aria-label="Leaderboard" class="leaderboard">
             <div class="leaderboard__header">
                 <h3 class="leaderboard__title" data-i18n="leaderboard.title">Leaderboard</h3>
                 <button aria-label="Share leaderboard" class="leaderboard__share-button"
@@ -112,6 +112,6 @@
                 </button>
             </div>
             <div data-field="leaderboard"></div>
-        </div>
-    </div>
+        </section>
+    </section>
 </template>

@@ -212,8 +212,8 @@ details.options[open] {
 .options__sound-list {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
-    margin-top: 0.4em;
+    gap: 0.1rem;
+    margin-top: 0.2em;
 }
 
 .options__row--sound {
@@ -271,11 +271,13 @@ details.options[open] {
     display: flex;
     align-items: center;
     gap: 0.4rem;
+    min-width: 0;
 }
 
 .options__volume-control > .options__input--range {
     flex: 1;
-    max-width: none;
+    min-width: 0;
+    max-width: 10rem;
 }
 
 .options__resume {

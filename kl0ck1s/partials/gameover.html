@@ -1,5 +1,5 @@
 <template id="tpl-screen-gameover-entry">
-    <div class="screen">
+    <section class="screen">
         <h2 class="screen__title" data-field="title" data-i18n="screens.gameOverEntry.title">GAME OVER</h2>
         <p class="screen__hint">
             <strong class="screen__hint-highlight" data-field="playerName"></strong>
@@ -27,8 +27,9 @@
                     type="button">Share
             </button>
         </div>
-        <div class="options" data-role="stats-detail">
-            <h3 class="options__title" data-i18n="screens.gameOverEntry.statsTitle">Session stats</h3>
+        <section aria-labelledby="gameover-stats-title" class="options" data-role="stats-detail">
+            <h3 class="options__title" data-i18n="screens.gameOverEntry.statsTitle" id="gameover-stats-title">
+                Session stats</h3>
             <div class="options__row">
                 <span data-i18n="screens.gameOverEntry.gameTimeLabel">Time</span>
                 <strong data-field="gameTime"></strong>
@@ -77,8 +78,8 @@
                 <span data-i18n="screens.gameOverEntry.droughtAvgLabel">D.AVG</span>
                 <strong data-field="droughtAvg"></strong>
             </div>
-        </div>
-        <div class="leaderboard">
+        </section>
+        <section aria-label="Leaderboard" class="leaderboard">
             <div class="leaderboard__header">
                 <h3 class="leaderboard__title" data-i18n="leaderboard.title">Leaderboard</h3>
                 <button aria-label="Share leaderboard" class="leaderboard__share-button"
@@ -87,6 +88,6 @@
                 </button>
             </div>
             <div data-field="leaderboard"></div>
-        </div>
-    </div>
+        </section>
+    </section>
 </template>

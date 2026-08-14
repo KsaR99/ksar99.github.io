@@ -302,8 +302,6 @@ body {
     min-height: 0;
     min-width: 0;
     width: 100%;
-    padding-top: calc(var(--safe-t) + var(--fab-row-h) + 0.5rem);
-    padding-bottom: calc(var(--touch-bar-h) + var(--safe-b) + 0.5rem);
 }
 
 .app__sidebar {
@@ -363,8 +361,8 @@ body.hud-right .card[data-role="next-piece-card"] {
     z-index: var(--z-fab);
     display: flex;
     align-items: center;
-    width: 3rem;
-    height: 3rem;
+    width: 5rem;
+    height: 5rem;
     padding: 0;
     justify-content: space-between;
     background: oklch(from var(--bg-2) l c h / 0.7);
@@ -376,8 +374,8 @@ body.hud-right .card[data-role="next-piece-card"] {
 }
 
 [data-role="next-piece-card"] .next-piece__canvas {
-    width: 2.6rem;
-    height: 2.6rem;
+    width: 5rem;
+    height: 5rem;
     background: oklch(from var(--bg-2) l c h / 0.4);
 }
 
@@ -637,7 +635,7 @@ body.perf-no-glow .board__filter--active.board__filter--vhs::after {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.4rem;
+    gap: 0.3rem;
     line-height: 1.5;
     letter-spacing: 1px;
     min-height: 100%;

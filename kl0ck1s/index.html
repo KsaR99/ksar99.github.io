@@ -11,13 +11,13 @@
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+Mono:wght@100..900&display=swap"
         rel="stylesheet"
     >
-    <link href="styles/main.css?v=58" rel="stylesheet">
-    <link href="styles/options.css?v=58" rel="stylesheet">
-    <link href="styles/menu.css?v=58" rel="stylesheet">
-    <link href="styles/leaderboard.css?v=58" rel="stylesheet">
-    <link href="styles/multiplayer.css?v=58" rel="stylesheet">
-    <link href="styles/mobile.css?v=58" media="(width < 48rem)" rel="stylesheet">
-    <link href="styles/desktop.css?v=58" media="(width >= 48rem)" rel="stylesheet">
+    <link href="styles/main.css?v=59" rel="stylesheet">
+    <link href="styles/options.css?v=59" rel="stylesheet">
+    <link href="styles/menu.css?v=59" rel="stylesheet">
+    <link href="styles/leaderboard.css?v=59" rel="stylesheet">
+    <link href="styles/multiplayer.css?v=59" rel="stylesheet">
+    <link href="styles/mobile.css?v=59" media="(width < 48rem)" rel="stylesheet">
+    <link href="styles/desktop.css?v=59" media="(width >= 48rem)" rel="stylesheet">
     <meta content="notranslate" name="google">
     <meta content="https://github.com/KsaR99" name="author">
     <meta content="index, follow" name="robots">
@@ -53,10 +53,10 @@
     </div>
 </div>
 <div class="app" id="app-root">
-    <div class="mobile-fabs">
+    <div aria-label="Quick actions" class="mobile-fabs" role="toolbar">
         <div class="mobile-fabs__group">
             <button aria-label="Stats" class="mobile-fab" data-role="fab-stats" type="button">📊</button>
-            <button aria-label="Controls" class="mobile-fab" data-role="fab-controls" type="button">❓</button>
+            <button aria-label="Controls" class="mobile-fab" data-role="fab-controls" type="button">⚙️</button>
         </div>
         <div class="mobile-fabs__group">
             <button aria-label="Fullscreen" aria-pressed="false" class="mobile-fab" data-role="fab-fullscreen"
@@ -66,13 +66,13 @@
     </div>
     <div class="drawer-scrim" data-role="drawer-scrim"></div>
 
-    <div class="app__sidebar sidebar sidebar--stats">
+    <aside aria-label="Stats sidebar" class="app__sidebar sidebar sidebar--stats">
         <button aria-label="Close" class="drawer-close" data-role="drawer-close" type="button">✕</button>
-        <div class="card">
+        <header class="card">
             <p class="brand__title" data-role="brand-title">Kl0ck1<span class="brand__title-flip"
                                                                         data-role="brand-title-flip">'s</span></p>
             <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.18.2-alpha</p>
-            <div class="settings-shortcut-row">
+            <div aria-label="Quick settings" class="settings-shortcut-row" role="toolbar">
                 <button aria-label="Mute sound" aria-pressed="false" class="settings-shortcut-icon"
                         data-role="mute-toggle" type="button">
                     <span aria-hidden="true" data-role="mute-toggle-icon">🔊</span>
@@ -86,9 +86,9 @@
                     <span aria-hidden="true">⚙️</span>
                 </button>
             </div>
-        </div>
+        </header>
 
-        <div class="card stats" data-role="stats-card">
+        <section aria-label="Stats" class="card stats" data-role="stats-card">
             <p class="stats__status" data-i18n="sidebar.statusLast" data-role="stats-status">Last game</p>
             <div class="stats__row" data-role="time-stat">
                 <h3 class="card__title" data-i18n="sidebar.time">Time</h3>
@@ -130,15 +130,16 @@
                     <div class="progress-bar__label" id="difficulty-value">-</div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="card card--next-piece" data-role="next-piece-card">
-            <h3 class="card__title card__title--next-piece" data-i18n="sidebar.nextPiece">Next piece</h3>
+        <section aria-labelledby="next-piece-title" class="card card--next-piece" data-role="next-piece-card">
+            <h3 class="card__title card__title--next-piece" data-i18n="sidebar.nextPiece" id="next-piece-title">Next
+                piece</h3>
             <canvas class="next-piece__canvas" height="120" id="next-piece-canvas" width="120"></canvas>
-        </div>
-    </div>
+        </section>
+    </aside>
 
-    <div class="app__board">
+    <main class="app__board">
         <div class="board">
             <div class="board__stage">
                 <canvas class="board__canvas" height="920" id="klockis-board" width="460"></canvas>
@@ -159,9 +160,9 @@
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
-    <div class="touch-controls" data-role="touch-controls">
+    <div aria-label="Touch controls" class="touch-controls" data-role="touch-controls" role="toolbar">
         <div class="touch-controls__group touch-controls__group--move">
             <button aria-label="Left" class="touch-controls__btn" data-key-action="ArrowLeft" type="button">◄</button>
             <button aria-label="Right" class="touch-controls__btn" data-key-action="ArrowRight" type="button">►</button>
@@ -180,14 +181,14 @@
 </div>
 
 <template id="tpl-screen-loading">
-    <div class="screen">
+    <section class="screen">
         <h2 class="screen__title" data-field="title"></h2>
         <p class="screen__hint" data-field="hint"></p>
-    </div>
+    </section>
 </template>
 
 <template id="tpl-screen-mode-info">
-    <div class="screen">
+    <section class="screen">
         <p class="brand__title">Kl0ck1's</p>
         <h2 class="screen__title mode-info__title" data-field="modeName"></h2>
         <ul class="mode-info__rules" data-field="rules"></ul>
@@ -195,7 +196,7 @@
                 data-role="mode-info-continue-button"
                 type="button">Continue
         </button>
-    </div>
+    </section>
 </template>
 
 <template id="tpl-mode-info-rule">
@@ -203,17 +204,17 @@
 </template>
 
 <template id="tpl-screen-countdown">
-    <div class="screen screen--countdown" data-role="countdown-screen">
+    <section class="screen screen--countdown" data-role="countdown-screen">
         <p class="brand__title">Kl0ck1's</p>
         <div class="countdown__number" data-field="number"></div>
         <div class="progress-bar progress-bar--countdown">
             <div class="progress-bar__fill" data-role="countdown-progress-bar"></div>
         </div>
-    </div>
+    </section>
 </template>
 
 <template id="tpl-screen-calibration-result">
-    <div class="screen">
+    <section class="screen">
         <h2 class="screen__title" data-i18n="screens.calibration.resultTitle">SENSITIVITY CALIBRATED</h2>
         <p class="screen__hint" data-role="calibration-success">
             <span data-i18n="screens.calibration.resultSuccessBefore">New sensitivity:</span>
@@ -234,11 +235,11 @@
                 data-role="calibration-result-discard-button"
                 type="button">Discard
         </button>
-    </div>
+    </section>
 </template>
 
 <template id="tpl-screen-keyboard-calibration-result">
-    <div class="screen">
+    <section class="screen">
         <h2 class="screen__title" data-i18n="screens.keyboardCalibration.resultTitle">KEYBOARD CALIBRATED</h2>
         <p class="screen__hint" data-role="keyboard-calibration-success">
             <span data-i18n="screens.keyboardCalibration.resultDas">DAS:</span>
@@ -262,7 +263,7 @@
                 data-role="keyboard-calibration-result-discard-button"
                 type="button">Discard
         </button>
-    </div>
+    </section>
 </template>
 
 <template id="tpl-credits-entry">
@@ -365,6 +366,6 @@
         window.addEventListener("orientationchange", notifyResize);
     })();
 </script>
-<script src="scripts/app/main.js?v=58" type="module"></script>
+<script src="scripts/app/main.js?v=59" type="module"></script>
 </body>
 </html>

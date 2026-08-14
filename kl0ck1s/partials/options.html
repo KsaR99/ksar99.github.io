@@ -1,5 +1,5 @@
 <template id="tpl-screen-options">
-    <div class="screen">
+    <section class="screen">
         <h2 class="screen__title" data-i18n="screens.options.title">OPTIONS</h2>
         <p class="screen__hint">
             <span data-i18n="screens.options.closeHintBefore">Press</span> <kbd class="kbd kbd--clickable"
@@ -9,9 +9,9 @@
         </p>
 
         <div class="options__panels" data-role="options-panels">
-            <div class="options" data-role="options-group-general">
+            <section aria-labelledby="options-general-title" class="options" data-role="options-group-general">
                 <h3 class="options__title options__title--static options__title--general"
-                    data-i18n="screens.options.generalTitle">General</h3>
+                    data-i18n="screens.options.generalTitle" id="options-general-title">General</h3>
                 <label class="options__row">
                     <span data-i18n="screens.options.language">Language</span>
                     <select class="options__input options__input--select" data-role="lang-select"></select>
@@ -76,7 +76,7 @@
                             data-role="reset-general-button" hidden type="button">Reset to defaults
                     </button>
                 </div>
-            </div>
+            </section>
 
             <div class="options__search" data-role="options-search">
                 <input class="options__search-input" data-i18n-placeholder="screens.options.searchPlaceholder"
@@ -391,8 +391,9 @@
                 </div>
             </details>
 
-            <div class="options" data-role="options-group-data">
-                <h3 class="options__title options__title--static" data-i18n="screens.options.dataTitle">Import /
+            <section aria-labelledby="options-data-title" class="options" data-role="options-group-data">
+                <h3 class="options__title options__title--static" data-i18n="screens.options.dataTitle"
+                    id="options-data-title">Import /
                     Export</h3>
                 <div class="options__row">
                     <span data-i18n="screens.options.exportLabel">Export options to a file</span>
@@ -411,11 +412,13 @@
                     </button>
                     <input accept="application/json" data-role="options-import-file" hidden type="file">
                 </div>
-            </div>
+            </section>
         </div>
 
-        <div class="options options__import-review" data-role="options-import-review" hidden>
-            <h3 class="options__title options__title--static" data-i18n="screens.options.importDiffTitle">Import
+        <section aria-labelledby="options-import-title" class="options options__import-review"
+                 data-role="options-import-review" hidden>
+            <h3 class="options__title options__title--static" data-i18n="screens.options.importDiffTitle"
+                id="options-import-title">Import
                 options</h3>
             <p class="options__import-review__subtitle" data-role="options-import-subtitle"></p>
 
@@ -450,13 +453,13 @@
                     hidden
                     type="button">OK
             </button>
-        </div>
+        </section>
 
         <button class="options__resume button button--accent" data-i18n="screens.options.close"
                 data-role="options-close-button"
                 type="button">Close
         </button>
-    </div>
+    </section>
 </template>
 
 <template id="tpl-options-diff-row">

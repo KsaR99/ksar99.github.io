@@ -6,13 +6,19 @@
     display: none;
 }
 
+.app__board {
+    padding-top: calc(var(--safe-t) + var(--fab-row-h));
+    padding-bottom: calc(var(--touch-bar-h) + var(--safe-b));
+}
+
 .options__group--advanced,
 .options__preview-button--reset-controls,
 .options__group--mouse {
     display: none;
 }
 
-.options__row:has(.options__preview-button--keybind-reset) {
+.options__row:has(.options__preview-button--keybind-reset),
+.options__row:has([data-role="hud-right-checkbox"]) {
     display: none;
 }
 

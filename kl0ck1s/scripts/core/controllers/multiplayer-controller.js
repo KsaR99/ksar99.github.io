@@ -1417,7 +1417,6 @@ export class MultiplayerController {
         boardHost.prepend(localHeader);
         this._opponentBoardHost = boardHost;
         this._localHeaderEl = localHeader;
-        boardHost.style.paddingTop = `${localHeader.offsetHeight}px`;
 
         const panel = this.dom.createElement("div");
         panel.className = "app__sidebar mp-opponent-column";

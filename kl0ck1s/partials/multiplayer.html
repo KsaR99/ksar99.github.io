@@ -16,7 +16,7 @@
         </div>
         <p class="mp-step-caption" data-field="mp-step-caption"></p>
 
-        <div class="mp-panel" data-role="mp-panel-role">
+        <section class="mp-panel" data-role="mp-panel-role">
             <p class="screen__hint" data-i18n="multiplayer.chooseConnection">Choose how to connect</p>
             <div class="screen__button-row">
                 <button class="button button--accent" data-i18n="multiplayer.hostButton" data-role="mp-host-button"
@@ -31,9 +31,9 @@
                         data-role="mp-bot-button" type="button">Play vs bot
                 </button>
             </div>
-        </div>
+        </section>
 
-        <div class="mp-panel" data-role="mp-panel-bot" hidden>
+        <section class="mp-panel" data-role="mp-panel-bot" hidden>
             <p class="mp-bot-hint" data-i18n="multiplayer.botHint">Practice on your own — the bot draws the exact
                 same pieces as you, in the same order, and starts at your currently selected level.</p>
             <p class="screen__hint" data-i18n="multiplayer.chooseModeHint">Choose a mode</p>
@@ -81,9 +81,9 @@
                         data-role="mp-bot-difficulty-start" type="button">Rozpocznij grę
                 </button>
             </div>
-        </div>
+        </section>
 
-        <div class="mp-panel" data-role="mp-panel-host" hidden>
+        <section class="mp-panel" data-role="mp-panel-host" hidden>
             <p class="mp-status" data-field="mp-host-wait-text" data-i18n="multiplayer.waitingForGuest">
                 Waiting for the other player to join…
             </p>
@@ -92,9 +92,9 @@
                data-i18n="multiplayer.noJoinRequests">
                 No one has asked to join yet.
             </p>
-        </div>
+        </section>
 
-        <div class="mp-panel" data-role="mp-panel-join" hidden>
+        <section class="mp-panel" data-role="mp-panel-join" hidden>
             <div data-role="mp-join-rooms-wrap">
                 <p class="screen__hint" data-i18n="multiplayer.browseHint">Pick a player to join</p>
                 <ul class="mp-room-list" data-role="mp-join-rooms-list"></ul>
@@ -107,9 +107,9 @@
                hidden>
                 Joining room…
             </p>
-        </div>
+        </section>
 
-        <div class="mp-panel" data-role="mp-panel-ready" hidden>
+        <section class="mp-panel" data-role="mp-panel-ready" hidden>
             <p class="mp-status" data-field="mp-status-text" data-i18n="multiplayer.statusConnecting">Connecting…
             </p>
             <div class="mp-config" data-role="mp-config">
@@ -154,10 +154,12 @@
                     Start game
                 </button>
             </div>
-        </div>
+        </section>
 
-        <div class="mp-panel mp-result-panel" data-role="mp-panel-result" hidden>
-            <h2 class="screen__title mp-result-panel__title" data-role="mp-result-title">YOU WIN</h2>
+        <section aria-labelledby="mp-result-title" class="mp-panel mp-result-panel" data-role="mp-panel-result"
+                 hidden>
+            <h2 class="screen__title mp-result-panel__title" data-role="mp-result-title" id="mp-result-title">YOU
+                WIN</h2>
             <div class="mp-result-players">
                 <div class="mp-result-player">
                     <span class="mp-result-player__name" data-role="mp-result-local-name">You</span>
@@ -212,7 +214,7 @@
                 </button>
                 <button class="button button--primary" data-role="mp-result-close-button" type="button">Close</button>
             </div>
-        </div>
+        </section>
 
         <p class="mp-error" data-field="mp-error-text" hidden></p>
     </div>
