@@ -32,16 +32,44 @@
                     <input class="options__input options__input--checkbox" data-role="hud-right-checkbox"
                            type="checkbox">
                 </label>
-                <label class="options__row">
-                    <span data-i18n="screens.options.theme">Screen filter</span>
-                    <select class="options__input options__input--select" data-role="theme-select">
-                        <option data-i18n="screens.options.themeNone" value="none">None</option>
-                        <option data-i18n="screens.options.themeVHS" value="vhs">VHS noise</option>
-                        <option data-i18n="screens.options.themeMatrix" value="matrix">Matrix</option>
-                        <option data-i18n="screens.options.themeRain" value="rain">Rain</option>
-                        <option data-i18n="screens.options.themeSnow" value="snow">Snow</option>
-                    </select>
-                </label>
+                <details class="options__theme-picker" data-role="theme-details">
+                    <summary class="options__row">
+                        <span data-i18n="screens.options.theme">Screen filter</span>
+                        <span class="options__theme-current" data-role="theme-current"></span>
+                    </summary>
+                    <div class="options__theme-grid" data-role="theme-grid">
+                        <button class="options__theme-card options__theme-card--none" data-role="theme-option"
+                                data-value="none" type="button">
+                            <span aria-hidden="true" class="options__theme-preview"></span>
+                            <span class="options__theme-card-label"
+                                  data-i18n="screens.options.themeNone">None</span>
+                        </button>
+                        <button class="options__theme-card options__theme-card--vhs" data-role="theme-option"
+                                data-value="vhs" type="button">
+                            <span aria-hidden="true" class="options__theme-preview"></span>
+                            <span class="options__theme-card-label"
+                                  data-i18n="screens.options.themeVHS">VHS noise</span>
+                        </button>
+                        <button class="options__theme-card options__theme-card--matrix" data-role="theme-option"
+                                data-value="matrix" type="button">
+                            <span aria-hidden="true" class="options__theme-preview"></span>
+                            <span class="options__theme-card-label"
+                                  data-i18n="screens.options.themeMatrix">Matrix</span>
+                        </button>
+                        <button class="options__theme-card options__theme-card--rain" data-role="theme-option"
+                                data-value="rain" type="button">
+                            <span aria-hidden="true" class="options__theme-preview"></span>
+                            <span class="options__theme-card-label"
+                                  data-i18n="screens.options.themeRain">Rain</span>
+                        </button>
+                        <button class="options__theme-card options__theme-card--snow" data-role="theme-option"
+                                data-value="snow" type="button">
+                            <span aria-hidden="true" class="options__theme-preview"></span>
+                            <span class="options__theme-card-label"
+                                  data-i18n="screens.options.themeSnow">Snow</span>
+                        </button>
+                    </div>
+                </details>
                 <div class="options__row options__row--end">
                     <button class="options__preview-button options__preview-button--wide"
                             data-i18n="screens.options.resetDefaults"

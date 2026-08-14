@@ -340,8 +340,22 @@ export const Screens = {
             mouseSensitivitySlider.disabled = !settings.mouseControl;
         }
 
-        const themeSelect = screen.querySelector('[data-role="theme-select"]');
-        if (themeSelect) themeSelect.value = settings.theme ?? "none";
+        const themeGrid = screen.querySelector('[data-role="theme-grid"]');
+        if (themeGrid) {
+            const activeTheme = settings.theme ?? "none";
+            const themeLabelKeys = {
+                none: "screens.options.themeNone",
+                vhs: "screens.options.themeVHS",
+                matrix: "screens.options.themeMatrix",
+                rain: "screens.options.themeRain",
+                snow: "screens.options.themeSnow",
+            };
+            themeGrid.querySelectorAll('[data-role="theme-option"]').forEach((card) => {
+                card.setAttribute("aria-pressed", String(card.dataset.value === activeTheme));
+            });
+            const themeCurrent = screen.querySelector('[data-role="theme-current"]');
+            if (themeCurrent) themeCurrent.textContent = i18n.t(themeLabelKeys[activeTheme] ?? "screens.options.themeNone");
+        }
 
         const keybindList = screen.querySelector('[data-role="keybind-list"]');
         if (keybindList) renderKeybindRows(dom, keybindList, settings.keyBindings, i18n);

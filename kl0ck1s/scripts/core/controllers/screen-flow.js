@@ -796,7 +796,7 @@ export class ScreenFlow {
         const glowCheckbox = root.querySelector('[data-role="glow-checkbox"]');
         const transparencyCheckbox = root.querySelector('[data-role="transparency-checkbox"]');
         const fallTrailCheckbox = root.querySelector('[data-role="fall-trail-checkbox"]');
-        const themeSelect = root.querySelector('[data-role="theme-select"]');
+        const themeGrid = root.querySelector('[data-role="theme-grid"]');
         const skipCountdownCheckbox = root.querySelector('[data-role="skip-countdown-checkbox"]');
         const mouseControlCheckbox = root.querySelector('[data-role="mouse-control-checkbox"]');
         const mouseSensitivityInput = root.querySelector('[data-role="mouse-sensitivity-input"]');
@@ -899,11 +899,14 @@ export class ScreenFlow {
             });
         }
 
-        if (themeSelect) {
-            themeSelect.addEventListener("change", () => {
-                game.settings.theme = themeSelect.value;
+        if (themeGrid) {
+            themeGrid.addEventListener("click", (event) => {
+                const card = event.target.closest('[data-role="theme-option"]');
+                if (!card) return;
+                game.settings.theme = card.dataset.value;
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
+                this.syncThemePicker();
                 this.syncCategoryResetButtons();
             });
         }
@@ -1122,6 +1125,28 @@ export class ScreenFlow {
                 this.renderOptionsMenu();
             });
         });
+    }
+
+    syncThemePicker() {
+        const game = this.game;
+        if (!game.hud.overlayEl) return;
+        const themeGrid = game.hud.overlayEl.querySelector('[data-role="theme-grid"]');
+        if (!themeGrid) return;
+        const activeTheme = game.settings.theme ?? "none";
+        const themeLabelKeys = {
+            none: "screens.options.themeNone",
+            vhs: "screens.options.themeVHS",
+            matrix: "screens.options.themeMatrix",
+            rain: "screens.options.themeRain",
+            snow: "screens.options.themeSnow",
+        };
+        themeGrid.querySelectorAll('[data-role="theme-option"]').forEach((card) => {
+            card.setAttribute("aria-pressed", String(card.dataset.value === activeTheme));
+        });
+        const themeCurrent = game.hud.overlayEl.querySelector('[data-role="theme-current"]');
+        if (themeCurrent) {
+            themeCurrent.textContent = game.i18n.t(themeLabelKeys[activeTheme] ?? "screens.options.themeNone");
+        }
     }
 
     syncCategoryResetButtons() {
