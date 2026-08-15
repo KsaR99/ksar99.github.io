@@ -429,7 +429,7 @@ details.options[open] {
 }
 
 .options__theme-card--none {
-    --theme-preview-bg: radial-gradient(circle at 50% 100%, oklch(0.89 0 0) 0, oklch(0.26 0.04 283.84) 60%);
+    --theme-preview-bg: radial-gradient(circle at 50% 100%, oklch(0.56 0 0) 0, oklch(0 0 0) 60%);;
 }
 
 .options__theme-card--matrix {
