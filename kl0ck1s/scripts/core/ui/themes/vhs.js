@@ -45,7 +45,7 @@ export class VHS {
         this._lineImageData = null;
         this._lineBuf32 = null;
 
-        this.scanlines = Array.from({length: 4}, () => ({
+        this.scanlines = Array.from({length: 3}, () => ({
             y: 0,
             speed: 0,
             hidden: false
