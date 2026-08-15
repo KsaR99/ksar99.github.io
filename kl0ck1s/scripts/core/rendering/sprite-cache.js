@@ -13,6 +13,14 @@ const MAX_DYNAMIC_ATLAS_ROWS = 32;
 const BLOCK_CORNER_RADIUS = 10;
 export {BLOCK_CORNER_RADIUS};
 
+const BLOCK_CORNER_RADIUS_RATIO = 0.35;
+
+function cornerRadiusForSize(size) {
+    return Math.min(BLOCK_CORNER_RADIUS, size * BLOCK_CORNER_RADIUS_RATIO);
+}
+export {cornerRadiusForSize};
+
+
 export function isGlowRow(row) {
     return row < GLOW_TOP_ROWS;
 }
@@ -28,7 +36,7 @@ export function colorForLevel(color, level) {
 
 function paintBlock(spriteCtx, ox, oy, size, color) {
     const bevel = Math.max(1.5, Math.round(size * 0.16));
-    const radius = Math.min(BLOCK_CORNER_RADIUS, size / 2);
+    const radius = cornerRadiusForSize(size);
 
     spriteCtx.save();
     spriteCtx.beginPath();
@@ -90,7 +98,7 @@ const OUTLINE_TOP_GLOW_BLUR_RATIO = 1.1;
 function paintOutlineBlock(spriteCtx, ox, oy, size, color, borderWidth, blur) {
     spriteCtx.fillStyle = "oklch(0 0 0)";
     spriteCtx.beginPath();
-    spriteCtx.roundRect(ox, oy, size, size, Math.min(BLOCK_CORNER_RADIUS, size / 2));
+    spriteCtx.roundRect(ox, oy, size, size, cornerRadiusForSize(size));
     spriteCtx.fill();
 
     paintOutlineBorder(spriteCtx, ox, oy, size, color, borderWidth, blur);
@@ -98,7 +106,7 @@ function paintOutlineBlock(spriteCtx, ox, oy, size, color, borderWidth, blur) {
 
 function paintOutlineBorder(spriteCtx, ox, oy, size, color, borderWidth, blur) {
     const inset = borderWidth / 2;
-    const radius = Math.max(0, Math.min(BLOCK_CORNER_RADIUS, size / 2) - inset);
+    const radius = Math.max(0, cornerRadiusForSize(size) - inset);
     spriteCtx.shadowColor = color;
     spriteCtx.shadowBlur = blur;
     spriteCtx.strokeStyle = color;
@@ -132,11 +140,11 @@ export function createOutlineBlockSprite(color, size, canvasFactory = () => docu
 function paintOutlineTopGlowBlock(spriteCtx, ox, oy, size, color, borderWidth, blur) {
     spriteCtx.fillStyle = "oklch(0 0 0)";
     spriteCtx.beginPath();
-    spriteCtx.roundRect(ox, oy, size, size, Math.min(BLOCK_CORNER_RADIUS, size / 2));
+    spriteCtx.roundRect(ox, oy, size, size, cornerRadiusForSize(size));
     spriteCtx.fill();
 
     const inset = borderWidth / 2;
-    const radius = Math.max(0, Math.min(BLOCK_CORNER_RADIUS, size / 2) - inset);
+    const radius = Math.max(0, cornerRadiusForSize(size) - inset);
     const haloColor = `oklch(from ${color} calc(l + 0.15) c h)`;
 
     spriteCtx.shadowColor = haloColor;
@@ -262,7 +270,7 @@ export function createGridCellSprite(size, canvasFactory = () => document.create
     spriteCtx.imageSmoothingEnabled = false;
 
     const bevel = Math.max(1, Math.round(size * 0.12));
-    const radius = Math.min(BLOCK_CORNER_RADIUS, size / 2);
+    const radius = cornerRadiusForSize(size);
 
     spriteCtx.save();
     spriteCtx.beginPath();
@@ -317,7 +325,7 @@ export function createGlowSprite(color, size, canvasFactory = () => document.cre
     spriteCtx.shadowBlur = blur;
     spriteCtx.fillStyle = color;
     spriteCtx.beginPath();
-    spriteCtx.roundRect(pad, pad, size, size, Math.min(BLOCK_CORNER_RADIUS, size / 2));
+    spriteCtx.roundRect(pad, pad, size, size, cornerRadiusForSize(size));
     spriteCtx.fill();
 
     spriteCtx.shadowBlur = 0;

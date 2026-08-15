@@ -4,7 +4,7 @@ import {forEachShapeCell, getTightBounds, lightenOklch, withAlpha} from "../shar
 import {FALL_TRAIL_ALPHA_CACHE, HARD_DROP_TRAIL_ALPHAS} from "../game/game-constants.js";
 import {LINE_CLEAR_FLASH_PHASE_FRACTION} from "../shared/config.js";
 import {
-    BLOCK_CORNER_RADIUS,
+    cornerRadiusForSize,
     fallTrailColor,
     GHOST_ALPHA,
     HARD_DROP_FLASH_SPRITE_HEIGHT,
@@ -971,7 +971,7 @@ export class Renderer {
 
         ctx.strokeStyle = strokeColor;
         ctx.lineWidth = 1;
-        const ghostRadius = Math.min(BLOCK_CORNER_RADIUS, size / 2);
+        const ghostRadius = cornerRadiusForSize(size);
         forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
             const y = piece.y + r + offset;
             if (y < 0) return;
