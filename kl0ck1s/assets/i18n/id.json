@@ -17,7 +17,8 @@
         "pps": "PPS",
         "objective": "Tujuan",
         "statusLive": "Permainan saat ini",
-        "statusLast": "Permainan terakhir"
+        "statusLast": "Permainan terakhir",
+        "height": "Ketinggian"
     },
     "controls": {
         "toggle": "Kontrol",

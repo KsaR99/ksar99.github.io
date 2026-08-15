@@ -17,7 +17,8 @@
         "pps": "PPS",
         "objective": "目標",
         "statusLive": "現在のゲーム",
-        "statusLast": "前回のゲーム"
+        "statusLast": "前回のゲーム",
+        "height": "高さ"
     },
     "controls": {
         "toggle": "操作方法",

@@ -17,7 +17,8 @@
         "pps": "PPS",
         "objective": "목표",
         "statusLive": "현재 게임",
-        "statusLast": "마지막 게임"
+        "statusLast": "마지막 게임",
+        "height": "높이"
     },
     "controls": {
         "toggle": "조작법",

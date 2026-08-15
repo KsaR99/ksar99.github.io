@@ -17,7 +17,8 @@
         "pps": "PPS",
         "objective": "الهدف",
         "statusLive": "اللعبة الحالية",
-        "statusLast": "آخر لعبة"
+        "statusLast": "آخر لعبة",
+        "height": "الارتفاع"
     },
     "controls": {
         "toggle": "أزرار التحكم",

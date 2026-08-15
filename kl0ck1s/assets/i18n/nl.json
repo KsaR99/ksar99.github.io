@@ -17,7 +17,8 @@
         "pps": "PPS",
         "objective": "Doel",
         "statusLive": "Huidige spel",
-        "statusLast": "Laatste spel"
+        "statusLast": "Laatste spel",
+        "height": "Hoogte"
     },
     "controls": {
         "toggle": "Bediening",

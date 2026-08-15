@@ -45,7 +45,7 @@ export class StatsTracker {
             noLeaderboard: game.gameModes[game.mode].noLeaderboard === true,
             hasLevelProgress: game.gameModes[game.mode].freezeLevel !== true,
             objective: game.modeController.objectiveText() !== null
-                ? `${game.i18n.t("sidebar.objective")}: ${game.modeController.objectiveText()}`
+                ? `${game.i18n.t(game.mode === "zen" ? "sidebar.height" : "sidebar.objective")}: ${game.modeController.objectiveText()}`
                 : null,
             objectivePercent: game.modeController.objectivePercent(),
             objectiveUrgency: game.modeController.objectiveUrgency(),

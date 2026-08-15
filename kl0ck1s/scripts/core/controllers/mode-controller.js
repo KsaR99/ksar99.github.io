@@ -120,6 +120,10 @@ export class ModeController {
             return formatDuration(Math.max(0, game.modeState.countdownRemainingMs));
         }
 
+        if (game.mode === "zen") {
+            return `${this.zenHeight()}`;
+        }
+
         return null;
     }
 
@@ -262,19 +266,28 @@ export class ModeController {
         return false;
     }
 
+    highestFilledRow() {
+        const board = this.game.board;
+        for (let y = 0; y < board.rows; y++) {
+            if (board.occupancy[y] !== 0) return y;
+        }
+        return board.rows;
+    }
+
+    zenHeight() {
+        const game = this.game;
+        const board = game.board;
+        const stackHeight = board.rows - this.highestFilledRow();
+        return (game.modeState.zenOverflowUsed ?? 0) + stackHeight;
+    }
+
     maybeApplyZenOverflow() {
         const game = this.game;
         const def = this.def;
         if (!def.zenOverflow) return;
 
         const board = game.board;
-        let highestFilledRow = board.rows;
-        for (let y = 0; y < board.rows; y++) {
-            if (board.occupancy[y] !== 0) {
-                highestFilledRow = y;
-                break;
-            }
-        }
+        const highestFilledRow = this.highestFilledRow();
 
         if (highestFilledRow > def.zenOverflowThresholdRow) return;
 
@@ -285,5 +298,6 @@ export class ModeController {
         const shiftAmount = Math.min(def.zenOverflowShiftRows, remaining);
         board.shiftDown(shiftAmount);
         game.modeState.zenOverflowUsed = used + shiftAmount;
+        game.renderer?.zenShiftTransition(shiftAmount);
     }
 }

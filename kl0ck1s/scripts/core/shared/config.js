@@ -48,7 +48,7 @@ export const GAME_MODES = Object.freeze({
     zen: Object.freeze({
         sprintTarget: null, timeLimitMs: null, garbage: false,
         freezeLevel: true, noLeaderboard: true,
-        zenOverflow: true, zenOverflowThresholdRow: 4, zenOverflowShiftRows: 6, zenOverflowMaxRows: 20,
+        zenOverflow: true, zenOverflowThresholdRow: 4, zenOverflowShiftRows: 2, zenOverflowMaxRows: Infinity,
     }),
     marathon: Object.freeze({sprintTarget: null, timeLimitMs: null, garbage: false}),
     sprint: Object.freeze({sprintTarget: 40, timeLimitMs: null, garbage: false}),

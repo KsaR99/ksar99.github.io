@@ -17,7 +17,8 @@
         "pps": "PPS",
         "objective": "Cieľ",
         "statusLive": "Aktuálna hra",
-        "statusLast": "Posledná hra"
+        "statusLast": "Posledná hra",
+        "height": "Výška"
     },
     "controls": {
         "toggle": "Ovládanie",

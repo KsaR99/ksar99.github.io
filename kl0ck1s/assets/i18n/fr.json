@@ -17,7 +17,8 @@
         "pps": "PPS",
         "objective": "Objectif",
         "statusLive": "Partie en cours",
-        "statusLast": "Dernière partie"
+        "statusLast": "Dernière partie",
+        "height": "Hauteur"
     },
     "controls": {
         "toggle": "Commandes",

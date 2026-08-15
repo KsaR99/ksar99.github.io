@@ -363,6 +363,23 @@ export class Renderer {
             `${this._boardOffsetX ?? 0}rem ${this._boardOffsetY ?? 0}rem`;
     }
 
+    zenShiftTransition(shiftRows, durationMs = 220) {
+        const el = this.boardEl;
+        if (!el || shiftRows <= 0) return;
+        clearTimeout(this._shakeTimer);
+        clearTimeout(this._squashTimerA);
+        clearTimeout(this._squashTimerB);
+        this._boardOffsetX = 0;
+        this._boardOffsetY = 0;
+        const offset = shiftRows * this.boardConfig.CELL_SIZE;
+        el.style.transition = "none";
+        el.style.translate = `0px ${-offset}px`;
+        el.getBoundingClientRect();
+        el.style.setProperty("--shake-duration", `${durationMs}ms`);
+        el.style.transition = "";
+        el.style.translate = "0px 0px";
+    }
+
     shakeMove(dir) {
         if (!this.shakeEnabled || !this.boardEl || !dir) return;
         clearTimeout(this._shakeTimer);

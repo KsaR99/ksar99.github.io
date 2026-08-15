@@ -17,7 +17,8 @@
         "pps": "PPS",
         "objective": "Cel",
         "statusLive": "Aktualna gra",
-        "statusLast": "Ostatnia gra"
+        "statusLast": "Ostatnia gra",
+        "height": "Wysokość"
     },
     "controls": {
         "toggle": "Sterowanie",
