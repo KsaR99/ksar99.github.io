@@ -13,7 +13,7 @@ const MAX_DYNAMIC_ATLAS_ROWS = 32;
 const BLOCK_CORNER_RADIUS = 10;
 export {BLOCK_CORNER_RADIUS};
 
-const BLOCK_CORNER_RADIUS_RATIO = 0.35;
+const BLOCK_CORNER_RADIUS_RATIO = 0.20;
 
 function cornerRadiusForSize(size) {
     return Math.min(BLOCK_CORNER_RADIUS, size * BLOCK_CORNER_RADIUS_RATIO);
@@ -91,10 +91,10 @@ export function createBlockSprite(color, size, canvasFactory = () => document.cr
     return sprite;
 }
 
-const OUTLINE_GLOW_BLUR_RATIO = 0.6;
-const OUTLINE_BLOCK_BORDER_WIDTH_RATIO = 0.05;
-const OUTLINE_GHOST_BORDER_WIDTH_RATIO = 0.05;
-const OUTLINE_TOP_GLOW_BLUR_RATIO = 1.1;
+const OUTLINE_GLOW_BLUR_RATIO = 0.5;
+const OUTLINE_BLOCK_BORDER_WIDTH_RATIO = 0.035;
+const OUTLINE_GHOST_BORDER_WIDTH_RATIO = 0.02;
+const OUTLINE_TOP_GLOW_BLUR_RATIO = 0.6;
 
 function paintOutlineBlock(spriteCtx, ox, oy, size, color, borderWidth, blur) {
     spriteCtx.fillStyle = "oklch(0 0 0)";

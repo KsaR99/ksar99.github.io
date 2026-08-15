@@ -42,7 +42,7 @@ body {
         --body-bg: radial-gradient(circle at 50% 100%, oklch(0.56 0 0) 0, oklch(0 0 0) 60%);
         --line: oklch(0.25 0 0);
         --muted: oklch(0.7 0 0 / 1);
-        --board-bg: oklch(0.18 0 0);
+        --board-bg: oklch(0.15 0 0);
         --board-accent: oklch(0.25 0 0 / 0.85);
         --stats__status--live-color: oklch(0.9 0 0 / 1);
         --panel: oklch(0.14 0 0 / 1);
@@ -110,7 +110,7 @@ body {
         --accent-2: oklch(0.71 0.15 52.11);
         --app-bg: oklch(0.09 0.02 76.87 / 0.9);
         --board-accent: oklch(0.41 0.11 56.07 / 0.85);
-        --board-bg: linear-gradient(180deg, oklch(0.25 0.05 46.91 / 1), oklch(0 0 0), oklch(0.21 0.04 57));
+        --board-bg: linear-gradient(180deg, oklch(0.37 0.11 50.6), oklch(0.4 0.11 56.42), oklch(0.23 0.07 54.64));
         --body-bg: radial-gradient(circle at 50% 100%, oklch(0.65 0.2 48.56) 0, oklch(0 0 0) 50%);
         --line: oklch(0.34 0.09 57.96);
         --stats__status--live-color: oklch(0.51 0.15 44.9);
@@ -435,7 +435,7 @@ body.hud-right .card[data-role="next-piece-card"] {
     }
 
     &.board--theme-volcano {
-        --board-bg: linear-gradient(180deg, oklch(0.25 0.05 46.91 / 1), oklch(0 0 0), oklch(0.21 0.04 57));
+        --board-bg: linear-gradient(180deg, oklch(0.37 0.11 50.6), oklch(0.4 0.11 56.42), oklch(0.23 0.07 54.64));
         --board-accent: oklch(0.41 0.11 56.07 / 0.85);
     }
 
