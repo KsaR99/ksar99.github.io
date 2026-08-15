@@ -10,6 +10,8 @@ export const SATURATION_LEVELS = Math.round(1 / SATURATION_STEP) + 1;
 
 const MAX_DYNAMIC_ATLAS_ROWS = 32;
 
+const BLOCK_CORNER_RADIUS = 10;
+export {BLOCK_CORNER_RADIUS};
 
 export function isGlowRow(row) {
     return row < GLOW_TOP_ROWS;
@@ -26,6 +28,12 @@ export function colorForLevel(color, level) {
 
 function paintBlock(spriteCtx, ox, oy, size, color) {
     const bevel = Math.max(1.5, Math.round(size * 0.16));
+    const radius = Math.min(BLOCK_CORNER_RADIUS, size / 2);
+
+    spriteCtx.save();
+    spriteCtx.beginPath();
+    spriteCtx.roundRect(ox, oy, size, size, radius);
+    spriteCtx.clip();
 
     spriteCtx.fillStyle = color;
     spriteCtx.fillRect(ox, oy, size, size);
@@ -52,9 +60,13 @@ function paintBlock(spriteCtx, ox, oy, size, color) {
     spriteCtx.closePath();
     spriteCtx.fill();
 
+    spriteCtx.restore();
+
     spriteCtx.strokeStyle = "oklch(0 0 0 / 0.6)";
     spriteCtx.lineWidth = 1;
-    spriteCtx.strokeRect(ox + 0.5, oy + 0.5, size - 1, size - 1);
+    spriteCtx.beginPath();
+    spriteCtx.roundRect(ox + 0.5, oy + 0.5, size - 1, size - 1, Math.max(0, radius - 0.5));
+    spriteCtx.stroke();
 }
 
 export function createBlockSprite(color, size, canvasFactory = () => document.createElement("canvas")) {
@@ -77,20 +89,27 @@ const OUTLINE_TOP_GLOW_BLUR_RATIO = 1.1;
 
 function paintOutlineBlock(spriteCtx, ox, oy, size, color, borderWidth, blur) {
     spriteCtx.fillStyle = "oklch(0 0 0)";
-    spriteCtx.fillRect(ox, oy, size, size);
+    spriteCtx.beginPath();
+    spriteCtx.roundRect(ox, oy, size, size, Math.min(BLOCK_CORNER_RADIUS, size / 2));
+    spriteCtx.fill();
 
     paintOutlineBorder(spriteCtx, ox, oy, size, color, borderWidth, blur);
 }
 
 function paintOutlineBorder(spriteCtx, ox, oy, size, color, borderWidth, blur) {
     const inset = borderWidth / 2;
+    const radius = Math.max(0, Math.min(BLOCK_CORNER_RADIUS, size / 2) - inset);
     spriteCtx.shadowColor = color;
     spriteCtx.shadowBlur = blur;
     spriteCtx.strokeStyle = color;
     spriteCtx.lineWidth = borderWidth;
-    spriteCtx.strokeRect(ox + inset, oy + inset, size - borderWidth, size - borderWidth);
+    spriteCtx.beginPath();
+    spriteCtx.roundRect(ox + inset, oy + inset, size - borderWidth, size - borderWidth, radius);
+    spriteCtx.stroke();
     spriteCtx.shadowBlur = 0;
-    spriteCtx.strokeRect(ox + inset, oy + inset, size - borderWidth, size - borderWidth);
+    spriteCtx.beginPath();
+    spriteCtx.roundRect(ox + inset, oy + inset, size - borderWidth, size - borderWidth, radius);
+    spriteCtx.stroke();
 }
 
 export function createOutlineBlockSprite(color, size, canvasFactory = () => document.createElement("canvas")) {
@@ -112,16 +131,21 @@ export function createOutlineBlockSprite(color, size, canvasFactory = () => docu
 
 function paintOutlineTopGlowBlock(spriteCtx, ox, oy, size, color, borderWidth, blur) {
     spriteCtx.fillStyle = "oklch(0 0 0)";
-    spriteCtx.fillRect(ox, oy, size, size);
+    spriteCtx.beginPath();
+    spriteCtx.roundRect(ox, oy, size, size, Math.min(BLOCK_CORNER_RADIUS, size / 2));
+    spriteCtx.fill();
 
     const inset = borderWidth / 2;
+    const radius = Math.max(0, Math.min(BLOCK_CORNER_RADIUS, size / 2) - inset);
     const haloColor = `oklch(from ${color} calc(l + 0.15) c h)`;
 
     spriteCtx.shadowColor = haloColor;
     spriteCtx.shadowBlur = blur;
     spriteCtx.strokeStyle = haloColor;
     spriteCtx.lineWidth = borderWidth;
-    spriteCtx.strokeRect(ox + inset, oy + inset, size - borderWidth, size - borderWidth);
+    spriteCtx.beginPath();
+    spriteCtx.roundRect(ox + inset, oy + inset, size - borderWidth, size - borderWidth, radius);
+    spriteCtx.stroke();
 
     paintOutlineBorder(spriteCtx, ox, oy, size, color, borderWidth, blur * 0.5);
 }
@@ -238,6 +262,12 @@ export function createGridCellSprite(size, canvasFactory = () => document.create
     spriteCtx.imageSmoothingEnabled = false;
 
     const bevel = Math.max(1, Math.round(size * 0.12));
+    const radius = Math.min(BLOCK_CORNER_RADIUS, size / 2);
+
+    spriteCtx.save();
+    spriteCtx.beginPath();
+    spriteCtx.roundRect(0, 0, size, size, radius);
+    spriteCtx.clip();
 
     spriteCtx.fillStyle = "oklch(0 0 0 / 0.18)"; // top + left
     spriteCtx.beginPath();
@@ -261,9 +291,13 @@ export function createGridCellSprite(size, canvasFactory = () => document.create
     spriteCtx.closePath();
     spriteCtx.fill();
 
+    spriteCtx.restore();
+
     spriteCtx.strokeStyle = "oklch(0 0 0 / 0.15)"; // border
     spriteCtx.lineWidth = 1;
-    spriteCtx.strokeRect(0.5, 0.5, size - 1, size - 1);
+    spriteCtx.beginPath();
+    spriteCtx.roundRect(0.5, 0.5, size - 1, size - 1, Math.max(0, radius - 0.5));
+    spriteCtx.stroke();
 
     return sprite;
 }
@@ -282,7 +316,9 @@ export function createGlowSprite(color, size, canvasFactory = () => document.cre
     spriteCtx.shadowColor = color;
     spriteCtx.shadowBlur = blur;
     spriteCtx.fillStyle = color;
-    spriteCtx.fillRect(pad, pad, size, size);
+    spriteCtx.beginPath();
+    spriteCtx.roundRect(pad, pad, size, size, Math.min(BLOCK_CORNER_RADIUS, size / 2));
+    spriteCtx.fill();
 
     spriteCtx.shadowBlur = 0;
     paintBlock(spriteCtx, pad, pad, size, color);

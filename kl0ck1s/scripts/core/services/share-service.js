@@ -16,6 +16,7 @@ const LOGO_STOPS_OKLCH = [
     "oklch(0.5812 0.2986 307.03)",
     "oklch(0.6489 0.237 26.97)",
 ];
+
 // Hex approximations, used only if the canvas can't parse oklch() colors.
 const LOGO_STOPS_HEX = [
     "#8fe0e6",

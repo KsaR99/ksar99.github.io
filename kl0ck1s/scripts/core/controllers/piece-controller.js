@@ -352,7 +352,7 @@ export class PieceController {
 
             game.rotationAnim = null;
             game.sensitivityCalibrationController?.notify("rotate", {});
-            return;
+
         }
     }
 
