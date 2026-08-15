@@ -1,6 +1,6 @@
 "use strict";
 
-const ASH_COLOR = "oklch(0.472 0.059 47.407 / 0.75)";
+const ASH_COLOR = "oklch(0.4853 0.0567 47.41 / 75%)";
 const EMBER_COLOR = "oklch(0.725 0.178 46.868 / 0.9)";
 
 const ASH_DENSITY = 1 / 27000; // ash spheres per square pixel (half as many as before)
