@@ -199,17 +199,14 @@ export class BenchmarkController {
         boardCanvas.height = height;
         const ctx = boardCanvas.getContext("2d");
 
-        const nextCanvas = document.createElement("canvas");
-        const nextCtx = nextCanvas.getContext("2d");
-
         this._offscreenRenderer = Object.assign(
             Object.create(Object.getPrototypeOf(liveRenderer)),
             liveRenderer.createSurface(ctx, boardCanvas),
             {
                 bodyEl: document.body,
                 boardEl: document.createElement("div"),
-                nextCtx,
-                nextCanvas,
+                nextCtxs: [],
+                nextCanvases: [],
                 spriteCache: liveRenderer.spriteCache,
                 nextSpriteCache: liveRenderer.nextSpriteCache,
                 boardConfig: liveRenderer.boardConfig,
@@ -280,12 +277,6 @@ export class BenchmarkController {
         };
     }
 
-    /**
-     * @param {object} [opts]
-     * @param {number} [opts.pieceCount=10000]
-     * @param {(done: number, total: number) => void} [opts.onProgress]
-     * @returns {Promise<{results: Array<{key: string, totalMs: number, avgMs: number, opsCount: number, percent: number}>, totalMs: number, pieceCount: number}>}
-     */
     async run({pieceCount = 10000, onProgress = null} = {}) {
         const liveGame = this.game;
         const cols = liveGame.board.cols;

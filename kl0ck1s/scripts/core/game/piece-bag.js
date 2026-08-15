@@ -24,4 +24,16 @@ export class PieceBag {
         this.#queue.length || this.refill();
         return this.#queue.shift();
     }
+
+    /**
+     * Look ahead without consuming. Refills as needed so the returned
+     * array always has `count` items (unless `types` is empty).
+     *
+     * @param {number} count
+     * @returns {Array<string>}
+     */
+    peek(count) {
+        while (this.#queue.length < count) this.refill();
+        return this.#queue.slice(0, count);
+    }
 }

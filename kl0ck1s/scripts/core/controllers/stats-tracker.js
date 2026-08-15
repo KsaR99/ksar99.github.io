@@ -42,7 +42,7 @@ export class StatsTracker {
             lines: game.lines,
             best: bestDisplay,
             mode: game.mode,
-            noLeaderboard: game.gameModes[game.mode].noLeaderboard === true,
+            noLeaderboard: game.gameModes[game.mode].noLeaderboard === true || Boolean(game.multiplayerConnected),
             hasLevelProgress: game.gameModes[game.mode].freezeLevel !== true,
             objective: game.modeController.objectiveText() !== null
                 ? `${game.i18n.t(game.mode === "zen" ? "sidebar.height" : "sidebar.objective")}: ${game.modeController.objectiveText()}`

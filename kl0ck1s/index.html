@@ -71,7 +71,7 @@
         <header class="card">
             <p class="brand__title" data-role="brand-title">Kl0ck1<span class="brand__title-flip"
                                                                         data-role="brand-title-flip">'s</span></p>
-            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.24.2-alpha</p>
+            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.25-alpha</p>
             <div aria-label="Quick settings" class="settings-shortcut-row" role="toolbar">
                 <button aria-label="Mute sound" aria-pressed="false" class="settings-shortcut-icon"
                         data-role="mute-toggle" type="button">
@@ -88,12 +88,15 @@
             </div>
         </header>
 
-        <section aria-label="Stats" class="card stats" data-role="stats-card">
+        <section aria-label="Status" class="card stats" data-role="status-card">
             <p class="stats__status" data-i18n="sidebar.statusLast" data-role="stats-status">Last game</p>
             <div class="stats__row" data-role="time-stat">
                 <h3 class="card__title" data-i18n="sidebar.time">Time</h3>
                 <div class="stats__value" id="time-value">00:00</div>
             </div>
+        </section>
+
+        <section aria-label="Stats" class="card stats" data-role="stats-card">
             <div class="stats__row" data-role="best-stat">
                 <h3 class="card__title" data-i18n="sidebar.best">Best</h3>
                 <div class="stats__value" id="best-value">0</div>
@@ -135,7 +138,11 @@
         <section aria-labelledby="next-piece-title" class="card card--next-piece" data-role="next-piece-card">
             <h3 class="card__title card__title--next-piece" data-i18n="sidebar.nextPiece" id="next-piece-title">Next
                 piece</h3>
-            <canvas class="next-piece__canvas" height="120" id="next-piece-canvas" width="120"></canvas>
+            <div class="next-piece__queue" data-role="next-piece-queue">
+                <canvas class="next-piece__canvas" height="22" width="44"></canvas>
+                <canvas class="next-piece__canvas" height="22" width="44"></canvas>
+                <canvas class="next-piece__canvas" height="22" width="44"></canvas>
+            </div>
         </section>
     </aside>
 

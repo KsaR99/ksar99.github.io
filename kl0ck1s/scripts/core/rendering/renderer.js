@@ -20,8 +20,8 @@ export class Renderer {
      * @param {HTMLBodyElement} bodyEl
      * @param {CanvasRenderingContext2D} deps.ctx
      * @param {HTMLCanvasElement} deps.boardCanvas
-     * @param {CanvasRenderingContext2D} deps.nextCtx
-     * @param {HTMLCanvasElement} deps.nextCanvas
+     * @param {Array<CanvasRenderingContext2D>} deps.nextCtxs - one per queue slot, index 0 = soonest
+     * @param {Array<HTMLCanvasElement>} deps.nextCanvases - one per queue slot, index 0 = soonest
      * @param {import("./sprite-cache.js").SpriteCache} deps.spriteCache
      * @param {object} deps.boardConfig
      * @param {object} deps.klockominos
@@ -34,8 +34,8 @@ export class Renderer {
                     boardEl = null,
                     ctx,
                     boardCanvas,
-                    nextCtx,
-                    nextCanvas,
+                    nextCtxs = [],
+                    nextCanvases = [],
                     spriteCache,
                     nextSpriteCache = spriteCache,
                     boardConfig,
@@ -48,8 +48,8 @@ export class Renderer {
         this.boardEl = boardEl;
         this.ctx = ctx;
         this.boardCanvas = boardCanvas;
-        this.nextCtx = nextCtx;
-        this.nextCanvas = nextCanvas;
+        this.nextCtxs = nextCtxs;
+        this.nextCanvases = nextCanvases;
         this.spriteCache = spriteCache;
         this.nextSpriteCache = nextSpriteCache;
         this.boardConfig = boardConfig;
@@ -373,11 +373,11 @@ export class Renderer {
         this._boardOffsetY = 0;
         const offset = shiftRows * this.boardConfig.CELL_SIZE;
         el.style.transition = "none";
-        el.style.translate = `0px ${-offset}px`;
+        el.style.translate = `0 ${-offset}px`;
         el.getBoundingClientRect();
         el.style.setProperty("--shake-duration", `${durationMs}ms`);
         el.style.transition = "";
-        el.style.translate = "0px 0px";
+        el.style.translate = "0 0";
     }
 
     shakeMove(dir) {
@@ -901,16 +901,6 @@ export class Renderer {
         ctx.restore();
     }
 
-    /**
-     * Draws the hard-drop impact flash: a bright band that sweeps up through the piece that
-     * just slammed down, from its bottom edge to its top edge, fading out as it travels.
-     * Clipped to the piece's own cells so it only lights up the piece itself, not the board.
-     *
-     * @param {{x:number, y:number, mask, width:number, height:number}} entry - snapshot of the
-     *   piece at the moment it locked.
-     * @param {number} progress - 0 (band at the piece's bottom, fully bright) to 1 (band past
-     *   the piece's top, fully faded).
-     */
     drawHardDropImpactFlash(entry, progress, surface = this) {
         if (!entry || !entry.mask || progress >= 1) return;
 
@@ -999,14 +989,6 @@ export class Renderer {
         });
     }
 
-    /**
-     * Draws the sweeping line-clear flash: a bright column-wide band that runs in from both
-     * edges toward the middle. Columns it has already swept past are left dark (their block is
-     * already gone and particles are showing there instead).
-     *
-     * @param {number[]} lineIndices - rows being cleared
-     * @param {Float32Array} colFlash - per-column flash intensity, 0..1, indexed by board column
-     */
     drawClearingFlash(lineIndices, colFlash, {
         ctx = this.ctx,
         size = this.boardConfig.CELL_SIZE,
@@ -1074,19 +1056,30 @@ export class Renderer {
         ctx.restore();
     }
 
-    drawNext(type) {
-        const {nextCtx, nextCanvas, nextPreviewCellSize} = this;
-        nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
-        if (!type) return;
+    /**
+     * Draws the upcoming-pieces queue, one piece per canvas.
+     *
+     * @param {Array<string|null>} types - upcoming piece types, index 0 = soonest to spawn
+     */
+    drawNext(types = []) {
+        const {nextCtxs, nextCanvases, nextPreviewCellSize} = this;
+        nextCanvases.forEach((nextCanvas, i) => {
+            const nextCtx = nextCtxs[i];
+            if (!nextCtx) return;
+            nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
 
-        const {states, width, height, color} = this.klockominos[type];
-        const mask = states[0];
-        const bounds = getTightBounds(mask, width, height);
-        const offsetX = (nextCanvas.width / nextPreviewCellSize - bounds.width) / 2 - bounds.minX;
-        const offsetY = (nextCanvas.height / nextPreviewCellSize - bounds.height) / 2 - bounds.minY;
+            const type = types[i];
+            if (!type) return;
 
-        forEachShapeCell(mask, width, height, (r, c) => {
-            this.drawCell(nextCtx, offsetX + c, offsetY + r, color, nextPreviewCellSize, {cache: this.nextSpriteCache});
+            const {states, width, height, color} = this.klockominos[type];
+            const mask = states[0];
+            const bounds = getTightBounds(mask, width, height);
+            const offsetX = (nextCanvas.width / nextPreviewCellSize - bounds.width) / 2 - bounds.minX;
+            const offsetY = (nextCanvas.height / nextPreviewCellSize - bounds.height) / 2 - bounds.minY;
+
+            forEachShapeCell(mask, width, height, (r, c) => {
+                this.drawCell(nextCtx, offsetX + c, offsetY + r, color, nextPreviewCellSize, {cache: this.nextSpriteCache});
+            });
         });
     }
 }

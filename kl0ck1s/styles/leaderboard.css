@@ -37,22 +37,22 @@
     cursor: pointer;
     user-select: none;
     transition: color 0.15s ease, filter 0.15s ease, transform 0.15s ease;
-}
 
-.leaderboard__share-button:hover,
-.leaderboard__share-button:focus-visible {
-    color: var(--text);
-    filter: brightness(1.35);
-}
+    &:hover,
+    &:focus-visible {
+        color: var(--text);
+        filter: brightness(1.35);
+    }
 
-.leaderboard__share-button:active {
-    transform: scale(0.92);
-}
+    &:active {
+        transform: scale(0.92);
+    }
 
-.leaderboard__share-button:disabled {
-    opacity: 0.6;
-    cursor: default;
-    transform: none;
+    &:disabled {
+        opacity: 0.6;
+        cursor: default;
+        transform: none;
+    }
 }
 
 .leaderboard__table {

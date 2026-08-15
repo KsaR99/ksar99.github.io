@@ -174,17 +174,17 @@
     scrollbar-width: thin;
     scrollbar-color: var(--accent) transparent;
     user-select: none;
-}
 
-.mode-description::-webkit-scrollbar {
-    width: 5px;
-}
+    &::-webkit-scrollbar {
+        width: 5px;
+    }
 
-.mode-description::-webkit-scrollbar-track {
-    background: transparent;
-}
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
 
-.mode-description::-webkit-scrollbar-thumb {
-    background: var(--accent);
-    border-radius: 3px;
+    &::-webkit-scrollbar-thumb {
+        background: var(--accent);
+        border-radius: 3px;
+    }
 }

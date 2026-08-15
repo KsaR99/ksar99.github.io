@@ -59,16 +59,20 @@ const boardStage = bodyEl.querySelector(".board__stage");
 const boardDiv = boardStage.parentElement;
 const sidebarStatsEl = bodyEl.querySelector(".sidebar--stats");
 const statsCardEl = sidebarStatsEl.querySelector('[data-role="stats-card"]');
+const statusCardEl = sidebarStatsEl.querySelector('[data-role="status-card"]');
 const nextPieceCardEl = sidebarStatsEl.querySelector('[data-role="next-piece-card"]');
 
 /** @type {HTMLCanvasElement} */
 const boardCanvas = boardStage.querySelector("#klockis-board");
 const ctx = boardCanvas.getContext("2d");
 
-/** @type {HTMLCanvasElement} */
-const nextCanvas = nextPieceCardEl.querySelector("#next-piece-canvas");
-const nextCtx = nextCanvas.getContext("2d");
-nextCtx.imageSmoothingEnabled = false;
+/** @type {Array<HTMLCanvasElement>} */
+const nextCanvases = Array.from(nextPieceCardEl.querySelectorAll(".next-piece__canvas"));
+const nextCtxs = nextCanvases.map((canvas) => {
+    const context = canvas.getContext("2d");
+    context.imageSmoothingEnabled = false;
+    return context;
+});
 
 function getSidebarInlineFootprint() {
     const sidebars = bodyEl.querySelectorAll(".app__sidebar");
@@ -138,8 +142,8 @@ const renderer = new Renderer({
     boardEl: boardStage,
     ctx,
     boardCanvas,
-    nextCtx,
-    nextCanvas,
+    nextCtxs,
+    nextCanvases,
     spriteCache,
     nextSpriteCache,
     boardConfig: BOARD_CONFIG,
@@ -157,13 +161,14 @@ const hud = new HUD({
     bestRowEl: statsCardEl.querySelector('[data-role="best-stat"]'),
     overlayEl: boardStage.querySelector("#overlay"),
     nextPieceCardEl,
-    statsStatusEl: statsCardEl.querySelector('[data-role="stats-status"]'),
+    statsStatusEl: statusCardEl.querySelector('[data-role="stats-status"]'),
     difficultyEl: statsCardEl.querySelector("#difficulty-value"),
     difficultyBarEl: statsCardEl.querySelector("#difficulty-bar"),
     difficultyRowEl: statsCardEl.querySelector('[data-role="difficulty-stat"]'),
     statsCardEl,
+    statusCardEl,
     i18n,
-    timeEl: statsCardEl.querySelector("#time-value"),
+    timeEl: statusCardEl.querySelector("#time-value"),
     droughtEl: statsCardEl.querySelector("#drought-value"),
     tetrisRateEl: statsCardEl.querySelector("#trt-value"),
     ppsEl: statsCardEl.querySelector("#pps-value"),

@@ -11,8 +11,6 @@ export class Board {
         this.reset();
     }
 
-    /** occupancy[y] = bitmask of filled columns in row y (bit c = column c). */
-    /** colors[y*cols+x] = colorIndex (0 = empty), used only for rendering the locked board. */
     reset() {
         this.occupancy = new Uint32Array(this.rows);
         this.colors = new Uint8Array(this.rows * this.cols);

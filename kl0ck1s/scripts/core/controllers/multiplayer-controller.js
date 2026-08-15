@@ -14,7 +14,7 @@ import {browseLobby, hostOpenLobby, requestJoinRoom, SupabaseSignalError} from "
 import {BOT_DIFFICULTIES, BotOpponent} from "../ai/bot-opponent.js";
 import {PieceBag} from "../game/piece-bag.js";
 import {mulberry32, randomSeed} from "../shared/seeded-random.js";
-import {formatDurationPrecise, formatNumber} from "../shared/utils.js";
+import {formatNumber} from "../shared/utils.js";
 import {BOARD_CONFIG, KLOCKOMINO_TYPES} from "../shared/config.js";
 
 const SCORE_POLL_MS = 200;
@@ -117,8 +117,11 @@ export class MultiplayerController {
         this._frameLoopRaf = null;
         this._opponentBadgeEl = null;
         this._opponentNameBadgeEl = null;
+        this._opponentObjectiveWrapEl = null;
+        this._opponentObjectiveFillEl = null;
+        this._opponentObjectiveLabelEl = null;
+        this._opponentObjectiveTrackEl = null;
         this._opponentScoreBadgeEl = null;
-        this._opponentBestBadgeEl = null;
         this._opponentLinesBadgeEl = null;
         this._opponentTrtBadgeEl = null;
         this._opponentPpsBadgeEl = null;
@@ -885,6 +888,7 @@ export class MultiplayerController {
             this._lastSentScore = statsSnapshot.score;
             this._sendToPeer({kind: MESSAGE_KIND.STATS, ...statsSnapshot});
             this._updateRaceMeter(statsSnapshot);
+            this._updateLiveComparison(statsSnapshot);
 
             if (game.board && game.state !== "clearing" && game.board.version !== this._lastSentBoardVersion) {
                 this._lastSentBoardVersion = game.board.version;
@@ -941,8 +945,10 @@ export class MultiplayerController {
         const efficiencyValue = game.lines > 0 ? game.score / game.lines : 0;
         const droughtAvgValue = game.droughtCount > 0 ? game.droughtTotal / game.droughtCount : 0;
         const isTimedRaceMode = game.mode === "sprint" || game.mode === "cheeseRace";
-        const bestEntry = game.leaderboard.bestEntry(game.mode);
-        const bestRaw = bestEntry ? (isTimedRaceMode ? bestEntry.timeMs : bestEntry.score) : null;
+        const linesPerLevel = game.scoring.LINES_PER_LEVEL;
+        const difficultyPercent = linesPerLevel
+            ? Math.floor(((game.lines % linesPerLevel) / linesPerLevel) * 100)
+            : 0;
 
         const def = game.gameModes[game.mode];
         let raceCompleted = null;
@@ -964,8 +970,16 @@ export class MultiplayerController {
             efficiency: efficiencyValue,
             tetrisRatePercent,
             pps,
-            bestRaw,
-            bestIsTime: isTimedRaceMode,
+            isTimedRaceMode,
+            objective: game.modeController.objectiveText(),
+            objectiveLabelKey: game.mode === "zen" ? "sidebar.height" : "sidebar.objective",
+            objectivePercent: game.modeController.objectivePercent(),
+            objectiveUrgency: game.modeController.objectiveUrgency(),
+            objectiveColorMode: game.modeController.objectiveColorMode(),
+            hasLevelProgress: game.gameModes[game.mode].freezeLevel !== true,
+            difficultyTier: game.levelTier,
+            difficultyLevel: game.level,
+            difficultyPercent,
         };
     }
 
@@ -1287,7 +1301,7 @@ export class MultiplayerController {
     _showOpponentBadge() {
         this._hideOpponentBadge();
         const statsCard = this.dom.querySelector('[data-role="stats-card"]');
-        const sidebar = this.dom.querySelector(".app__sidebar");
+        const sidebar = this.dom.querySelector(".app__sidebar.sidebar--stats");
         if (!statsCard && !sidebar) return;
 
         const panel = this.dom.createElement("div");
@@ -1301,13 +1315,13 @@ export class MultiplayerController {
         name.textContent = this._remoteDisplayName();
         panel.appendChild(name);
 
-        this._opponentBestBadgeEl = this._appendStatRow(panel, "sidebar.best", "mp-opponent-best-value", "—");
-        this._opponentBestBadgeEl.closest(".stats__row").classList.add("stats__row--hidden");
         this._opponentScoreBadgeEl = this._appendStatRow(panel, "sidebar.score", "mp-opponent-score-value", formatNumber(0));
         this._opponentLinesBadgeEl = this._appendStatRow(panel, "sidebar.lines", "mp-opponent-lines-value", "0");
         this._opponentTrtBadgeEl = this._appendStatRow(panel, "sidebar.tetrisRate", "mp-opponent-trt-value", "0.0%");
         this._opponentPpsBadgeEl = this._appendStatRow(panel, "sidebar.pps", "mp-opponent-pps-value", "0.00");
         this._opponentDroughtBadgeEl = this._appendStatRow(panel, "sidebar.drought", "mp-opponent-drought-value", "0");
+        this._opponentObjectiveTrackEl = this._appendObjectiveBar(panel);
+        this._opponentDifficultyTrackEl = this._appendDifficultyBar(panel);
 
         if (statsCard) statsCard.insertAdjacentElement("beforebegin", panel);
         else sidebar.prepend(panel);
@@ -1337,6 +1351,62 @@ export class MultiplayerController {
         return value;
     }
 
+    _appendObjectiveBar(panel) {
+        const wrap = this.dom.createElement("div");
+        wrap.dataset.role = "mp-opponent-objective-stat";
+        wrap.classList.add("stats__row--hidden");
+
+        const track = this.dom.createElement("div");
+        track.className = "progress-bar progress-bar--objective";
+        track.dataset.role = "mp-opponent-objective-track";
+
+        const fill = this.dom.createElement("div");
+        fill.className = "progress-bar__fill";
+        fill.dataset.role = "mp-opponent-objective-fill";
+
+        const label = this.dom.createElement("div");
+        label.className = "progress-bar__label";
+        label.dataset.role = "mp-opponent-objective-value";
+        label.textContent = "—";
+
+        track.appendChild(fill);
+        track.appendChild(label);
+        wrap.appendChild(track);
+        panel.appendChild(wrap);
+
+        this._opponentObjectiveWrapEl = wrap;
+        this._opponentObjectiveFillEl = fill;
+        this._opponentObjectiveLabelEl = label;
+        return track;
+    }
+
+    _appendDifficultyBar(panel) {
+        const wrap = this.dom.createElement("div");
+        wrap.className = "difficulty-indicator";
+        wrap.dataset.role = "mp-opponent-difficulty-stat";
+
+        const track = this.dom.createElement("div");
+        track.className = "progress-bar progress-bar--difficulty";
+
+        const fill = this.dom.createElement("div");
+        fill.className = "progress-bar__fill";
+        fill.dataset.role = "mp-opponent-difficulty-fill";
+
+        const label = this.dom.createElement("div");
+        label.className = "progress-bar__label";
+        label.dataset.role = "mp-opponent-difficulty-value";
+        label.textContent = "—";
+
+        track.appendChild(fill);
+        track.appendChild(label);
+        wrap.appendChild(track);
+        panel.appendChild(wrap);
+
+        this._opponentDifficultyFillEl = fill;
+        this._opponentDifficultyLabelEl = label;
+        return track;
+    }
+
     _createLeaveButton() {
         const button = this.dom.createElement("button");
         button.type = "button";
@@ -1352,30 +1422,100 @@ export class MultiplayerController {
         this._opponentBadgeEl?.remove();
         this._opponentBadgeEl = null;
         this._opponentNameBadgeEl = null;
+        this._opponentObjectiveWrapEl = null;
+        this._opponentObjectiveFillEl = null;
+        this._opponentObjectiveLabelEl = null;
+        this._opponentObjectiveTrackEl = null;
         this._opponentScoreBadgeEl = null;
-        this._opponentBestBadgeEl = null;
         this._opponentLinesBadgeEl = null;
         this._opponentTrtBadgeEl = null;
         this._opponentPpsBadgeEl = null;
         this._opponentDroughtBadgeEl = null;
+        this._opponentDifficultyTrackEl = null;
+        this._opponentDifficultyFillEl = null;
+        this._opponentDifficultyLabelEl = null;
+        this._clearLiveComparisonColors();
     }
 
     _updateOpponentStats(payload) {
         this._lastRemoteScore = payload.score ?? 0;
         this._lastRemoteStats = payload;
-        const bestRow = this._opponentBestBadgeEl?.closest(".stats__row");
-        if (bestRow) bestRow.classList.toggle("stats__row--hidden", payload.bestRaw === null || payload.bestRaw === undefined);
-        if (this._opponentBestBadgeEl) this._opponentBestBadgeEl.textContent = this._formatBest(payload.bestRaw, payload.bestIsTime);
+
+        const hasObjective = payload.objective !== null && payload.objective !== undefined;
+        if (this._opponentObjectiveWrapEl) this._opponentObjectiveWrapEl.classList.toggle("stats__row--hidden", !hasObjective);
+        if (hasObjective) {
+            if (this._opponentObjectiveLabelEl) {
+                this._opponentObjectiveLabelEl.textContent = `${this._t(payload.objectiveLabelKey ?? "sidebar.objective")}: ${payload.objective}`;
+            }
+
+            const percent = payload.objectivePercent;
+            if (this._opponentObjectiveFillEl) {
+                if (percent !== null && percent !== undefined) {
+                    this._opponentObjectiveFillEl.style.width = `${percent}%`;
+                    this._opponentObjectiveFillEl.style.backgroundColor = payload.objectiveColorMode === "ramp"
+                        ? `color-mix(in oklch, var(--accent-2) ${100 - percent}%, var(--good) ${percent}%)`
+                        : "";
+                } else {
+                    this._opponentObjectiveFillEl.style.width = "0%";
+                    this._opponentObjectiveFillEl.style.backgroundColor = "";
+                }
+            }
+
+            if (this._opponentObjectiveTrackEl) {
+                this._opponentObjectiveTrackEl.dataset.urgency = payload.objectiveUrgency ?? "";
+            }
+        }
+
         if (this._opponentScoreBadgeEl) this._opponentScoreBadgeEl.textContent = formatNumber(payload.score ?? 0);
         if (this._opponentLinesBadgeEl) this._opponentLinesBadgeEl.textContent = String(payload.lines ?? 0);
         if (this._opponentTrtBadgeEl) this._opponentTrtBadgeEl.textContent = `${(payload.tetrisRatePercent ?? 0).toFixed(1)}%`;
         if (this._opponentPpsBadgeEl) this._opponentPpsBadgeEl.textContent = (payload.pps ?? 0).toFixed(2);
         if (this._opponentDroughtBadgeEl) this._opponentDroughtBadgeEl.textContent = String(payload.drought ?? 0);
+
+        const hasLevelProgress = payload.hasLevelProgress !== false && payload.difficultyTier !== undefined;
+        if (this._opponentDifficultyTrackEl) {
+            this._opponentDifficultyTrackEl.parentElement.classList.toggle("stats__row--hidden", !hasLevelProgress);
+        }
+        if (hasLevelProgress) {
+            if (this._opponentDifficultyLabelEl) {
+                this._opponentDifficultyLabelEl.textContent = `${this._t(`difficulty.${payload.difficultyTier}`)} ${payload.difficultyLevel ?? 1}`;
+            }
+            if (this._opponentDifficultyFillEl && payload.difficultyPercent !== undefined) {
+                this._opponentDifficultyFillEl.style.width = `${payload.difficultyPercent}%`;
+            }
+        }
+
+        this._updateLiveComparison();
     }
 
-    _formatBest(bestRaw, bestIsTime) {
-        if (bestRaw === null || bestRaw === undefined) return bestIsTime ? "—" : formatNumber(0);
-        return bestIsTime ? formatDurationPrecise(bestRaw) : formatNumber(bestRaw);
+    _updateLiveComparison(localSnapshot = null) {
+        const remote = this._lastRemoteStats;
+        if (!remote || !this._opponentBadgeEl) return;
+        const local = localSnapshot ?? this._localStatsSnapshot();
+
+        const pair = (localEl, remoteEl, localRaw, remoteRaw, lowerBetter = false) => {
+            if (!localEl && !remoteEl) return;
+            localEl?.classList.remove("stats__value--better", "stats__value--worse");
+            remoteEl?.classList.remove("stats__value--better", "stats__value--worse");
+            if (localRaw === remoteRaw) return;
+            const localIsBetter = lowerBetter ? localRaw < remoteRaw : localRaw > remoteRaw;
+            localEl?.classList.add(localIsBetter ? "stats__value--better" : "stats__value--worse");
+            remoteEl?.classList.add(localIsBetter ? "stats__value--worse" : "stats__value--better");
+        };
+
+        const dom = this.dom;
+        pair(dom.getElementById("score-value"), this._opponentScoreBadgeEl, local.score, remote.score ?? 0);
+        pair(dom.getElementById("lines-value"), this._opponentLinesBadgeEl, local.lines, remote.lines ?? 0);
+        pair(dom.getElementById("trt-value"), this._opponentTrtBadgeEl, local.tetrisRatePercent, remote.tetrisRatePercent ?? 0);
+        pair(dom.getElementById("pps-value"), this._opponentPpsBadgeEl, local.pps, remote.pps ?? 0);
+        pair(dom.getElementById("drought-value"), this._opponentDroughtBadgeEl, local.drought, remote.drought ?? 0, true);
+    }
+
+    _clearLiveComparisonColors() {
+        const dom = this.dom;
+        ["score-value", "lines-value", "trt-value", "pps-value", "drought-value"].forEach((id) => {
+            dom?.getElementById(id)?.classList.remove("stats__value--better", "stats__value--worse");
+        });
     }
 
     _raceMetric(stats) {
@@ -1432,7 +1572,6 @@ export class MultiplayerController {
         name.className = "mp-opponent-column__name";
         name.textContent = this._remoteDisplayName();
         header.appendChild(name);
-        header.appendChild(this._createLeaveButton());
 
         panel.appendChild(header);
 

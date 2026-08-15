@@ -4,7 +4,7 @@ import {Piece} from "../game/piece.js";
 import {pointsForHardDrop, pointsForSoftDrop} from "../game/scoring.js";
 import {getKickTable, PIECE_CONTROLLABLE_STATES, T_FRONT_CORNERS} from "../game/game-constants.js";
 import {forEachShapeCell, getTightBounds} from "../shared/utils.js";
-import {LINE_CLEAR_SOUND_PLAYBACK_RATE} from "../shared/config.js";
+import {LINE_CLEAR_SOUND_PLAYBACK_RATE, NEXT_PREVIEW_QUEUE_SIZE} from "../shared/config.js";
 
 const GROUNDED_GRACE_MS = 100;
 const GROUNDED_SOUND_REFERENCE_DURATION_MS = 1500;
@@ -31,19 +31,19 @@ export class PieceController {
 
         game.current = new Piece(game.bag.next(), {cols: game.board.cols});
         game.statsTracker.registerPieceSpawn(game.current.type);
-        game.next = game.bag.next();
-        game.renderer.drawNext(game.next);
+        game.nextQueue = game.bag.peek(NEXT_PREVIEW_QUEUE_SIZE);
+        game.renderer.drawNext(game.nextQueue);
         this.snapToPointer();
     }
 
     spawnNext() {
         const game = this.game;
         game.modeController.maybeApplyZenOverflow();
-        game.current = new Piece(game.next, {cols: game.board.cols});
+        game.current = new Piece(game.bag.next(), {cols: game.board.cols});
         game.statsTracker.registerPieceSpawn(game.current.type);
-        game.next = game.bag.next();
+        game.nextQueue = game.bag.peek(NEXT_PREVIEW_QUEUE_SIZE);
         this.resetPerPieceState();
-        game.renderer.drawNext(game.next);
+        game.renderer.drawNext(game.nextQueue);
         this.snapToPointer();
 
         if (game.board.collides(game.current, 0, 0)) {

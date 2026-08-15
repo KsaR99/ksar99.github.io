@@ -104,7 +104,7 @@ export class Game {
         this.pointerClientY = null;
 
         this.current = null;
-        this.next = null;
+        this.nextQueue = [];
         this.rotationAnim = null;
         this.shiftAnim = null;
         this.dropCounter = 0;

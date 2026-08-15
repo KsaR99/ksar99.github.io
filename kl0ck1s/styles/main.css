@@ -21,10 +21,10 @@
     --radius: 0.5rem;
 
     --touch-bar-h: clamp(3.75rem, 9svh, 4.75rem);
-    --safe-t: env(safe-area-inset-top, 0px);
-    --safe-b: env(safe-area-inset-bottom, 0px);
-    --safe-l: env(safe-area-inset-left, 0px);
-    --safe-r: env(safe-area-inset-right, 0px);
+    --safe-t: env(safe-area-inset-top, 0);
+    --safe-b: env(safe-area-inset-bottom, 0);
+    --safe-l: env(safe-area-inset-left, 0);
+    --safe-r: env(safe-area-inset-right, 0);
     --z-fab: 3;
     --z-credits: 29;
     --z-drawer: 28;
@@ -367,11 +367,6 @@ body.hud-right .sidebar--stats.app__sidebar--open {
     right: 0;
 }
 
-body.hud-right .card[data-role="next-piece-card"] {
-    display: flex;
-    flex-direction: row-reverse;
-}
-
 .card[data-role="next-piece-card"] {
     position: fixed;
     top: 50%;
@@ -380,10 +375,10 @@ body.hud-right .card[data-role="next-piece-card"] {
     z-index: var(--z-fab);
     display: flex;
     align-items: center;
+    justify-content: center;
     width: 5rem;
     height: 5rem;
     padding: 0;
-    justify-content: space-between;
     background: oklch(from var(--bg-2) l c h / 0.7);
     border-radius: var(--radius);
 }
@@ -392,9 +387,20 @@ body.hud-right .card[data-role="next-piece-card"] {
     display: none;
 }
 
+[data-role="next-piece-queue"] {
+    display: flex;
+    align-items: center;
+    gap: 0.125rem;
+    flex-direction: row-reverse;
+}
+
+body.hud-right [data-role="next-piece-queue"] {
+    flex-direction: row;
+}
+
 [data-role="next-piece-card"] .next-piece__canvas {
-    width: 5rem;
-    height: 5rem;
+    width: 1.375rem;
+    height: 0.6875rem;
     background: oklch(from var(--bg-2) l c h / 0.4);
 }
 
@@ -405,11 +411,11 @@ body.hud-right .card[data-role="next-piece-card"] {
     left: calc(var(--safe-l) + 0.5rem + (var(--fab-size) * 2) + (var(--fab-gap) * 2));
     right: calc(var(--safe-r) + 0.5rem + var(--fab-size) + var(--fab-gap));
     z-index: var(--z-fab);
-}
 
-[data-role="difficulty-stat"] .progress-bar--difficulty {
-    height: 100%;
-    background: oklch(from var(--bg-2) l c h / 0.75);
+    & .progress-bar--difficulty {
+        height: 100%;
+        background: oklch(from var(--bg-2) l c h / 0.75);
+    }
 }
 
 .board {
@@ -420,8 +426,9 @@ body.hud-right .card[data-role="next-piece-card"] {
     box-shadow: var(--board-accent, oklch(0.39 0 0)) 0 0 1.15rem 0.25rem;
 
     /** Opponent / M.P. */
+
     &.board--theme-none {
-        --board-bg: oklch(0.18 0 0);
+        --board-bg: oklch(0.15 0 0);
         --board-accent: oklch(0.49 0 0 / 0.85);
     }
 
@@ -436,7 +443,7 @@ body.hud-right .card[data-role="next-piece-card"] {
     }
 
     &.board--theme-volcano {
-        --board-bg: linear-gradient(180deg, oklch(0.37 0.11 50.6), oklch(0.4 0.11 56.42), oklch(0.23 0.07 54.64));
+        --board-bg: linear-gradient(180deg, oklch(0.33 0.1 52.27), oklch(0.15 0.04 69.07), oklch(0.25 0.07 54.41));
         --board-accent: oklch(0.41 0.11 56.07 / 0.85);
     }
 
@@ -475,7 +482,6 @@ body.perf-no-glow .screen__title {
     width: 100%;
     height: 100%;
 }
-
 
 .board__overlay {
     position: absolute;
@@ -554,12 +560,12 @@ body.perf-no-transparency .board__overlay--transparent {
     color: var(--text);
     text-decoration: none;
     font-size: 1.1rem;
-}
 
-.board__credits__link:hover,
-.board__credits__link:focus-visible {
-    color: var(--accent);
-    text-decoration: underline;
+    &:hover,
+    &:focus-visible {
+        color: var(--accent);
+        text-decoration: underline;
+    }
 }
 
 .board__credits__roles {
@@ -603,7 +609,7 @@ body.perf-no-transparency .board__overlay--transparent {
     content: "";
     position: absolute;
     inset: 0;
-    background: repeating-linear-gradient(0deg, oklch(0 0 0 / 20%) 0px, oklch(0 0 0 / 20%) 1px, transparent 1px, transparent 3px),
+    background: repeating-linear-gradient(0deg, oklch(0 0 0 / 20%) 0, oklch(0 0 0 / 20%) 1px, transparent 1px, transparent 3px),
     linear-gradient(180deg, oklch(1 0 0 / 8%), transparent 35%, transparent 65%, oklch(1 0 0 / 8%));
     mix-blend-mode: overlay;
     animation: vhs-roll 7s linear infinite;
@@ -619,10 +625,10 @@ body.perf-no-glow .board__filter--active.board__filter--vhs::after {
 }
 
 @keyframes vhs-roll {
-    0% {
+    from {
         background-position: 0 0, 0 0;
     }
-    100% {
+    to {
         background-position: 0 220px, 0 0;
     }
 }
@@ -710,16 +716,18 @@ body.perf-no-glow .board__filter--active.board__filter--vhs::after {
     transition: background-color 0.25s ease;
 }
 
-.screen--countdown[data-tint="red"] {
-    background-color: oklch(0.55 0.22 25 / 35%);
-}
+.screen--countdown {
+    &[data-tint="red"] {
+        background-color: oklch(0.55 0.22 25 / 35%);
+    }
 
-.screen--countdown[data-tint="yellow"] {
-    background-color: oklch(0.86 0.19 95 / 35%);
-}
+    &[data-tint="yellow"] {
+        background-color: oklch(0.86 0.19 95 / 35%);
+    }
 
-.screen--countdown[data-tint="green"] {
-    background-color: oklch(0.72 0.19 145 / 35%);
+    &[data-tint="green"] {
+        background-color: oklch(0.72 0.19 145 / 35%);
+    }
 }
 
 .countdown__number {
@@ -799,18 +807,18 @@ body.perf-no-glow .board__filter--active.board__filter--vhs::after {
     cursor: pointer;
     transition: color 0.15s ease, filter 0.15s ease;
     user-select: none;
-}
 
-.settings-shortcut-icon:hover,
-.settings-shortcut-icon:focus-visible {
-    color: var(--text);
-    filter: brightness(1.35);
-}
+    &:hover,
+    &:focus-visible {
+        color: var(--text);
+        filter: brightness(1.35);
+    }
 
-.settings-shortcut-icon[aria-pressed="true"] {
-    color: oklch(0 0 0);
-    background: var(--accent-2);
-    border-color: var(--accent-2);
+    &[aria-pressed="true"] {
+        color: oklch(0 0 0);
+        background: var(--accent-2);
+        border-color: var(--accent-2);
+    }
 }
 
 .card__title {
@@ -894,11 +902,20 @@ body.perf-no-glow .board__filter--active.board__filter--vhs::after {
 .stats__value {
     font-family: var(--font-display);
     font-size: 0.95rem;
-    color: var(--accent-2);
+    color: var(--text);
+    transition: color 0.15s ease;
 
     &[id="time-value"], &[id="pps-value"], &[id="score-value"] {
         text-rendering: optimizeSpeed;
     }
+}
+
+.stats__value--better {
+    color: var(--good);
+}
+
+.stats__value--worse {
+    color: var(--danger);
 }
 
 .stats__status {
@@ -947,6 +964,10 @@ body.perf-no-glow .board__filter--active.board__filter--vhs::after {
     position: relative;
     height: 1.5rem;
     border-radius: var(--radius);
+    margin-top: 0.15rem;
+}
+
+.mp-opponent-stats .difficulty-indicator {
     margin-top: 0.15rem;
 }
 
@@ -1179,18 +1200,18 @@ body.perf-no-glow .board__filter--active.board__filter--vhs::after {
     line-height: 1;
     min-height: 1.2em;
     color: var(--text);
-}
 
-.board__calibration__countdown[data-tint="red"] {
-    color: oklch(0.55 0.22 25);
-}
+    &[data-tint="red"] {
+        color: oklch(0.55 0.22 25);
+    }
 
-.board__calibration__countdown[data-tint="yellow"] {
-    color: oklch(0.86 0.19 95);
-}
+    &[data-tint="yellow"] {
+        color: oklch(0.86 0.19 95);
+    }
 
-.board__calibration__countdown[data-tint="green"] {
-    color: oklch(0.72 0.19 145);
+    &[data-tint="green"] {
+        color: oklch(0.72 0.19 145);
+    }
 }
 
 .board__calibration__countdown--pop {
@@ -1237,11 +1258,17 @@ body.perf-no-glow .board__filter--active.board__filter--vhs::after {
     line-height: 1;
     cursor: pointer;
     user-select: none;
-}
 
-.mobile-fab:active {
-    background: var(--panel);
-    border-color: var(--accent-2);
+    &:active {
+        background: var(--panel);
+        border-color: var(--accent-2);
+    }
+
+    &[aria-pressed="true"] {
+        color: oklch(0 0 0);
+        background: var(--accent-2);
+        border-color: var(--accent-2);
+    }
 }
 
 .drawer-close {
@@ -1263,12 +1290,6 @@ body.perf-no-glow .board__filter--active.board__filter--vhs::after {
 
 .sidebar--stats > .drawer-close {
     right: 0.6rem;
-}
-
-.mobile-fab[aria-pressed="true"] {
-    color: oklch(0 0 0);
-    background: var(--accent-2);
-    border-color: var(--accent-2);
 }
 
 .drawer-scrim {
@@ -1325,12 +1346,12 @@ body.perf-no-glow .board__filter--active.board__filter--vhs::after {
     touch-action: none;
     user-select: none;
     -webkit-user-select: none;
-}
 
-.touch-controls__btn:active {
-    background: oklch(25.039% 0.02732 271.986);
-    border-color: var(--accent-2);
-    color: var(--accent-2);
+    &:active {
+        background: oklch(25.039% 0.02732 271.986);
+        border-color: var(--accent-2);
+        color: var(--accent-2);
+    }
 }
 
 .touch-controls__btn--wide {

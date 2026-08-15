@@ -4,7 +4,7 @@ export class HUD {
     constructor({
                     scoreEl, linesEl, bestEl, overlayEl,
                     nextPieceCardEl = null, statsStatusEl = null, difficultyEl = null,
-                    difficultyBarEl = null, statsCardEl = null, i18n = null,
+                    difficultyBarEl = null, statsCardEl = null, statusCardEl = null, i18n = null,
                     timeEl = null, droughtEl = null, tetrisRateEl = null, ppsEl = null,
                     objectiveEl = null, objectiveRowEl = null,
                     objectiveBarEl = null, objectiveBarTrackEl = null, linesRowEl = null,
@@ -21,7 +21,9 @@ export class HUD {
         this.difficultyEl = difficultyEl;
         this.difficultyBarEl = difficultyBarEl;
         this.statsCardEl = statsCardEl;
+        this.statusCardEl = statusCardEl;
         this.i18n = i18n;
+        this._statusOverride = null;
         this.timeEl = timeEl;
         this.droughtEl = droughtEl;
         this.tetrisRateEl = tetrisRateEl;
@@ -70,6 +72,9 @@ export class HUD {
         if (this.statsCardEl) {
             this.statsCardEl.classList.toggle("card--hidden", !hasPlayedBefore);
         }
+        if (this.statusCardEl) {
+            this.statusCardEl.classList.toggle("card--hidden", !hasPlayedBefore);
+        }
     }
 
     setPlaying(isPlaying, mode = null) {
@@ -81,16 +86,36 @@ export class HUD {
             this.nextPieceCardEl.classList.toggle("card--hidden", !isPlaying);
         }
         if (this.statsStatusEl) {
-            const text = isPlaying && mode
-                ? (this.i18n ? this.i18n.t(`modes.${mode}.name`) : mode)
-                : (this.i18n ? this.i18n.t("sidebar.statusLast") : "Last game");
-
-            if (this._cache.statsStatusText !== text) {
-                this._cache.statsStatusText = text;
-                this.statsStatusEl.textContent = text;
-            }
+            this._refreshStatusText();
             this.statsStatusEl.classList.toggle("stats__status--live", isPlaying);
         }
+    }
+
+    _refreshStatusText() {
+        if (!this.statsStatusEl) return;
+        const {isPlaying, statsStatusMode: mode} = this._cache;
+        const text = this._statusOverride != null
+            ? this._statusOverride
+            : (isPlaying && mode
+                ? (this.i18n ? this.i18n.t(`modes.${mode}.name`) : mode)
+                : (this.i18n ? this.i18n.t("sidebar.statusLast") : "Last game"));
+
+        if (this._cache.statsStatusText !== text) {
+            this._cache.statsStatusText = text;
+            this.statsStatusEl.textContent = text;
+        }
+    }
+
+    setStatusOverride(text) {
+        if (this._statusOverride === text) return;
+        this._statusOverride = text;
+        this._refreshStatusText();
+    }
+
+    clearStatusOverride() {
+        if (this._statusOverride == null) return;
+        this._statusOverride = null;
+        this._refreshStatusText();
     }
 
     update({
@@ -163,14 +188,21 @@ export class HUD {
                 this._setText(this.objectiveEl, "objective", objective);
             }
 
-            if (this.objectiveBarEl && hasObjective && objectivePercent !== undefined && objectivePercent !== null) {
-                if (this._cache.objectivePercent !== objectivePercent || this._cache.objectiveColorMode !== objectiveColorMode) {
-                    this._cache.objectivePercent = objectivePercent;
-                    this._cache.objectiveColorMode = objectiveColorMode;
-                    this.objectiveBarEl.style.width = `${objectivePercent}%`;
-                    this.objectiveBarEl.style.backgroundColor = objectiveColorMode === "ramp"
-                        ? `color-mix(in oklch, var(--accent-2) ${100 - objectivePercent}%, var(--good) ${objectivePercent}%)`
-                        : "";
+            if (this.objectiveBarEl && hasObjective) {
+                if (objectivePercent !== undefined && objectivePercent !== null) {
+                    if (this._cache.objectivePercent !== objectivePercent || this._cache.objectiveColorMode !== objectiveColorMode) {
+                        this._cache.objectivePercent = objectivePercent;
+                        this._cache.objectiveColorMode = objectiveColorMode;
+                        this.objectiveBarEl.style.width = `${objectivePercent}%`;
+                        this.objectiveBarEl.style.backgroundColor = objectiveColorMode === "ramp"
+                            ? `color-mix(in oklch, var(--accent-2) ${100 - objectivePercent}%, var(--good) ${objectivePercent}%)`
+                            : "";
+                    }
+                } else if (this._cache.objectivePercent !== null) {
+                    this._cache.objectivePercent = null;
+                    this._cache.objectiveColorMode = undefined;
+                    this.objectiveBarEl.style.width = "0%";
+                    this.objectiveBarEl.style.backgroundColor = "";
                 }
             }
 

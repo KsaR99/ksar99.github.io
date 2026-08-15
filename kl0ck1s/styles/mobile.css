@@ -17,8 +17,7 @@
     display: none;
 }
 
-.options__row:has(.options__preview-button--keybind-reset),
-.options__row:has([data-role="hud-right-checkbox"]) {
+.options__row:has(.options__preview-button--keybind-reset, [data-role="hud-right-checkbox"]) {
     display: none;
 }
 

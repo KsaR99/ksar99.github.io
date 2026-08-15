@@ -121,7 +121,7 @@ export class Leaderboard {
     }
 
     async loadTrash() {
-        let entries = [];
+        let entries;
         try {
             const raw = await this.store.get(Leaderboard.PROFILE_TRASH_KEY);
             const parsed = raw ? JSON.parse(raw) : [];

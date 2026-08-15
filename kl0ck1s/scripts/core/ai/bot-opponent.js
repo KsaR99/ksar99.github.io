@@ -1,13 +1,13 @@
 "use strict";
 
-import {KLOCKOMINOS, LINE_CLEAR_ANIMATION_DURATION_MS} from "../shared/config.js";
+import {DIFFICULTIES, KLOCKOMINOS, LINE_CLEAR_ANIMATION_DURATION_MS, SCORING} from "../shared/config.js";
 import {MESSAGE_KIND} from "../net/net-constants.js";
 import {Board} from "../game/board.js";
 import {HARD_DROP_TRAIL_ALPHAS, HARD_DROP_TRAIL_DURATION_MS} from "../game/game-constants.js";
 import {PieceBag} from "../game/piece-bag.js";
 import {levelForLines, pointsForLineClear} from "../game/scoring.js";
 import {mulberry32} from "../shared/seeded-random.js";
-import {formatNumber, rollSurvivalGarbageCount} from "../shared/utils.js";
+import {formatDuration, formatNumber, rollSurvivalGarbageCount, tierForLevel} from "../shared/utils.js";
 
 export const BOT_DIFFICULTIES = Object.freeze({
     easy: Object.freeze({
@@ -577,6 +577,71 @@ export class BotOpponent extends EventTarget {
         this._scheduleNext();
     }
 
+    _objectiveText() {
+        const def = this.modeDef;
+        if (this.mode === "sprint") return `${this.lines} / ${def.sprintTarget}`;
+        if (this.mode === "cheeseRace") return `${this.lines} / ${def.cheeseRows}`;
+        if (this.mode === "digSurvival") return `${this.lines} / ${def.digTarget}`;
+        if (this.mode === "ultra") {
+            const now = this._finishedAt ?? Date.now();
+            const elapsedMs = this._startedAt ? now - this._startedAt : 0;
+            return formatDuration(Math.max(0, (def.timeLimitMs ?? 0) - elapsedMs));
+        }
+        if (this.mode === "countdown") return formatDuration(Math.max(0, this.countdownRemainingMs ?? 0));
+        if (this.mode === "zen") return `${this._zenHeight()}`;
+        return null;
+    }
+
+    _zenHeight() {
+        const board = this.board;
+        let highestFilledRow = board.rows;
+        for (let y = 0; y < board.rows; y++) {
+            if (board.occupancy[y] !== 0) {
+                highestFilledRow = y;
+                break;
+            }
+        }
+        return board.rows - highestFilledRow;
+    }
+
+    _objectivePercent() {
+        const def = this.modeDef;
+        if (this.mode === "sprint") return Math.min(100, (this.lines / def.sprintTarget) * 100);
+        if (this.mode === "cheeseRace") return Math.min(100, (this.lines / def.cheeseRows) * 100);
+        if (this.mode === "digSurvival") return Math.min(100, (this.lines / def.digTarget) * 100);
+        if (this.mode === "ultra") {
+            const now = this._finishedAt ?? Date.now();
+            const elapsedMs = this._startedAt ? now - this._startedAt : 0;
+            return Math.min(100, (elapsedMs / (def.timeLimitMs ?? 1)) * 100);
+        }
+        if (this.mode === "countdown") return Math.min(100, ((this.countdownRemainingMs ?? 0) / (def.countdownStartMs ?? 1)) * 100);
+        return null;
+    }
+
+    _objectiveUrgency() {
+        const def = this.modeDef;
+        let remainingMs;
+        if (this.mode === "ultra") {
+            const now = this._finishedAt ?? Date.now();
+            const elapsedMs = this._startedAt ? now - this._startedAt : 0;
+            remainingMs = (def.timeLimitMs ?? 0) - elapsedMs;
+        } else if (this.mode === "countdown") {
+            remainingMs = this.countdownRemainingMs ?? 0;
+        } else {
+            return null;
+        }
+
+        if (remainingMs <= 5000) return "danger";
+        if (remainingMs <= 10000) return "warning";
+        return null;
+    }
+
+    _objectiveColorMode() {
+        if (["sprint", "cheeseRace", "digSurvival"].includes(this.mode)) return "ramp";
+        if (["ultra", "countdown"].includes(this.mode)) return "urgency";
+        return null;
+    }
+
     _objectiveComplete() {
         const def = this.modeDef;
         if (this.mode === "sprint") return this.lines >= def.sprintTarget;
@@ -652,8 +717,18 @@ export class BotOpponent extends EventTarget {
             efficiency: efficiencyValue,
             tetrisRatePercent,
             pps,
-            bestRaw: null,
-            bestIsTime: false,
+            isTimedRaceMode: this.mode === "sprint" || this.mode === "cheeseRace",
+            objective: this._objectiveText(),
+            objectiveLabelKey: this.mode === "zen" ? "sidebar.height" : "sidebar.objective",
+            objectivePercent: this._objectivePercent(),
+            objectiveUrgency: this._objectiveUrgency(),
+            objectiveColorMode: this._objectiveColorMode(),
+            hasLevelProgress: this.modeDef.freezeLevel !== true,
+            difficultyTier: tierForLevel(this.level, DIFFICULTIES),
+            difficultyLevel: this.level,
+            difficultyPercent: SCORING.LINES_PER_LEVEL
+                ? Math.floor(((this.lines % SCORING.LINES_PER_LEVEL) / SCORING.LINES_PER_LEVEL) * 100)
+                : 0,
             display: {
                 best: "—",
                 score: formatNumber(this.score),

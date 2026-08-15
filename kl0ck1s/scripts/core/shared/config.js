@@ -186,7 +186,10 @@ export const CREDITS_TIMING = Object.freeze({
     EXIT_DURATION_MS: 500,
 });
 
-export const NEXT_PREVIEW_CELL_SIZE = 22;
+export const NEXT_PREVIEW_QUEUE_SIZE = 3;
+export const NEXT_PREVIEW_CELL_SIZE = 11;
+export const NEXT_PREVIEW_CANVAS_WIDTH = NEXT_PREVIEW_CELL_SIZE * 4; // widest piece
+export const NEXT_PREVIEW_CANVAS_HEIGHT = NEXT_PREVIEW_CELL_SIZE * 2; // tallest piece
 
 export const MUSIC_TENSION = Object.freeze({
     TRACK_KEYS: ["tetrisowyShvt", "tetrisowyShvt2", "tetrisowyShvt3"],

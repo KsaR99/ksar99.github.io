@@ -112,7 +112,7 @@ export class CreditsController {
         });
 
         const bottomHiddenY = root.clientHeight;
-        const currentTransform = scroll.style.transform || "translateY(0px)";
+        const currentTransform = scroll.style.transform || "translateY(0)";
 
         scroll.animate(
             [
