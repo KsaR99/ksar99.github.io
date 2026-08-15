@@ -142,6 +142,7 @@ export class MultiplayerController {
         this._negotiationRetryCount = 0;
         this._negotiationRetryTimer = null;
         this._connectInFlight = false;
+        this._launching = false;
 
         this._onKeydown = this._onKeydown.bind(this);
     }
@@ -277,7 +278,7 @@ export class MultiplayerController {
         this._negotiationRetryTimer = null;
         this._negotiationRetryCount = 0;
 
-        if (this._connectInFlight) return;
+        if (this._connectInFlight || this._launching) return;
 
         if (this.session) this._resetSession();
     }
@@ -787,7 +788,9 @@ export class MultiplayerController {
     }
 
     _launchMatch() {
+        this._launching = true;
         this.close();
+        this._launching = false;
         this._hideResultPanel();
         this._localFinalScore = null;
         this._remoteFinalScore = null;

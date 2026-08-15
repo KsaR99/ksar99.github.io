@@ -94,7 +94,7 @@
 [data-role="difficulty-stat"] > .progress-bar--difficulty {
     width: 100%;
     height: 1.5rem;
-    background: oklch(0.25 0 0 / 1);
+    background: oklch(25.03% 0.027 271);
     backdrop-filter: none;
 }
 
