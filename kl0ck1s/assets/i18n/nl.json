@@ -213,10 +213,6 @@
             "spinsLabel": "Spins (T / T-mini / overig)",
             "maxComboLabel": "Langste combo",
             "efficiencyLabel": "Efficiëntie (pt/lijn)"
-        },
-        "gameOverSaved": {
-            "title": "SCORE OPGESLAGEN",
-            "playAgainButton": "Opnieuw spelen"
         }
     },
     "leaderboard": {
@@ -309,6 +305,15 @@
                 "⏱️ Begint met 60 seconden op de klok",
                 "➕ Elke opgeruimde lijn geeft tijd terug (meer voor 4 lijnen)",
                 "⏳ Het spel eindigt wanneer de klok nul bereikt"
+            ]
+        },
+        "zen": {
+            "name": "Zen",
+            "description": "Speel zonder druk — geen game over, geen oplopende snelheid",
+            "rules": [
+                "🧘 Constant, rustig tempo — wordt nooit sneller",
+                "⬇️ Wordt de stapel te hoog, dan schuift het bord vanzelf naar beneden",
+                "🙈 De score wordt niet opgeslagen op het scorebord"
             ]
         },
         "random": {

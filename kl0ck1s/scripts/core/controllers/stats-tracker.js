@@ -42,6 +42,8 @@ export class StatsTracker {
             lines: game.lines,
             best: bestDisplay,
             mode: game.mode,
+            noLeaderboard: game.gameModes[game.mode].noLeaderboard === true,
+            hasLevelProgress: game.gameModes[game.mode].freezeLevel !== true,
             objective: game.modeController.objectiveText() !== null
                 ? `${game.i18n.t("sidebar.objective")}: ${game.modeController.objectiveText()}`
                 : null,
@@ -125,7 +127,7 @@ export class StatsTracker {
         this.addScore(pointsForLineClear(cleared, game.level, game.scoring));
 
         const newLevel = levelForLines(game.lines, game.startLevel, game.scoring);
-        if (newLevel !== game.level) {
+        if (!game.gameModes[game.mode].freezeLevel && newLevel !== game.level) {
             game.level = newLevel;
             game.dropInterval = dropIntervalForLevel(game.level, game.scoring);
             game.levelTier = tierForLevel(game.level, game.difficulties);

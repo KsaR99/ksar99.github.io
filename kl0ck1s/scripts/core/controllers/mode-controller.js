@@ -13,7 +13,7 @@ export class ModeController {
 
     get randomizableModeKeys() {
         const game = this.game;
-        return Object.keys(game.gameModes).filter((key) => !game.gameModes[key].isRandom);
+        return Object.keys(game.gameModes).filter((key) => !game.gameModes[key].isRandom && !game.gameModes[key].excludeFromRandom);
     }
 
     setMode(mode) {
@@ -65,9 +65,6 @@ export class ModeController {
 
         if (game.state === "idle") {
             game.screenFlow.renderIdleScreen(game.leaderboard.forMode(game.mode));
-        } else if (game.state === "gameOver-saved" && game.currentGameOverSaved) {
-            const {entry} = game.currentGameOverSaved;
-            game.screenFlow.renderGameOverSaved(game.leaderboard.forMode(game.mode), entry);
         }
     }
 
@@ -77,6 +74,7 @@ export class ModeController {
             garbageTimer: 0,
             digCleared: 0,
             countdownRemainingMs: def.countdownStartMs ?? 0,
+            zenOverflowUsed: 0,
         };
     }
 
@@ -262,5 +260,30 @@ export class ModeController {
         }
 
         return false;
+    }
+
+    maybeApplyZenOverflow() {
+        const game = this.game;
+        const def = this.def;
+        if (!def.zenOverflow) return;
+
+        const board = game.board;
+        let highestFilledRow = board.rows;
+        for (let y = 0; y < board.rows; y++) {
+            if (board.occupancy[y] !== 0) {
+                highestFilledRow = y;
+                break;
+            }
+        }
+
+        if (highestFilledRow > def.zenOverflowThresholdRow) return;
+
+        const used = game.modeState.zenOverflowUsed ?? 0;
+        const remaining = def.zenOverflowMaxRows - used;
+        if (remaining <= 0) return;
+
+        const shiftAmount = Math.min(def.zenOverflowShiftRows, remaining);
+        board.shiftDown(shiftAmount);
+        game.modeState.zenOverflowUsed = used + shiftAmount;
     }
 }

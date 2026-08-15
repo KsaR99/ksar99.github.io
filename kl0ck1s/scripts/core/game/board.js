@@ -168,4 +168,24 @@ export class Board {
         ++this.version;
         return {toppedOut};
     }
+
+    shiftDown(amount) {
+        if (amount <= 0) return;
+        const shift = Math.min(amount, this.rows);
+
+        const newOccupancy = new Uint32Array(this.rows);
+        const newColors = new Uint8Array(this.rows * this.cols);
+
+        for (let y = 0; y < this.rows - shift; y++) {
+            newOccupancy[y + shift] = this.occupancy[y];
+            newColors.set(
+                this.colors.subarray(y * this.cols, (y + 1) * this.cols),
+                (y + shift) * this.cols
+            );
+        }
+
+        this.occupancy = newOccupancy;
+        this.colors = newColors;
+        ++this.version;
+    }
 }

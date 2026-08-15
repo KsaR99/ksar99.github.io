@@ -669,6 +669,10 @@ body.perf-no-glow .board__filter--active.board__filter--vhs::after {
     backdrop-filter: grayscale(1) blur(2px);
 }
 
+.screen--menu {
+    justify-content: flex-start;
+}
+
 .screen__title {
     font-family: var(--font-display);
     font-size: clamp(1.25rem, 4vw, 1.75rem);

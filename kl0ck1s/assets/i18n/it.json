@@ -213,10 +213,6 @@
             "spinsLabel": "Spin (T / T-mini / altro)",
             "maxComboLabel": "Combo più lunga",
             "efficiencyLabel": "Efficienza (punti/linea)"
-        },
-        "gameOverSaved": {
-            "title": "PUNTEGGIO SALVATO",
-            "playAgainButton": "Gioca ancora"
         }
     },
     "leaderboard": {
@@ -309,6 +305,15 @@
                 "⏱️ Inizia con 60 secondi sull'orologio",
                 "➕ Ogni linea eliminata aggiunge tempo (di più per 4 linee)",
                 "⏳ La partita finisce quando l'orologio arriva a zero"
+            ]
+        },
+        "zen": {
+            "name": "Zen",
+            "description": "Gioca senza pressione: nessun game over, nessuna accelerazione",
+            "rules": [
+                "🧘 Ritmo costante e tranquillo, non accelera mai",
+                "⬇️ Se la pila diventa troppo alta, il campo scende da solo",
+                "🙈 Il punteggio non viene salvato in classifica"
             ]
         },
         "random": {

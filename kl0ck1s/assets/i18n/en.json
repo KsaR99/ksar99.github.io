@@ -214,10 +214,6 @@
             "spinsLabel": "Spins (T / T-mini / other)",
             "maxComboLabel": "Longest combo",
             "efficiencyLabel": "Efficiency (pts/line)"
-        },
-        "gameOverSaved": {
-            "title": "SCORE SAVED",
-            "playAgainButton": "Play again"
         }
     },
     "leaderboard": {
@@ -311,6 +307,15 @@
                 "⏱️ Starts with 60 seconds on the clock",
                 "➕ Every line clear adds time back (more for 4 lines)",
                 "⏳ The game ends when the clock hits zero"
+            ]
+        },
+        "zen": {
+            "name": "Zen",
+            "description": "Play with no pressure — no game over, no ramping speed",
+            "rules": [
+                "🧘 Constant, calm pace — never speeds up",
+                "⬇️ When the stack gets too tall, the board shifts itself down",
+                "🙈 Score is not saved to the leaderboard"
             ]
         },
         "random": {

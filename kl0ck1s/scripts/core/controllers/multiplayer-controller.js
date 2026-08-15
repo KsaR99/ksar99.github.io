@@ -21,7 +21,7 @@ const SCORE_POLL_MS = 200;
 const REMOTE_PIECE_LERP_MIN_MS = 16;
 const REMOTE_PIECE_LERP_MAX_MS = 1600;
 const RUNNING_STATES = new Set(["countdown", "running", "clearing", "paused", "options"]);
-const FINISHED_STATES = new Set(["gameOver-entry", "gameOver-saved"]);
+const FINISHED_STATES = new Set(["gameOver-entry"]);
 
 const OPPONENT_BOARD_FALLBACK_CELL_PX = 24;
 
@@ -807,7 +807,7 @@ export class MultiplayerController {
         this._showOpponentUI();
 
         const game = this.game;
-        if (game.state === "idle" || game.state === "gameOver-saved") {
+        if (game.state === "idle") {
             const startButton = this.dom.querySelector('[data-role="start-button"]');
             startButton?.click();
         } else {

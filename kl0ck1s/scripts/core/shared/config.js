@@ -45,6 +45,11 @@ export const DIFFICULTIES = Object.freeze({
 export const DEFAULT_DIFFICULTY = "hard";
 
 export const GAME_MODES = Object.freeze({
+    zen: Object.freeze({
+        sprintTarget: null, timeLimitMs: null, garbage: false,
+        freezeLevel: true, noLeaderboard: true,
+        zenOverflow: true, zenOverflowThresholdRow: 4, zenOverflowShiftRows: 6, zenOverflowMaxRows: 20,
+    }),
     marathon: Object.freeze({sprintTarget: null, timeLimitMs: null, garbage: false}),
     sprint: Object.freeze({sprintTarget: 40, timeLimitMs: null, garbage: false}),
     ultra: Object.freeze({sprintTarget: null, timeLimitMs: 180000, garbage: false}),
@@ -65,7 +70,7 @@ export const GAME_MODES = Object.freeze({
     random: Object.freeze({sprintTarget: null, timeLimitMs: null, garbage: false, isRandom: true}),
 });
 
-export const DEFAULT_MODE = "marathon";
+export const DEFAULT_MODE = "zen";
 
 function packState(rows) {
     const height = rows.length;
@@ -168,10 +173,10 @@ export const COLOR_PALETTE = [
 ];
 
 export const GARBAGE_COLOR_INDEX = COLOR_PALETTE.length;
-COLOR_PALETTE.push("oklch(0.42 0.015 271)");
+COLOR_PALETTE.push("oklch(0.818 0.167 93.98)");
 
 export const CREDITS = Object.freeze([
-    Object.freeze({name: "Sa_ymon", link: "https://www.twitch.tv/sa_ymon", roles: ["developer", "sfx"]}),
+    Object.freeze({name: "Sa_ymon", link: "https://www.twitch.tv/sa_ymon", roles: ["developer", "tester", "sfx"]}),
     Object.freeze({name: "Danio_Dragon", link: "https://www.twitch.tv/danio_dragon", roles: ["tester"]}),
     Object.freeze({name: "Aleksander Żak", link: "https://www.twitch.tv/grubyolson", roles: ["music", "sfx"]}),
 ]);

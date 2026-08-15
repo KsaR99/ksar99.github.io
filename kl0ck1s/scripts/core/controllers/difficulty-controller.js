@@ -10,7 +10,7 @@ export class DifficultyController {
         game.difficulty = difficulty;
         game.levelTier = difficulty;
 
-        if (game.state === "idle" || game.state === "gameOver-saved") {
+        if (game.state === "idle") {
             game.level = game.difficulties[difficulty].startLevel;
             game.lines = 0;
         }
@@ -38,9 +38,6 @@ export class DifficultyController {
 
         if (game.state === "idle") {
             game.screenFlow.renderIdleScreen(game.currentIdleList);
-        } else if (game.state === "gameOver-saved" && game.currentGameOverSaved) {
-            const {list, entry} = game.currentGameOverSaved;
-            game.screenFlow.renderGameOverSaved(list, entry);
         }
     }
 }

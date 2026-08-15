@@ -100,7 +100,6 @@ export class Game {
         this.playerName = "";
         this.currentIdleList = null;
         this.currentGameOverEntry = null;
-        this.currentGameOverSaved = null;
         this.pointerClientX = null;
         this.pointerClientY = null;
 

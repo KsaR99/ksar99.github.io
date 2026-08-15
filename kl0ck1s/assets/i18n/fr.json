@@ -213,10 +213,6 @@
             "spinsLabel": "Spins (T / T-mini / autre)",
             "maxComboLabel": "Combo le plus long",
             "efficiencyLabel": "Efficacité (pts/ligne)"
-        },
-        "gameOverSaved": {
-            "title": "SCORE ENREGISTRÉ",
-            "playAgainButton": "Rejouer"
         }
     },
     "leaderboard": {
@@ -309,6 +305,15 @@
                 "⏱️ Commence avec 60 secondes à l'horloge",
                 "➕ Chaque ligne effacée ajoute du temps (plus pour 4 lignes)",
                 "⏳ La partie se termine quand l'horloge atteint zéro"
+            ]
+        },
+        "zen": {
+            "name": "Zen",
+            "description": "Jouez sans pression — pas de fin de partie, pas d'accélération",
+            "rules": [
+                "🧘 Rythme constant et calme — n'accélère jamais",
+                "⬇️ Si la pile devient trop haute, le plateau descend tout seul",
+                "🙈 Le score n'est pas enregistré dans le classement"
             ]
         },
         "random": {

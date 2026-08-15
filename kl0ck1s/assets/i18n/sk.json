@@ -213,10 +213,6 @@
             "spinsLabel": "Spiny (T / T-mini / iné)",
             "maxComboLabel": "Najdlhšie kombo",
             "efficiencyLabel": "Efektivita (body/riadok)"
-        },
-        "gameOverSaved": {
-            "title": "SKÓRE ULOŽENÉ",
-            "playAgainButton": "Hrať znova"
         }
     },
     "leaderboard": {
@@ -309,6 +305,15 @@
                 "⏱️ Začína so 60 sekundami na hodinách",
                 "➕ Každé vyčistenie riadku pridá čas (viac za 4 riadky)",
                 "⏳ Hra sa skončí, keď hodiny dôjdu na nulu"
+            ]
+        },
+        "zen": {
+            "name": "Zen",
+            "description": "Hraj bez tlaku – bez konca hry a bez zrýchľovania",
+            "rules": [
+                "🧘 Stále, pokojné tempo – nikdy sa nezrýchľuje",
+                "⬇️ Keď je hromada príliš vysoká, hracia plocha sa sama posunie nadol",
+                "🙈 Skóre sa neukladá do rebríčka"
             ]
         },
         "random": {

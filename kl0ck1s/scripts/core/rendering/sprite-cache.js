@@ -18,6 +18,7 @@ const BLOCK_CORNER_RADIUS_RATIO = 0.35;
 function cornerRadiusForSize(size) {
     return Math.min(BLOCK_CORNER_RADIUS, size * BLOCK_CORNER_RADIUS_RATIO);
 }
+
 export {cornerRadiusForSize};
 
 

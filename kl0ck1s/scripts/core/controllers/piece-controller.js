@@ -38,6 +38,7 @@ export class PieceController {
 
     spawnNext() {
         const game = this.game;
+        game.modeController.maybeApplyZenOverflow();
         game.current = new Piece(game.next, {cols: game.board.cols});
         game.statsTracker.registerPieceSpawn(game.current.type);
         game.next = game.bag.next();
@@ -202,7 +203,7 @@ export class PieceController {
 
     handleHorizontalArrow(dir, isRepeat = false) {
         const game = this.game;
-        if (game.state === "idle" || game.state === "gameOver-saved") {
+        if (game.state === "idle") {
             if (game.menuSelector === "mode") {
                 game.modeController.changeMode(dir);
             } else {

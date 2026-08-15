@@ -214,10 +214,6 @@
             "spinsLabel": "Spiny (T / T-mini / inne)",
             "maxComboLabel": "Najdłuższe combo",
             "efficiencyLabel": "Efektywność (pkt/linię)"
-        },
-        "gameOverSaved": {
-            "title": "WYNIK ZAPISANY",
-            "playAgainButton": "Zagraj ponownie"
         }
     },
     "leaderboard": {
@@ -311,6 +307,15 @@
                 "⏱️ Start z 60 sekundami na zegarze",
                 "➕ Każde czyszczenie linii dodaje czasu (więcej za 4 linie)",
                 "⏳ Gra kończy się, gdy zegar dojdzie do zera"
+            ]
+        },
+        "zen": {
+            "name": "Zen",
+            "description": "Graj bez presji — bez końca gry i w stałym tempie",
+            "rules": [
+                "🧘 Stałe, spokojne tempo — nigdy nie przyspiesza",
+                "⬇️ Gdy stos urośnie zbyt wysoko, plansza sama zsuwa się w dół",
+                "🙈 Wynik nie trafia na tablicę wyników"
             ]
         },
         "random": {

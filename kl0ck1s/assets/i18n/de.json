@@ -213,10 +213,6 @@
             "spinsLabel": "Spins (T / T-Mini / sonstige)",
             "maxComboLabel": "Längste Combo",
             "efficiencyLabel": "Effizienz (Pkt./Reihe)"
-        },
-        "gameOverSaved": {
-            "title": "PUNKTZAHL GESPEICHERT",
-            "playAgainButton": "Erneut spielen"
         }
     },
     "leaderboard": {
@@ -309,6 +305,15 @@
                 "⏱️ Start mit 60 Sekunden auf der Uhr",
                 "➕ Jede Linie bringt Zeit zurück (mehr für 4 Linien)",
                 "⏳ Das Spiel endet, wenn die Uhr null erreicht"
+            ]
+        },
+        "zen": {
+            "name": "Zen",
+            "description": "Spiele ohne Druck – kein Game Over, kein steigendes Tempo",
+            "rules": [
+                "🧘 Gleichbleibendes, ruhiges Tempo – wird nie schneller",
+                "⬇️ Wird der Stapel zu hoch, verschiebt sich das Feld selbst nach unten",
+                "🙈 Der Punktestand wird nicht in der Bestenliste gespeichert"
             ]
         },
         "random": {

@@ -37,7 +37,7 @@ export class KeyboardInput extends InputSource {
 
     get actionHandlers() {
         const game = this.game;
-        const isMenuScreen = () => game.state === "idle" || game.state === "gameOver-saved";
+        const isMenuScreen = () => game.state === "idle";
         return {
             moveLeft: (isRepeat) => game.pieceController.handleHorizontalArrow(-1, isRepeat),
             moveRight: (isRepeat) => game.pieceController.handleHorizontalArrow(1, isRepeat),
@@ -145,7 +145,7 @@ export class KeyboardInput extends InputSource {
             if (this._listening) return;
             if (isTypingInField(event) && event.code !== "Enter") return;
 
-            const isMenuScreen = game.state === "idle" || game.state === "gameOver-saved";
+            const isMenuScreen = game.state === "idle";
             if (isMenuScreen && (event.code === "ArrowUp" || event.code === "ArrowDown")) {
                 event.preventDefault();
                 if (!event.repeat) game.screenFlow.moveMenuFocus(event.code === "ArrowDown" ? 1 : -1);
@@ -184,7 +184,7 @@ export class KeyboardInput extends InputSource {
 
         this._keyupHandler = (event) => {
             if (this._listening) return;
-            const isMenuScreen = game.state === "idle" || game.state === "gameOver-saved";
+            const isMenuScreen = game.state === "idle";
             let slotId = this.dispatchMap()[event.code];
             if (isMenuScreen) {
                 if (event.code === "ArrowLeft") slotId = "moveLeft";

@@ -213,10 +213,6 @@
             "spinsLabel": "Spin (T / T-mini / lainnya)",
             "maxComboLabel": "Kombo terpanjang",
             "efficiencyLabel": "Efisiensi (poin/baris)"
-        },
-        "gameOverSaved": {
-            "title": "SKOR TERSIMPAN",
-            "playAgainButton": "Main lagi"
         }
     },
     "leaderboard": {
@@ -309,6 +305,15 @@
                 "⏱️ Dimulai dengan 60 detik di jam",
                 "➕ Setiap baris yang dibersihkan menambah waktu (lebih banyak untuk 4 baris)",
                 "⏳ Permainan berakhir saat jam mencapai nol"
+            ]
+        },
+        "zen": {
+            "name": "Zen",
+            "description": "Main tanpa tekanan — tanpa game over, tanpa percepatan",
+            "rules": [
+                "🧘 Kecepatan tetap dan tenang — tidak pernah bertambah cepat",
+                "⬇️ Jika tumpukan terlalu tinggi, papan bergeser turun sendiri",
+                "🙈 Skor tidak disimpan ke papan peringkat"
             ]
         },
         "random": {

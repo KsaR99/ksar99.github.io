@@ -254,7 +254,12 @@ export const Screens = {
         screen.querySelector('[data-role="name-input"]').value = playerName;
         fillProfileSelect(dom, screen.querySelector('[data-role="profile-select"]'), profiles, playerName, i18n, trash);
         screen.querySelector('[data-role="delete-profile-button"]').disabled = !playerName;
-        screen.querySelector('[data-field="leaderboard"]').appendChild(renderLeaderboard(list));
+        const idleLeaderboardSectionEl = screen.querySelector('[data-role="leaderboard-section"]');
+        if (gameModes[selectedMode]?.noLeaderboard) {
+            if (idleLeaderboardSectionEl) idleLeaderboardSectionEl.remove();
+        } else {
+            screen.querySelector('[data-field="leaderboard"]').appendChild(renderLeaderboard(list));
+        }
         i18n.applyStatic(screen);
         return screen;
     },
@@ -557,7 +562,12 @@ export const Screens = {
             todayBestRow.remove();
         }
 
-        screen.querySelector('[data-field="leaderboard"]').appendChild(renderLeaderboard(list, highlightEntry));
+        const leaderboardSectionEl = screen.querySelector('[data-role="leaderboard-section"]');
+        if (stats.noLeaderboard) {
+            if (leaderboardSectionEl) leaderboardSectionEl.remove();
+        } else {
+            screen.querySelector('[data-field="leaderboard"]').appendChild(renderLeaderboard(list, highlightEntry));
+        }
         i18n.applyStatic(screen);
 
         const titleKeyByReason = {
@@ -572,19 +582,6 @@ export const Screens = {
             if (titleEl) titleEl.textContent = i18n.t(titleKey);
         }
 
-        return screen;
-    },
-
-    gameOverSaved(list, highlightEntry, renderLeaderboard, selectedDifficulty, difficulties, selectedMode, gameModes, dom = document, i18n, playerName = "", profiles = [], trash = []) {
-        const screen = clone(dom, "tpl-screen-gameover-saved");
-        fillDifficultyCarousel(screen.querySelector('[data-role="difficulty-select"]'), selectedDifficulty, difficulties, i18n);
-        fillModeCarousel(screen.querySelector('[data-role="mode-select"]'), selectedMode, i18n);
-        fillModeDescription(screen.querySelector('[data-field="modeDescription"]'), selectedMode, i18n);
-        screen.querySelector('[data-role="name-input"]').value = playerName;
-        fillProfileSelect(dom, screen.querySelector('[data-role="profile-select"]'), profiles, playerName, i18n, trash);
-        screen.querySelector('[data-role="delete-profile-button"]').disabled = !playerName;
-        screen.querySelector('[data-field="leaderboard"]').appendChild(renderLeaderboard(list, highlightEntry));
-        i18n.applyStatic(screen);
         return screen;
     },
 };

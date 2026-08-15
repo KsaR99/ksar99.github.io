@@ -117,8 +117,6 @@ export class ScreenFlow {
 
         if (game.state === "idle") {
             this.renderIdleScreen(game.leaderboard.forMode(game.mode));
-        } else if (game.state === "gameOver-saved" && game.currentGameOverSaved) {
-            this.renderGameOverSaved(game.leaderboard.forMode(game.mode), null);
         }
         game.hud.update(game.stats);
     }
@@ -137,9 +135,6 @@ export class ScreenFlow {
 
         if (game.state === "idle") {
             this.renderIdleScreen(game.leaderboard.forMode(game.mode));
-        } else if (game.state === "gameOver-saved" && game.currentGameOverSaved) {
-            const {entry} = game.currentGameOverSaved;
-            this.renderGameOverSaved(game.leaderboard.forMode(game.mode), entry);
         }
         game.hud.update(game.stats);
     }
@@ -154,9 +149,6 @@ export class ScreenFlow {
 
         if (game.state === "idle") {
             this.renderIdleScreen(game.leaderboard.forMode(game.mode));
-        } else if (game.state === "gameOver-saved" && game.currentGameOverSaved) {
-            const {entry} = game.currentGameOverSaved;
-            this.renderGameOverSaved(game.leaderboard.forMode(game.mode), entry);
         }
         game.hud.update(game.stats);
     }
@@ -214,7 +206,7 @@ export class ScreenFlow {
 
     moveMenuFocus(dir) {
         const game = this.game;
-        if (game.state !== "idle" && game.state !== "gameOver-saved") return;
+        if (game.state !== "idle") return;
 
         const groups = ["mode", "difficulty", "nickname"];
         const currentIndex = groups.indexOf(game.menuSelector);
@@ -427,7 +419,7 @@ export class ScreenFlow {
         const raceUnfinished =
             (game.mode === "sprint" && reason !== "sprintComplete") ||
             (game.mode === "cheeseRace" && reason !== "cheeseClear");
-        const savedEntry = raceUnfinished ? null : entry;
+        const savedEntry = (raceUnfinished || game.gameModes[game.mode].noLeaderboard) ? null : entry;
 
         const todayBestBeforeThisGame = game.mode === "marathon" ? game.leaderboard.todayBestEntry() : null;
 
@@ -487,34 +479,11 @@ export class ScreenFlow {
     continueFromGameOverEntry() {
         const game = this.game;
         if (game.state !== "gameOver-entry" || !game.currentGameOverEntry) return;
-        const {list, entry} = game.currentGameOverEntry;
-        game.state = "gameOver-saved";
-        game.menuSelector = "mode";
+        game.currentGameOverEntry = null;
         game.level = game.difficulties[game.difficulty].startLevel;
-        game.modeController.restoreSelectedMode();
         game.statsTracker.reset();
         game.modeController.reset();
-        game.hud.update(game.stats);
-        this.renderGameOverSaved(list, entry);
-    }
-
-    renderGameOverSaved(list, entry) {
-        const game = this.game;
-        game.currentGameOverSaved = {list, entry};
-        game.hud.showScreen(
-            game.screens.gameOverSaved(
-                list, entry, (l, h) => this.renderLeaderboard(l, h),
-                game.difficulty, game.difficulties, game.mode, game.gameModes, game.dom, game.i18n, game.playerName,
-                game.leaderboard.profiles, game.leaderboard.trash
-            )
-        );
-        game.difficultyController.bindDifficultyButtons();
-        game.modeController.bindModeButtons();
-        this.bindNameInput();
-        this.bindProfileSelect();
-        this.bindStartButton();
-        this.bindLeaderboardActions();
-        this.updateMenuSelectorFocus();
+        this.showIdleScreen().then();
     }
 
     togglePause() {
@@ -575,7 +544,7 @@ export class ScreenFlow {
 
     restart() {
         const game = this.game;
-        if (!["running", "paused", "clearing", "countdown", "gameOver-entry", "gameOver-saved"].includes(game.state)) {
+        if (!["running", "paused", "clearing", "countdown", "gameOver-entry"].includes(game.state)) {
             return;
         }
 
@@ -628,7 +597,7 @@ export class ScreenFlow {
             if (mp.isResultPanelVisible) mp.rematch();
             return;
         }
-        if (game.state === "idle" || game.state === "gameOver-saved") {
+        if (game.state === "idle") {
             if (!this.isNicknameValid()) return;
             if (game.playerName) await this.commitProfile(game.playerName);
             game.modeController.resolveRandomMode();
@@ -665,9 +634,6 @@ export class ScreenFlow {
             this.renderPauseMenu();
         } else if (game.state === "options") {
             this.renderOptionsMenu();
-        } else if (game.state === "gameOver-saved" && game.currentGameOverSaved) {
-            const {list, entry} = game.currentGameOverSaved;
-            this.renderGameOverSaved(list, entry);
         }
     }
 
@@ -718,9 +684,6 @@ export class ScreenFlow {
                 this.renderPauseMenu();
             } else if (previousState === "idle") {
                 this.renderIdleScreen(game.currentIdleList ?? []);
-            } else if (previousState === "gameOver-saved" && game.currentGameOverSaved) {
-                const {list, entry} = game.currentGameOverSaved;
-                this.renderGameOverSaved(list, entry);
             } else if (previousState === "gameOver-entry" && game.currentGameOverEntry) {
                 const {list, entry, todayBestBeforeThisGame, reason} = game.currentGameOverEntry;
                 this.renderGameOverEntry(list, entry, todayBestBeforeThisGame, reason);
@@ -729,7 +692,7 @@ export class ScreenFlow {
             return;
         }
 
-        if (!["idle", "running", "paused", "gameOver-saved", "gameOver-entry"].includes(game.state))
+        if (!["idle", "running", "paused", "gameOver-entry"].includes(game.state))
             return;
 
         game.previousStateBeforeOptions = game.state;

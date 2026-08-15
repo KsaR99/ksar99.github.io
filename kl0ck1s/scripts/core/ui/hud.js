@@ -8,11 +8,13 @@ export class HUD {
                     timeEl = null, droughtEl = null, tetrisRateEl = null, ppsEl = null,
                     objectiveEl = null, objectiveRowEl = null,
                     objectiveBarEl = null, objectiveBarTrackEl = null, linesRowEl = null,
+                    bestRowEl = null, difficultyRowEl = null,
                 }) {
         this.scoreEl = scoreEl;
         this.linesEl = linesEl;
         this.linesRowEl = linesRowEl;
         this.bestEl = bestEl;
+        this.bestRowEl = bestRowEl;
         this.overlayEl = overlayEl;
         this.nextPieceCardEl = nextPieceCardEl;
         this.statsStatusEl = statsStatusEl;
@@ -28,6 +30,7 @@ export class HUD {
         this.objectiveRowEl = objectiveRowEl;
         this.objectiveBarEl = objectiveBarEl;
         this.objectiveBarTrackEl = objectiveBarTrackEl;
+        this.difficultyRowEl = difficultyRowEl;
 
         this._cache = {
             score: undefined,
@@ -45,6 +48,8 @@ export class HUD {
             objectiveUrgency: undefined,
             hasObjective: undefined,
             hasLinesRow: undefined,
+            hasRecord: undefined,
+            hasLevelProgress: undefined,
             hasPlayedBefore: undefined,
             isPlaying: undefined,
             statsStatusMode: undefined,
@@ -90,11 +95,19 @@ export class HUD {
 
     update({
                score, lines, best, difficulty, difficultyPercent, gameTime, drought, tetrisRate, pps,
-               objective, objectivePercent, objectiveUrgency, objectiveColorMode,
+               objective, objectivePercent, objectiveUrgency, objectiveColorMode, noLeaderboard, hasLevelProgress,
            }) {
         this._setText(this.scoreEl, "score", score);
         this._setText(this.linesEl, "lines", lines);
         this._setText(this.bestEl, "best", best);
+
+        if (this.bestRowEl) {
+            const hasRecord = !noLeaderboard;
+            if (this._cache.hasRecord !== hasRecord) {
+                this._cache.hasRecord = hasRecord;
+                this.bestRowEl.classList.toggle("stats__row--hidden", !hasRecord);
+            }
+        }
 
         if (this.linesRowEl) {
             const hideLinesRow = objectiveColorMode === "ramp";
@@ -108,7 +121,14 @@ export class HUD {
             this._setText(this.difficultyEl, "difficulty", difficulty);
         }
 
-        if (this.difficultyBarEl && difficultyPercent !== undefined) {
+        if (this.difficultyRowEl && hasLevelProgress !== undefined) {
+            if (this._cache.hasLevelProgress !== hasLevelProgress) {
+                this._cache.hasLevelProgress = hasLevelProgress;
+                this.difficultyRowEl.classList.toggle("stats__row--hidden", !hasLevelProgress);
+            }
+        }
+
+        if (this.difficultyBarEl && difficultyPercent !== undefined && hasLevelProgress !== false) {
             if (this._cache.difficultyPercent !== difficultyPercent) {
                 this._cache.difficultyPercent = difficultyPercent;
                 this.difficultyBarEl.style.width = `${difficultyPercent}%`;
