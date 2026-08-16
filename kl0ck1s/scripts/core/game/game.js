@@ -12,6 +12,7 @@ import {
     HARD_DROP_TRAIL_DURATION_MS,
     HUD_UPDATE_INTERVAL_MS
 } from "./game-constants.js";
+import {GAME_STATE_KEYS, GameState} from "./game-state.js";
 import {InputController} from "../controllers/input-controller.js";
 import {PieceController} from "../controllers/piece-controller.js";
 import {StatsTracker} from "../controllers/stats-tracker.js";
@@ -19,7 +20,7 @@ import {SettingsController} from "../controllers/settings-controller.js";
 import {ThemeOverlay} from "../controllers/theme-overlay.js";
 import {DifficultyController} from "../controllers/difficulty-controller.js";
 import {ModeController} from "../controllers/mode-controller.js";
-import {ScreenFlow} from "../controllers/screen-flow.js";
+import {GameFlowController} from "../controllers/game-flow-controller.js";
 import {CreditsController} from "../controllers/credits-controller.js";
 import {SensitivityCalibrationController} from "../controllers/sensitivity-calibration-controller.js";
 import {KeyboardCalibrationController} from "../controllers/keyboard-calibration-controller.js";
@@ -67,10 +68,7 @@ export class Game {
         this.leaderboard = leaderboard;
         this.screens = screens;
         this.difficulties = difficulties;
-        this.difficulty = defaultDifficulty;
         this.gameModes = gameModes;
-        this.mode = defaultMode;
-        this.modeState = {garbageTimer: 0};
         this.scoring = scoring;
         this.levelUpBannerDuration = levelUpBannerDuration;
         this.lineClearAnimationDuration = lineClearAnimationDuration;
@@ -80,10 +78,20 @@ export class Game {
         this.i18n = i18n;
         this.lastTime = 0;
         this._backgroundTicker = null;
-        this.activeTheme = "none";
-        this.previousStateBeforeOptions = null;
-        this.isPlayingSession = false;
-        this.multiplayerOptionsOverlayOpen = false;
+
+        this.gameState = new GameState({defaultDifficulty, defaultMode});
+        for (const key of GAME_STATE_KEYS) {
+            Object.defineProperty(this, key, {
+                get() {
+                    return this.gameState[key];
+                },
+                set(value) {
+                    this.gameState[key] = value;
+                },
+                enumerable: true,
+                configurable: true,
+            });
+        }
 
         this.dom?.addEventListener("visibilitychange", () => {
             if (this.dom.hidden) {
@@ -93,81 +101,13 @@ export class Game {
             }
         });
 
-        this.state = "idle";
-        this.menuSelector = "mode";
-        this.countdownIndex = 0;
-        this.countdownTimer = 0;
-        this.playerName = "";
-        this.currentIdleList = null;
-        this.currentGameOverEntry = null;
-        this.pointerClientX = null;
-        this.pointerClientY = null;
-
-        this.current = null;
-        this.nextQueue = [];
-        this.rotationAnim = null;
-        this.shiftAnim = null;
-        this.dropCounter = 0;
-        this.dropInterval = 0;
-        this.lockDelayTimer = 0;
-        this.lockDelayResets = 0;
-        this.groundedTime = 0;
-        this.hardDropUsed = false;
-        this.isGrounded = false;
-        this.rawGrounded = false;
-        this.groundedSoundId = null;
-        this.groundedGraceTimer = 0;
-        this.groundedSoundRate = 1;
-        this.fallingSoundId = null;
-        this.lastAction = null;
-        this.pendingSpin = null;
-        this.clearingLines = [];
-        this.clearingFragments = [];
-        this.clearingDropRows = [];
-        this.clearingTimer = 0;
-
-        this.fallTrail = Array.from({length: FALL_TRAIL_MAX_LENGTH}, () => ({
-            x: 0, y: 0, mask: null, width: 0, height: 0, color: null,
-        }));
-        this.fallTrailHead = 0;
-        this.fallTrailCount = 0;
-        this._trailPieceRef = null;
-        this.hardDropTrail = null;
-        this.hardDropImpactFlash = null;
-
-        this.lastRowStepTime = 0;
-        this.effectiveDropIntervalMs = Infinity;
-
-        this.lastColStepTime = 0;
-        this.effectiveShiftIntervalMs = Infinity;
-
-        this.startLevel = 0;
-        this.level = 0;
-        this.levelTier = null;
-        this.levelUpTimer = 0;
-        this.levelUpLevel = null;
-        this.score = 0;
-        this.lines = 0;
-        this.elapsedMs = 0;
-        this.drought = 0;
-        this.maxDrought = 0;
-        this.droughtTotal = 0;
-        this.droughtCount = 0;
-        this.burn = 0;
-        this.transitionScore = null;
-        this.clearCounts = {1: 0, 2: 0, 3: 0, 4: 0};
-        this.piecesSpawned = 0;
-        this.spinCounts = {t: 0, tMini: 0, other: 0};
-        this.currentCombo = 0;
-        this.maxCombo = 0;
-
         this.statsTracker = new StatsTracker(this);
         this.pieceController = new PieceController(this);
         this.settingsController = new SettingsController(this);
         this.themeOverlay = new ThemeOverlay(this, {canvas: themeCanvas, ctx: themeCtx});
         this.difficultyController = new DifficultyController(this);
         this.modeController = new ModeController(this);
-        this.screenFlow = new ScreenFlow(this);
+        this.screenFlow = new GameFlowController(this);
         this.inputController = new InputController(this);
         this.creditsController = new CreditsController(this);
         this.sensitivityCalibrationController = new SensitivityCalibrationController(this);
@@ -562,11 +502,11 @@ export class Game {
             this.renderer.drawHardDropImpactFlash(this.hardDropImpactFlash.entry, progress);
         }
 
-        if (this.state === "running" || this.state === "paused" || this.state === "calibrating"
-            || this.state === "calibrating-keyboard" || showPieceBehindOptions) {
+        if (["running", "paused", "calibrating", "calibrating-keyboard"].includes(this.state)
+            || showPieceBehindOptions) {
             const renderedPiece = this.getRenderedPiece();
 
-            if (this.state === "running" || this.state === "calibrating" || this.state === "calibrating-keyboard") {
+            if (["running", "calibrating", "calibrating-keyboard"].includes(this.state)) {
                 this.renderer.drawGhost(this.current, this.board);
                 if (this.settings.fallTrail) {
                     this.updateFallTrail(renderedPiece);

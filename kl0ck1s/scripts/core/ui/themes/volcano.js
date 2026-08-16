@@ -1,6 +1,7 @@
 "use strict";
 
 import {ThemeEffect} from "./theme-effect.js";
+import {ParticleField} from "./particle-field.js";
 
 const ASH_COLOR = "oklch(0.4853 0.0567 47.41 / 75%)";
 const EMBER_COLOR = "oklch(0.725 0.178 46.868 / 0.9)";
@@ -14,63 +15,44 @@ export class Volcano extends ThemeEffect {
     constructor(canvas, ctx = null) {
         super(canvas, ctx);
 
-        this.ashCount = 0;
-        this.ax = new Float32Array(0);
-        this.ay = new Float32Array(0);
-        this.aRadius = new Float32Array(0);
-        this.aSpeed = new Float32Array(0);
-        this.aDrift = new Float32Array(0);
-        this.aDriftSpeed = new Float32Array(0);
-
-        this.emberCount = 0;
-        this.ex = new Float32Array(0);
-        this.ey = new Float32Array(0);
-        this.eLength = new Float32Array(0);
-        this.evx = new Float32Array(0);
-        this.evy = new Float32Array(0);
+        this.ash = new ParticleField({
+            x: Float32Array, y: Float32Array, radius: Float32Array,
+            speed: Float32Array, drift: Float32Array, driftSpeed: Float32Array,
+        });
+        this.embers = new ParticleField({
+            x: Float32Array, y: Float32Array, length: Float32Array,
+            vx: Float32Array, vy: Float32Array,
+        });
     }
 
-    _spawnAsh(i, width, height, initial = false) {
-        this.ax[i] = Math.random() * width;
-        this.ay[i] = initial ? Math.random() * height : Math.random() * -height;
-        this.aRadius[i] = 1.5 + Math.random() * 8.5;
-        this.aSpeed[i] = 0.15 + Math.random() * 1.5;
-        this.aDrift[i] = Math.random() * Math.PI * 2;
-        this.aDriftSpeed[i] = 0.005 + Math.random() * 0.015;
-    }
+    _spawnAsh = (i, width, height, initial = false) => {
+        const {x, y, radius, speed, drift, driftSpeed} = this.ash;
+        x[i] = Math.random() * width;
+        y[i] = initial ? Math.random() * height : Math.random() * -height;
+        radius[i] = 1.5 + Math.random() * 8.5;
+        speed[i] = 0.15 + Math.random() * 1.5;
+        drift[i] = Math.random() * Math.PI * 2;
+        driftSpeed[i] = 0.005 + Math.random() * 0.015;
+    };
 
-    _spawnEmber(i, width, height) {
-        this.ex[i] = Math.random() * width;
-        this.ey[i] = Math.random() * height;
-        this.eLength[i] = 1.5 + Math.random() * 7;
+    _spawnEmber = (i, width, height) => {
+        const {x, y, length, vx, vy} = this.embers;
+        x[i] = Math.random() * width;
+        y[i] = Math.random() * height;
+        length[i] = 1.5 + Math.random() * 7;
 
         const angle = Math.random() * Math.PI * 2;
         const speed = 1 + Math.random() * 4;
-        this.evx[i] = Math.cos(angle) * speed;
-        this.evy[i] = Math.sin(angle) * speed;
-    }
+        vx[i] = Math.cos(angle) * speed;
+        vy[i] = Math.sin(angle) * speed;
+    };
 
     resize(width, height) {
-        const {w, h, unchanged} = this.resizeCanvas(width, height, this.ashCount && this.emberCount);
+        const {w, h, unchanged} = this.resizeCanvas(width, height, this.ash.count && this.embers.count);
         if (unchanged) return;
 
-        this.ashCount = Math.max(8, Math.round(w * h * ASH_DENSITY));
-        this.ax = new Float32Array(this.ashCount);
-        this.ay = new Float32Array(this.ashCount);
-        this.aRadius = new Float32Array(this.ashCount);
-        this.aSpeed = new Float32Array(this.ashCount);
-        this.aDrift = new Float32Array(this.ashCount);
-        this.aDriftSpeed = new Float32Array(this.ashCount);
-        for (let i = 0; i < this.ashCount; i++) this._spawnAsh(i, w, h, true);
-
-        this.emberCount = Math.max(4, Math.round(w * EMBER_DENSITY));
-        this.ex = new Float32Array(this.emberCount);
-        this.ey = new Float32Array(this.emberCount);
-        this.eLength = new Float32Array(this.emberCount);
-        this.evx = new Float32Array(this.emberCount);
-        this.evy = new Float32Array(this.emberCount);
-        for (let i = 0; i < this.emberCount; i++) this._spawnEmber(i, w, h);
-
+        this.ash.allocate(Math.max(8, Math.round(w * h * ASH_DENSITY)), this._spawnAsh, w, h);
+        this.embers.allocate(Math.max(4, Math.round(w * EMBER_DENSITY)), this._spawnEmber, w, h);
         this.ctx.clearRect(0, 0, w, h);
     }
 
@@ -80,8 +62,16 @@ export class Volcano extends ThemeEffect {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        if (this.ashCount) {
-            const {ax, ay, aRadius, aSpeed, aDrift, aDriftSpeed, ashCount} = this;
+        const {
+            count: ashCount,
+            x: ax,
+            y: ay,
+            radius: aRadius,
+            speed: aSpeed,
+            drift: aDrift,
+            driftSpeed: aDriftSpeed
+        } = this.ash;
+        if (ashCount) {
             ctx.fillStyle = ASH_COLOR;
             const ashPath = new Path2D();
             for (let i = 0; i < ashCount; i++) {
@@ -100,8 +90,8 @@ export class Volcano extends ThemeEffect {
             ctx.fill(ashPath);
         }
 
-        if (this.emberCount) {
-            const {ex, ey, eLength, evx, evy, emberCount} = this;
+        const {count: emberCount, x: ex, y: ey, length: eLength, vx: evx, vy: evy} = this.embers;
+        if (emberCount) {
             ctx.strokeStyle = EMBER_COLOR;
             ctx.lineWidth = 1.5;
             ctx.lineCap = "round";

@@ -172,12 +172,12 @@ export class ShareService {
         button.addEventListener("click", async () => {
             if (button.disabled) return;
             button.disabled = true;
-            let icon = "✕";
+            let icon = "❌";
             try {
                 const {status} = await action();
                 icon = this._statusIcon(status);
             } catch {
-                icon = "✕";
+                icon = "❌";
             } finally {
                 button.textContent = icon;
                 setTimeout(() => {
@@ -522,11 +522,11 @@ export class ShareService {
     }
 
     _statusIcon(status) {
-        if (status === "shared" || status === "downloaded") return "✓";
+        if (status === "shared" || status === "downloaded") return "✅";
         if (status === "copied") return "📋";
         if (status === "empty") return "…";
         if (status === "cancelled") return "📤";
-        return "✕";
+        return "❌";
     }
 
     async _dispatch(canvas, {text, filename}) {

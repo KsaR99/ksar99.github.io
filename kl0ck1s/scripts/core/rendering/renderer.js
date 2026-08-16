@@ -1,6 +1,7 @@
 "use strict";
 
 import {forEachShapeCell, getTightBounds, lightenOklch, withAlpha} from "../shared/utils.js";
+import {CachedCanvasLayer} from "./cached-canvas-layer.js";
 import {FALL_TRAIL_ALPHA_CACHE, HARD_DROP_TRAIL_ALPHAS} from "../game/game-constants.js";
 import {LINE_CLEAR_FLASH_PHASE_FRACTION} from "../shared/config.js";
 import {
@@ -77,17 +78,11 @@ export class Renderer {
     }
 
     createSurface(ctx, boardCanvas) {
-        const backgroundCanvas = document.createElement("canvas");
-        const clearingStaticCanvas = document.createElement("canvas");
-        const clearingAboveCanvas = document.createElement("canvas");
-        const clearingGridCanvas = document.createElement("canvas");
-
         return {
             ctx,
             boardCanvas,
 
-            backgroundCanvas,
-            backgroundCtx: backgroundCanvas.getContext("2d"),
+            background: new CachedCanvasLayer(),
             _bgVersion: -1,
             _bgSize: 0,
             _bgGrid: null,
@@ -96,16 +91,14 @@ export class Renderer {
             _bgSat: null,
             _bgOutline: null,
 
-            _clearingStaticCanvas: clearingStaticCanvas,
-            _clearingStaticCtx: clearingStaticCanvas.getContext("2d"),
+            clearingStatic: new CachedCanvasLayer(),
             _clearingStaticVersion: -1,
             _clearingStaticSize: 0,
             _clearingStaticFromRow: -1,
             _clearingStaticSat: null,
             _clearingStaticOutline: null,
 
-            _clearingAboveCanvas: clearingAboveCanvas,
-            _clearingAboveCtx: clearingAboveCanvas.getContext("2d"),
+            clearingAbove: new CachedCanvasLayer(),
             _clearingAboveVersion: -1,
             _clearingAboveSize: 0,
             _clearingAboveSat: null,
@@ -114,8 +107,7 @@ export class Renderer {
             _clearingAboveDropRowsRef: null,
             _clearingAboveSegments: [],
 
-            _clearingGridCanvas: clearingGridCanvas,
-            _clearingGridCtx: clearingGridCanvas.getContext("2d"),
+            clearingGrid: new CachedCanvasLayer(),
             _clearingGridSize: 0,
             _clearingGridRows: 0,
             _clearingGridCols: 0,
@@ -300,7 +292,7 @@ export class Renderer {
      *   A negative value for a column means "not revealed yet" - fragments in that column are skipped.
      */
     drawFragments(ctx, fragments, particleProgress) {
-        if (!fragments || !fragments.count) return;
+        if (!fragments?.count) return;
 
         const {
             count,
@@ -533,10 +525,9 @@ export class Renderer {
 
         const width = board.cols * size;
         const height = board.rows * size;
-        if (surface.backgroundCanvas.width !== width) surface.backgroundCanvas.width = width;
-        if (surface.backgroundCanvas.height !== height) surface.backgroundCanvas.height = height;
+        surface.background.resize(width, height);
 
-        const bgCtx = surface.backgroundCtx;
+        const bgCtx = surface.background.ctx;
         bgCtx.clearRect(0, 0, width, height);
         if (this.gridEnabled) this.drawGrid(board, bgCtx);
 
@@ -557,7 +548,7 @@ export class Renderer {
 
         this.spriteCache.warmGlow(size, this.heightSaturationEnabled);
 
-        const bgCtx = surface.backgroundCtx;
+        const bgCtx = surface.background.ctx;
         const pad = this.outlineBlocksEnabled
             ? this.spriteCache.outlinePad
             : (this.glowEnabled ? this.spriteCache.glowPad : 0);
@@ -614,7 +605,7 @@ export class Renderer {
         const padRows = pad ? Math.ceil(pad / size) : 0;
         const affectedMaxRow = Math.min(board.rows - 1, Math.max(...clearedRowIndices) + padRows);
         const width = board.cols * size;
-        const bgCtx = surface.backgroundCtx;
+        const bgCtx = surface.background.ctx;
 
         bgCtx.clearRect(0, 0, width, (affectedMaxRow + 1) * size);
         if (this.gridEnabled) this.drawGrid(board, bgCtx, 0, affectedMaxRow);
@@ -641,10 +632,9 @@ export class Renderer {
         const rowsCount = Math.max(0, board.rows - staticFromRow);
         const width = board.cols * size;
         const height = rowsCount * size;
-        if (surface._clearingStaticCanvas.width !== width) surface._clearingStaticCanvas.width = width;
-        if (surface._clearingStaticCanvas.height !== height) surface._clearingStaticCanvas.height = height;
+        surface.clearingStatic.resize(width, height);
 
-        const sCtx = surface._clearingStaticCtx;
+        const sCtx = surface.clearingStatic.ctx;
         sCtx.clearRect(0, 0, width, height);
 
         for (let y = staticFromRow; y < board.rows; y++) {
@@ -671,10 +661,9 @@ export class Renderer {
 
         const width = board.cols * size;
         const height = board.rows * size;
-        if (surface._clearingGridCanvas.width !== width) surface._clearingGridCanvas.width = width;
-        if (surface._clearingGridCanvas.height !== height) surface._clearingGridCanvas.height = height;
+        surface.clearingGrid.resize(width, height);
 
-        const gCtx = surface._clearingGridCtx;
+        const gCtx = surface.clearingGrid.ctx;
         gCtx.clearRect(0, 0, width, height);
         this.drawGrid(board, gCtx, 0, board.rows - 1);
 
@@ -690,7 +679,7 @@ export class Renderer {
         this.updateBoardBackground(board, size, surface);
 
         ctx.clearRect(0, 0, surface.boardCanvas.width, surface.boardCanvas.height); // required for fall-trail.
-        ctx.drawImage(surface.backgroundCanvas, 0, 0);
+        ctx.drawImage(surface.background.canvas, 0, 0);
     }
 
     _ensureClearingAboveCache(surface, board, size, affectedMaxRow, lineIndices, dropRows) {
@@ -706,12 +695,9 @@ export class Renderer {
         const clearingSet = new Set(lineIndices);
         const width = board.cols * size;
         const height = (affectedMaxRow + 1) * size;
-        if (surface._clearingAboveCanvas.width !== width) surface._clearingAboveCanvas.width = width;
-        if (surface._clearingAboveCanvas.height !== Math.max(1, height)) {
-            surface._clearingAboveCanvas.height = Math.max(1, height);
-        }
+        surface.clearingAbove.resize(width, height);
 
-        const ctx = surface._clearingAboveCtx;
+        const ctx = surface.clearingAbove.ctx;
         ctx.clearRect(0, 0, width, Math.max(1, height));
 
         const segments = [];
@@ -807,14 +793,14 @@ export class Renderer {
 
         ctx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
 
-        if (this.gridEnabled) ctx.drawImage(surface._clearingGridCanvas, 0, 0);
+        if (this.gridEnabled) ctx.drawImage(surface.clearingGrid.canvas, 0, 0);
 
         const width = board.cols * size;
         for (const segment of surface._clearingAboveSegments) {
             const dy = segment.top * size + segment.dropAmount * size * fallProgress;
             const segHeight = segment.height * size;
             ctx.drawImage(
-                surface._clearingAboveCanvas,
+                surface.clearingAbove.canvas,
                 0, segment.top * size, width, segHeight,
                 0, dy, width, segHeight,
             );
@@ -830,7 +816,7 @@ export class Renderer {
             }
         }
 
-        if (staticFromRow < board.rows) ctx.drawImage(surface._clearingStaticCanvas, 0, staticFromRow * size);
+        if (staticFromRow < board.rows) ctx.drawImage(surface.clearingStatic.canvas, 0, staticFromRow * size);
 
         if (this.particlesEnabled) this.drawFragments(ctx, fragments, colParticleProgress);
 

@@ -12,6 +12,7 @@ import {
 } from "../net/net-constants.js";
 import {browseLobby, hostOpenLobby, requestJoinRoom, SupabaseSignalError} from "../net/supabase-signaling.js";
 import {BOT_DIFFICULTIES, BotOpponent} from "../ai/bot-opponent.js";
+import {OpponentBoardView} from "./multiplayer/opponent-board-view.js";
 import {PieceBag} from "../game/piece-bag.js";
 import {mulberry32, randomSeed} from "../shared/seeded-random.js";
 import {formatNumber} from "../shared/utils.js";
@@ -23,8 +24,6 @@ const REMOTE_PIECE_LERP_MAX_MS = 1600;
 const RUNNING_STATES = new Set(["countdown", "running", "clearing", "paused", "options"]);
 const FINISHED_STATES = new Set(["gameOver-entry"]);
 
-const OPPONENT_BOARD_FALLBACK_CELL_PX = 24;
-
 const BOT_DIFFICULTY_ORDER = ["easy", "medium", "hard"];
 
 const MAX_NEGOTIATION_AUTO_RETRIES = 2;
@@ -35,6 +34,23 @@ const STEP_BY_PANEL = {
     host: {step: 2, labelKey: "multiplayer.step2Label"},
     join: {step: 2, labelKey: "multiplayer.step2Label"},
     ready: {step: 3, labelKey: "multiplayer.step3Label"},
+};
+
+const PANEL_KEY_CONFIG = {
+    bot: {
+        groups: [
+            {prev: "mp-bot-mode-prev", next: "mp-bot-mode-next", focus: "mp-bot-mode-select"},
+            {prev: "mp-bot-level-prev", next: "mp-bot-level-next", focus: "mp-bot-level-select"},
+        ],
+        primary: ["mp-bot-difficulty-start"],
+    },
+    ready: {
+        groups: [
+            {prev: "mp-ready-mode-prev", next: "mp-ready-mode-next", focus: "mp-ready-mode-select"},
+            {prev: "mp-ready-difficulty-prev", next: "mp-ready-difficulty-next", focus: "mp-ready-difficulty-select"},
+        ],
+        primary: ["mp-start-button", "mp-ready-button"],
+    },
 };
 
 export class MultiplayerController {
@@ -127,21 +143,14 @@ export class MultiplayerController {
         this._opponentPpsBadgeEl = null;
         this._opponentDroughtBadgeEl = null;
         this._resultPanelEl = null;
-        this._opponentPanelEl = null;
-        this._opponentNameEl = null;
-        this._opponentCanvasEl = null;
-        this._opponentCanvasCtx = null;
-        this._opponentBoardHost = null;
-        this._localHeaderEl = null;
-        this._raceMeterEl = null;
-        this._raceMeterFillEl = null;
-        this._handleOpponentWindowResize = null;
+        this.opponentBoard = new OpponentBoardView(this.game, this.dom);
         this._botStartTimer = null;
         this._botStartDeadline = 0;
         this._botDifficultyKey = null;
         this._guestOriginalMode = null;
         this._guestOriginalDifficulty = null;
         this._activePanelName = null;
+        this._panelGroupFocus = 0;
         this._negotiationRetryCount = 0;
         this._negotiationRetryTimer = null;
         this._connectInFlight = false;
@@ -287,7 +296,63 @@ export class MultiplayerController {
     }
 
     _onKeydown(event) {
-        if (event.key === "Escape") this.close();
+        if (event.key === "Escape") {
+            this.close();
+            return;
+        }
+
+        const tag = event.target?.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA") return;
+
+        const config = PANEL_KEY_CONFIG[this._activePanelName];
+        if (!config) return;
+
+        const groups = config.groups ?? [];
+
+        if (event.code === "ArrowUp" || event.code === "ArrowDown") {
+            if (!groups.length) return;
+            event.preventDefault();
+            const dir = event.code === "ArrowDown" ? 1 : -1;
+            this._panelGroupFocus = Math.max(0, Math.min(groups.length - 1, this._panelGroupFocus + dir));
+            this._syncPanelGroupFocus();
+            return;
+        }
+
+        if (event.code === "ArrowLeft" || event.code === "ArrowRight") {
+            const group = groups[this._panelGroupFocus];
+            if (!group) return;
+            const role = event.code === "ArrowLeft" ? group.prev : group.next;
+            const button = role ? this.overlayEl?.querySelector(`[data-role="${role}"]`) : null;
+            if (button && !button.disabled) {
+                event.preventDefault();
+                button.click();
+            }
+            return;
+        }
+
+        if (event.code === "Enter") {
+            const root = this.overlayEl;
+            const primaryRole = (config.primary ?? []).find((role) => {
+                const button = root?.querySelector(`[data-role="${role}"]`);
+                return button && !button.hidden && !button.disabled;
+            });
+            const button = primaryRole ? root?.querySelector(`[data-role="${primaryRole}"]`) : null;
+            if (button) {
+                event.preventDefault();
+                button.click();
+            }
+        }
+    }
+
+    _syncPanelGroupFocus() {
+        const config = PANEL_KEY_CONFIG[this._activePanelName];
+        const root = this.overlayEl;
+        if (!root) return;
+
+        (config?.groups ?? []).forEach((group, index) => {
+            const el = root.querySelector(`[data-role="${group.focus}"]`);
+            if (el) el.classList.toggle("difficulty--focused", index === this._panelGroupFocus);
+        });
     }
 
     _showPanel(name) {
@@ -296,8 +361,10 @@ export class MultiplayerController {
             if (el) el.hidden = key !== name;
         });
         this._activePanelName = name;
+        this._panelGroupFocus = 0;
         this._updateSteps(name);
         this._renderConfigPanels();
+        this._syncPanelGroupFocus();
     }
 
     _updateSteps(name) {
@@ -1001,7 +1068,7 @@ export class MultiplayerController {
         } else if (payload.kind === MESSAGE_KIND.NAME) {
             this._remoteName = (payload.name || "").trim() || null;
             this._updateReadyBadges();
-            if (this._opponentNameEl) this._opponentNameEl.textContent = this._remoteDisplayName();
+            this.opponentBoard.setName(this._remoteDisplayName());
             if (this._opponentNameBadgeEl) this._opponentNameBadgeEl.textContent = this._remoteDisplayName();
             if (this._lastRemoteStats) this._updateOpponentStats(this._lastRemoteStats);
         } else if (payload.kind === MESSAGE_KIND.THEME) {
@@ -1413,7 +1480,7 @@ export class MultiplayerController {
         button.className = "mp-leave-button";
         button.dataset.role = "mp-leave-inline-button";
         button.setAttribute("aria-label", this._t("multiplayer.leaveButton"));
-        button.textContent = "✕";
+        button.textContent = "❌";
         button.addEventListener("click", () => this._leaveMatch());
         return button;
     }
@@ -1524,146 +1591,32 @@ export class MultiplayerController {
     }
 
     _updateRaceMeter(localStats) {
-        const fill = this._raceMeterFillEl;
-        if (!fill) return;
+        if (!this.opponentBoard.raceMeterFillEl) return;
         const remoteStats = this._lastRemoteStats;
         if (!remoteStats) {
-            fill.style.height = "50%";
-            fill.classList.remove("mp-race-meter__fill--winning", "mp-race-meter__fill--losing");
+            this.opponentBoard.resetRaceMeter();
             return;
         }
         const local = this._raceMetric(localStats);
         const remote = this._raceMetric(remoteStats);
         const total = local + remote;
         const percent = total === 0 ? 50 : 50 + 50 * (local - remote) / total;
-        fill.style.height = `${Math.max(0, Math.min(100, percent))}%`;
-        fill.classList.toggle("mp-race-meter__fill--winning", percent > 50);
-        fill.classList.toggle("mp-race-meter__fill--losing", percent < 50);
+        this.opponentBoard.updateRaceMeter(percent);
     }
 
     _showOpponentBoard() {
-        this._hideOpponentBoard();
-
-        if (!globalThis.matchMedia?.("(width >= 48rem)").matches) return;
-
-        const boardHost = this.dom.querySelector(".app__board");
-        if (!boardHost) return;
-
-        const localHeader = this.dom.createElement("div");
-        localHeader.className = "mp-opponent-column__header mp-local-board-header";
-
-        const localName = this.dom.createElement("span");
-        localName.className = "mp-opponent-column__name";
-        localName.textContent = this._localDisplayName();
-        localHeader.appendChild(localName);
-
-        boardHost.prepend(localHeader);
-        this._opponentBoardHost = boardHost;
-        this._localHeaderEl = localHeader;
-
-        const panel = this.dom.createElement("div");
-        panel.className = "app__sidebar mp-opponent-column";
-        panel.dataset.role = "mp-opponent-panel";
-
-        const header = this.dom.createElement("div");
-        header.className = "mp-opponent-column__header";
-
-        const name = this.dom.createElement("span");
-        name.className = "mp-opponent-column__name";
-        name.textContent = this._remoteDisplayName();
-        header.appendChild(name);
-
-        panel.appendChild(header);
-
-        const boardEl = this.dom.createElement("div");
-        boardEl.className = "board mp-opponent-column__board";
-
-        const stage = this.dom.createElement("div");
-        stage.className = "board__stage";
-
-        const canvas = this.dom.createElement("canvas");
-        canvas.className = "board__canvas mp-opponent-column__canvas";
-        canvas.dataset.role = "mp-opponent-canvas";
-
-        const filterEl = this.dom.createElement("div");
-        filterEl.className = "board__filter board__filter--none";
-
-        const filterCanvas = this.dom.createElement("canvas");
-        filterCanvas.className = "board__filter-canvas";
-        filterEl.appendChild(filterCanvas);
-
-        stage.appendChild(canvas);
-        stage.appendChild(filterEl);
-        boardEl.appendChild(stage);
-        panel.appendChild(boardEl);
-
-        boardHost.insertAdjacentElement("afterend", panel);
-
-        const raceMeter = this.dom.createElement("div");
-        raceMeter.className = "app__sidebar mp-race-meter";
-        raceMeter.dataset.role = "mp-race-meter";
-        const raceMeterFill = this.dom.createElement("div");
-        raceMeterFill.className = "mp-race-meter__fill";
-        raceMeterFill.dataset.role = "mp-race-meter-fill";
-        raceMeter.appendChild(raceMeterFill);
-        boardHost.insertAdjacentElement("afterend", raceMeter);
-
-        this._opponentPanelEl = panel;
-        this._opponentHeaderEl = header;
-        this._opponentNameEl = name;
-        this._raceMeterEl = raceMeter;
-        this._raceMeterFillEl = raceMeterFill;
-        this._opponentCanvasEl = canvas;
-        this._opponentCanvasCtx = canvas.getContext("2d");
-        this._opponentSurface = this.game.renderer?.createSurface(this._opponentCanvasCtx, canvas) ?? null;
-        this.game.themeOverlay.registerTarget("opponent", {overlayEl: filterEl, canvas: filterCanvas, boardEl});
-
-        this._notifyLayoutResize();
-        this._syncOpponentCanvasSize();
-
-        this._handleOpponentWindowResize = () => this._syncOpponentCanvasSize();
-        const resizeTarget = globalThis.visualViewport ?? globalThis.window ?? null;
-        resizeTarget?.addEventListener("resize", this._handleOpponentWindowResize);
-    }
-
-    _syncOpponentCanvasSize() {
-        const canvas = this._opponentCanvasEl;
-        if (!canvas) return;
-        const cellSize = BOARD_CONFIG.CELL_SIZE || OPPONENT_BOARD_FALLBACK_CELL_PX;
-        const width = cellSize * BOARD_CONFIG.COLS;
-        const height = cellSize * BOARD_CONFIG.ROWS;
-        if (canvas.width === width && canvas.height === height) return;
-        canvas.width = width;
-        canvas.height = height;
-        this.game.themeOverlay.resize(width, height, "opponent");
-        this._drawOpponentBoard(this._lastRemoteCells, this._remoteLivePiece);
+        this.opponentBoard.show(
+            this._localDisplayName(),
+            this._remoteDisplayName(),
+            {
+                onLayoutResize: () => this._notifyLayoutResize(),
+                draw: () => this._drawOpponentBoard(this._lastRemoteCells, this._remoteLivePiece),
+            }
+        );
     }
 
     _hideOpponentBoard() {
-        if (!this._opponentPanelEl && !this._localHeaderEl) return;
-        this.game.themeOverlay.unregisterTarget("opponent");
-        this._opponentPanelEl?.remove();
-        this._opponentPanelEl = null;
-        this._opponentHeaderEl = null;
-        this._opponentNameEl = null;
-        this._raceMeterEl?.remove();
-        this._raceMeterEl = null;
-        this._raceMeterFillEl = null;
-        this._localHeaderEl?.remove();
-        this._localHeaderEl = null;
-        if (this._opponentBoardHost) {
-            this._opponentBoardHost.style.paddingTop = "";
-            this._opponentBoardHost = null;
-        }
-        this._opponentCanvasEl = null;
-        this._opponentCanvasCtx = null;
-        this._opponentSurface = null;
-        if (this._handleOpponentWindowResize) {
-            const resizeTarget = globalThis.visualViewport ?? globalThis.window ?? null;
-            resizeTarget?.removeEventListener("resize", this._handleOpponentWindowResize);
-            this._handleOpponentWindowResize = null;
-        }
-        this._notifyLayoutResize();
+        this.opponentBoard.hide(() => this._notifyLayoutResize());
     }
 
     _notifyLayoutResize() {
@@ -1680,49 +1633,11 @@ export class MultiplayerController {
     }
 
     _buildOpponentClearFragments(cells, lineIndices) {
-        const renderer = this.game.renderer;
-        const surface = this._opponentSurface;
-        if (!renderer || !surface || !cells || lineIndices.length === 0) return [];
-
-        const {COLS, ROWS} = BOARD_CONFIG;
-        return renderer.buildClearFragments({
-            cells,
-            cols: COLS,
-            rows: ROWS,
-            lineIndices,
-            size: renderer.boardConfig.CELL_SIZE,
-        });
-    }
-
-    _remoteBoardView(cells) {
-        const {COLS, ROWS} = BOARD_CONFIG;
-        if (!this._emptyRemoteCells) this._emptyRemoteCells = new Uint8Array(COLS * ROWS);
-        return {cols: COLS, rows: ROWS, colors: cells || this._emptyRemoteCells, version: this._remoteBoardVersion};
+        return this.opponentBoard.buildClearFragments(cells, lineIndices);
     }
 
     _drawOpponentBoard(cells, livePiece = null, hardDropTrail = null) {
-        const surface = this._opponentSurface;
-        const renderer = this.game.renderer;
-        if (!surface || !renderer) return;
-
-        const board = this._remoteBoardView(cells);
-        renderer.drawBoard(board, surface);
-
-        if (hardDropTrail) {
-            renderer.drawHardDropTrail(hardDropTrail.entries, hardDropTrail.progress, surface);
-        }
-
-        if (livePiece) {
-            const piece = {
-                x: livePiece.x,
-                y: livePiece.y,
-                mask: livePiece.mask,
-                width: livePiece.width,
-                height: livePiece.height,
-                color: renderer.colorPalette[livePiece.colorIndex],
-            };
-            renderer.drawPiece(piece, board, surface);
-        }
+        this.opponentBoard.draw(cells, this._remoteBoardVersion, livePiece, hardDropTrail);
     }
 
     _currentHardDropTrailForDraw() {
@@ -1770,13 +1685,7 @@ export class MultiplayerController {
     }
 
     _drawOpponentClearingFrame(rc, progress) {
-        const surface = this._opponentSurface;
-        const renderer = this.game.renderer;
-        if (!surface || !renderer || !rc?.cells) return;
-
-        const {COLS, ROWS} = BOARD_CONFIG;
-        const board = {cols: COLS, rows: ROWS, colors: rc.cells, version: rc.version};
-        renderer.drawClearingFrame(board, rc.lines, rc.dropRows, rc.fragments || [], progress, surface);
+        this.opponentBoard.drawClearingFrame(rc, progress);
     }
 
     _sendToPeer(payload) {

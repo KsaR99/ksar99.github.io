@@ -464,7 +464,7 @@ export class BenchmarkController {
 
                 t0 = mark();
                 shadow.renderer.ctx.clearRect(0, 0, shadow.renderer.boardCanvas.width, shadow.renderer.boardCanvas.height);
-                shadow.renderer.ctx.drawImage(shadow.renderer.backgroundCanvas, 0, 0);
+                shadow.renderer.ctx.drawImage(shadow.renderer.background.canvas, 0, 0);
                 timings.renderBlit.ms += mark() - t0;
                 timings.renderBlit.ops++;
 

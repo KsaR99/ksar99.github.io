@@ -44,7 +44,7 @@ function subscribe(channel) {
     return new Promise((resolve, reject) => {
         channel.subscribe((status, err) => {
             if (status === "SUBSCRIBED") resolve();
-            else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+            else if (["CHANNEL_ERROR", "TIMED_OUT", "CLOSED"].includes(status)) {
                 reject(new SupabaseSignalError("channel", err?.message ?? `Channel status: ${status}`));
             }
         });

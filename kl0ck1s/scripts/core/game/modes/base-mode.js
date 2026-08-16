@@ -1,10 +1,5 @@
 "use strict";
 
-/**
- * Base class for a game mode's behavior. A mode only overrides the
- * methods it actually needs; everything else falls back to a safe
- * no-op default so ModeController can treat every mode uniformly.
- */
 export class BaseMode {
     constructor(game) {
         this.game = game;

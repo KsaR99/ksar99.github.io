@@ -425,7 +425,7 @@ body.hud-right [data-role="next-piece-queue"] {
     border: 1px solid var(--board-accent, var(--line));
     box-shadow: var(--board-accent, oklch(0.39 0 0)) 0 0 1.15rem 0.25rem;
 
-    /** Opponent / M.P. */
+    /** === Opponent / M.P. === */
 
     &.board--theme-none {
         --board-bg: oklch(0.15 0 0);

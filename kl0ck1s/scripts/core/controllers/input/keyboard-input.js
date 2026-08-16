@@ -114,6 +114,7 @@ export class KeyboardInput extends InputSource {
         this._keydownHandler = (event) => {
             if (this._listening) return;
             if (isTypingInField(event) && event.code !== "Enter") return;
+            if (game.multiplayerController?.isOpen) return;
 
             const isMenuScreen = game.state === "idle";
             if (isMenuScreen && (event.code === "ArrowUp" || event.code === "ArrowDown")) {
@@ -154,6 +155,7 @@ export class KeyboardInput extends InputSource {
 
         this._keyupHandler = (event) => {
             if (this._listening) return;
+            if (game.multiplayerController?.isOpen) return;
             const isMenuScreen = game.state === "idle";
             let slotId = this.dispatchMap()[event.code];
             if (isMenuScreen) {
