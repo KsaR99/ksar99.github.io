@@ -1,15 +1,13 @@
 "use strict";
 
+import {ThemeEffect} from "./theme-effect.js";
+
 const FLAKE_COLOR = "oklch(1 0 0 / 85%)";
 const DENSITY = 1 / 6000; // flakes per square pixel
 
-export class Snow {
+export class Snow extends ThemeEffect {
     constructor(canvas, ctx = null) {
-        this.canvas = canvas;
-        this.ctx = ctx ?? canvas.getContext("2d");
-        this.active = false;
-        this.rafId = null;
-        this.frameCount = 0;
+        super(canvas, ctx);
 
         this.count = 0;
         this.x = new Float32Array(0);
@@ -18,8 +16,6 @@ export class Snow {
         this.speed = new Float32Array(0);
         this.drift = new Float32Array(0);
         this.driftSpeed = new Float32Array(0);
-
-        this._loop = this.loop.bind(this);
     }
 
     _spawnFlake(i, width, height, initial = false) {
@@ -32,14 +28,8 @@ export class Snow {
     }
 
     resize(width, height) {
-        const w = Math.max(1, Math.round(width));
-        const h = Math.max(1, Math.round(height));
-        if (this._lastWidth === w && this._lastHeight === h && this.count) return;
-        this._lastWidth = w;
-        this._lastHeight = h;
-
-        this.canvas.width = w;
-        this.canvas.height = h;
+        const {w, h, unchanged} = this.resizeCanvas(width, height, this.count);
+        if (unchanged) return;
 
         this.count = Math.max(10, Math.round(w * h * DENSITY));
         this.x = new Float32Array(this.count);
@@ -74,27 +64,5 @@ export class Snow {
             }
         }
         ctx.fill(path);
-    }
-
-    loop() {
-        if (!this.active) return;
-        this.frameCount = (this.frameCount + 1) % 2;
-        if (this.frameCount === 0) this.drawFrame();
-        this.rafId = requestAnimationFrame(this._loop);
-    }
-
-    start() {
-        if (this.active) return;
-        this.active = true;
-        this.frameCount = 0;
-        this.rafId = requestAnimationFrame(this._loop);
-    }
-
-    stop() {
-        if (!this.active) return;
-        this.active = false;
-        if (this.rafId !== null) cancelAnimationFrame(this.rafId);
-        this.rafId = null;
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 }

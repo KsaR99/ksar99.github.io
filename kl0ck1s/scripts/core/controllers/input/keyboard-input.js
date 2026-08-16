@@ -1,7 +1,9 @@
 "use strict";
 
-import {InputSource} from "./input-source.js";
+import {DEFAULT_ARR_MS, DEFAULT_DAS_MS, InputSource} from "./input-source.js";
 import {defaultKeyBindings} from "../../shared/key-bindings.js";
+
+export {DEFAULT_DAS_MS, DEFAULT_ARR_MS};
 
 const PREVENT_DEFAULT_KEYS = new Set([
     "ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Space", "Enter", "Escape"
@@ -9,9 +11,6 @@ const PREVENT_DEFAULT_KEYS = new Set([
 
 const REPEATABLE_SLOTS = new Set(["moveLeft", "moveRight", "softDrop"]);
 const MOVEMENT_SLOTS = new Set(["moveLeft", "moveRight", "softDrop", "rotateUp", "rotateZ", "rotate180", "hardDrop"]);
-
-export const DEFAULT_DAS_MS = 125;
-export const DEFAULT_ARR_MS = 16;
 
 export const MOVEMENT_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Space", "KeyZ", "KeyA"]);
 
@@ -27,7 +26,6 @@ export class KeyboardInput extends InputSource {
      */
     constructor(game, steeringArbiter) {
         super(game, steeringArbiter);
-        this.heldTimers = new Map();
         this._keydownHandler = null;
         this._keyupHandler = null;
         this._blurHandler = null;
@@ -75,34 +73,6 @@ export class KeyboardInput extends InputSource {
             if (code) map[code] = slotId;
         });
         return map;
-    }
-
-    stopRepeat(slotId) {
-        const timers = this.heldTimers.get(slotId);
-        if (!timers) return;
-        if (timers.timeoutId !== undefined) clearTimeout(timers.timeoutId);
-        if (timers.intervalId !== undefined) clearInterval(timers.intervalId);
-        this.heldTimers.delete(slotId);
-    }
-
-    startRepeat(slotId, action) {
-        this.stopRepeat(slotId);
-        const settings = this.game.settings;
-        const dasMs = settings?.keyboardDAS ?? DEFAULT_DAS_MS;
-        const arrMs = settings?.keyboardARR ?? DEFAULT_ARR_MS;
-        const timeoutId = setTimeout(() => {
-            const intervalId = setInterval(action, arrMs);
-            this.heldTimers.set(slotId, {intervalId});
-        }, dasMs);
-        this.heldTimers.set(slotId, {timeoutId});
-    }
-
-    stopAllRepeats() {
-        this.heldTimers.forEach((timers) => {
-            if (timers.timeoutId !== undefined) clearTimeout(timers.timeoutId);
-            if (timers.intervalId !== undefined) clearInterval(timers.intervalId);
-        });
-        this.heldTimers.clear();
     }
 
     listenForNextKey(callback) {

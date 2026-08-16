@@ -1,10 +1,11 @@
 "use strict";
 
-import {formatDuration, rollSurvivalGarbageCount} from "../shared/utils.js";
+import {createMode} from "../game/modes/index.js";
 
 export class ModeController {
     constructor(game) {
         this.game = game;
+        this.currentMode = createMode(game.mode, game);
     }
 
     get def() {
@@ -49,6 +50,7 @@ export class ModeController {
         const keys = this.randomizableModeKeys;
         const picked = keys[Math.floor(Math.random() * keys.length)];
         game.mode = picked;
+        this.currentMode = createMode(picked, game);
         game.hud.update(game.stats);
     }
 
@@ -56,6 +58,7 @@ export class ModeController {
         const game = this.game;
         if (game.settings.mode && game.gameModes[game.settings.mode] && game.mode !== game.settings.mode) {
             game.mode = game.settings.mode;
+            this.currentMode = createMode(game.mode, game);
         }
     }
 
@@ -70,234 +73,49 @@ export class ModeController {
 
     reset() {
         const def = this.def;
+        this.currentMode = createMode(this.game.mode, this.game);
         this.game.modeState = {
             garbageTimer: 0,
             digCleared: 0,
             countdownRemainingMs: def.countdownStartMs ?? 0,
             zenOverflowUsed: 0,
+            zenGiveBackUsed: 0,
         };
     }
 
     setupBoard() {
-        const game = this.game;
-        const def = this.def;
-        if (!def.cheeseRows) return;
-        game.board.addGarbageLines(def.cheeseRows);
-    }
-
-    cheeseRaceComplete() {
-        const game = this.game;
-        const def = this.def;
-        return game.lines >= def.cheeseRows;
+        this.currentMode.setupBoard();
     }
 
     objectiveText() {
-        const game = this.game;
-        const def = this.def;
-
-        if (game.mode === "sprint") {
-            return `${game.lines} / ${def.sprintTarget}`;
-        }
-
-        if (game.mode === "ultra") {
-            return formatDuration(Math.max(0, def.timeLimitMs - game.elapsedMs));
-        }
-
-        if (game.mode === "survival") {
-            const remainingMs = Math.max(0, def.garbageIntervalMs - game.modeState.garbageTimer);
-            return `${Math.ceil(remainingMs / 1000)}s`;
-        }
-
-        if (game.mode === "cheeseRace") {
-            return `${game.lines} / ${def.cheeseRows}`;
-        }
-
-        if (game.mode === "digSurvival") {
-            return `${game.modeState.digCleared} / ${def.digTarget}`;
-        }
-
-        if (game.mode === "countdown") {
-            return formatDuration(Math.max(0, game.modeState.countdownRemainingMs));
-        }
-
-        if (game.mode === "zen") {
-            return `${this.zenHeight()}`;
-        }
-
-        return null;
+        return this.currentMode.objectiveText();
     }
 
     objectivePercent() {
-        const game = this.game;
-        const def = this.def;
-
-        if (game.mode === "sprint") {
-            return Math.min(100, (game.lines / def.sprintTarget) * 100);
-        }
-
-        if (game.mode === "ultra") {
-            return Math.min(100, (game.elapsedMs / def.timeLimitMs) * 100);
-        }
-
-        if (game.mode === "survival") {
-            return Math.min(100, (game.modeState.garbageTimer / def.garbageIntervalMs) * 100);
-        }
-
-        if (game.mode === "cheeseRace") {
-            return Math.min(100, (game.lines / def.cheeseRows) * 100);
-        }
-
-        if (game.mode === "digSurvival") {
-            return Math.min(100, (game.modeState.digCleared / def.digTarget) * 100);
-        }
-
-        if (game.mode === "countdown") {
-            return Math.min(100, (game.modeState.countdownRemainingMs / def.countdownStartMs) * 100);
-        }
-
-        return null;
+        return this.currentMode.objectivePercent();
     }
 
     objectiveUrgency() {
-        const game = this.game;
-        const def = this.def;
-        let remainingMs;
-
-        if (game.mode === "ultra") {
-            remainingMs = def.timeLimitMs - game.elapsedMs;
-        } else if (game.mode === "survival") {
-            remainingMs = def.garbageIntervalMs - game.modeState.garbageTimer;
-        } else if (game.mode === "countdown") {
-            remainingMs = game.modeState.countdownRemainingMs;
-        } else {
-            return null;
-        }
-
-        if (remainingMs <= 5000) return "danger";
-        if (remainingMs <= 10000) return "warning";
-        return null;
+        return this.currentMode.objectiveUrgency();
     }
 
     objectiveColorMode() {
-        const game = this.game;
-        if (["sprint", "cheeseRace", "digSurvival"].includes(game.mode)) {
-            return "ramp";
-        }
-
-        if (["ultra", "survival", "countdown"].includes(game.mode)) {
-            return "urgency";
-        }
-
-        return null;
+        return this.currentMode.objectiveColorMode();
     }
 
     update(delta) {
-        const game = this.game;
-        const def = this.def;
-
-        if (game.mode === "ultra" && game.elapsedMs >= def.timeLimitMs) {
-            game.screenFlow.endRound("timeUp");
-            return;
-        }
-
-        if (game.mode === "countdown") {
-            game.modeState.countdownRemainingMs -= delta;
-            if (game.modeState.countdownRemainingMs <= 0) {
-                game.screenFlow.endRound("timeUp");
-                return;
-            }
-        }
-
-        if (game.mode === "survival" && def.garbage) {
-            game.modeState.garbageTimer += delta;
-            if (game.modeState.garbageTimer >= def.garbageIntervalMs) {
-                game.modeState.garbageTimer -= def.garbageIntervalMs;
-                const count = rollSurvivalGarbageCount(def);
-                const {toppedOut} = game.board.addGarbageLines(count);
-                if (game.current) game.current.y -= count;
-                if (toppedOut) {
-                    game.screenFlow.endRound("topOut");
-                }
-            }
-        }
+        this.currentMode.update(delta);
     }
 
     onLinesCleared(cleared) {
-        const game = this.game;
-        const def = this.def;
-
-        if (game.mode === "digSurvival") {
-            game.modeState.digCleared += cleared;
-
-            const {toppedOut} = game.board.addGarbageLines(cleared);
-            if (toppedOut) {
-                game.screenFlow.endRound("topOut");
-                return true;
-            }
-        }
-
-        if (game.mode === "countdown") {
-            const bonusMs = def.countdownBonusMs[Math.min(cleared, def.countdownBonusMs.length - 1)];
-            game.modeState.countdownRemainingMs += bonusMs;
-        }
-
-        return false;
+        return this.currentMode.onLinesCleared(cleared);
     }
 
     checkObjectiveComplete() {
-        const game = this.game;
-        const def = this.def;
-
-        if (game.mode === "sprint" && game.lines >= def.sprintTarget) {
-            game.screenFlow.endRound("sprintComplete");
-            return true;
-        }
-
-        if (game.mode === "cheeseRace" && this.cheeseRaceComplete()) {
-            game.screenFlow.endRound("cheeseClear");
-            return true;
-        }
-
-        if (game.mode === "digSurvival" && game.modeState.digCleared >= def.digTarget) {
-            game.screenFlow.endRound("digComplete");
-            return true;
-        }
-
-        return false;
-    }
-
-    highestFilledRow() {
-        const board = this.game.board;
-        for (let y = 0; y < board.rows; y++) {
-            if (board.occupancy[y] !== 0) return y;
-        }
-        return board.rows;
-    }
-
-    zenHeight() {
-        const game = this.game;
-        const board = game.board;
-        const stackHeight = board.rows - this.highestFilledRow();
-        return (game.modeState.zenOverflowUsed ?? 0) + stackHeight;
+        return this.currentMode.checkObjectiveComplete();
     }
 
     maybeApplyZenOverflow() {
-        const game = this.game;
-        const def = this.def;
-        if (!def.zenOverflow) return;
-
-        const board = game.board;
-        const highestFilledRow = this.highestFilledRow();
-
-        if (highestFilledRow > def.zenOverflowThresholdRow) return;
-
-        const used = game.modeState.zenOverflowUsed ?? 0;
-        const remaining = def.zenOverflowMaxRows - used;
-        if (remaining <= 0) return;
-
-        const shiftAmount = Math.min(def.zenOverflowShiftRows, remaining);
-        board.shiftDown(shiftAmount);
-        game.modeState.zenOverflowUsed = used + shiftAmount;
-        game.renderer?.zenShiftTransition(shiftAmount);
+        this.currentMode.maybeApplyZenOverflow?.();
     }
 }

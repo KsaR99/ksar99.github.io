@@ -6,9 +6,6 @@ import {PIECE_CONTROLLABLE_STATES} from "../../game/game-constants.js";
 
 const REPEATABLE_CODES = new Set(["ArrowLeft", "ArrowRight", "ArrowDown"]);
 
-const DEFAULT_DAS_MS = 125;
-const DEFAULT_ARR_MS = 16;
-
 const TAP_MAX_MOVEMENT_PX = 12;
 const TAP_MAX_DURATION_MS = 250;
 const SWIPE_DOWN_THRESHOLD_RATIO = 0.22;
@@ -41,7 +38,6 @@ export class TouchInput extends InputSource {
 
         this._buttonsRoot = null;
         this._buttonHandlers = [];
-        this._heldTimers = new Map();
     }
 
     steerTo(clientX) {
@@ -205,34 +201,6 @@ export class TouchInput extends InputSource {
         }
         this._buttonHandlers = [];
         this._buttonsRoot = null;
-    }
-
-    stopRepeat(code) {
-        const timers = this._heldTimers.get(code);
-        if (!timers) return;
-        if (timers.timeoutId !== undefined) clearTimeout(timers.timeoutId);
-        if (timers.intervalId !== undefined) clearInterval(timers.intervalId);
-        this._heldTimers.delete(code);
-    }
-
-    stopAllRepeats() {
-        this._heldTimers.forEach((timers) => {
-            if (timers.timeoutId !== undefined) clearTimeout(timers.timeoutId);
-            if (timers.intervalId !== undefined) clearInterval(timers.intervalId);
-        });
-        this._heldTimers.clear();
-    }
-
-    startRepeat(code, action) {
-        this.stopRepeat(code);
-        const settings = this.game.settings;
-        const dasMs = settings?.keyboardDAS ?? DEFAULT_DAS_MS;
-        const arrMs = settings?.keyboardARR ?? DEFAULT_ARR_MS;
-        const timeoutId = setTimeout(() => {
-            const intervalId = setInterval(action, arrMs);
-            this._heldTimers.set(code, {intervalId});
-        }, dasMs);
-        this._heldTimers.set(code, {timeoutId});
     }
 
     bindButtons(root) {

@@ -1,5 +1,7 @@
 "use strict";
 
+import {ThemeEffect} from "./theme-effect.js";
+
 const CHARS = "Kl0ck1's";
 const FONT_SIZE = 18;
 const FONT = `400 ${FONT_SIZE}px "Noto Sans Mono", monospace`;
@@ -102,13 +104,9 @@ function getColumnSprites() {
     return columnSprites;
 }
 
-export class Matrix {
+export class Matrix extends ThemeEffect {
     constructor(canvas, ctx = null) {
-        this.canvas = canvas;
-        this.ctx = ctx ?? canvas.getContext("2d");
-        this.active = false;
-        this.rafId = null;
-        this.frameCount = 0;
+        super(canvas, ctx);
 
         this.count = 0;
         this.y = new Float32Array(0);
@@ -120,8 +118,6 @@ export class Matrix {
 
         getGlyphSprites();
         this._columnSprites = getColumnSprites();
-
-        this._loop = this.loop.bind(this);
     }
 
     _spawnColumn(i, height, initial = false) {
@@ -139,22 +135,8 @@ export class Matrix {
     }
 
     resize(width, height) {
-        const w = Math.max(1, Math.round(width));
-        const h = Math.max(1, Math.round(height));
-
-        if (
-            this._lastWidth === w &&
-            this._lastHeight === h &&
-            this.count
-        ) {
-            return;
-        }
-
-        this._lastWidth = w;
-        this._lastHeight = h;
-
-        this.canvas.width = w;
-        this.canvas.height = h;
+        const {w, h, unchanged} = this.resizeCanvas(width, height, this.count);
+        if (unchanged) return;
 
         this.count = Math.max(1, Math.floor(w / FONT_SIZE));
 
@@ -231,43 +213,5 @@ export class Matrix {
                 this._spawnColumn(i, height);
             }
         }
-    }
-
-    loop() {
-        if (!this.active) return;
-
-        this.frameCount = (this.frameCount + 1) % 2;
-
-        if (this.frameCount === 0) {
-            this.drawFrame();
-        }
-
-        this.rafId = requestAnimationFrame(this._loop);
-    }
-
-    start() {
-        if (this.active) return;
-
-        this.active = true;
-        this.frameCount = 0;
-        this.rafId = requestAnimationFrame(this._loop);
-    }
-
-    stop() {
-        if (!this.active) return;
-
-        this.active = false;
-
-        if (this.rafId !== null) {
-            cancelAnimationFrame(this.rafId);
-        }
-
-        this.rafId = null;
-        this.ctx.clearRect(
-            0,
-            0,
-            this.canvas.width,
-            this.canvas.height
-        );
     }
 }

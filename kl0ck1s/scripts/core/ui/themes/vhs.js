@@ -1,5 +1,7 @@
 "use strict";
 
+import {ThemeEffect} from "./theme-effect.js";
+
 const LITTLE_ENDIAN = new Uint8Array(new Uint32Array([1]).buffer)[0] === 1;
 
 function packRGBA(r, g, b, a) {
@@ -24,13 +26,9 @@ const TILE_HEIGHT_DIVISOR = 10;
 const TILE_HEIGHT_MIN = 8;
 const LINE_ROWS = 3;
 
-export class VHS {
+export class VHS extends ThemeEffect {
     constructor(canvas, ctx = null) {
-        this.canvas = canvas;
-        this.ctx = ctx ?? canvas.getContext("2d");
-        this.active = false;
-        this.rafId = null;
-        this.frameCount = 0;
+        super(canvas, ctx, 3);
 
         this._scanCanvas = document.createElement("canvas");
         this._scanCanvas.className = canvas.className;
@@ -55,8 +53,6 @@ export class VHS {
         this._noiseSkip = new Uint8Array(NOISE_SIZE);
         this._noiseScanColor = new Uint32Array(NOISE_SIZE);
         this._regenNoise();
-
-        this._loop = this.loop.bind(this);
     }
 
     _regenNoise() {
@@ -90,12 +86,9 @@ export class VHS {
     }
 
     resize(width, height) {
-        const w = Math.max(1, Math.round(width));
-        const h = Math.max(1, Math.round(height));
-        if (this.canvas.width === w && this.canvas.height === h) return;
+        const {w, h, unchanged} = this.resizeCanvas(width, height, true);
+        if (unchanged) return;
 
-        this.canvas.width = w;
-        this.canvas.height = h;
         this._scanCanvas.width = w;
         this._scanCanvas.height = h;
 
@@ -178,26 +171,8 @@ export class VHS {
         }
     }
 
-    loop() {
-        if (!this.active) return;
-        this.frameCount = (this.frameCount + 1) % 3;
-        if (this.frameCount === 0) this.drawFrame();
-        this.rafId = requestAnimationFrame(this._loop);
-    }
-
-    start() {
-        if (this.active) return;
-        this.active = true;
-        this.frameCount = 0;
-        this.rafId = requestAnimationFrame(this._loop);
-    }
-
-    stop() {
-        if (!this.active) return;
-        this.active = false;
-        if (this.rafId !== null) cancelAnimationFrame(this.rafId);
-        this.rafId = null;
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    clear() {
+        super.clear();
         this._scanCtx.clearRect(0, 0, this._scanCanvas.width, this._scanCanvas.height);
     }
 }

@@ -89,7 +89,6 @@ export class MultiplayerSession extends EventTarget {
                 this.dispatchEvent(new CustomEvent("message", {detail: raw.payload}));
                 break;
             default:
-                // Unknown envelope shape — surface it as generic data rather than dropping it silently.
                 this.dispatchEvent(new CustomEvent("message", {detail: raw}));
         }
     }

@@ -380,6 +380,23 @@ export class Renderer {
         el.style.translate = "0 0";
     }
 
+    zenGiveBackTransition(shiftRows, durationMs = 220) {
+        const el = this.boardEl;
+        if (!el || shiftRows <= 0) return;
+        clearTimeout(this._shakeTimer);
+        clearTimeout(this._squashTimerA);
+        clearTimeout(this._squashTimerB);
+        this._boardOffsetX = 0;
+        this._boardOffsetY = 0;
+        const offset = shiftRows * this.boardConfig.CELL_SIZE;
+        el.style.transition = "none";
+        el.style.translate = `0 ${offset}px`;
+        el.getBoundingClientRect();
+        el.style.setProperty("--shake-duration", `${durationMs}ms`);
+        el.style.transition = "";
+        el.style.translate = "0 0";
+    }
+
     shakeMove(dir) {
         if (!this.shakeEnabled || !this.boardEl || !dir) return;
         clearTimeout(this._shakeTimer);

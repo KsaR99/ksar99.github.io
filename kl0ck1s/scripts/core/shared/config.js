@@ -46,9 +46,16 @@ export const DEFAULT_DIFFICULTY = "hard";
 
 export const GAME_MODES = Object.freeze({
     zen: Object.freeze({
-        sprintTarget: null, timeLimitMs: null, garbage: false,
-        freezeLevel: true, noLeaderboard: true,
-        zenOverflow: true, zenOverflowThresholdRow: 4, zenOverflowShiftRows: 2, zenOverflowMaxRows: Infinity,
+        sprintTarget: null,
+        timeLimitMs: null,
+        garbage: false,
+        freezeLevel: true,
+        noLeaderboard: true,
+        zenOverflow: true,
+        zenOverflowThresholdRow: 4,
+        zenOverflowShiftRows: 2,
+        zenOverflowMaxRows: Infinity,
+        zenGiveBackMaxRows: 10000,
     }),
     marathon: Object.freeze({sprintTarget: null, timeLimitMs: null, garbage: false}),
     sprint: Object.freeze({sprintTarget: 40, timeLimitMs: null, garbage: false}),

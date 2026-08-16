@@ -14,7 +14,22 @@ export class Board {
     reset() {
         this.occupancy = new Uint32Array(this.rows);
         this.colors = new Uint8Array(this.rows * this.cols);
+        this.overflowBuffer = [];
         ++this.version;
+    }
+
+    #emptyGrid() {
+        return {
+            occupancy: new Uint32Array(this.rows),
+            colors: new Uint8Array(this.rows * this.cols),
+        };
+    }
+
+    #copyRowColors(newColors, srcY, destY) {
+        newColors.set(
+            this.colors.subarray(srcY * this.cols, (srcY + 1) * this.cols),
+            destY * this.cols
+        );
     }
 
     isInsideCols(x) {
@@ -111,17 +126,13 @@ export class Board {
         const cleared = this.rows - keptRows.length;
         if (cleared === 0) return 0;
 
-        const newOccupancy = new Uint32Array(this.rows);
-        const newColors = new Uint8Array(this.rows * this.cols);
+        const {occupancy: newOccupancy, colors: newColors} = this.#emptyGrid();
 
         let dest = this.rows - 1;
         for (let i = keptRows.length - 1; i >= 0; i--, dest--) {
             const src = keptRows[i];
             newOccupancy[dest] = this.occupancy[src];
-            newColors.set(
-                this.colors.subarray(src * this.cols, (src + 1) * this.cols),
-                dest * this.cols
-            );
+            this.#copyRowColors(newColors, src, dest);
         }
 
         this.occupancy = newOccupancy;
@@ -138,15 +149,11 @@ export class Board {
             if (this.occupancy[y] !== 0) toppedOut = true;
         }
 
-        const newOccupancy = new Uint32Array(this.rows);
-        const newColors = new Uint8Array(this.rows * this.cols);
+        const {occupancy: newOccupancy, colors: newColors} = this.#emptyGrid();
 
         for (let y = count; y < this.rows; y++) {
             newOccupancy[y - count] = this.occupancy[y];
-            newColors.set(
-                this.colors.subarray(y * this.cols, (y + 1) * this.cols),
-                (y - count) * this.cols
-            );
+            this.#copyRowColors(newColors, y, y - count);
         }
 
         for (let i = 0; i < Math.min(count, this.rows); i++) {
@@ -167,23 +174,64 @@ export class Board {
         return {toppedOut};
     }
 
-    shiftDown(amount) {
-        if (amount <= 0) return;
-        const shift = Math.min(amount, this.rows);
+    emptyRowsFromTop(limit = this.rows) {
+        let count = 0;
+        for (let y = 0; y < this.rows && count < limit; y++) {
+            if (this.occupancy[y] !== 0) break;
+            count++;
+        }
+        return count;
+    }
 
-        const newOccupancy = new Uint32Array(this.rows);
-        const newColors = new Uint8Array(this.rows * this.cols);
+    shiftDown(amount) {
+        if (amount <= 0) return 0;
+        const shift = Math.min(amount, this.rows);
+        if (shift <= 0) return 0;
+
+        const hiddenRows = [];
+        for (let y = this.rows - shift; y < this.rows; y++) {
+            hiddenRows.push({
+                occ: this.occupancy[y],
+                colors: this.colors.slice(y * this.cols, (y + 1) * this.cols),
+            });
+        }
+        this.overflowBuffer.unshift(...hiddenRows);
+
+        const {occupancy: newOccupancy, colors: newColors} = this.#emptyGrid();
 
         for (let y = 0; y < this.rows - shift; y++) {
             newOccupancy[y + shift] = this.occupancy[y];
-            newColors.set(
-                this.colors.subarray(y * this.cols, (y + 1) * this.cols),
-                (y + shift) * this.cols
-            );
+            this.#copyRowColors(newColors, y, y + shift);
         }
 
         this.occupancy = newOccupancy;
         this.colors = newColors;
         ++this.version;
+        return shift;
+    }
+
+    shiftUp(amount) {
+        if (amount <= 0) return 0;
+        const shift = Math.min(amount, this.rows, this.emptyRowsFromTop(amount), this.overflowBuffer.length);
+        if (shift <= 0) return 0;
+
+        const {occupancy: newOccupancy, colors: newColors} = this.#emptyGrid();
+
+        for (let y = shift; y < this.rows; y++) {
+            newOccupancy[y - shift] = this.occupancy[y];
+            this.#copyRowColors(newColors, y, y - shift);
+        }
+
+        const restoredRows = this.overflowBuffer.splice(0, shift);
+        for (let i = 0; i < shift; i++) {
+            const y = this.rows - shift + i;
+            newOccupancy[y] = restoredRows[i].occ;
+            newColors.set(restoredRows[i].colors, y * this.cols);
+        }
+
+        this.occupancy = newOccupancy;
+        this.colors = newColors;
+        ++this.version;
+        return shift;
     }
 }

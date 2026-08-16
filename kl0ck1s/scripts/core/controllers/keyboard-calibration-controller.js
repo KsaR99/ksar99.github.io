@@ -11,15 +11,19 @@ import {
     KEYBOARD_CALIBRATION_ROUNDS,
 } from "../game/game-constants.js";
 import {DEFAULT_DAS_MS} from "./input/keyboard-input.js";
-import {voiceCountingKey} from "../shared/config.js";
+import {
+    bindCalibrationResultButtons,
+    clampToStep,
+    clearCountdownDisplay,
+    hideCalibrationBanner,
+    mean,
+    showCalibrationBanner,
+    tickCalibrationCountdown,
+    updateCountdownDisplay,
+} from "./calibration-shared.js";
 
 const HOLD_GESTURE_CODES = {holdLeft: "ArrowLeft", holdRight: "ArrowRight"};
 const HOLD_GESTURE_GLYPHS = {holdLeft: "◄", holdRight: "►"};
-
-function clampToStep(value, min, max, step) {
-    const clamped = Math.max(min, Math.min(max, value));
-    return Math.round(clamped / step) * step;
-}
 
 function pickGestures(count) {
     const pool = Object.keys(HOLD_GESTURE_CODES);
@@ -28,10 +32,6 @@ function pickGestures(count) {
         picked.push(pool[Math.floor(Math.random() * pool.length)]);
     }
     return picked;
-}
-
-function mean(values) {
-    return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
 export class KeyboardCalibrationController {
@@ -95,21 +95,18 @@ export class KeyboardCalibrationController {
 
     tick(delta) {
         if (this.armed) return;
-
-        this.countdownTimer += delta;
-        while (this.countdownTimer >= this.game.countdownStepDuration) {
-            this.countdownTimer -= this.game.countdownStepDuration;
-            this.countdownIndex++;
-
-            if (this.countdownIndex >= COUNTDOWN_STEPS.length) {
+        tickCalibrationCountdown(this, delta, {
+            steps: COUNTDOWN_STEPS,
+            stepDuration: this.game.countdownStepDuration,
+            onStep: () => {
+                this._updateCountdownDisplay();
+                this._updateCountdownBar();
+            },
+            onComplete: () => {
                 this.game.soundManager.play("voiceLetsGo");
                 this._armRound();
-                return;
-            }
-
-            this._updateCountdownDisplay();
-            this._updateCountdownBar();
-        }
+            },
+        });
     }
 
     _armCountdown() {
@@ -179,32 +176,21 @@ export class KeyboardCalibrationController {
                 steps: 1,
             });
         }
-        banner.classList.add("board__calibration--visible");
+        showCalibrationBanner(game);
     }
 
     _hideBanner() {
-        const banner = this.game.dom?.querySelector('[data-role="calibration-banner"]');
-        if (banner) banner.classList.remove("board__calibration--visible");
+        hideCalibrationBanner(this.game);
     }
 
     _updateCountdownDisplay() {
-        const banner = this.game.dom?.querySelector('[data-role="calibration-banner"]');
-        const el = banner?.querySelector('[data-field="countdown"]');
-        if (!el) return;
-
-        const {number, tint} = COUNTDOWN_STEPS[this.countdownIndex];
-        this.game.soundManager.play(voiceCountingKey(number));
-        el.textContent = number;
-        el.dataset.tint = tint;
-        el.classList.remove("board__calibration__countdown--pop");
-        void el.offsetWidth;
-        el.classList.add("board__calibration__countdown--pop");
+        updateCountdownDisplay(this.game, this.countdownIndex, COUNTDOWN_STEPS, (el, tint) => {
+            el.dataset.tint = tint;
+        });
     }
 
     _clearCountdownDisplay() {
-        const banner = this.game.dom?.querySelector('[data-role="calibration-banner"]');
-        const el = banner?.querySelector('[data-field="countdown"]');
-        if (el) el.textContent = "";
+        clearCountdownDisplay(this.game);
     }
 
     _bindKeyTracking() {
@@ -305,22 +291,11 @@ export class KeyboardCalibrationController {
 
     _bindResultButtons() {
         const game = this.game;
-        const saveButton = game.dom?.querySelector('[data-role="keyboard-calibration-result-save-button"]');
-        const discardButton = game.dom?.querySelector('[data-role="keyboard-calibration-result-discard-button"]');
-        const restartButton = game.dom?.querySelector('[data-role="keyboard-calibration-result-restart-button"]');
-
-        if (saveButton) {
-            if (Object.keys(this._pendingSettings ?? {}).length === 0) {
-                saveButton.hidden = true;
-            } else {
-                saveButton.addEventListener("click", () => this._acceptResult(), {once: true});
-            }
-        }
-        if (discardButton) {
-            discardButton.addEventListener("click", () => game.screenFlow.showIdleScreen().then(), {once: true});
-        }
-        if (restartButton) {
-            restartButton.addEventListener("click", () => this.start(), {once: true});
-        }
+        bindCalibrationResultButtons(game, "keyboard-calibration-result", {
+            hasPending: Object.keys(this._pendingSettings ?? {}).length > 0,
+            onSave: () => this._acceptResult(),
+            onDiscard: () => game.screenFlow.showIdleScreen().then(),
+            onRestart: () => this.start(),
+        });
     }
 }

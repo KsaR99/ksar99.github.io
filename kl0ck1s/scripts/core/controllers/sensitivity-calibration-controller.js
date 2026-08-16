@@ -9,7 +9,16 @@ import {
     SENSITIVITY_STEP,
 } from "../game/game-constants.js";
 import {getTightBounds} from "../shared/utils.js";
-import {voiceCountingKey} from "../shared/config.js";
+import {
+    bindCalibrationResultButtons,
+    clampToStep,
+    clearCountdownDisplay,
+    hideCalibrationBanner,
+    mean,
+    showCalibrationBanner,
+    tickCalibrationCountdown,
+    updateCountdownDisplay,
+} from "./calibration-shared.js";
 
 const GESTURE_DIR_SIGN = {tutorialLeft: -1, tutorialRight: 1, dragToLeftEdge: -1, dragToRightEdge: 1};
 const TUTORIAL_GESTURES = new Set(["tutorialLeft", "tutorialRight"]);
@@ -35,8 +44,7 @@ function instructionText(i18n, gesture) {
 }
 
 function clampSensitivity(value) {
-    const clamped = Math.max(SENSITIVITY_MIN, Math.min(SENSITIVITY_MAX, value));
-    return Math.round(clamped / SENSITIVITY_STEP) * SENSITIVITY_STEP;
+    return clampToStep(value, SENSITIVITY_MIN, SENSITIVITY_MAX, SENSITIVITY_STEP);
 }
 
 function buildGestureQueue(passes) {
@@ -122,20 +130,15 @@ export class SensitivityCalibrationController {
 
     tick(delta) {
         if (this.armed) return;
-
-        this.countdownTimer += delta;
-        while (this.countdownTimer >= this.game.countdownStepDuration) {
-            this.countdownTimer -= this.game.countdownStepDuration;
-            this.countdownIndex++;
-
-            if (this.countdownIndex >= COUNTDOWN_STEPS.length) {
+        tickCalibrationCountdown(this, delta, {
+            steps: COUNTDOWN_STEPS,
+            stepDuration: this.game.countdownStepDuration,
+            onStep: () => this._updateCountdownDisplay(),
+            onComplete: () => {
                 this.game.soundManager.play("voiceLetsGo");
                 this._armRound();
-                return;
-            }
-
-            this._updateCountdownDisplay();
-        }
+            },
+        });
     }
 
     notify(kind, payload) {
@@ -230,8 +233,7 @@ export class SensitivityCalibrationController {
 
         Object.entries(byKey).forEach(([key, values]) => {
             if (values.length === 0) return;
-            const average = values.reduce((sum, value) => sum + value, 0) / values.length;
-            game.settings[key] = clampSensitivity(average);
+            game.settings[key] = clampSensitivity(mean(values));
         });
     }
 
@@ -247,8 +249,7 @@ export class SensitivityCalibrationController {
         let summaryValue = null;
         Object.entries(byKey).forEach(([key, values]) => {
             if (values.length === 0) return;
-            const average = values.reduce((sum, value) => sum + value, 0) / values.length;
-            const clamped = clampSensitivity(average);
+            const clamped = clampSensitivity(mean(values));
             pending[key] = clamped;
             if (summaryValue === null) summaryValue = clamped;
         });
@@ -282,26 +283,15 @@ export class SensitivityCalibrationController {
 
     _bindResultButtons() {
         const game = this.game;
-        const saveButton = game.dom?.querySelector('[data-role="calibration-result-save-button"]');
-        const discardButton = game.dom?.querySelector('[data-role="calibration-result-discard-button"]');
-        const restartButton = game.dom?.querySelector('[data-role="calibration-result-restart-button"]');
-
-        if (saveButton) {
-            if (Object.keys(this._pendingSettings ?? {}).length === 0) {
-                saveButton.hidden = true;
-            } else {
-                saveButton.addEventListener("click", () => this._acceptResult(), {once: true});
-            }
-        }
-        if (discardButton) {
-            discardButton.addEventListener("click", () => this._discardResult(), {once: true});
-        }
-        if (restartButton) {
-            restartButton.addEventListener("click", () => {
+        bindCalibrationResultButtons(game, "calibration-result", {
+            hasPending: Object.keys(this._pendingSettings ?? {}).length > 0,
+            onSave: () => this._acceptResult(),
+            onDiscard: () => this._discardResult(),
+            onRestart: () => {
                 this._restoreOriginalSettings();
                 this.start();
-            }, {once: true});
-        }
+            },
+        });
     }
 
     _showBanner(gesture) {
@@ -319,33 +309,22 @@ export class SensitivityCalibrationController {
                 pass, totalPasses: this.totalPasses, step, steps: this.stepsPerPass,
             });
         }
-        banner.classList.add("board__calibration--visible");
+        showCalibrationBanner(game);
     }
 
     _hideBanner() {
-        const banner = this.game.dom?.querySelector('[data-role="calibration-banner"]');
-        if (banner) banner.classList.remove("board__calibration--visible");
+        hideCalibrationBanner(this.game);
     }
 
     _updateCountdownDisplay() {
-        const banner = this.game.dom?.querySelector('[data-role="calibration-banner"]');
-        const el = banner?.querySelector('[data-field="countdown"]');
-        if (!el) return;
-
-        const {number, tint} = COUNTDOWN_STEPS[this.countdownIndex];
-        this.game.soundManager.play(voiceCountingKey(number));
-        el.textContent = number;
-        el.classList.remove("board__calibration__countdown--red", "board__calibration__countdown--yellow", "board__calibration__countdown--green");
-        el.classList.add(`board__calibration__countdown--${tint}`);
-        el.classList.remove("board__calibration__countdown--pop");
-        void el.offsetWidth;
-        el.classList.add("board__calibration__countdown--pop");
+        updateCountdownDisplay(this.game, this.countdownIndex, COUNTDOWN_STEPS, (el, tint) => {
+            el.classList.remove("board__calibration__countdown--red", "board__calibration__countdown--yellow", "board__calibration__countdown--green");
+            el.classList.add(`board__calibration__countdown--${tint}`);
+        });
     }
 
     _clearCountdownDisplay() {
-        const banner = this.game.dom?.querySelector('[data-role="calibration-banner"]');
-        const el = banner?.querySelector('[data-field="countdown"]');
-        if (el) el.textContent = "";
+        clearCountdownDisplay(this.game);
     }
 
     _bindPointerTracking() {
