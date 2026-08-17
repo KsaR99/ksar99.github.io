@@ -61,6 +61,10 @@ export class OpponentBoardView {
         const boardEl = this.dom.createElement("div");
         boardEl.className = "board mp-opponent-column__board";
 
+        const bg = this.dom.createElement("div");
+        bg.setAttribute("aria-hidden", "true");
+        bg.className = "board__bg";
+
         const stage = this.dom.createElement("div");
         stage.className = "board__stage";
 
@@ -77,6 +81,7 @@ export class OpponentBoardView {
 
         stage.appendChild(canvas);
         stage.appendChild(filterEl);
+        boardEl.appendChild(bg);
         boardEl.appendChild(stage);
         panel.appendChild(boardEl);
 

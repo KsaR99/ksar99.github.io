@@ -62,7 +62,7 @@ export class Renderer {
         this.i18n = i18n;
         this.glowEnabled = true;
         this.transparencyEnabled = true;
-        this.ghostType = "radioactive";
+        this.ghostType = "white";
         this.ghostOpacities = {...GHOST_OPACITY_DEFAULTS};
         this.gridEnabled = true;
         this.shakeEnabled = true;

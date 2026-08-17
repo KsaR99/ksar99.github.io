@@ -18,7 +18,7 @@ export class SettingsController {
             transparency: true,
             theme: "none",
             hudRight: false,
-            ghostType: "radioactive",
+            ghostType: "white",
             ghostOpacity: {...GHOST_OPACITY_DEFAULTS},
             gridLines: true,
             screenShake: true,

@@ -110,7 +110,7 @@ body {
         --accent-2: oklch(0.71 0.15 52.11);
         --app-bg: oklch(0.09 0.02 76.87 / 0.9);
         --board-accent: oklch(0.41 0.11 56.07 / 0.85);
-        --board-bg: linear-gradient(180deg, oklch(0.33 0.1 52.27), oklch(0.15 0.04 69.07), oklch(0.25 0.07 54.41));
+        --board-bg: linear-gradient(180deg, oklch(0.52 0.17 46.69) 10px, oklch(0.44 0.13 44.33) 10%, oklch(0.24 0.07 49.35), oklch(0.19 0.05 60.65), oklch(0.51 0.16 45.52));
         --body-bg: radial-gradient(circle at 50% 100%, oklch(0.65 0.2 48.56) 0, oklch(0 0 0) 50%);
         --line: oklch(0.34 0.09 57.96);
         --stats__status--live-color: oklch(0.51 0.15 44.9);
@@ -421,7 +421,6 @@ body.hud-right [data-role="next-piece-queue"] {
 
 .board {
     position: relative;
-    background: var(--board-bg, var(--panel));
 
     /** === Opponent / M.P. === */
 
@@ -459,6 +458,13 @@ body.hud-right [data-role="next-piece-queue"] {
 .mp-opponent-column__board, .app__board {
     border: 1px solid var(--board-accent, var(--line));
     border-radius: var(--radius);
+}
+
+.board__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: var(--board-bg, var(--panel));
 }
 
 .board__stage {
@@ -613,6 +619,26 @@ body.perf-no-transparency .board__overlay--transparent {
     linear-gradient(180deg, oklch(1 0 0 / 8%), transparent 35%, transparent 65%, oklch(1 0 0 / 8%));
     mix-blend-mode: overlay;
     animation: vhs-roll 7s linear infinite;
+}
+
+.board__filter--active.board__filter--volcano::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(180deg, oklch(0.4383 0.1081 44.47), oklch(0.1 0.0321 48.61));
+
+    /** https://www.cssportal.com/css-clip-path-generator/ */
+    clip-path: polygon(
+        19% 63%,
+        0% 100%,
+        100% 100%,
+        81% 63%,
+        62% 0%,
+        57% 6%,
+        43% 6%,
+        38% 0%
+    );
 }
 
 body.perf-no-glow .board__filter--active.board__filter--vhs {

@@ -337,10 +337,10 @@ export const Screens = {
         const developerGroup = screen.querySelector('[data-role="options-group-developer"]');
         if (developerGroup) developerGroup.hidden = !DEV_MODE;
         const ghostTypeSelect = screen.querySelector('[data-role="ghost-type-select"]');
-        if (ghostTypeSelect) ghostTypeSelect.value = settings.ghostType ?? "radioactive";
+        if (ghostTypeSelect) ghostTypeSelect.value = settings.ghostType ?? "white";
         const ghostOpacitySlider = screen.querySelector('[data-role="ghost-opacity-slider"]');
         if (ghostOpacitySlider) {
-            const activeGhostType = settings.ghostType ?? "radioactive";
+            const activeGhostType = settings.ghostType ?? "white";
             const ghostOpacities = settings.ghostOpacity ?? {};
             ghostOpacitySlider.value = Math.round((ghostOpacities[activeGhostType] ?? 0.5) * 100);
             ghostOpacitySlider.disabled = activeGhostType === "off";
