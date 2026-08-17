@@ -120,6 +120,8 @@
             "advancedTitle": "고급",
             "keyboardDas": "키보드 DAS (ms)",
             "keyboardArr": "키보드 ARR (ms)",
+            "keyboardDasTag": "DAS",
+            "keyboardArrTag": "ARR",
             "dataTitle": "가져오기 / 내보내기",
             "exportLabel": "옵션을 파일로 내보내기",
             "exportButton": "내보내기",

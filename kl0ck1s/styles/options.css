@@ -132,6 +132,20 @@
     color: var(--text);
 }
 
+.options__row--metered {
+    justify-content: flex-start;
+    gap: 0.6rem;
+}
+
+.options__row-tag {
+    flex: none;
+    width: 2.4em;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    opacity: 0.6;
+}
+
 .options__input--range {
     flex: 1;
     max-width: 9rem;
@@ -150,6 +164,27 @@
     font-size: 0.8125rem;
     cursor: pointer;
     user-select: none;
+
+    &:hover {
+        border-color: oklch(49.199% 0.03256 265.213);
+    }
+
+    &:focus {
+        outline: 2px solid var(--accent-2);
+    }
+}
+
+.options__input--number {
+    flex: none;
+    width: 5em;
+    background: oklch(22.054% 0.02402 273.436);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 0.15em 0.1em;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    text-align: center;
 
     &:hover {
         border-color: oklch(49.199% 0.03256 265.213);

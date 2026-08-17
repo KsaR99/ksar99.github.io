@@ -347,41 +347,37 @@
                         <summary class="options__group-summary options__group-summary--advanced"
                                  data-i18n="screens.options.advancedTitle">Advanced
                         </summary>
-                        <label class="options__row">
-                            <span data-i18n="screens.options.keyboardDas">Keyboard DAS (ms)</span>
+                        <label class="options__row options__row--metered">
+                            <span class="options__row-tag" data-i18n="screens.options.keyboardDasTag">DAS</span>
                             <input class="options__input options__input--number" data-role="keyboard-das-input"
                                    inputmode="numeric"
                                    type="number">
+                            <div class="options__meter" data-role="das-preview">
+                                <div class="options__meter__track">
+                                    <div class="options__meter__fill"></div>
+                                </div>
+                            </div>
                         </label>
-                        <label class="options__row">
-                            <span data-i18n="screens.options.keyboardArr">Keyboard ARR (ms)</span>
+                        <label class="options__row options__row--metered">
+                            <span class="options__row-tag" data-i18n="screens.options.keyboardArrTag">ARR</span>
                             <input class="options__input options__input--number" data-role="keyboard-arr-input"
                                    inputmode="numeric"
                                    type="number">
+                            <div class="options__meter" data-role="arr-preview">
+                                <div class="options__meter__ticks">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
                         </label>
-                        <div class="das-arr-preview" data-role="das-arr-preview">
-                            <div class="das-arr-preview__meter">
-                                <span class="das-arr-preview__tag">DAS</span>
-                                <div class="das-arr-preview__track">
-                                    <div class="das-arr-preview__fill"></div>
-                                </div>
-                            </div>
-                            <div class="das-arr-preview__meter">
-                                <span class="das-arr-preview__tag">ARR</span>
-                                <div class="das-arr-preview__ticks">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                </div>
-                            </div>
-                        </div>
                         <div class="options__row options__row--end">
                             <button class="options__preview-button options__preview-button--wide"
                                     data-i18n="screens.options.resetDefaults"

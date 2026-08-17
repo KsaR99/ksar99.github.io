@@ -120,6 +120,8 @@
             "advancedTitle": "Pokročilé",
             "keyboardDas": "DAS klávesnice (ms)",
             "keyboardArr": "ARR klávesnice (ms)",
+            "keyboardDasTag": "DAS",
+            "keyboardArrTag": "ARR",
             "dataTitle": "Import / export",
             "exportLabel": "Exportovať nastavenia do súboru",
             "exportButton": "Exportovať",

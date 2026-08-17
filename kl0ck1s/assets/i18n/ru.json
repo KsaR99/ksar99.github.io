@@ -120,6 +120,8 @@
             "advancedTitle": "Дополнительно",
             "keyboardDas": "DAS клавиатуры (мс)",
             "keyboardArr": "ARR клавиатуры (мс)",
+            "keyboardDasTag": "DAS",
+            "keyboardArrTag": "ARR",
             "dataTitle": "Импорт / Экспорт",
             "exportLabel": "Экспортировать настройки в файл",
             "exportButton": "Экспорт",

@@ -217,7 +217,8 @@ export class OptionsController {
         const touchSensitivityInput = root.querySelector('[data-role="touch-sensitivity-input"]');
         const keyboardDasInput = root.querySelector('[data-role="keyboard-das-input"]');
         const keyboardArrInput = root.querySelector('[data-role="keyboard-arr-input"]');
-        const dasArrPreview = root.querySelector('[data-role="das-arr-preview"]');
+        const dasPreview = root.querySelector('[data-role="das-preview"]');
+        const arrPreview = root.querySelector('[data-role="arr-preview"]');
         const closeButton = root.querySelector('[data-role="options-close-button"]');
         const closeKey = root.querySelector('[data-role="options-close-key"]');
 
@@ -421,15 +422,15 @@ export class OptionsController {
         }
 
         const syncDasArrPreview = () => {
-            if (!dasArrPreview) return;
+            if (!dasPreview && !arrPreview) return;
             const das = clampToStep(
                 parseFloat(keyboardDasInput?.value) || DAS_MIN, DAS_MIN, DAS_MAX, DAS_STEP
             );
             const arr = clampToStep(
                 parseFloat(keyboardArrInput?.value) || ARR_MIN, ARR_MIN, ARR_MAX, ARR_STEP
             );
-            dasArrPreview.style.setProperty("--das-ms", `${das}ms`);
-            dasArrPreview.style.setProperty("--arr-ms", `${Math.max(arr, 1)}ms`);
+            dasPreview?.style.setProperty("--das-ms", `${das}ms`);
+            arrPreview?.style.setProperty("--arr-ms", `${Math.max(arr, 1)}ms`);
         };
 
         if (keyboardDasInput) {

@@ -120,6 +120,8 @@
             "advancedTitle": "متقدم",
             "keyboardDas": "DAS ديال الكيبورد (ms)",
             "keyboardArr": "ARR ديال الكيبورد (ms)",
+            "keyboardDasTag": "DAS",
+            "keyboardArrTag": "ARR",
             "dataTitle": "استيراد / تصدير",
             "exportLabel": "تصدير الخيارات إلى ملف",
             "exportButton": "تصدير",

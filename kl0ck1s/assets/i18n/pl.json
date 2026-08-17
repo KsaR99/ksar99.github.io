@@ -120,6 +120,8 @@
             "advancedTitle": "Zaawansowane",
             "keyboardDas": "DAS klawiatury (ms)",
             "keyboardArr": "ARR klawiatury (ms)",
+            "keyboardDasTag": "DAS",
+            "keyboardArrTag": "ARR",
             "dataTitle": "Import / Eksport",
             "exportLabel": "Eksportuj opcje do pliku",
             "exportButton": "Eksportuj",

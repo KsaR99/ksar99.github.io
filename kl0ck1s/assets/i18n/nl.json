@@ -120,6 +120,8 @@
             "advancedTitle": "Geavanceerd",
             "keyboardDas": "Toetsenbord-DAS (ms)",
             "keyboardArr": "Toetsenbord-ARR (ms)",
+            "keyboardDasTag": "DAS",
+            "keyboardArrTag": "ARR",
             "dataTitle": "Importeren / Exporteren",
             "exportLabel": "Opties exporteren naar een bestand",
             "exportButton": "Exporteren",

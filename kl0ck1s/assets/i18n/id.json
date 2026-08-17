@@ -120,6 +120,8 @@
             "advancedTitle": "Lanjutan",
             "keyboardDas": "DAS keyboard (ms)",
             "keyboardArr": "ARR keyboard (ms)",
+            "keyboardDasTag": "DAS",
+            "keyboardArrTag": "ARR",
             "dataTitle": "Impor / Ekspor",
             "exportLabel": "Ekspor opsi ke berkas",
             "exportButton": "Ekspor",

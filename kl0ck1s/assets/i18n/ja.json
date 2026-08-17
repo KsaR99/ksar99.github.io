@@ -120,6 +120,8 @@
             "advancedTitle": "詳細設定",
             "keyboardDas": "キーボードDAS（ms）",
             "keyboardArr": "キーボードARR（ms）",
+            "keyboardDasTag": "DAS",
+            "keyboardArrTag": "ARR",
             "dataTitle": "インポート / エクスポート",
             "exportLabel": "オプションをファイルにエクスポート",
             "exportButton": "エクスポート",
