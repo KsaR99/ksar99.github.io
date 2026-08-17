@@ -11,6 +11,7 @@ const PREVENT_DEFAULT_KEYS = new Set([
 
 const REPEATABLE_SLOTS = new Set(["moveLeft", "moveRight", "softDrop"]);
 const MOVEMENT_SLOTS = new Set(["moveLeft", "moveRight", "softDrop", "rotateUp", "rotateZ", "rotate180", "hardDrop"]);
+const OPPOSITE_HORIZONTAL_SLOT = {moveLeft: "moveRight", moveRight: "moveLeft"};
 
 export const MOVEMENT_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", "Space", "KeyZ", "KeyA"]);
 
@@ -31,6 +32,8 @@ export class KeyboardInput extends InputSource {
         this._blurHandler = null;
         this._listening = false;
         this._listenHandler = null;
+        this._heldHorizontal = new Set();
+        this._activeHorizontal = null;
     }
 
     get actionHandlers() {
@@ -63,6 +66,16 @@ export class KeyboardInput extends InputSource {
             ArrowUp: handlers.rotateUp,
             Space: handlers.hardDrop,
             KeyP: handlers.togglePause,
+        };
+    }
+
+    _buildAction(slotId) {
+        const baseAction = this.actionHandlers[slotId];
+        if (!baseAction) return null;
+        if (!MOVEMENT_SLOTS.has(slotId)) return baseAction;
+        return (isRepeat) => {
+            this.steeringArbiter.markKeyboardSteer();
+            baseAction(isRepeat);
         };
     }
 
@@ -130,26 +143,27 @@ export class KeyboardInput extends InputSource {
             }
             if (!slotId) return;
 
-            const baseAction = this.actionHandlers[slotId];
-            if (!baseAction) return;
+            const action = this._buildAction(slotId);
+            if (!action) return;
 
             if (PREVENT_DEFAULT_KEYS.has(event.code)) event.preventDefault();
 
-            const action = MOVEMENT_SLOTS.has(slotId)
-                ? (isRepeat) => {
-                    this.steeringArbiter.markKeyboardSteer();
-                    baseAction(isRepeat);
-                }
-                : baseAction;
-
             if (REPEATABLE_SLOTS.has(slotId)) {
                 if (event.repeat) return;
+
+                const opposite = OPPOSITE_HORIZONTAL_SLOT[slotId];
+                if (opposite) {
+                    this._heldHorizontal.add(slotId);
+                    if (this._heldHorizontal.has(opposite)) this.stopRepeat(opposite);
+                    this._activeHorizontal = slotId;
+                }
+
                 action(false);
                 this.startRepeat(slotId, () => action(true));
                 return;
             }
 
-            if (event.repeat && slotId === "hardDrop") return;
+            if (event.repeat) return;
             action();
         };
 
@@ -162,9 +176,33 @@ export class KeyboardInput extends InputSource {
                 if (event.code === "ArrowLeft") slotId = "moveLeft";
                 else if (event.code === "ArrowRight") slotId = "moveRight";
             }
-            if (slotId) this.stopRepeat(slotId);
+            if (!slotId) return;
+
+            const opposite = OPPOSITE_HORIZONTAL_SLOT[slotId];
+            if (opposite) {
+                this._heldHorizontal.delete(slotId);
+                this.stopRepeat(slotId);
+                if (this._activeHorizontal === slotId) {
+                    this._activeHorizontal = null;
+                    if (this._heldHorizontal.has(opposite)) {
+                        const resumeAction = this._buildAction(opposite);
+                        if (resumeAction) {
+                            this._activeHorizontal = opposite;
+                            resumeAction(false);
+                            this.startRepeat(opposite, () => resumeAction(true));
+                        }
+                    }
+                }
+                return;
+            }
+
+            this.stopRepeat(slotId);
         };
-        this._blurHandler = () => this.stopAllRepeats();
+        this._blurHandler = () => {
+            this.stopAllRepeats();
+            this._heldHorizontal.clear();
+            this._activeHorizontal = null;
+        };
 
         game.dom.addEventListener("keydown", this._keydownHandler);
         game.dom.addEventListener("keyup", this._keyupHandler, {passive: true});
@@ -175,6 +213,8 @@ export class KeyboardInput extends InputSource {
         const game = this.game;
         this.stopAllRepeats();
         this.cancelListening();
+        this._heldHorizontal.clear();
+        this._activeHorizontal = null;
 
         if (game.dom) {
             if (this._keydownHandler) game.dom.removeEventListener("keydown", this._keydownHandler);
