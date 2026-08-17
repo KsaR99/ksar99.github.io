@@ -117,13 +117,9 @@
             "close": "Zamknij",
             "mouseSensitivity": "Czułość myszy",
             "touchSensitivity": "Czułość dotyku",
-            "calibrateSensitivity": "Kalibracja czułości",
-            "calibrateSensitivityButton": "Kalibruj",
             "advancedTitle": "Zaawansowane",
             "keyboardDas": "DAS klawiatury (ms)",
             "keyboardArr": "ARR klawiatury (ms)",
-            "calibrateKeyboard": "Kalibracja klawiatury",
-            "calibrateKeyboardButton": "Kalibruj",
             "dataTitle": "Import / Eksport",
             "exportLabel": "Eksportuj opcje do pliku",
             "exportButton": "Eksportuj",
@@ -156,35 +152,6 @@
             "benchmarkCopyButton": "Kopiuj wyniki",
             "benchmarkCopied": "Skopiowano do schowka",
             "benchmarkCopyFailed": "Nie udało się skopiować"
-        },
-        "calibration": {
-            "gestures": {
-                "sideToCenter": "Przeciągnij klocek do środkowej kolumny",
-                "sideToEdge": "Przeciągnij klocek do skrajnej kolumny",
-                "toWall": "Do ściany {kbd}",
-                "click": "Kliknij raz {kbd}",
-                "hardDrop": "Wykonaj szybki spadek",
-                "softDropOne": "Wykonaj krok miękkiego spadku",
-                "rotate": "Obróć klocek",
-                "hold": "Przytrzymaj {kbd}, a potem puść"
-            },
-            "progress": "Runda {pass}/{totalPasses} · Krok {step}/{steps}",
-            "resultTitle": "KALIBRACJA CZUŁOŚCI",
-            "resultSuccessBefore": "Twoja czułość została ustawiona na",
-            "resultFailed": "Nie udało się wyznaczyć czułości — spróbuj ponownie, przeciągając myszą lub palcem.",
-            "resultClose": "Zamknij",
-            "resultSave": "Zapisz",
-            "resultDiscard": "Odrzuć",
-            "resultRestart": "Powtórz"
-        },
-        "keyboardCalibration": {
-            "resultTitle": "KALIBRACJA KLAWIATURY",
-            "resultDas": "DAS:",
-            "resultArr": "ARR:",
-            "resultFailed": "Nie zebrano wystarczających danych — spróbuj przytrzymać klawisz kierunku choć raz.",
-            "resultSave": "Zapisz",
-            "resultDiscard": "Odrzuć",
-            "resultRestart": "Powtórz"
         },
         "loading": {
             "leaderboardHint": "Wczytywanie tabeli wyników..."

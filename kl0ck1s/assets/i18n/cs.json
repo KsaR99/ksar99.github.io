@@ -117,13 +117,9 @@
             "close": "Zavřít",
             "mouseSensitivity": "Citlivost myši",
             "touchSensitivity": "Citlivost dotyku",
-            "calibrateSensitivity": "Kalibrace citlivosti",
-            "calibrateSensitivityButton": "Kalibrovat",
             "advancedTitle": "Pokročilé",
             "keyboardDas": "DAS klávesnice (ms)",
             "keyboardArr": "ARR klávesnice (ms)",
-            "calibrateKeyboard": "Kalibrace klávesnice",
-            "calibrateKeyboardButton": "Kalibrovat",
             "dataTitle": "Import / export",
             "exportLabel": "Exportovat nastavení do souboru",
             "exportButton": "Exportovat",
@@ -156,35 +152,6 @@
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
             "benchmarkCopyFailed": "Copy failed"
-        },
-        "calibration": {
-            "gestures": {
-                "sideToCenter": "Přetáhni díl do prostředního sloupce",
-                "sideToEdge": "Přetáhni díl do krajního sloupce",
-                "toWall": "Přetáhni ke zdi {kbd}",
-                "click": "Klikni jednou {kbd}",
-                "hardDrop": "Proveď rychlý pád",
-                "softDropOne": "Proveď krok pomalého pádu",
-                "rotate": "Otoč díl",
-                "hold": "Podrž {kbd}, poté pusť"
-            },
-            "progress": "Kolo {pass}/{totalPasses} · Krok {step}/{steps}",
-            "resultTitle": "KALIBRACE CITLIVOSTI",
-            "resultSuccessBefore": "Tvoje citlivost je nyní nastavena na",
-            "resultFailed": "Nepodařilo se vypočítat citlivost — zkus to znovu tažením myší nebo prstem.",
-            "resultClose": "Zavřít",
-            "resultSave": "Uložit",
-            "resultDiscard": "Zahodit",
-            "resultRestart": "Restart"
-        },
-        "keyboardCalibration": {
-            "resultTitle": "KALIBRACE KLÁVESNICE",
-            "resultDas": "DAS:",
-            "resultArr": "ARR:",
-            "resultFailed": "Nebylo zachyceno dost dat — zkus podržet směrovou klávesu alespoň jednou.",
-            "resultSave": "Uložit",
-            "resultDiscard": "Zahodit",
-            "resultRestart": "Restart"
         },
         "loading": {
             "leaderboardHint": "Načítání žebříčku..."

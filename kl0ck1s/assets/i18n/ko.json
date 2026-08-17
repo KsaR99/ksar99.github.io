@@ -117,13 +117,9 @@
             "close": "닫기",
             "mouseSensitivity": "마우스 감도",
             "touchSensitivity": "터치 감도",
-            "calibrateSensitivity": "감도 보정",
-            "calibrateSensitivityButton": "보정하기",
             "advancedTitle": "고급",
             "keyboardDas": "키보드 DAS (ms)",
             "keyboardArr": "키보드 ARR (ms)",
-            "calibrateKeyboard": "키보드 보정",
-            "calibrateKeyboardButton": "보정하기",
             "dataTitle": "가져오기 / 내보내기",
             "exportLabel": "옵션을 파일로 내보내기",
             "exportButton": "내보내기",
@@ -156,35 +152,6 @@
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
             "benchmarkCopyFailed": "Copy failed"
-        },
-        "calibration": {
-            "gestures": {
-                "sideToCenter": "블록을 가운데 열로 드래그하세요",
-                "sideToEdge": "블록을 가장자리 열로 드래그하세요",
-                "toWall": "벽까지 드래그하세요 {kbd}",
-                "click": "한 번 클릭하세요 {kbd}",
-                "hardDrop": "하드 드롭을 실행하세요",
-                "softDropOne": "소프트 드롭을 한 번 실행하세요",
-                "rotate": "블록을 회전하세요",
-                "hold": "{kbd}를 누르고 있다가 놓으세요"
-            },
-            "progress": "라운드 {pass}/{totalPasses} · 단계 {step}/{steps}",
-            "resultTitle": "감도 보정",
-            "resultSuccessBefore": "감도가 다음 값으로 설정되었습니다:",
-            "resultFailed": "감도 값을 계산할 수 없습니다 — 마우스 드래그나 터치 스와이프로 다시 시도해 보세요.",
-            "resultClose": "닫기",
-            "resultSave": "저장",
-            "resultDiscard": "취소",
-            "resultRestart": "다시 시작"
-        },
-        "keyboardCalibration": {
-            "resultTitle": "키보드 보정",
-            "resultDas": "DAS:",
-            "resultArr": "ARR:",
-            "resultFailed": "충분한 데이터가 수집되지 않았습니다 — 방향키를 최소 한 라운드 동안 눌러 보세요.",
-            "resultSave": "저장",
-            "resultDiscard": "취소",
-            "resultRestart": "다시 시작"
         },
         "loading": {
             "leaderboardHint": "리더보드 불러오는 중..."

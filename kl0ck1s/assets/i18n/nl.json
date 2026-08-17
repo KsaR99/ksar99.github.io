@@ -117,13 +117,9 @@
             "close": "Sluiten",
             "mouseSensitivity": "Muisgevoeligheid",
             "touchSensitivity": "Aanraakgevoeligheid",
-            "calibrateSensitivity": "Gevoeligheidskalibratie",
-            "calibrateSensitivityButton": "Kalibreren",
             "advancedTitle": "Geavanceerd",
             "keyboardDas": "Toetsenbord-DAS (ms)",
             "keyboardArr": "Toetsenbord-ARR (ms)",
-            "calibrateKeyboard": "Toetsenbord kalibreren",
-            "calibrateKeyboardButton": "Kalibreren",
             "dataTitle": "Importeren / Exporteren",
             "exportLabel": "Opties exporteren naar een bestand",
             "exportButton": "Exporteren",
@@ -156,35 +152,6 @@
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
             "benchmarkCopyFailed": "Copy failed"
-        },
-        "calibration": {
-            "gestures": {
-                "sideToCenter": "Sleep het blok naar de middelste kolom",
-                "sideToEdge": "Sleep het blok naar de buitenste kolom",
-                "toWall": "Sleep naar de muur {kbd}",
-                "click": "Eén keer klikken {kbd}",
-                "hardDrop": "Voer een snelle val uit",
-                "softDropOne": "Voer een stap zacht vallen uit",
-                "rotate": "Draai het blok",
-                "hold": "Houd {kbd} ingedrukt en laat dan los"
-            },
-            "progress": "Ronde {pass}/{totalPasses} · Stap {step}/{steps}",
-            "resultTitle": "GEVOELIGHEIDSKALIBRATIE",
-            "resultSuccessBefore": "Je gevoeligheid is ingesteld op",
-            "resultFailed": "De gevoeligheid kon niet worden berekend — probeer het opnieuw door te slepen met muis of vinger.",
-            "resultClose": "Sluiten",
-            "resultSave": "Opslaan",
-            "resultDiscard": "Negeren",
-            "resultRestart": "Opnieuw"
-        },
-        "keyboardCalibration": {
-            "resultTitle": "TOETSENBORDKALIBRATIE",
-            "resultDas": "DAS:",
-            "resultArr": "ARR:",
-            "resultFailed": "Er zijn niet genoeg gegevens verzameld — probeer minstens één ronde een richtingstoets ingedrukt te houden.",
-            "resultSave": "Opslaan",
-            "resultDiscard": "Negeren",
-            "resultRestart": "Opnieuw"
         },
         "loading": {
             "leaderboardHint": "Scorebord laden..."

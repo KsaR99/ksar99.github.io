@@ -117,13 +117,9 @@
             "close": "Chiudi",
             "mouseSensitivity": "Sensibilità del mouse",
             "touchSensitivity": "Sensibilità tocco",
-            "calibrateSensitivity": "Calibrazione sensibilità",
-            "calibrateSensitivityButton": "Calibra",
             "advancedTitle": "Avanzate",
             "keyboardDas": "DAS tastiera (ms)",
             "keyboardArr": "ARR tastiera (ms)",
-            "calibrateKeyboard": "Calibra tastiera",
-            "calibrateKeyboardButton": "Calibra",
             "dataTitle": "Importa / Esporta",
             "exportLabel": "Esporta le opzioni in un file",
             "exportButton": "Esporta",
@@ -156,35 +152,6 @@
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
             "benchmarkCopyFailed": "Copy failed"
-        },
-        "calibration": {
-            "gestures": {
-                "sideToCenter": "Trascina il pezzo nella colonna centrale",
-                "sideToEdge": "Trascina il pezzo nella colonna del bordo",
-                "toWall": "Trascina fino al muro {kbd}",
-                "click": "Clicca una volta {kbd}",
-                "hardDrop": "Fai cadere rapidamente il pezzo",
-                "softDropOne": "Fai scendere lentamente il pezzo",
-                "rotate": "Ruota il pezzo",
-                "hold": "Tieni premuto {kbd}, poi rilascia"
-            },
-            "progress": "Round {pass}/{totalPasses} · Passo {step}/{steps}",
-            "resultTitle": "CALIBRAZIONE SENSIBILITÀ",
-            "resultSuccessBefore": "La tua sensibilità è ora impostata a",
-            "resultFailed": "Impossibile calcolare un valore di sensibilità — riprova trascinando con il mouse o con uno swipe tattile.",
-            "resultClose": "Chiudi",
-            "resultSave": "Salva",
-            "resultDiscard": "Scarta",
-            "resultRestart": "Riavvia"
-        },
-        "keyboardCalibration": {
-            "resultTitle": "CALIBRAZIONE TASTIERA",
-            "resultDas": "DAS:",
-            "resultArr": "ARR:",
-            "resultFailed": "Non sono stati raccolti dati sufficienti — prova a tenere premuto un tasto direzionale per almeno un round.",
-            "resultSave": "Salva",
-            "resultDiscard": "Scarta",
-            "resultRestart": "Riavvia"
         },
         "loading": {
             "leaderboardHint": "Caricamento classifica..."

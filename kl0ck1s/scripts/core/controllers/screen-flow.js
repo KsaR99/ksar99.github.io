@@ -569,10 +569,6 @@ export class ScreenFlow {
             this.toggleMultiplayerLiveOptions();
         } else if (this.game.state === "options") {
             this.toggleOptions();
-        } else if (this.game.state === "calibrating" || this.game.state === "calibrating-result") {
-            this.game.sensitivityCalibrationController.cancel();
-        } else if (this.game.state === "calibrating-keyboard" || this.game.state === "calibrating-keyboard-result") {
-            this.game.keyboardCalibrationController.cancel();
         } else {
             this.togglePause();
         }
@@ -768,8 +764,7 @@ export class ScreenFlow {
         const touchSensitivityInput = root.querySelector('[data-role="touch-sensitivity-input"]');
         const keyboardDasInput = root.querySelector('[data-role="keyboard-das-input"]');
         const keyboardArrInput = root.querySelector('[data-role="keyboard-arr-input"]');
-        const calibrateSensitivityButton = root.querySelector('[data-role="calibrate-sensitivity-button"]');
-        const calibrateKeyboardButton = root.querySelector('[data-role="calibrate-keyboard-button"]');
+        const dasArrPreview = root.querySelector('[data-role="das-arr-preview"]');
         const closeButton = root.querySelector('[data-role="options-close-button"]');
         const closeKey = root.querySelector('[data-role="options-close-key"]');
 
@@ -972,12 +967,25 @@ export class ScreenFlow {
             });
         }
 
+        const syncDasArrPreview = () => {
+            if (!dasArrPreview) return;
+            const das = clampToStep(
+                parseFloat(keyboardDasInput?.value) || DAS_MIN, DAS_MIN, DAS_MAX, DAS_STEP
+            );
+            const arr = clampToStep(
+                parseFloat(keyboardArrInput?.value) || ARR_MIN, ARR_MIN, ARR_MAX, ARR_STEP
+            );
+            dasArrPreview.style.setProperty("--das-ms", `${das}ms`);
+            dasArrPreview.style.setProperty("--arr-ms", `${Math.max(arr, 1)}ms`);
+        };
+
         if (keyboardDasInput) {
             keyboardDasInput.min = DAS_MIN;
             keyboardDasInput.max = DAS_MAX;
             keyboardDasInput.step = DAS_STEP;
             keyboardDasInput.value = game.settings.keyboardDAS ?? DAS_MIN;
 
+            keyboardDasInput.addEventListener("input", syncDasArrPreview);
             keyboardDasInput.addEventListener("change", () => {
                 const parsed = parseFloat(keyboardDasInput.value);
                 const value = clampToStep(
@@ -987,6 +995,7 @@ export class ScreenFlow {
                 game.settings.keyboardDAS = value;
                 settingsController.saveSettings();
                 this.syncCategoryResetButtons();
+                syncDasArrPreview();
             });
         }
 
@@ -996,6 +1005,7 @@ export class ScreenFlow {
             keyboardArrInput.step = ARR_STEP;
             keyboardArrInput.value = game.settings.keyboardARR ?? ARR_MIN;
 
+            keyboardArrInput.addEventListener("input", syncDasArrPreview);
             keyboardArrInput.addEventListener("change", () => {
                 const parsed = parseFloat(keyboardArrInput.value);
                 const value = clampToStep(
@@ -1005,20 +1015,11 @@ export class ScreenFlow {
                 game.settings.keyboardARR = value;
                 settingsController.saveSettings();
                 this.syncCategoryResetButtons();
+                syncDasArrPreview();
             });
         }
 
-        if (calibrateSensitivityButton) {
-            calibrateSensitivityButton.addEventListener("click", () => {
-                game.sensitivityCalibrationController.start();
-            });
-        }
-
-        if (calibrateKeyboardButton) {
-            calibrateKeyboardButton.addEventListener("click", () => {
-                game.keyboardCalibrationController.start();
-            });
-        }
+        syncDasArrPreview();
 
         root.querySelectorAll('[data-role="category-volume-slider"]').forEach((slider) => {
             slider.addEventListener("input", () => {

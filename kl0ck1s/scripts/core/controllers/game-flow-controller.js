@@ -372,10 +372,6 @@ export class GameFlowController {
             this.options.toggleMultiplayerLiveOptions();
         } else if (this.game.state === "options") {
             this.options.toggleOptions();
-        } else if (["calibrating", "calibrating-result"].includes(this.game.state)) {
-            this.game.sensitivityCalibrationController.cancel();
-        } else if (["calibrating-keyboard", "calibrating-keyboard-result"].includes(this.game.state)) {
-            this.game.keyboardCalibrationController.cancel();
         } else {
             this.togglePause();
         }

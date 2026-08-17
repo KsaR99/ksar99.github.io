@@ -300,7 +300,6 @@ export class BenchmarkController {
         };
         shadow.soundManager = this._mutedSoundManager();
         shadow.musicDirector = new MusicDirector(shadow.soundManager);
-        shadow.sensitivityCalibrationController = null;
         shadow.steeringArbiter = null;
         shadow.pointerClientX = null;
         shadow.state = "running";

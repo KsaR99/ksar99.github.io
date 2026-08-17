@@ -59,19 +59,14 @@ export const COUNTDOWN_STEPS = [
     {number: 1, tint: "green"},
 ];
 
-export const PIECE_CONTROLLABLE_STATES = new Set(["running", "calibrating", "calibrating-keyboard"]);
+export const PIECE_CONTROLLABLE_STATES = new Set(["running"]);
 
 export const HUD_UPDATE_INTERVAL_MS = 100;
 
-export const SENSITIVITY_CALIBRATION_ROUNDS = 5;
-export const SENSITIVITY_CALIBRATION_STEPS = [
-    "tutorialLeft", "tutorialRight", "dragToLeftEdge", "dragToRightEdge",
-];
 export const SENSITIVITY_MIN = 0.5;
 export const SENSITIVITY_MAX = 2;
 export const SENSITIVITY_STEP = 0.05;
 
-export const KEYBOARD_CALIBRATION_ROUNDS = 3;
 export const DAS_MIN = 50;
 export const DAS_MAX = 300;
 export const DAS_STEP = 5;

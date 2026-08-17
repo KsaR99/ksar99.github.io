@@ -117,13 +117,9 @@
             "close": "Zavrieť",
             "mouseSensitivity": "Citlivosť myši",
             "touchSensitivity": "Citlivosť dotyku",
-            "calibrateSensitivity": "Kalibrácia citlivosti",
-            "calibrateSensitivityButton": "Kalibrovať",
             "advancedTitle": "Pokročilé",
             "keyboardDas": "DAS klávesnice (ms)",
             "keyboardArr": "ARR klávesnice (ms)",
-            "calibrateKeyboard": "Kalibrácia klávesnice",
-            "calibrateKeyboardButton": "Kalibrovať",
             "dataTitle": "Import / export",
             "exportLabel": "Exportovať nastavenia do súboru",
             "exportButton": "Exportovať",
@@ -156,35 +152,6 @@
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
             "benchmarkCopyFailed": "Copy failed"
-        },
-        "calibration": {
-            "gestures": {
-                "sideToCenter": "Presuň diel do stredného stĺpca",
-                "sideToEdge": "Presuň diel do krajného stĺpca",
-                "toWall": "Presuň k stene {kbd}",
-                "click": "Klikni raz {kbd}",
-                "hardDrop": "Vykonaj rýchly pád",
-                "softDropOne": "Vykonaj krok pomalého pádu",
-                "rotate": "Otoč diel",
-                "hold": "Podrž {kbd}, potom pusti"
-            },
-            "progress": "Kolo {pass}/{totalPasses} · Krok {step}/{steps}",
-            "resultTitle": "KALIBRÁCIA CITLIVOSTI",
-            "resultSuccessBefore": "Tvoja citlivosť je teraz nastavená na",
-            "resultFailed": "Nepodarilo sa vypočítať citlivosť — skús to znova ťahaním myšou alebo prstom.",
-            "resultClose": "Zavrieť",
-            "resultSave": "Uložiť",
-            "resultDiscard": "Zahodiť",
-            "resultRestart": "Reštart"
-        },
-        "keyboardCalibration": {
-            "resultTitle": "KALIBRÁCIA KLÁVESNICE",
-            "resultDas": "DAS:",
-            "resultArr": "ARR:",
-            "resultFailed": "Nebolo zachytených dosť údajov — skús podržať smerovú klávesu aspoň raz.",
-            "resultSave": "Uložiť",
-            "resultDiscard": "Zahodiť",
-            "resultRestart": "Reštart"
         },
         "loading": {
             "leaderboardHint": "Načítavanie rebríčka..."

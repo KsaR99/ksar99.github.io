@@ -197,7 +197,6 @@ export class PieceController {
                 game.rawGrounded = true;
                 game.dropCounter = 0;
             }
-            game.sensitivityCalibrationController?.notify("move", {x: game.current.x, via: "step"});
         }
     }
 
@@ -226,8 +225,6 @@ export class PieceController {
             Math.min(targetColumn, game.board.cols - bounds.width)
         );
         let targetX = targetColumn - offsetX;
-
-        targetX = game.sensitivityCalibrationController?.clampDragTargetX?.(targetX) ?? targetX;
 
         if (targetX === game.current.x) return;
 
@@ -258,8 +255,6 @@ export class PieceController {
             game.rawGrounded = true;
             game.dropCounter = 0;
         }
-
-        game.sensitivityCalibrationController?.notify("move", {x: game.current.x, via: "drag"});
     }
 
     softDrop() {
@@ -273,7 +268,6 @@ export class PieceController {
         game.dropCounter = 0;
         game.noteRowStep();
         game.shiftAnim = null;
-        game.sensitivityCalibrationController?.notify("softDrop", {});
     }
 
     hardDrop() {
@@ -287,7 +281,6 @@ export class PieceController {
         game.current.y += cellsDropped;
 
         game.statsTracker.addScore(pointsForHardDrop(cellsDropped, game.scoring));
-        game.sensitivityCalibrationController?.notify("hardDrop", {});
         game.renderer.shakeHardDrop();
         game.beginHardDropTrail(game.current, cellsDropped);
         game.beginHardDropImpactFlash(game.current);
@@ -352,8 +345,6 @@ export class PieceController {
             if (game.board.collides(game.current, 0, 1)) this.resetLockDelay();
 
             game.rotationAnim = null;
-            game.sensitivityCalibrationController?.notify("rotate", {});
-
         }
     }
 

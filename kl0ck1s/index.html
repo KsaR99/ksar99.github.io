@@ -11,13 +11,13 @@
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+Mono:wght@100..900&display=swap"
         rel="stylesheet"
     >
-    <link href="styles/main.css?v=72" rel="stylesheet">
-    <link href="styles/options.css?v=72" rel="stylesheet">
-    <link href="styles/menu.css?v=72" rel="stylesheet">
-    <link href="styles/leaderboard.css?v=72" rel="stylesheet">
-    <link href="styles/multiplayer.css?v=72" rel="stylesheet">
-    <link href="styles/mobile.css?v=72" media="(width < 48rem)" rel="stylesheet">
-    <link href="styles/desktop.css?v=72" media="(width >= 48rem)" rel="stylesheet">
+    <link href="styles/main.css?v=73" rel="stylesheet">
+    <link href="styles/options.css?v=73" rel="stylesheet">
+    <link href="styles/menu.css?v=73" rel="stylesheet">
+    <link href="styles/leaderboard.css?v=73" rel="stylesheet">
+    <link href="styles/multiplayer.css?v=73" rel="stylesheet">
+    <link href="styles/mobile.css?v=73" media="(width < 48rem)" rel="stylesheet">
+    <link href="styles/desktop.css?v=73" media="(width >= 48rem)" rel="stylesheet">
     <meta content="notranslate" name="google">
     <meta content="https://github.com/KsaR99" name="author">
     <meta content="index, follow" name="robots">
@@ -154,14 +154,6 @@
                     <canvas class="board__filter-canvas" id="filter-canvas"></canvas>
                 </div>
                 <div class="board__overlay" id="overlay"></div>
-                <div class="board__calibration" data-role="calibration-banner">
-                    <p class="board__calibration__instruction" data-field="instruction"></p>
-                    <p class="board__calibration__countdown" data-field="countdown"></p>
-                    <div class="progress-bar progress-bar--countdown" data-role="calibration-countdown-progress">
-                        <div class="progress-bar__fill" data-role="calibration-countdown-progress-bar"></div>
-                    </div>
-                    <p class="board__calibration__progress" data-field="progress"></p>
-                </div>
                 <div aria-hidden="true" class="board__credits" data-role="credits">
                     <div class="board__credits__scroll" data-role="credits-scroll"></div>
                 </div>
@@ -217,59 +209,6 @@
         <div class="progress-bar progress-bar--countdown">
             <div class="progress-bar__fill" data-role="countdown-progress-bar"></div>
         </div>
-    </section>
-</template>
-
-<template id="tpl-screen-calibration-result">
-    <section class="screen">
-        <h2 class="screen__title" data-i18n="screens.calibration.resultTitle">SENSITIVITY CALIBRATED</h2>
-        <p class="screen__hint" data-role="calibration-success">
-            <span data-i18n="screens.calibration.resultSuccessBefore">New sensitivity:</span>
-            <strong class="screen__hint-highlight" data-field="sensitivityValue"></strong>
-        </p>
-        <p class="screen__hint" data-i18n="screens.calibration.resultFailed" data-role="calibration-failed">
-            Not enough data was captured - try again.
-        </p>
-        <button class="options__resume button button--accent" data-i18n="screens.calibration.resultSave"
-                data-role="calibration-result-save-button"
-                type="button">Save
-        </button>
-        <button class="options__resume button" data-i18n="screens.calibration.resultRestart"
-                data-role="calibration-result-restart-button"
-                type="button">Restart
-        </button>
-        <button class="options__resume button" data-i18n="screens.calibration.resultDiscard"
-                data-role="calibration-result-discard-button"
-                type="button">Discard
-        </button>
-    </section>
-</template>
-
-<template id="tpl-screen-keyboard-calibration-result">
-    <section class="screen">
-        <h2 class="screen__title" data-i18n="screens.keyboardCalibration.resultTitle">KEYBOARD CALIBRATED</h2>
-        <p class="screen__hint" data-role="keyboard-calibration-success">
-            <span data-i18n="screens.keyboardCalibration.resultDas">DAS:</span>
-            <strong class="screen__hint-highlight" data-field="dasValue"></strong>
-            <span data-i18n="screens.keyboardCalibration.resultArr">ARR:</span>
-            <strong class="screen__hint-highlight" data-field="arrValue"></strong>
-        </p>
-        <p class="screen__hint" data-i18n="screens.keyboardCalibration.resultFailed"
-           data-role="keyboard-calibration-failed">
-            Not enough data was captured - try again.
-        </p>
-        <button class="options__resume button button--accent" data-i18n="screens.keyboardCalibration.resultSave"
-                data-role="keyboard-calibration-result-save-button" type="button"
-        >Save
-        </button>
-        <button class="options__resume button" data-i18n="screens.keyboardCalibration.resultRestart"
-                data-role="keyboard-calibration-result-restart-button"
-                type="button">Restart
-        </button>
-        <button class="options__resume button" data-i18n="screens.keyboardCalibration.resultDiscard"
-                data-role="keyboard-calibration-result-discard-button"
-                type="button">Discard
-        </button>
     </section>
 </template>
 
@@ -373,6 +312,6 @@
         window.addEventListener("orientationchange", notifyResize);
     })();
 </script>
-<script src="scripts/app/main.js?v=72" type="module"></script>
+<script src="scripts/app/main.js?v=73" type="module"></script>
 </body>
 </html>

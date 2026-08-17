@@ -22,8 +22,6 @@ import {DifficultyController} from "../controllers/difficulty-controller.js";
 import {ModeController} from "../controllers/mode-controller.js";
 import {GameFlowController} from "../controllers/game-flow-controller.js";
 import {CreditsController} from "../controllers/credits-controller.js";
-import {SensitivityCalibrationController} from "../controllers/sensitivity-calibration-controller.js";
-import {KeyboardCalibrationController} from "../controllers/keyboard-calibration-controller.js";
 import {MusicDirector} from "../services/music-director.js";
 import {ShareService} from "../services/share-service.js";
 import {ConfirmDialog} from "../services/confirm-dialog.js";
@@ -110,8 +108,6 @@ export class Game {
         this.screenFlow = new GameFlowController(this);
         this.inputController = new InputController(this);
         this.creditsController = new CreditsController(this);
-        this.sensitivityCalibrationController = new SensitivityCalibrationController(this);
-        this.keyboardCalibrationController = new KeyboardCalibrationController(this);
         this.musicDirector = new MusicDirector(this.soundManager);
         this.shareService = new ShareService(this);
         this.confirmDialog = new ConfirmDialog(this.dom);
@@ -337,16 +333,6 @@ export class Game {
             return;
         }
 
-        if (this.state === "calibrating") {
-            this.sensitivityCalibrationController.tick(delta);
-            return;
-        }
-
-        if (this.state === "calibrating-keyboard") {
-            this.keyboardCalibrationController.tick(delta);
-            return;
-        }
-
         if (this.state !== "running") return;
 
         const resting = this.board.collides(this.current, 0, 1);
@@ -502,11 +488,11 @@ export class Game {
             this.renderer.drawHardDropImpactFlash(this.hardDropImpactFlash.entry, progress);
         }
 
-        if (["running", "paused", "calibrating", "calibrating-keyboard"].includes(this.state)
+        if (["running", "paused"].includes(this.state)
             || showPieceBehindOptions) {
             const renderedPiece = this.getRenderedPiece();
 
-            if (["running", "calibrating", "calibrating-keyboard"].includes(this.state)) {
+            if (this.state === "running") {
                 this.renderer.drawGhost(this.current, this.board);
                 if (this.settings.fallTrail) {
                     this.updateFallTrail(renderedPiece);

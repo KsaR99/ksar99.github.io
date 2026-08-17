@@ -117,13 +117,9 @@
             "close": "Tutup",
             "mouseSensitivity": "Sensitivitas mouse",
             "touchSensitivity": "Sensitivitas sentuh",
-            "calibrateSensitivity": "Kalibrasi sensitivitas",
-            "calibrateSensitivityButton": "Kalibrasi",
             "advancedTitle": "Lanjutan",
             "keyboardDas": "DAS keyboard (ms)",
             "keyboardArr": "ARR keyboard (ms)",
-            "calibrateKeyboard": "Kalibrasi keyboard",
-            "calibrateKeyboardButton": "Kalibrasi",
             "dataTitle": "Impor / Ekspor",
             "exportLabel": "Ekspor opsi ke berkas",
             "exportButton": "Ekspor",
@@ -156,35 +152,6 @@
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
             "benchmarkCopyFailed": "Copy failed"
-        },
-        "calibration": {
-            "gestures": {
-                "sideToCenter": "Seret balok ke kolom tengah",
-                "sideToEdge": "Seret balok ke kolom tepi",
-                "toWall": "Seret ke dinding {kbd}",
-                "click": "Klik sekali {kbd}",
-                "hardDrop": "Lakukan jatuh cepat",
-                "softDropOne": "Lakukan satu langkah jatuh lembut",
-                "rotate": "Putar balok",
-                "hold": "Tahan {kbd}, lalu lepaskan"
-            },
-            "progress": "Ronde {pass}/{totalPasses} · Langkah {step}/{steps}",
-            "resultTitle": "KALIBRASI SENSITIVITAS",
-            "resultSuccessBefore": "Sensitivitasmu kini diatur ke",
-            "resultFailed": "Tidak dapat menghitung nilai sensitivitas — coba lagi dengan menyeret mouse atau mengusap layar sentuh.",
-            "resultClose": "Tutup",
-            "resultSave": "Simpan",
-            "resultDiscard": "Buang",
-            "resultRestart": "Ulangi"
-        },
-        "keyboardCalibration": {
-            "resultTitle": "KALIBRASI KEYBOARD",
-            "resultDas": "DAS:",
-            "resultArr": "ARR:",
-            "resultFailed": "Data yang terkumpul tidak cukup — coba tahan tombol arah setidaknya satu putaran.",
-            "resultSave": "Simpan",
-            "resultDiscard": "Buang",
-            "resultRestart": "Ulangi"
         },
         "loading": {
             "leaderboardHint": "Memuat papan peringkat..."

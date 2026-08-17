@@ -117,13 +117,9 @@
             "close": "Cerrar",
             "mouseSensitivity": "Sensibilidad del ratón",
             "touchSensitivity": "Sensibilidad táctil",
-            "calibrateSensitivity": "Calibración de sensibilidad",
-            "calibrateSensitivityButton": "Calibrar",
             "advancedTitle": "Avanzado",
             "keyboardDas": "DAS del teclado (ms)",
             "keyboardArr": "ARR del teclado (ms)",
-            "calibrateKeyboard": "Calibrar teclado",
-            "calibrateKeyboardButton": "Calibrar",
             "dataTitle": "Importar / Exportar",
             "exportLabel": "Exportar opciones a un archivo",
             "exportButton": "Exportar",
@@ -156,35 +152,6 @@
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
             "benchmarkCopyFailed": "Copy failed"
-        },
-        "calibration": {
-            "gestures": {
-                "sideToCenter": "Arrastra la pieza a la columna central",
-                "sideToEdge": "Arrastra la pieza a la columna del borde",
-                "toWall": "Arrastra hacia el muro {kbd}",
-                "click": "Haz clic una vez {kbd}",
-                "hardDrop": "Haz una caída rápida",
-                "softDropOne": "Haz un paso de caída suave",
-                "rotate": "Gira la pieza",
-                "hold": "Mantén pulsada {kbd} y luego suelta"
-            },
-            "progress": "Ronda {pass}/{totalPasses} · Paso {step}/{steps}",
-            "resultTitle": "CALIBRACIÓN DE SENSIBILIDAD",
-            "resultSuccessBefore": "Tu sensibilidad se ha ajustado a",
-            "resultFailed": "No se pudo calcular la sensibilidad — inténtalo de nuevo arrastrando con el ratón o el dedo.",
-            "resultClose": "Cerrar",
-            "resultSave": "Guardar",
-            "resultDiscard": "Descartar",
-            "resultRestart": "Reiniciar"
-        },
-        "keyboardCalibration": {
-            "resultTitle": "CALIBRACIÓN DE TECLADO",
-            "resultDas": "DAS:",
-            "resultArr": "ARR:",
-            "resultFailed": "No se capturaron suficientes datos — intenta mantener pulsada una tecla de dirección al menos una vez.",
-            "resultSave": "Guardar",
-            "resultDiscard": "Descartar",
-            "resultRestart": "Reiniciar"
         },
         "loading": {
             "leaderboardHint": "Cargando clasificación..."

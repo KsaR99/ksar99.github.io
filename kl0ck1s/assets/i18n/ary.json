@@ -117,13 +117,9 @@
             "close": "سد",
             "mouseSensitivity": "حساسية الماوس",
             "touchSensitivity": "حساسية اللمس",
-            "calibrateSensitivity": "معايرة الحساسية",
-            "calibrateSensitivityButton": "عاير",
             "advancedTitle": "متقدم",
             "keyboardDas": "DAS ديال الكيبورد (ms)",
             "keyboardArr": "ARR ديال الكيبورد (ms)",
-            "calibrateKeyboard": "معايرة الكيبورد",
-            "calibrateKeyboardButton": "عاير",
             "dataTitle": "استيراد / تصدير",
             "exportLabel": "تصدير الخيارات إلى ملف",
             "exportButton": "تصدير",
@@ -156,35 +152,6 @@
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
             "benchmarkCopyFailed": "Copy failed"
-        },
-        "calibration": {
-            "gestures": {
-                "sideToCenter": "جرّ القطعة للعمود اللي فالوسط",
-                "sideToEdge": "جرّ القطعة للعمود اللي فالحافة",
-                "toWall": "جرّ حتى للحيط {kbd}",
-                "click": "كليكي مرة وحدة {kbd}",
-                "hardDrop": "دير نزول فالحين",
-                "softDropOne": "دير خطوة نزول بشوية",
-                "rotate": "دوّر القطعة",
-                "hold": "بقى ضاغط على {kbd}، من بعد حل"
-            },
-            "progress": "الجولة {pass}/{totalPasses} · الخطوة {step}/{steps}",
-            "resultTitle": "معايرة الحساسية",
-            "resultSuccessBefore": "الحساسية ديالك دابا مضبوطة على",
-            "resultFailed": "ما قدرناش نحسبو قيمة الحساسية — عاود المحاولة بجرّ الماوس أو اللمس.",
-            "resultClose": "سد",
-            "resultSave": "حفظ",
-            "resultDiscard": "تجاهل",
-            "resultRestart": "عاود"
-        },
-        "keyboardCalibration": {
-            "resultTitle": "معايرة الكيبورد",
-            "resultDas": "DAS:",
-            "resultArr": "ARR:",
-            "resultFailed": "ما تجمعاتش بيانات كافية — حاول تبقى ضاغط على زر الاتجاه فجولة وحدة على الأقل.",
-            "resultSave": "حفظ",
-            "resultDiscard": "تجاهل",
-            "resultRestart": "عاود"
         },
         "loading": {
             "leaderboardHint": "كيتحمّل الترتيب..."

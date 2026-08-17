@@ -117,13 +117,9 @@
             "close": "Fermer",
             "mouseSensitivity": "Sensibilité de la souris",
             "touchSensitivity": "Sensibilité tactile",
-            "calibrateSensitivity": "Calibration de la sensibilité",
-            "calibrateSensitivityButton": "Calibrer",
             "advancedTitle": "Avancé",
             "keyboardDas": "DAS clavier (ms)",
             "keyboardArr": "ARR clavier (ms)",
-            "calibrateKeyboard": "Calibrer le clavier",
-            "calibrateKeyboardButton": "Calibrer",
             "dataTitle": "Import / Export",
             "exportLabel": "Exporter les options vers un fichier",
             "exportButton": "Exporter",
@@ -156,35 +152,6 @@
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
             "benchmarkCopyFailed": "Copy failed"
-        },
-        "calibration": {
-            "gestures": {
-                "sideToCenter": "Glisse la pièce vers la colonne centrale",
-                "sideToEdge": "Glisse la pièce vers la colonne du bord",
-                "toWall": "Glisse jusqu'au mur {kbd}",
-                "click": "Clique une fois {kbd}",
-                "hardDrop": "Effectue une chute rapide",
-                "softDropOne": "Effectue une étape de chute lente",
-                "rotate": "Tourne la pièce",
-                "hold": "Maintiens {kbd}, puis relâche"
-            },
-            "progress": "Manche {pass}/{totalPasses} · Étape {step}/{steps}",
-            "resultTitle": "CALIBRATION DE LA SENSIBILITÉ",
-            "resultSuccessBefore": "Ta sensibilité est maintenant réglée sur",
-            "resultFailed": "Impossible de calculer une valeur de sensibilité — réessaie avec un glissement à la souris ou au doigt.",
-            "resultClose": "Fermer",
-            "resultSave": "Enregistrer",
-            "resultDiscard": "Ignorer",
-            "resultRestart": "Recommencer"
-        },
-        "keyboardCalibration": {
-            "resultTitle": "CALIBRATION DU CLAVIER",
-            "resultDas": "DAS :",
-            "resultArr": "ARR :",
-            "resultFailed": "Pas assez de données recueillies — essaie de maintenir une touche directionnelle pendant au moins une manche.",
-            "resultSave": "Enregistrer",
-            "resultDiscard": "Ignorer",
-            "resultRestart": "Recommencer"
         },
         "loading": {
             "leaderboardHint": "Chargement du classement..."

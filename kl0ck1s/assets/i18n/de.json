@@ -117,13 +117,9 @@
             "close": "Schließen",
             "mouseSensitivity": "Mausempfindlichkeit",
             "touchSensitivity": "Touch-Empfindlichkeit",
-            "calibrateSensitivity": "Empfindlichkeitskalibrierung",
-            "calibrateSensitivityButton": "Kalibrieren",
             "advancedTitle": "Erweitert",
             "keyboardDas": "Tastatur-DAS (ms)",
             "keyboardArr": "Tastatur-ARR (ms)",
-            "calibrateKeyboard": "Tastatur kalibrieren",
-            "calibrateKeyboardButton": "Kalibrieren",
             "dataTitle": "Import / Export",
             "exportLabel": "Optionen in eine Datei exportieren",
             "exportButton": "Exportieren",
@@ -156,35 +152,6 @@
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
             "benchmarkCopyFailed": "Copy failed"
-        },
-        "calibration": {
-            "gestures": {
-                "sideToCenter": "Ziehe den Stein zur mittleren Spalte",
-                "sideToEdge": "Ziehe den Stein zur äußersten Spalte",
-                "toWall": "Zur Wand ziehen {kbd}",
-                "click": "Einmal klicken {kbd}",
-                "hardDrop": "Führe ein hartes Fallen aus",
-                "softDropOne": "Führe einen Schritt sanftes Fallen aus",
-                "rotate": "Drehe den Stein",
-                "hold": "Halte {kbd} gedrückt und lasse dann los"
-            },
-            "progress": "Runde {pass}/{totalPasses} · Schritt {step}/{steps}",
-            "resultTitle": "EMPFINDLICHKEITSKALIBRIERUNG",
-            "resultSuccessBefore": "Deine Empfindlichkeit wurde eingestellt auf",
-            "resultFailed": "Die Empfindlichkeit konnte nicht ermittelt werden — versuche es erneut mit Ziehen per Maus oder Touch.",
-            "resultClose": "Schließen",
-            "resultSave": "Speichern",
-            "resultDiscard": "Verwerfen",
-            "resultRestart": "Wiederholen"
-        },
-        "keyboardCalibration": {
-            "resultTitle": "TASTATURKALIBRIERUNG",
-            "resultDas": "DAS:",
-            "resultArr": "ARR:",
-            "resultFailed": "Es wurden nicht genügend Daten erfasst — versuche, mindestens einmal eine Richtungstaste zu halten.",
-            "resultSave": "Speichern",
-            "resultDiscard": "Verwerfen",
-            "resultRestart": "Wiederholen"
         },
         "loading": {
             "leaderboardHint": "Bestenliste wird geladen..."

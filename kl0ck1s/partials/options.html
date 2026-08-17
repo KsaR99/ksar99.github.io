@@ -304,15 +304,6 @@
                                inputmode="decimal"
                                type="number">
                     </label>
-                    <div class="options__row">
-                        <span data-i18n="screens.options.calibrateSensitivity">Calibrate sensitivity</span>
-                        <button
-                            class="options__preview-button options__preview-button--wide options__input--desktop-only"
-                            data-i18n="screens.options.calibrateSensitivityButton"
-                            data-role="calibrate-sensitivity-button"
-                            type="button">Calibrate
-                        </button>
-                    </div>
                 </details>
 
                 <details class="options__group options__group--keyboard" data-role="options-group-keyboard">
@@ -368,13 +359,28 @@
                                    inputmode="numeric"
                                    type="number">
                         </label>
-                        <div class="options__row">
-                            <span data-i18n="screens.options.calibrateKeyboard">Calibrate keyboard</span>
-                            <button class="options__preview-button options__preview-button--wide"
-                                    data-i18n="screens.options.calibrateKeyboardButton"
-                                    data-role="calibrate-keyboard-button"
-                                    type="button">
-                            </button>
+                        <div class="das-arr-preview" data-role="das-arr-preview">
+                            <div class="das-arr-preview__meter">
+                                <span class="das-arr-preview__tag">DAS</span>
+                                <div class="das-arr-preview__track">
+                                    <div class="das-arr-preview__fill"></div>
+                                </div>
+                            </div>
+                            <div class="das-arr-preview__meter">
+                                <span class="das-arr-preview__tag">ARR</span>
+                                <div class="das-arr-preview__ticks">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
                         </div>
                         <div class="options__row options__row--end">
                             <button class="options__preview-button options__preview-button--wide"

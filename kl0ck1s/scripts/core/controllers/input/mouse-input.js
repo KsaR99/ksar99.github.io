@@ -52,18 +52,16 @@ export class MouseInput extends InputSource {
             game.pointerClientX = event.clientX;
             game.pointerClientY = event.clientY;
 
-            const calibrating = game.state === "calibrating";
-            if (!game.settings?.mouseControl && !calibrating) return;
+            if (!game.settings?.mouseControl) return;
 
             if (!PIECE_CONTROLLABLE_STATES.has(game.state)) return;
-            if (!calibrating && this.steeringArbiter.isPointerSuppressed()) return;
+            if (this.steeringArbiter.isPointerSuppressed()) return;
 
             this.steerTo(event.clientX);
         };
 
         const onMouseDown = (event) => {
-            const calibrating = game.state === "calibrating";
-            if (!game.settings?.mouseControl && !calibrating) return;
+            if (!game.settings?.mouseControl) return;
             if (!PIECE_CONTROLLABLE_STATES.has(game.state)) return;
 
             if (event.button === 2) {

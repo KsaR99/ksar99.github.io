@@ -117,13 +117,9 @@
             "close": "Закрыть",
             "mouseSensitivity": "Чувствительность мыши",
             "touchSensitivity": "Чувствительность сенсора",
-            "calibrateSensitivity": "Калибровка чувствительности",
-            "calibrateSensitivityButton": "Калибровать",
             "advancedTitle": "Дополнительно",
             "keyboardDas": "DAS клавиатуры (мс)",
             "keyboardArr": "ARR клавиатуры (мс)",
-            "calibrateKeyboard": "Калибровка клавиатуры",
-            "calibrateKeyboardButton": "Калибровать",
             "dataTitle": "Импорт / Экспорт",
             "exportLabel": "Экспортировать настройки в файл",
             "exportButton": "Экспорт",
@@ -156,35 +152,6 @@
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
             "benchmarkCopyFailed": "Copy failed"
-        },
-        "calibration": {
-            "gestures": {
-                "sideToCenter": "Перетащите фигуру в центральный столбец",
-                "sideToEdge": "Перетащите фигуру в крайний столбец",
-                "toWall": "Перетащите к стене {kbd}",
-                "click": "Кликните один раз {kbd}",
-                "hardDrop": "Выполните мгновенное падение",
-                "softDropOne": "Выполните шаг плавного падения",
-                "rotate": "Поверните фигуру",
-                "hold": "Удерживайте {kbd}, затем отпустите"
-            },
-            "progress": "Раунд {pass}/{totalPasses} · Шаг {step}/{steps}",
-            "resultTitle": "КАЛИБРОВКА ЧУВСТВИТЕЛЬНОСТИ",
-            "resultSuccessBefore": "Ваша чувствительность установлена на",
-            "resultFailed": "Не удалось рассчитать чувствительность — попробуйте снова, перетаскивая мышью или пальцем.",
-            "resultClose": "Закрыть",
-            "resultSave": "Сохранить",
-            "resultDiscard": "Отменить",
-            "resultRestart": "Заново"
-        },
-        "keyboardCalibration": {
-            "resultTitle": "КАЛИБРОВКА КЛАВИАТУРЫ",
-            "resultDas": "DAS:",
-            "resultArr": "ARR:",
-            "resultFailed": "Недостаточно данных — попробуйте удержать клавишу направления хотя бы один раз.",
-            "resultSave": "Сохранить",
-            "resultDiscard": "Отменить",
-            "resultRestart": "Заново"
         },
         "loading": {
             "leaderboardHint": "Загрузка таблицы лидеров..."

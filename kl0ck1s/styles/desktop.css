@@ -33,7 +33,6 @@
 .options__row:has(
     [data-role="mouse-control-checkbox"],
     [data-role="mouse-sensitivity-input"],
-    [data-role="calibrate-sensitivity-button"],
     [data-role="screen-shake-checkbox"]
 ) {
     display: flex;
