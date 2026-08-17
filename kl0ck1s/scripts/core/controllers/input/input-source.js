@@ -1,7 +1,7 @@
 "use strict";
 
-export const DEFAULT_DAS_MS = 125;
-export const DEFAULT_ARR_MS = 16;
+export const DEFAULT_DAS_MS = 80;
+export const DEFAULT_ARR_MS = 46;
 
 export class InputSource {
     /**
