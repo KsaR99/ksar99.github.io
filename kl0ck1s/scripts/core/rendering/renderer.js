@@ -5,15 +5,17 @@ import {CachedCanvasLayer} from "./cached-canvas-layer.js";
 import {FALL_TRAIL_ALPHA_CACHE, HARD_DROP_TRAIL_ALPHAS} from "../game/game-constants.js";
 import {LINE_CLEAR_FLASH_PHASE_FRACTION} from "../shared/config.js";
 import {
+    colorForLevel,
     cornerRadiusForSize,
     fallTrailColor,
-    GHOST_ALPHA,
+    GHOST_OPACITY_DEFAULTS,
     HARD_DROP_FLASH_SPRITE_HEIGHT,
     hardDropTrailColor,
     SATURATION_LEVELS
 } from "./sprite-cache.js";
 
 const GHOST_MIN_DROP_ROWS = 3;
+const GHOST_WHITE_COLOR = "oklch(0.96 0 0)";
 
 export class Renderer {
     /**
@@ -60,7 +62,8 @@ export class Renderer {
         this.i18n = i18n;
         this.glowEnabled = true;
         this.transparencyEnabled = true;
-        this.ghostEnabled = true;
+        this.ghostType = "radioactive";
+        this.ghostOpacities = {...GHOST_OPACITY_DEFAULTS};
         this.gridEnabled = true;
         this.shakeEnabled = true;
         this.heightSaturationEnabled = true;
@@ -75,6 +78,10 @@ export class Renderer {
 
         this._onWindowResize = () => this.refreshBoardCanvasRect();
         window.addEventListener("resize", this._onWindowResize);
+    }
+
+    get ghostOpacity() {
+        return this.ghostOpacities[this.ghostType] ?? GHOST_OPACITY_DEFAULTS.colorful;
     }
 
     createSurface(ctx, boardCanvas) {
@@ -134,8 +141,17 @@ export class Renderer {
         this.transparencyEnabled = enabled;
     }
 
-    setGhostEnabled(enabled) {
-        this.ghostEnabled = enabled;
+    setGhostType(type) {
+        this.ghostType = type;
+    }
+
+    setGhostOpacities(opacities) {
+        const clamp = (value) => Math.min(1, Math.max(0, value));
+        this.ghostOpacities = {
+            colorful: clamp(opacities?.colorful ?? this.ghostOpacities.colorful),
+            radioactive: clamp(opacities?.radioactive ?? this.ghostOpacities.radioactive),
+            white: clamp(opacities?.white ?? this.ghostOpacities.white),
+        };
     }
 
     setGridEnabled(enabled) {
@@ -450,7 +466,7 @@ export class Renderer {
                 context.rect(x * size, y * size, size, size);
                 context.clip();
             }
-            if (ghost) context.globalAlpha *= GHOST_ALPHA;
+            if (ghost) context.globalAlpha *= this.ghostOpacity;
             context.drawImage(sprite, x * size - offset, y * size - offset);
             context.restore();
             return;
@@ -479,7 +495,7 @@ export class Renderer {
 
         if (ghost) {
             context.save();
-            context.globalAlpha *= GHOST_ALPHA;
+            context.globalAlpha *= this.ghostOpacity;
         }
 
         context.drawImage(region.image, region.sx, region.sy, region.sw, region.sh, x * size, y * size, size, size);
@@ -937,7 +953,7 @@ export class Renderer {
     }
 
     drawGhost(piece, board, surface = this) {
-        if (!this.ghostEnabled) return;
+        if (this.ghostType === "off") return;
 
         const offset = board.getDropOffset(piece);
         if (offset <= GHOST_MIN_DROP_ROWS) return;
@@ -945,29 +961,34 @@ export class Renderer {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx} = surface;
 
-        if (this.outlineBlocksEnabled) {
+        if (this.ghostType === "radioactive") {
+            const sprite = this.spriteCache.getOutlineGhost(piece.color, size, 0);
+            const spriteOffset = (sprite.width - size) / 2;
+            const applyOpacity = this.transparencyEnabled;
+            if (applyOpacity) {
+                ctx.save();
+                ctx.globalAlpha *= this.ghostOpacity;
+            }
             forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
                 const y = piece.y + r + offset;
                 if (y < 0) return;
-                const level = this.saturationLevelForRow(y, board.rows);
-                const sprite = this.spriteCache.getOutlineGhost(piece.color, size, level);
-                const spriteOffset = (sprite.width - size) / 2;
                 ctx.drawImage(sprite, (piece.x + c) * size - spriteOffset, y * size - spriteOffset);
             });
+            if (applyOpacity) ctx.restore();
             return;
         }
 
-        const strokeColor = withAlpha(piece.color, 0.6);
-        const lightColor = lightenOklch(piece.color);
+        const baseColor = this.ghostType === "white" ? GHOST_WHITE_COLOR : piece.color;
+        const lightColor = this.ghostType === "white" ? GHOST_WHITE_COLOR : lightenOklch(baseColor);
 
         if (this.transparencyEnabled) {
             ctx.save();
-            ctx.globalAlpha *= GHOST_ALPHA;
+            ctx.globalAlpha *= this.ghostOpacity;
             forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
                 const y = piece.y + r + offset;
                 if (y < 0) return;
                 const level = this.saturationLevelForRow(y, board.rows);
-                this.drawCell(ctx, piece.x + c, y, piece.color, size, {level});
+                this.drawCell(ctx, piece.x + c, y, baseColor, size, {level});
             });
             ctx.restore();
         } else {
@@ -979,13 +1000,15 @@ export class Renderer {
             });
         }
 
-        ctx.strokeStyle = strokeColor;
         ctx.lineWidth = 1;
         const ghostRadius = cornerRadiusForSize(size);
         forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
             const y = piece.y + r + offset;
             if (y < 0) return;
             const x = piece.x + c;
+            const level = this.saturationLevelForRow(y, board.rows);
+            const strokeColor = withAlpha(colorForLevel(baseColor, level), 0.6);
+            ctx.strokeStyle = strokeColor;
             ctx.beginPath();
             ctx.roundRect(x * size + 0.5, y * size + 0.5, size - 1, size - 1, Math.max(0, ghostRadius - 0.5));
             ctx.stroke();

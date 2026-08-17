@@ -748,7 +748,7 @@ export class ScreenFlow {
         const optionsMuteToggle = root.querySelector('[data-role="options-mute-toggle"]');
         const volumeSlider = root.querySelector('[data-role="volume-slider"]');
         const hudRightCheckbox = root.querySelector('[data-role="hud-right-checkbox"]');
-        const ghostCheckbox = root.querySelector('[data-role="ghost-checkbox"]');
+        const ghostTypeSelect = root.querySelector('[data-role="ghost-type-select"]');
         const gridCheckbox = root.querySelector('[data-role="grid-checkbox"]');
         const screenShakeCheckbox = root.querySelector('[data-role="screen-shake-checkbox"]');
         const heightSaturationCheckbox = root.querySelector('[data-role="height-saturation-checkbox"]');
@@ -797,9 +797,9 @@ export class ScreenFlow {
 
         this.bindBenchmark();
 
-        if (ghostCheckbox) {
-            ghostCheckbox.addEventListener("change", () => {
-                game.settings.ghost = ghostCheckbox.checked;
+        if (ghostTypeSelect) {
+            ghostTypeSelect.addEventListener("change", () => {
+                game.settings.ghostType = ghostTypeSelect.value;
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
                 this.syncCategoryResetButtons();
@@ -1092,11 +1092,11 @@ export class ScreenFlow {
     }
 
     categoryResetGroups() {
-        const graphicsKeys = ["screenShake", "outlineBlocks", "heightSaturation", "glow", "transparency", "fallTrail", "hardDropFlash"];
+        const graphicsKeys = ["screenShake", "ghostType", "outlineBlocks", "heightSaturation", "glow", "transparency", "fallTrail", "hardDropFlash"];
         return {
             "reset-general-button": ["volume", "muted", "hudRight", "theme"],
             "reset-controls-button": ["mouseControl", "mouseSensitivity", "touchSensitivity"],
-            "reset-gameplay-button": ["skipCountdown", "skipModeInfo", "ghost", "gridLines"],
+            "reset-gameplay-button": ["skipCountdown", "skipModeInfo", "gridLines"],
             "reset-graphics-button": isMobileViewport()
                 ? graphicsKeys.filter((key) => key !== "screenShake")
                 : graphicsKeys,

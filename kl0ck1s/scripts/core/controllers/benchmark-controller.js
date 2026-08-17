@@ -220,7 +220,8 @@ export class BenchmarkController {
         Object.defineProperties(this._offscreenRenderer, {
             glowEnabled: {get: () => liveRenderer.glowEnabled},
             transparencyEnabled: {get: () => liveRenderer.transparencyEnabled},
-            ghostEnabled: {get: () => liveRenderer.ghostEnabled},
+            ghostType: {get: () => liveRenderer.ghostType},
+            ghostOpacities: {get: () => liveRenderer.ghostOpacities},
             gridEnabled: {get: () => liveRenderer.gridEnabled},
             shakeEnabled: {get: () => liveRenderer.shakeEnabled},
             heightSaturationEnabled: {get: () => liveRenderer.heightSaturationEnabled},

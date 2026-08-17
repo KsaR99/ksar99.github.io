@@ -21,6 +21,17 @@ const DEFAULT_LANGUAGE = "en";
 const STORAGE_KEY = "klockis-lang";
 const LOCALE_STORAGE_KEY = "klockis-locale";
 
+function deepMergeDicts(base, override) {
+    if (typeof override !== "object" || override === null || Array.isArray(override)) {
+        return override === undefined ? base : override;
+    }
+    const result = {...(typeof base === "object" && base !== null ? base : {})};
+    for (const key of Object.keys(override)) {
+        result[key] = deepMergeDicts(base?.[key], override[key]);
+    }
+    return result;
+}
+
 export class I18n {
     constructor({
                     basePath = "assets/i18n/",
@@ -35,6 +46,7 @@ export class I18n {
         this.lang = DEFAULT_LANGUAGE;
         this.dict = {};
         this.browserLocale = null;
+        this._referenceDict = null;
     }
 
     get locale() {
@@ -82,6 +94,13 @@ export class I18n {
         return response.json();
     }
 
+    async loadReferenceDictionary() {
+        if (!this._referenceDict) {
+            this._referenceDict = await this.loadDictionary(DEFAULT_LANGUAGE);
+        }
+        return this._referenceDict;
+    }
+
     async init() {
         const stored = this.storage?.getItem(STORAGE_KEY);
         const {lang, locale} = this.resolveInitialLanguage();
@@ -93,7 +112,10 @@ export class I18n {
         const resolved = SUPPORTED_LANGUAGES.includes(lang) ? lang : DEFAULT_LANGUAGE;
 
         try {
-            this.dict = await this.loadDictionary(resolved);
+            const loaded = await this.loadDictionary(resolved);
+            this.dict = resolved === DEFAULT_LANGUAGE
+                ? loaded
+                : deepMergeDicts(await this.loadReferenceDictionary(), loaded);
             this.lang = resolved;
         } catch {
             if (resolved !== DEFAULT_LANGUAGE) {

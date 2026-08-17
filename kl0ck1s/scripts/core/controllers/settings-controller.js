@@ -3,6 +3,7 @@
 import {SETTINGS_KEY} from "../game/game-constants.js";
 import {defaultKeyBindings} from "../shared/key-bindings.js";
 import {isMobileViewport} from "../shared/utils.js";
+import {GHOST_OPACITY_DEFAULTS} from "../rendering/sprite-cache.js";
 
 export class SettingsController {
     constructor(game) {
@@ -17,7 +18,8 @@ export class SettingsController {
             transparency: true,
             theme: "none",
             hudRight: false,
-            ghost: true,
+            ghostType: "radioactive",
+            ghostOpacity: {...GHOST_OPACITY_DEFAULTS},
             gridLines: true,
             screenShake: true,
             heightSaturation: true,
@@ -82,11 +84,18 @@ export class SettingsController {
         const game = this.game;
         const defaults = this.defaultSettings();
         const settings = {...defaults, ...stored};
+        if (stored.ghostType === undefined && stored.ghost === false) {
+            settings.ghostType = "off";
+        }
         settings.categoryVolumes = {...defaults.categoryVolumes, ...(stored.categoryVolumes ?? {})};
         settings.categoryMuted = {...defaults.categoryMuted, ...(stored.categoryMuted ?? {})};
         settings.soundVolumes = {...defaults.soundVolumes, ...(stored.soundVolumes ?? {})};
         settings.soundMuted = {...defaults.soundMuted, ...(stored.soundMuted ?? {})};
         settings.keyBindings = {...defaults.keyBindings, ...(stored.keyBindings ?? {})};
+        settings.ghostOpacity = {
+            ...defaults.ghostOpacity,
+            ...(stored.ghostOpacity && typeof stored.ghostOpacity === "object" ? stored.ghostOpacity : {}),
+        };
 
         game.settings = settings;
         if (settings.difficulty && game.difficulties[settings.difficulty]) {
@@ -135,7 +144,8 @@ export class SettingsController {
             glow,
             transparency,
             theme,
-            ghost,
+            ghostType,
+            ghostOpacity,
             gridLines,
             fallTrail,
             screenShake,
@@ -144,7 +154,8 @@ export class SettingsController {
         } = game.settings;
         game.renderer.setGlowEnabled(glow);
         game.renderer.setTransparencyEnabled(transparency);
-        game.renderer.setGhostEnabled(ghost);
+        game.renderer.setGhostType(ghostType);
+        game.renderer.setGhostOpacities(ghostOpacity);
         game.renderer.setGridEnabled(gridLines);
         game.renderer.setShakeEnabled(screenShake && !isMobileViewport());
         game.renderer.setHeightSaturationEnabled(heightSaturation && !outlineBlocks);
@@ -344,6 +355,11 @@ export class SettingsController {
             } else if (change.key === "categoryMuted") {
                 game.settings.categoryMuted = {
                     ...this.defaultSettings().categoryMuted,
+                    ...change.newValue,
+                };
+            } else if (change.key === "ghostOpacity") {
+                game.settings.ghostOpacity = {
+                    ...this.defaultSettings().ghostOpacity,
                     ...change.newValue,
                 };
             } else if (change.key === "keyBindings") {

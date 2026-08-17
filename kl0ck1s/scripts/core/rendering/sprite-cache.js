@@ -3,7 +3,11 @@
 const GLOW_BLUR_RATIO = 0.8;
 const GLOW_TOP_ROWS = 5;
 
-export const GHOST_ALPHA = 0.3;
+export const GHOST_OPACITY_DEFAULTS = {
+    colorful: 0.5,
+    radioactive: 1.00,
+    white: 0.2,
+};
 
 export const SATURATION_STEP = 0.05;
 export const SATURATION_LEVELS = Math.round(1 / SATURATION_STEP) + 1;

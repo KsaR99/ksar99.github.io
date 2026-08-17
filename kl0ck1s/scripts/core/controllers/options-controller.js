@@ -201,7 +201,9 @@ export class OptionsController {
         const optionsMuteToggle = root.querySelector('[data-role="options-mute-toggle"]');
         const volumeSlider = root.querySelector('[data-role="volume-slider"]');
         const hudRightCheckbox = root.querySelector('[data-role="hud-right-checkbox"]');
-        const ghostCheckbox = root.querySelector('[data-role="ghost-checkbox"]');
+        const ghostTypeSelect = root.querySelector('[data-role="ghost-type-select"]');
+        const ghostOpacitySlider = root.querySelector('[data-role="ghost-opacity-slider"]');
+        const ghostOpacityRow = root.querySelector('[data-role="ghost-opacity-row"]');
         const gridCheckbox = root.querySelector('[data-role="grid-checkbox"]');
         const screenShakeCheckbox = root.querySelector('[data-role="screen-shake-checkbox"]');
         const heightSaturationCheckbox = root.querySelector('[data-role="height-saturation-checkbox"]');
@@ -250,9 +252,27 @@ export class OptionsController {
 
         this.bindBenchmark();
 
-        if (ghostCheckbox) {
-            ghostCheckbox.addEventListener("change", () => {
-                game.settings.ghost = ghostCheckbox.checked;
+        if (ghostTypeSelect) {
+            ghostTypeSelect.addEventListener("change", () => {
+                game.settings.ghostType = ghostTypeSelect.value;
+                settingsController.applyPerformanceSettings();
+                settingsController.saveSettings();
+                if (ghostOpacitySlider) {
+                    const isOff = ghostTypeSelect.value === "off";
+                    ghostOpacitySlider.disabled = isOff;
+                    if (!isOff) {
+                        ghostOpacitySlider.value = Math.round((game.settings.ghostOpacity[ghostTypeSelect.value] ?? 0.5) * 100);
+                    }
+                }
+                this.syncCategoryResetButtons();
+            });
+        }
+
+        if (ghostOpacitySlider) {
+            ghostOpacitySlider.addEventListener("input", () => {
+                const type = ghostTypeSelect?.value;
+                if (!type || type === "off") return;
+                game.settings.ghostOpacity = {...game.settings.ghostOpacity, [type]: ghostOpacitySlider.value / 100};
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
                 this.syncCategoryResetButtons();
@@ -306,6 +326,7 @@ export class OptionsController {
                 game.settings.transparency = transparencyCheckbox.checked;
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
+                if (ghostOpacityRow) ghostOpacityRow.hidden = !transparencyCheckbox.checked;
                 this.syncCategoryResetButtons();
             });
         }
@@ -545,11 +566,11 @@ export class OptionsController {
     }
 
     categoryResetGroups() {
-        const graphicsKeys = ["screenShake", "outlineBlocks", "heightSaturation", "glow", "transparency", "fallTrail", "hardDropFlash"];
+        const graphicsKeys = ["screenShake", "ghostType", "ghostOpacity", "outlineBlocks", "heightSaturation", "glow", "transparency", "fallTrail", "hardDropFlash"];
         return {
             "reset-general-button": ["volume", "muted", "hudRight", "theme"],
             "reset-controls-button": ["mouseControl", "mouseSensitivity", "touchSensitivity"],
-            "reset-gameplay-button": ["skipCountdown", "skipModeInfo", "ghost", "gridLines"],
+            "reset-gameplay-button": ["skipCountdown", "skipModeInfo", "gridLines"],
             "reset-graphics-button": isMobileViewport()
                 ? graphicsKeys.filter((key) => key !== "screenShake")
                 : graphicsKeys,

@@ -107,10 +107,6 @@
                            type="checkbox">
                 </label>
                 <label class="options__row">
-                    <span data-i18n="screens.options.ghost">Ghost piece</span>
-                    <input class="options__input options__input--checkbox" data-role="ghost-checkbox" type="checkbox">
-                </label>
-                <label class="options__row">
                     <span data-i18n="screens.options.gridLines">Grid lines</span>
                     <input class="options__input options__input--checkbox" data-role="grid-checkbox" type="checkbox">
                 </label>
@@ -131,6 +127,21 @@
                     <input class="options__input options__input--checkbox options__input--desktop-only"
                            data-role="screen-shake-checkbox"
                            type="checkbox">
+                </label>
+                <label class="options__row">
+                    <span data-i18n="screens.options.ghost">Ghost piece</span>
+                    <select class="options__input options__input--select" data-role="ghost-type-select">
+                        <option data-i18n="screens.options.ghostTypeColorful" value="colorful">Colorful</option>
+                        <option data-i18n="screens.options.ghostTypeRadioactive" value="radioactive">Radioactive
+                        </option>
+                        <option data-i18n="screens.options.ghostTypeWhite" value="white">White</option>
+                        <option data-i18n="screens.options.ghostTypeOff" value="off">Off</option>
+                    </select>
+                </label>
+                <label class="options__row" data-role="ghost-opacity-row">
+                    <span data-i18n="screens.options.ghostOpacity">Ghost opacity</span>
+                    <input class="options__input options__input--range" data-role="ghost-opacity-slider" max="100"
+                           min="5" type="range">
                 </label>
                 <label class="options__row">
                     <span data-i18n="screens.options.blockType">Block type</span>

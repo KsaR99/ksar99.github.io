@@ -157,7 +157,8 @@ const DIFF_LABEL_KEYS = {
     touchSensitivity: "screens.options.touchSensitivity",
     skipCountdown: "screens.options.skipCountdown",
     skipModeInfo: "screens.options.skipModeInfo",
-    ghost: "screens.options.ghost",
+    ghostType: "screens.options.ghost",
+    ghostOpacity: "screens.options.ghostOpacity",
     gridLines: "screens.options.gridLines",
     screenShake: "screens.options.screenShake",
     heightSaturation: "screens.options.heightSaturation",
@@ -191,6 +192,13 @@ const BENCHMARK_LABEL_KEYS = {
     audioStop: "benchmark.categories.audioStop",
 };
 
+const GHOST_TYPE_LABEL_KEYS = {
+    colorful: "screens.options.ghostTypeColorful",
+    radioactive: "screens.options.ghostTypeRadioactive",
+    white: "screens.options.ghostTypeWhite",
+    off: "screens.options.ghostTypeOff",
+};
+
 const THEME_LABEL_KEYS = {
     none: "screens.options.themeNone",
     vhs: "screens.options.themeVHS",
@@ -209,8 +217,9 @@ function formatSettingValue(key, value, i18n) {
     if (key === "outlineBlocks") {
         return i18n.t(value ? "screens.options.blockTypeRadioactive" : "screens.options.blockTypeColorful");
     }
+    if (key === "ghostType") return i18n.t(GHOST_TYPE_LABEL_KEYS[value] ?? "screens.options.ghostTypeColorful");
     if (typeof value === "boolean") return i18n.t(value ? "screens.options.valueOn" : "screens.options.valueOff");
-    if (key === "categoryVolumes" || key === "soundVolumes") {
+    if (key === "categoryVolumes" || key === "soundVolumes" || key === "ghostOpacity") {
         return Object.entries(value ?? {}).map(([k, v]) => `${k}: ${Math.round(v * 100)}%`).join(", ") || "—";
     }
     if (key === "categoryMuted") {
@@ -327,7 +336,17 @@ export const Screens = {
         screen.querySelector('[data-role="hud-right-checkbox"]').checked = settings.hudRight;
         const developerGroup = screen.querySelector('[data-role="options-group-developer"]');
         if (developerGroup) developerGroup.hidden = !DEV_MODE;
-        screen.querySelector('[data-role="ghost-checkbox"]').checked = settings.ghost;
+        const ghostTypeSelect = screen.querySelector('[data-role="ghost-type-select"]');
+        if (ghostTypeSelect) ghostTypeSelect.value = settings.ghostType ?? "radioactive";
+        const ghostOpacitySlider = screen.querySelector('[data-role="ghost-opacity-slider"]');
+        if (ghostOpacitySlider) {
+            const activeGhostType = settings.ghostType ?? "radioactive";
+            const ghostOpacities = settings.ghostOpacity ?? {};
+            ghostOpacitySlider.value = Math.round((ghostOpacities[activeGhostType] ?? 0.5) * 100);
+            ghostOpacitySlider.disabled = activeGhostType === "off";
+        }
+        const ghostOpacityRow = screen.querySelector('[data-role="ghost-opacity-row"]');
+        if (ghostOpacityRow) ghostOpacityRow.hidden = !settings.transparency;
         screen.querySelector('[data-role="grid-checkbox"]').checked = settings.gridLines;
         const screenShakeCheckbox = screen.querySelector('[data-role="screen-shake-checkbox"]');
         if (screenShakeCheckbox) screenShakeCheckbox.checked = Boolean(settings.screenShake);
