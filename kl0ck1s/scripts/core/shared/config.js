@@ -29,7 +29,7 @@ export const SPIN_POINTS = Object.freeze({
     OTHER: [100, 200, 400, 600],
 });
 
-export const LEVEL_UP_BANNER_DURATION_MS = 320;
+export const LEVEL_UP_BANNER_DURATION_MS = 300;
 export const LINE_CLEAR_ANIMATION_DURATION_MS = 260;
 export const LINE_CLEAR_SOUND_PLAYBACK_RATE = 0.6;
 export const LINE_CLEAR_FLASH_PHASE_FRACTION = 0.75;
@@ -42,7 +42,7 @@ export const DIFFICULTIES = Object.freeze({
     pro: {startLevel: 19, groundedTime: 1000, fallingSoundRate: 0.8}, // floored: instant drop (20G) from the start
 });
 
-export const DEFAULT_DIFFICULTY = "hard";
+export const DEFAULT_DIFFICULTY = "medium";
 
 export const GAME_MODES = Object.freeze({
     zen: Object.freeze({

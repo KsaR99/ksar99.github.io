@@ -29,7 +29,7 @@
     height: 1.6rem;
     padding: 0;
     border: 1px solid var(--line);
-    border-radius: 999px;
+    border-radius: 50%;
     background: var(--panel);
     color: var(--muted);
     font-size: 0.8rem;
@@ -59,10 +59,10 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 0.75rem;
-}
 
-.leaderboard__table tbody tr:nth-child(even) .leaderboard__cell {
-    background: color-mix(in oklch, var(--line) 30%, transparent);
+    & tbody tr:nth-child(even) .leaderboard__cell {
+        background: color-mix(in oklch, var(--line) 30%, transparent);
+    }
 }
 
 .leaderboard__cell--rank {
