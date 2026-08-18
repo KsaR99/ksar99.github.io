@@ -79,12 +79,12 @@
 [data-role="next-piece-queue"] {
     display: flex;
     align-items: center;
-    gap: 0.5em;
+    gap: 0.25em;
 
     & > .next-piece__canvas {
         display: block;
-        width: 2.75em;
-        height: 1.375em;
+        width: 4.7334375em;
+        height: 2.36664em;
     }
 }
 

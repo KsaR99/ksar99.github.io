@@ -194,7 +194,7 @@ export const CREDITS_TIMING = Object.freeze({
 });
 
 export const NEXT_PREVIEW_QUEUE_SIZE = 3;
-export const NEXT_PREVIEW_CELL_SIZE = 11;
+export const NEXT_PREVIEW_CELL_SIZE = 27;
 export const NEXT_PREVIEW_CANVAS_WIDTH = NEXT_PREVIEW_CELL_SIZE * 4; // widest piece
 export const NEXT_PREVIEW_CANVAS_HEIGHT = NEXT_PREVIEW_CELL_SIZE * 2; // tallest piece
 

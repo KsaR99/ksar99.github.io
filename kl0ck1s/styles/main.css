@@ -377,8 +377,8 @@ body.hud-right .sidebar--stats {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 5rem;
-    height: 5rem;
+    width: 12.5rem;
+    height: 12.5rem;
     padding: 0;
     background: oklch(from var(--bg-2) l c h / 0.7);
     border-radius: var(--radius);
@@ -391,7 +391,7 @@ body.hud-right .sidebar--stats {
 [data-role="next-piece-queue"] {
     display: flex;
     align-items: center;
-    gap: 0.125rem;
+    gap: 0;
     flex-flow: row-reverse;
 }
 
@@ -400,8 +400,8 @@ body.hud-right [data-role="next-piece-queue"] {
 }
 
 [data-role="next-piece-card"] .next-piece__canvas {
-    width: 1.375rem;
-    height: 0.6875rem;
+    width: 3.4375rem;
+    height: 1.71875rem;
     background: oklch(from var(--bg-2) l c h / 0.4);
 }
 
@@ -465,6 +465,7 @@ body.hud-right [data-role="next-piece-queue"] {
     inset: 0;
     z-index: 0;
     background: var(--board-bg, var(--panel));
+    border-radius: var(--radius)
 }
 
 .board__stage {
