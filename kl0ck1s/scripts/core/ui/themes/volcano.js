@@ -3,13 +3,13 @@
 import {ThemeEffect} from "./theme-effect.js";
 import {ParticleField} from "./particle-field.js";
 
-const ASH_COLOR = "oklch(0.4853 0.0567 47.41 / 75%)";
+const ASH_COLOR = "oklch(0.35 0 0 / 75%)";
 const EMBER_COLOR = "oklch(0.725 0.178 46.868 / 0.9)";
 
-const ASH_DENSITY = 1 / 27000; // ash spheres per square pixel (half as many as before)
-const EMBER_DENSITY = 0.08;    // embers per pixel of width (3x more than before)
+const ASH_DENSITY = 1 / 27000;
+const EMBER_DENSITY = 0.08;
 
-const GRAVITY = 0.05;          // pulls embers back down after launch
+const GRAVITY = 0.05;
 
 export class Volcano extends ThemeEffect {
     constructor(canvas, ctx = null) {
@@ -48,11 +48,27 @@ export class Volcano extends ThemeEffect {
     };
 
     resize(width, height) {
-        const {w, h, unchanged} = this.resizeCanvas(width, height, this.ash.count && this.embers.count);
+        const {w, h, unchanged} = this.resizeCanvas(
+            width,
+            height,
+            this.ash.count && this.embers.count
+        );
         if (unchanged) return;
 
-        this.ash.allocate(Math.max(8, Math.round(w * h * ASH_DENSITY)), this._spawnAsh, w, h);
-        this.embers.allocate(Math.max(4, Math.round(w * EMBER_DENSITY)), this._spawnEmber, w, h);
+        this.ash.allocate(
+            Math.max(8, Math.round(w * h * ASH_DENSITY)),
+            this._spawnAsh,
+            w,
+            h
+        );
+
+        this.embers.allocate(
+            Math.max(4, Math.round(w * EMBER_DENSITY)),
+            this._spawnEmber,
+            w,
+            h
+        );
+
         this.ctx.clearRect(0, 0, w, h);
     }
 
@@ -71,9 +87,11 @@ export class Volcano extends ThemeEffect {
             drift: aDrift,
             driftSpeed: aDriftSpeed
         } = this.ash;
+
         if (ashCount) {
             ctx.fillStyle = ASH_COLOR;
             const ashPath = new Path2D();
+
             for (let i = 0; i < ashCount; i++) {
                 ashPath.moveTo(ax[i] + aRadius[i], ay[i]);
                 ashPath.arc(ax[i], ay[i], aRadius[i], 0, Math.PI * 2);
@@ -87,20 +105,45 @@ export class Volcano extends ThemeEffect {
                     ay[i] = -aRadius[i];
                 }
             }
+
             ctx.fill(ashPath);
         }
 
-        const {count: emberCount, x: ex, y: ey, length: eLength, vx: evx, vy: evy} = this.embers;
+        const {
+            count: emberCount,
+            x: ex,
+            y: ey,
+            length: eLength,
+            vx: evx,
+            vy: evy
+        } = this.embers;
+
         if (emberCount) {
             ctx.strokeStyle = EMBER_COLOR;
             ctx.lineWidth = 1.5;
             ctx.lineCap = "round";
+
             const emberPath = new Path2D();
+
             for (let i = 0; i < emberCount; i++) {
-                const len = eLength[i];
+                const yRatio = ey[i] / canvas.height;
+
+                let sizeMultiplier;
+
+                if (yRatio < 0.2) { // Y.% <= 20%
+                    sizeMultiplier = 3.0 - yRatio / 0.2; // 3.0x
+                } else if (yRatio < 0.4) { // Y.% <= 40%
+                    sizeMultiplier = 1.5 - ((yRatio - 0.2) / 0.5) * 0.5; // 1.5x
+                } else {
+                    sizeMultiplier = 1; // Normal
+                }
+
+                const len = eLength[i] * sizeMultiplier;
+
                 const mag = Math.hypot(evx[i], evy[i]) || 1;
                 const tx = ex[i] - (evx[i] / mag) * len;
                 const ty = ey[i] - (evy[i] / mag) * len;
+
                 emberPath.moveTo(ex[i], ey[i]);
                 emberPath.lineTo(tx, ty);
 
@@ -113,8 +156,12 @@ export class Volcano extends ThemeEffect {
                     ey[i] + len < 0 ||
                     ex[i] < -len ||
                     ex[i] > canvas.width + len;
-                if (offCanvas) this._spawnEmber(i, canvas.width, canvas.height);
+
+                if (offCanvas) {
+                    this._spawnEmber(i, canvas.width, canvas.height);
+                }
             }
+
             ctx.stroke(emberPath);
         }
     }
