@@ -417,7 +417,7 @@ export class Game {
             y = anim.fromY + (base.y - anim.fromY) * eased;
             angle = anim.fromAngle * (1 - eased);
         } else {
-            if (this.shiftAnim) {
+            if (this.shiftAnim && this.rawGrounded) {
                 const t = Math.min(1, this.shiftAnim.elapsed / this.shiftAnim.duration);
                 const {fromX, toX} = this.shiftAnim;
                 x = fromX + (toX - fromX) * t;
@@ -537,6 +537,11 @@ export class Game {
                 }
             } else {
                 this.fallTrailCount = 0;
+            }
+
+            if (this.rotationAnim) {
+                const direction = Math.sign(this.rotationAnim.fromAngle);
+                this.renderer.drawRotationIndicator(renderedPiece, direction);
             }
 
             this.renderer.drawPiece(renderedPiece, this.board);

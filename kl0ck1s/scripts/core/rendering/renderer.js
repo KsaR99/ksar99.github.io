@@ -839,6 +839,41 @@ export class Renderer {
         if (p < flashEnd) this.drawClearingFlash(lineIndices, colFlash, {ctx, size, cols});
     }
 
+    drawRotationIndicator(piece, direction, surface = this) {
+        if (!piece || !direction) return;
+
+        const size = this.boardConfig.CELL_SIZE;
+        const {ctx} = surface;
+        const pivotX = piece.pivotX ?? (piece.width / 2);
+        const pivotY = piece.pivotY ?? (piece.height / 2);
+        const cx = (piece.x + pivotX) * size;
+        const cy = (piece.y + pivotY) * size;
+        const lengths = [0.5, 0.3, 0.12];
+        const totalArc = Math.PI * (220 / 180);
+        const tipAngle = -Math.PI / 2;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.lineCap = "round";
+        ctx.lineWidth = Math.max(2, size * 0.07);
+        ctx.globalAlpha = 0.5;
+        ctx.strokeStyle = piece.color;
+
+        for (let i = 0; i < lengths.length; i++) {
+            const radius = size * (1.65 + i * 0.28);
+            const arc = totalArc * lengths[i];
+            const startAngle = direction > 0
+                ? tipAngle - arc
+                : tipAngle + arc;
+
+            ctx.beginPath();
+            ctx.arc(0, 0, radius, startAngle, tipAngle, direction < 0);
+            ctx.stroke();
+        }
+
+        ctx.restore();
+    }
+
     drawPiece(piece, board, surface = this) {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx} = surface;
