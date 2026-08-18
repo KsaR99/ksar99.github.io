@@ -12,6 +12,8 @@ const SWIPE_DOWN_THRESHOLD_RATIO = 0.22;
 
 const DRAG_DISTANCE_IN_SCREENS = 0.8;
 
+const JOYSTICK_DEADZONE_RATIO = 0.35;
+
 export class TouchInput extends InputSource {
     /**
      * @param {object} game
@@ -38,6 +40,10 @@ export class TouchInput extends InputSource {
 
         this._buttonsRoot = null;
         this._buttonHandlers = [];
+
+        this._joystickRoot = null;
+        this._joystickDirection = null;
+        this._joystickPointerId = null;
     }
 
     steerTo(clientX) {
@@ -201,6 +207,111 @@ export class TouchInput extends InputSource {
         }
         this._buttonHandlers = [];
         this._buttonsRoot = null;
+
+        this._joystickRoot = null;
+        this._joystickDirection = null;
+        this._joystickPointerId = null;
+    }
+
+    _setJoystickDirection(direction) {
+        if (direction === this._joystickDirection) return;
+        if (this._joystickDirection) {
+            this.stopRepeat(this._joystickDirection);
+        }
+        this._joystickDirection = direction;
+        if (!direction) return;
+
+        const action = this.getAction(direction);
+        if (!action) return;
+
+        const runAction = (isRepeat) => {
+            if (MOVEMENT_KEYS.has(direction)) this.steeringArbiter.markKeyboardSteer();
+            action(isRepeat);
+        };
+
+        runAction(false);
+        this.startRepeat(direction, () => runAction(true));
+    }
+
+    bindJoystick(root) {
+        if (!root) return;
+        const base = root.querySelector('[data-role="touch-joystick-base"]');
+        const stick = root.querySelector('[data-role="touch-joystick-stick"]');
+        if (!base || !stick) return;
+
+        this._joystickRoot = root;
+
+        const addListener = (el, type, handler, options) => {
+            el.addEventListener(type, handler, options);
+            this._buttonHandlers.push({el, type, handler, options});
+        };
+
+        let centerX = 0;
+        let centerY = 0;
+        let maxRadius = 0;
+
+        const resetStick = () => {
+            stick.classList.remove("touch-controls__joystick-stick--dragging");
+            stick.style.transform = "";
+            base.classList.remove("touch-controls__joystick-base--active");
+        };
+
+        const updateFromPointer = (clientX, clientY) => {
+            const dx = clientX - centerX;
+            const dy = clientY - centerY;
+            const dist = Math.hypot(dx, dy);
+            const angle = Math.atan2(dy, dx);
+            const clampedDist = Math.min(dist, maxRadius);
+            const visualX = Math.cos(angle) * clampedDist;
+            const visualY = Math.sin(angle) * clampedDist;
+            stick.style.transform = `translate(${visualX}px, ${visualY}px)`;
+
+            if (dist < maxRadius * JOYSTICK_DEADZONE_RATIO) {
+                this._setJoystickDirection(null);
+                return;
+            }
+            if (Math.abs(dx) >= Math.abs(dy)) {
+                this._setJoystickDirection(dx < 0 ? "ArrowLeft" : "ArrowRight");
+            } else if (dy > 0) {
+                this._setJoystickDirection("ArrowDown");
+            } else {
+                this._setJoystickDirection(null);
+            }
+        };
+
+        const onPointerDown = (event) => {
+            if (this._joystickPointerId !== null) return;
+            event.preventDefault();
+            this._joystickPointerId = event.pointerId;
+
+            const rect = base.getBoundingClientRect();
+            centerX = rect.left + rect.width / 2;
+            centerY = rect.top + rect.height / 2;
+            maxRadius = Math.max((rect.width - stick.offsetWidth) / 2, 1);
+
+            base.classList.add("touch-controls__joystick-base--active");
+            stick.classList.add("touch-controls__joystick-stick--dragging");
+            base.setPointerCapture?.(event.pointerId);
+            updateFromPointer(event.clientX, event.clientY);
+        };
+
+        const onPointerMove = (event) => {
+            if (event.pointerId !== this._joystickPointerId) return;
+            event.preventDefault();
+            updateFromPointer(event.clientX, event.clientY);
+        };
+
+        const onPointerEnd = (event) => {
+            if (event.pointerId !== this._joystickPointerId) return;
+            this._joystickPointerId = null;
+            this._setJoystickDirection(null);
+            resetStick();
+        };
+
+        addListener(base, "pointerdown", onPointerDown);
+        addListener(base, "pointermove", onPointerMove);
+        addListener(base, "pointerup", onPointerEnd);
+        addListener(base, "pointercancel", onPointerEnd);
     }
 
     bindButtons(root) {

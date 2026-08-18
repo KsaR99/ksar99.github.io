@@ -32,5 +32,7 @@ export class InputController {
         if (!game.dom) return;
         const bar = game.dom.querySelector('[data-role="touch-controls"]');
         if (bar) this.touch.bindButtons(bar);
+        const joystick = game.dom.querySelector('[data-role="touch-joystick"]');
+        if (joystick) this.touch.bindJoystick(joystick);
     }
 }

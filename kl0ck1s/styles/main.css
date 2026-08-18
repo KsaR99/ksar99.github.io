@@ -1245,6 +1245,14 @@ body.perf-no-glow .board__filter--active.board__filter--vhs {
     }
 }
 
+.exit-match-button {
+    &:hover,
+    &:focus-visible {
+        color: var(--danger);
+        border-color: var(--danger);
+    }
+}
+
 .drawer-close {
     position: absolute;
     top: 50%;
@@ -1289,21 +1297,68 @@ body.perf-no-glow .board__filter--active.board__filter--vhs {
     height: calc(var(--touch-bar-h) + var(--safe-b));
     padding: 0.4rem calc(var(--safe-r) + 0.5rem) calc(var(--safe-b) + 0.4rem) calc(var(--safe-l) + 0.5rem);
     display: flex;
-    align-items: stretch;
-    gap: 0.5rem;
+    align-items: flex-end;
+    justify-content: center;
     background: linear-gradient(0deg, oklch(from var(--bg-2) l c h / 0.92) 0%, oklch(from var(--bg-2) l c h / 0.65) 70%, transparent 100%);
     touch-action: none;
     user-select: none;
 }
 
-.touch-controls__group {
+.touch-controls__cluster {
     display: flex;
+    align-items: stretch;
+    justify-content: center;
     gap: 0.4rem;
-    flex: 1 1 auto;
+    margin-bottom: 0.75rem;
 }
 
-.touch-controls__group--move {
-    flex: 1.3 1 auto;
+.touch-controls__joystick {
+    position: relative;
+    width: clamp(8.3125rem, 38.5vw, 10.9375rem);
+    height: clamp(8.3125rem, 38.5vw, 10.9375rem);
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.touch-controls__joystick-base {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: oklch(100% 0 0 / 0.15);
+    border: 1px solid var(--line);
+    box-shadow:
+        inset 0 0 0 1px oklch(from var(--line) l c h / 0.4),
+        inset 0 0.35rem 0.6rem oklch(100% 0 0 / 0.15),
+        0 0.15rem 0.4rem oklch(100% 0 0 / 0.15);
+    touch-action: none;
+    transition: border-color 0.15s ease;
+}
+
+.touch-controls__joystick-base--active {
+    border-color: var(--accent-2);
+}
+
+.touch-controls__joystick-stick {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44%;
+    height: 44%;
+    margin: -22% 0 0 -22%;
+    border-radius: 50%;
+    background: linear-gradient(160deg,
+    oklch(from var(--accent-2) calc(l + 0.1) c h / 1) 0%,
+    oklch(from var(--accent-2) calc(l - 0.05) c h / 1) 100%);
+    border: 1px solid oklch(from var(--accent-2) calc(l - 0.12) c h / 1);
+    box-shadow: 0 0.12rem 0.3rem oklch(100% 0 0 / 0.15);
+    pointer-events: none;
+    transition: transform 0.15s ease;
+    will-change: transform;
+}
+
+.touch-controls__joystick-stick--dragging {
+    transition: none;
 }
 
 .touch-controls__btn {
@@ -1328,8 +1383,41 @@ body.perf-no-glow .board__filter--active.board__filter--vhs {
     }
 }
 
-.touch-controls__btn--wide {
-    flex: 1.6;
+.touch-controls__rotate {
+    flex: none;
+    width: clamp(3.4rem, 15vw, 4.2rem);
+    aspect-ratio: 1/1;
+}
+
+.touch-controls__group--actions {
+    display: flex;
+    flex-direction: column;
+    align-self: flex-end;
+    justify-content: flex-start;
+    margin-left: 0.4rem;
+    height: clamp(8.3125rem, 38.5vw, 10.9375rem);
+}
+
+.touch-controls__action-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    width: clamp(3.4rem, 15vw, 4.2rem);
+    height: 100%;
+}
+
+.touch-controls__action-stack .touch-controls__btn {
+    flex: 1;
+    width: 100%;
+}
+
+.touch-controls__pause {
+    position: absolute;
+    right: calc(var(--safe-r) + 0.5rem);
+    bottom: calc(var(--safe-b) + 0.4rem);
+    flex: none;
+    width: clamp(3rem, 13vw, 3.6rem);
+    height: calc(var(--touch-bar-h) - 0.8rem);
 }
 
 .touch-controls__btn-label {

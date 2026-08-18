@@ -253,6 +253,12 @@ if (muteToggleBtn) {
     });
 }
 
+bodyEl.querySelectorAll('[data-role="exit-match-button"]').forEach((btn) => {
+    btn.addEventListener("click", () => {
+        game.screenFlow.exitToMenu();
+    });
+});
+
 function handleViewportResize() {
     resizeBoardCanvas();
     game.render();

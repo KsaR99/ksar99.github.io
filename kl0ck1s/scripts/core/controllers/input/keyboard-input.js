@@ -64,6 +64,7 @@ export class KeyboardInput extends InputSource {
             ArrowRight: handlers.moveRight,
             ArrowDown: handlers.softDrop,
             ArrowUp: handlers.rotateUp,
+            KeyZ: handlers.rotateZ,
             Space: handlers.hardDrop,
             KeyP: handlers.togglePause,
         };
