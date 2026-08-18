@@ -110,7 +110,7 @@ body {
         --accent-2: oklch(0.71 0.15 52.11);
         --app-bg: oklch(0.09 0.02 76.87 / 0.9);
         --board-accent: oklch(0.41 0.11 56.07 / 0.85);
-        --board-bg: linear-gradient(180deg, oklch(0.69 0.26 37.81) -2rem, oklch(0 0 0) 6rem, oklch(0.18 0.05 56.66) 22rem, oklch(0.11 0.02 68.99), oklch(0.3 0.1 45.3) 65rem);
+        --board-bg: repeating-conic-gradient(from 180deg, oklch(0.13 0 0) 7%, oklch(0.1 0 0) 45%, oklch(0 0 0), oklch(0.1 0 0) 12%, oklch(0.76 0.2 48.97) 48%, oklch(0.69 0.26 37.81) 50%, oklch(0.77 0.21 58.07) 52%, oklch(5.3% 0.022 29.2) 55%);
         --body-bg: radial-gradient(circle at 50% 100%, oklch(0.65 0.2 48.56) 0, oklch(0 0 0) 50%);
         --line: oklch(0.34 0.09 57.96);
         --stats__status--live-color: oklch(0.51 0.15 44.9);
@@ -440,7 +440,7 @@ body.hud-right [data-role="next-piece-queue"] {
     }
 
     &.board--theme-volcano {
-        --board-bg: linear-gradient(180deg, oklch(0.69 0.26 37.81) -2rem, oklch(0 0 0) 6rem, oklch(0.18 0.05 56.66) 22rem, oklch(0.11 0.02 68.99), oklch(0.3 0.1 45.3) 65rem);
+        --board-bg: repeating-conic-gradient(from 180deg, oklch(0.13 0 0) 7%, oklch(0.1 0 0) 45%, oklch(0 0 0), oklch(0.1 0 0) 12%, oklch(0.76 0.2 48.97) 48%, oklch(0.69 0.26 37.81) 50%, oklch(0.77 0.21 58.07) 52%, oklch(5.3% 0.022 29.2) 55%);
         --board-accent: oklch(0.41 0.11 56.07 / 0.85);
     }
 
@@ -627,7 +627,7 @@ body.perf-no-transparency .board__overlay--transparent {
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: linear-gradient(180deg, oklch(0.164 0 0), oklch(0.174 0.002 17.315));
+    background: linear-gradient(180deg, oklch(0.23 0 0), oklch(0.18 0 0));
 
     /** https://www.cssportal.com/css-clip-path-generator/ */
     clip-path: polygon(

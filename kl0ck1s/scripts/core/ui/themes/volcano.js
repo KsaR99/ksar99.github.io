@@ -10,6 +10,7 @@ const ASH_DENSITY = 1 / 27000;
 const EMBER_DENSITY = 0.08;
 
 const GRAVITY = 0.05;
+const EMBER_SPEED_MULTIPLIER = 0.7;
 
 export class Volcano extends ThemeEffect {
     constructor(canvas, ctx = null) {
@@ -19,6 +20,7 @@ export class Volcano extends ThemeEffect {
             x: Float32Array, y: Float32Array, radius: Float32Array,
             speed: Float32Array, drift: Float32Array, driftSpeed: Float32Array,
         });
+
         this.embers = new ParticleField({
             x: Float32Array, y: Float32Array, length: Float32Array,
             vx: Float32Array, vy: Float32Array,
@@ -27,24 +29,46 @@ export class Volcano extends ThemeEffect {
 
     _spawnAsh = (i, width, height, initial = false) => {
         const {x, y, radius, speed, drift, driftSpeed} = this.ash;
+
         x[i] = Math.random() * width;
         y[i] = initial ? Math.random() * height : Math.random() * -height;
+
         radius[i] = 1.5 + Math.random() * 8.5;
-        speed[i] = 0.15 + Math.random() * 1.5;
+        speed[i] = 0.5 + (10 - radius[i]) * 0.18;
         drift[i] = Math.random() * Math.PI * 2;
         driftSpeed[i] = 0.005 + Math.random() * 0.015;
     };
 
-    _spawnEmber = (i, width, height) => {
+    _spawnEmber = (i, width, height, initial = false) => {
         const {x, y, length, vx, vy} = this.embers;
-        x[i] = Math.random() * width;
-        y[i] = Math.random() * height;
+        const startX = width * (0.45 + Math.random() * 0.1);
+        const startY = height * 0.05;
+
+        x[i] = startX;
+        y[i] = startY;
+
         length[i] = 1.5 + Math.random() * 7;
 
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 1 + Math.random() * 4;
+        const angle = Math.PI * (0.175 + Math.random() * 0.65);
+        const speed = (1 + Math.random() * 4) * EMBER_SPEED_MULTIPLIER;
+
         vx[i] = Math.cos(angle) * speed;
         vy[i] = Math.sin(angle) * speed;
+
+        if (initial) {
+            const frames =
+                Math.random() *
+                (height * 0.55) /
+                speed;
+
+            x[i] += vx[i] * frames;
+
+            y[i] +=
+                vy[i] * frames +
+                0.5 * GRAVITY * frames * frames;
+
+            vy[i] += GRAVITY * frames;
+        }
     };
 
     resize(width, height) {
@@ -53,6 +77,7 @@ export class Volcano extends ThemeEffect {
             height,
             this.ash.count && this.embers.count
         );
+
         if (unchanged) return;
 
         this.ash.allocate(
@@ -64,7 +89,8 @@ export class Volcano extends ThemeEffect {
 
         this.embers.allocate(
             Math.max(4, Math.round(w * EMBER_DENSITY)),
-            this._spawnEmber,
+            (i, width, height) =>
+                this._spawnEmber(i, width, height, true),
             w,
             h
         );
@@ -74,6 +100,7 @@ export class Volcano extends ThemeEffect {
 
     drawFrame() {
         const {ctx, canvas} = this;
+
         if (canvas.width === 0 || canvas.height === 0) return;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -90,13 +117,38 @@ export class Volcano extends ThemeEffect {
 
         if (ashCount) {
             ctx.fillStyle = ASH_COLOR;
+
             const ashPath = new Path2D();
 
             for (let i = 0; i < ashCount; i++) {
-                ashPath.moveTo(ax[i] + aRadius[i], ay[i]);
-                ashPath.arc(ax[i], ay[i], aRadius[i], 0, Math.PI * 2);
+                const yRatio = ay[i] / canvas.height;
+
+                const ashSizeMultiplier =
+                    yRatio < 0.25
+                        ? 1.5 - yRatio * 2
+                        : 1;
+
+                const radius = aRadius[i] * ashSizeMultiplier;
+
+                ashPath.moveTo(ax[i] + radius, ay[i]);
+                ashPath.arc(
+                    ax[i],
+                    ay[i],
+                    radius,
+                    0,
+                    Math.PI * 2
+                );
+
+                ashPath.arc(
+                    ax[i],
+                    ay[i],
+                    aRadius[i],
+                    0,
+                    Math.PI * 2
+                );
 
                 aDrift[i] += aDriftSpeed[i];
+
                 ax[i] += Math.sin(aDrift[i]) * 0.4;
                 ay[i] += aSpeed[i];
 
@@ -130,26 +182,35 @@ export class Volcano extends ThemeEffect {
 
                 let sizeMultiplier;
 
-                if (yRatio < 0.2) { // Y.% <= 20%
-                    sizeMultiplier = 3.0 - yRatio / 0.2; // 3.0x
-                } else if (yRatio < 0.4) { // Y.% <= 40%
-                    sizeMultiplier = 1.5 - ((yRatio - 0.2) / 0.5) * 0.5; // 1.5x
+                if (yRatio < 0.4) {
+                    sizeMultiplier = 3 - yRatio * 4.5;
+                } else if (yRatio < 0.5) {
+                    sizeMultiplier = 1.2;
                 } else {
-                    sizeMultiplier = 1; // Normal
+                    const steps = Math.floor((yRatio - 0.5) / 0.15);
+                    sizeMultiplier = 1.5 + steps * 0.3;
                 }
-
                 const len = eLength[i] * sizeMultiplier;
 
                 const mag = Math.hypot(evx[i], evy[i]) || 1;
-                const tx = ex[i] - (evx[i] / mag) * len;
-                const ty = ey[i] - (evy[i] / mag) * len;
+
+                const tx =
+                    ex[i] -
+                    (evx[i] / mag) * len;
+
+                const ty =
+                    ey[i] -
+                    (evy[i] / mag) * len;
 
                 emberPath.moveTo(ex[i], ey[i]);
                 emberPath.lineTo(tx, ty);
 
+                const speedMultiplier = ey[i] < canvas.height * 0.5 ? 0.5 : 1;
+
                 evy[i] += GRAVITY;
-                ex[i] += evx[i];
-                ey[i] += evy[i];
+
+                ex[i] += evx[i] * speedMultiplier;
+                ey[i] += evy[i] * speedMultiplier;
 
                 const offCanvas =
                     ey[i] - len > canvas.height ||
@@ -158,7 +219,11 @@ export class Volcano extends ThemeEffect {
                     ex[i] > canvas.width + len;
 
                 if (offCanvas) {
-                    this._spawnEmber(i, canvas.width, canvas.height);
+                    this._spawnEmber(
+                        i,
+                        canvas.width,
+                        canvas.height
+                    );
                 }
             }
 
