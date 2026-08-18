@@ -18,6 +18,18 @@ export class Piece {
         this.width = def.width;
         this.height = def.height;
         this.rotationState = 0;
+
+        if (type === "I") {
+            this.pivotX = 1.5;
+            this.pivotY = 1.5;
+        } else if (type === "O") {
+            this.pivotX = 0.5;
+            this.pivotY = 0.5;
+        } else {
+            this.pivotX = 1;
+            this.pivotY = 1;
+        }
+
         this.mask = def.states[this.rotationState];
         this.x = Math.floor((cols - this.width) / 2);
         this.y = 0;

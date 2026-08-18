@@ -217,8 +217,12 @@ export class OpponentBoardView {
                 x: livePiece.x,
                 y: livePiece.y,
                 mask: livePiece.mask,
+                renderMask: livePiece.renderMask,
                 width: livePiece.width,
                 height: livePiece.height,
+                pivotX: livePiece.pivotX,
+                pivotY: livePiece.pivotY,
+                renderAngle: livePiece.renderAngle || 0,
                 color: renderer.colorPalette[livePiece.colorIndex],
             };
             renderer.drawPiece(piece, board, surface);

@@ -5,8 +5,7 @@ import {pointsForHardDrop, pointsForSoftDrop} from "../game/scoring.js";
 import {
     getKickTable,
     PIECE_CONTROLLABLE_STATES,
-    ROTATION_ANIM_ANGLE_180_DEG,
-    ROTATION_ANIM_ANGLE_DEG,
+    ROTATION_ANIM_180_DURATION_MS,
     ROTATION_ANIM_DURATION_MS,
     T_FRONT_CORNERS,
 } from "../game/game-constants.js";
@@ -296,14 +295,33 @@ export class PieceController {
         game.dropCounter = 0;
     }
 
-    get180Kicks(piece, rotatedMask) {
-        const fromBounds = getTightBounds(piece.mask, piece.width, piece.height);
-        const toBounds = getTightBounds(rotatedMask, piece.width, piece.height);
-        const baseDx = fromBounds.minX - toBounds.minX;
-        const baseDy = fromBounds.minY - toBounds.minY;
+    find180Kick(piece) {
+        const game = this.game;
+        const fromState = piece.rotationState;
+        const firstState = (fromState + 1) % 4;
+        const finalState = (fromState + 2) % 4;
+        const firstMask = piece.rotated(1);
+        const finalMask = piece.rotated(2);
 
-        return [[0, 0], [1, 0], [-1, 0], [0, -1], [0, 1]]
-            .map(([nx, ny]) => [baseDx + nx, baseDy + ny]);
+        const firstKicks = getKickTable(piece.type)[`${fromState}>${firstState}`] ?? [[0, 0]];
+        const secondKicks = getKickTable(piece.type)[`${firstState}>${finalState}`] ?? [[0, 0]];
+
+        for (const [dx1, dy1] of firstKicks) {
+            if (game.board.collides(piece, dx1, dy1, firstMask)) continue;
+            if (!this.pieceHasVisibleCell(piece, dx1, dy1, firstMask)) continue;
+
+            for (const [dx2, dy2] of secondKicks) {
+                const totalDx = dx1 + dx2;
+                const totalDy = dy1 + dy2;
+
+                if (game.board.collides(piece, totalDx, totalDy, finalMask)) continue;
+                if (!this.pieceHasVisibleCell(piece, totalDx, totalDy, finalMask)) continue;
+
+                return [totalDx, totalDy];
+            }
+        }
+
+        return null;
     }
 
     pieceFullyVisible(piece, offsetX, offsetY, mask) {
@@ -323,38 +341,65 @@ export class PieceController {
     }
 
     /**
-     * @param {number} [dir=1] - +1 for clockwise, -1 for counterclockwise, ±2 for 180°
+     * Rotate the active piece using SRS kicks and animate the final state
+     * around the piece's actual SRS pivot.
+     *
+     * @param {number} [dir=1] - +1 clockwise, -1 counter-clockwise, 2 for 180°
      */
     rotate(dir = 1) {
         const game = this.game;
         if (!this.canControlPiece()) return;
 
-        const rotatedMask = game.current.rotated(dir);
-        const fromState = game.current.rotationState;
-        const toState = (fromState + dir + 4) % 4;
-        const kicks = Math.abs(dir) === 2
-            ? this.get180Kicks(game.current, rotatedMask)
-            : getKickTable(game.current.type)[`${fromState}>${toState}`] ?? [[0, 0]];
+        if (game.rotationAnim) return;
 
-        const legalKicks = kicks.filter(([dx, dy]) => !game.board.collides(game.current, dx, dy, rotatedMask));
+        const piece = game.current;
+        const fromState = piece.rotationState;
+        const normalizedDir = dir === 2 ? 2 : (dir < 0 ? -1 : 1);
+        const toState = (fromState + normalizedDir + 4) % 4;
+        const rotatedMask = piece.rotated(normalizedDir);
 
-        const chosen = legalKicks.find(([dx, dy]) => this.pieceFullyVisible(game.current, dx, dy, rotatedMask))
-            ?? legalKicks.find(([dx, dy]) => this.pieceHasVisibleCell(game.current, dx, dy, rotatedMask));
+        const fromX = piece.x;
+        const fromY = piece.y;
 
-        if (chosen) {
-            const [dx, dy] = chosen;
-            game.current.mask = rotatedMask;
-            game.current.x += dx;
-            game.current.y += dy;
-            game.current.rotationState = toState;
-            game.lastAction = "rotate";
-            game.soundManager.play("rotate");
-            if (game.board.collides(game.current, 0, 1)) this.resetLockDelay();
+        let chosen = null;
 
-            const is180 = Math.abs(dir) === 2;
-            const fromAngle = is180 ? ROTATION_ANIM_ANGLE_180_DEG : -dir * ROTATION_ANIM_ANGLE_DEG;
-            game.rotationAnim = {fromAngle, elapsed: 0, duration: ROTATION_ANIM_DURATION_MS};
+        if (Math.abs(normalizedDir) === 2) {
+            chosen = this.find180Kick(piece);
+        } else {
+            const kicks = getKickTable(piece.type)[`${fromState}>${toState}`] ?? [[0, 0]];
+            const legalKicks = kicks.filter(([dx, dy]) =>
+                !game.board.collides(piece, dx, dy, rotatedMask)
+            );
+
+            chosen = legalKicks.find(([dx, dy]) =>
+                this.pieceFullyVisible(piece, dx, dy, rotatedMask)
+            ) ?? legalKicks.find(([dx, dy]) =>
+                this.pieceHasVisibleCell(piece, dx, dy, rotatedMask)
+            ) ?? null;
         }
+
+        if (!chosen) return;
+
+        const [dx, dy] = chosen;
+        piece.mask = rotatedMask;
+        piece.x += dx;
+        piece.y += dy;
+        piece.rotationState = toState;
+        game.lastAction = "rotate";
+        game.soundManager.play("rotate");
+
+        if (game.board.collides(piece, 0, 1)) this.resetLockDelay();
+
+        const is180 = Math.abs(normalizedDir) === 2;
+        game.rotationAnim = {
+            fromX,
+            fromY,
+            toX: piece.x,
+            toY: piece.y,
+            fromAngle: is180 ? 180 : -normalizedDir * 90,
+            elapsed: 0,
+            duration: is180 ? ROTATION_ANIM_180_DURATION_MS : ROTATION_ANIM_DURATION_MS,
+        };
     }
 
     rotate180() {
@@ -384,7 +429,10 @@ export class PieceController {
 
         this.stopGameplaySounds();
         game.soundManager.play(isHardDrop ? "drop" : "pieceLock");
-        if (!isHardDrop) game.beginLockImpactFlash(game.current);
+        if (!isHardDrop) {
+            game.beginLockImpactFlash(game.current);
+            game.multiplayerController?.notifyLockImpactFlash();
+        }
         game.board.lockPiece(game.current);
         game.renderer.notifyPieceLocked(game.current, game.board);
 

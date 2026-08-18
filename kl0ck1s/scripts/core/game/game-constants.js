@@ -85,7 +85,8 @@ export const HARD_DROP_IMPACT_FLASH_DURATION_MS = 220;
 
 export const ROTATION_ANIM_ANGLE_180_DEG = 180;
 export const ROTATION_ANIM_ANGLE_DEG = 90;
-export const ROTATION_ANIM_DURATION_MS = 28;
+export const ROTATION_ANIM_DURATION_MS = 90;
+export const ROTATION_ANIM_180_DURATION_MS = 140;
 
 export function fallTrailLengthForInterval(dropIntervalMs) {
     if (!(dropIntervalMs < FALL_TRAIL_SLOW_INTERVAL_MS)) return 0;

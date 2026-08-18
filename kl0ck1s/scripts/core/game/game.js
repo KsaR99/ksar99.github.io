@@ -409,9 +409,13 @@ export class Game {
         let angle = 0;
 
         if (this.rotationAnim) {
-            const t = Math.min(1, this.rotationAnim.elapsed / this.rotationAnim.duration);
-            const eased = 1 - Math.pow(1 - t, 3);
-            angle = this.rotationAnim.fromAngle * (1 - eased);
+            const anim = this.rotationAnim;
+            const t = Math.min(1, anim.elapsed / anim.duration);
+            const eased = t * t * (3 - 2 * t);
+
+            x = anim.fromX + (base.x - anim.fromX) * eased;
+            y = anim.fromY + (base.y - anim.fromY) * eased;
+            angle = anim.fromAngle * (1 - eased);
         } else {
             if (this.shiftAnim) {
                 const t = Math.min(1, this.shiftAnim.elapsed / this.shiftAnim.duration);

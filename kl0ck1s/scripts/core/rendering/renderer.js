@@ -845,15 +845,19 @@ export class Renderer {
         const angle = piece.renderAngle || 0;
 
         if (angle !== 0) {
-            const cx = (piece.x + piece.width / 2) * size;
-            const cy = (piece.y + piece.height / 2) * size;
+            const pivotX = piece.pivotX ?? (piece.width / 2);
+            const pivotY = piece.pivotY ?? (piece.height / 2);
+            const cx = (piece.x + pivotX) * size;
+            const cy = (piece.y + pivotY) * size;
+
             ctx.save();
             ctx.translate(cx, cy);
             ctx.rotate(angle * Math.PI / 180);
             ctx.translate(-cx, -cy);
         }
 
-        forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
+        const renderMask = piece.renderMask ?? piece.mask;
+        forEachShapeCell(renderMask, piece.width, piece.height, (r, c) => {
             const y = piece.y + r;
             if (y < 0 && angle === 0) return;
             const level = board ? this.saturationLevelForRow(Math.round(y), board.rows) : 0;

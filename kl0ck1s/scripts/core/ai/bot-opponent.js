@@ -3,7 +3,11 @@
 import {DIFFICULTIES, KLOCKOMINOS, LINE_CLEAR_ANIMATION_DURATION_MS, SCORING} from "../shared/config.js";
 import {MESSAGE_KIND} from "../net/net-constants.js";
 import {Board} from "../game/board.js";
-import {HARD_DROP_TRAIL_ALPHAS, HARD_DROP_TRAIL_DURATION_MS} from "../game/game-constants.js";
+import {
+    HARD_DROP_IMPACT_FLASH_DURATION_MS,
+    HARD_DROP_TRAIL_ALPHAS,
+    HARD_DROP_TRAIL_DURATION_MS
+} from "../game/game-constants.js";
 import {PieceBag} from "../game/piece-bag.js";
 import {levelForLines, pointsForLineClear} from "../game/scoring.js";
 import {mulberry32} from "../shared/seeded-random.js";
@@ -389,6 +393,9 @@ export class BotOpponent extends EventTarget {
         this._sendPiece({
             x: spawnX, y: 0, mask: def.states[0],
             width: placement.width, height: placement.height, colorIndex,
+            pivotX: this.current === "I" ? 1.5 : this.current === "O" ? 0.5 : 1,
+            pivotY: this.current === "I" ? 1.5 : this.current === "O" ? 0.5 : 1,
+            rotationAngle: 0,
         });
         this._dropTimer = setTimeout(
             () => this._rotateThenSlide(placement, colorIndex, spawnX, onDone),
@@ -397,7 +404,7 @@ export class BotOpponent extends EventTarget {
     }
 
     _rotateThenSlide(placement, colorIndex, spawnX, onDone) {
-        const stepMs = 40;
+        const stepMs = 100;
         const def = KLOCKOMINOS[this.current];
         const startSlide = () => this._animateSlide(placement, colorIndex, spawnX, onDone);
 
@@ -409,15 +416,19 @@ export class BotOpponent extends EventTarget {
         let state = 0;
         const rotateTick = () => {
             if (this.finished) return;
+            const nextState = state + 1;
             this._sendPiece({
-                x: spawnX, y: 0, mask: def.states[state],
+                x: spawnX, y: 0, mask: def.states[nextState],
                 width: placement.width, height: placement.height, colorIndex,
+                pivotX: this.current === "I" ? 1.5 : this.current === "O" ? 0.5 : 1,
+                pivotY: this.current === "I" ? 1.5 : this.current === "O" ? 0.5 : 1,
+                rotationAngle: 90,
             });
+            state = nextState;
             if (state >= placement.rotationState) {
                 this._dropTimer = setTimeout(startSlide, stepMs);
                 return;
             }
-            state++;
             this._dropTimer = setTimeout(rotateTick, stepMs);
         };
         rotateTick();
@@ -456,6 +467,7 @@ export class BotOpponent extends EventTarget {
         const distance = Math.max(0, placement.y - startY);
 
         if (this.random() < this.profile.hardDropChance) {
+            this._lastPlacementWasHardDrop = true;
             this._sendHardDropTrail(placement, distance);
             this._sendPiece({
                 x: placement.x, y: placement.y, mask: placement.mask,
@@ -465,6 +477,7 @@ export class BotOpponent extends EventTarget {
             return;
         }
 
+        this._lastPlacementWasHardDrop = false;
         const totalMs = Math.min(FREE_FALL_MAX_MS, Math.max(FREE_FALL_MIN_MS, distance * FREE_FALL_MS_PER_ROW));
         const steps = Math.max(1, Math.round(totalMs / FREE_FALL_STEP_MS));
 
@@ -499,6 +512,10 @@ export class BotOpponent extends EventTarget {
             x: placement.x,
             y: placement.y,
         };
+
+        if (this._lastPlacementWasHardDrop !== true) {
+            this._sendLockImpactFlash(piece);
+        }
         this.board.lockPiece(piece);
 
         const fullRows = this.board.getFullLineIndices();
@@ -668,6 +685,24 @@ export class BotOpponent extends EventTarget {
         }));
     }
 
+    _sendLockImpactFlash(piece) {
+        this.dispatchEvent(new CustomEvent("message", {
+            detail: {
+                kind: MESSAGE_KIND.HARD_DROP_TRAIL,
+                entries: [],
+                duration: 0,
+                flashEntry: {
+                    x: piece.x,
+                    y: piece.y,
+                    mask: piece.mask,
+                    width: piece.width,
+                    height: piece.height,
+                },
+                flashDuration: HARD_DROP_IMPACT_FLASH_DURATION_MS,
+            },
+        }));
+    }
+
     _sendHardDropTrail(placement, cellsDropped) {
         if (cellsDropped <= 0) return;
 
@@ -685,7 +720,19 @@ export class BotOpponent extends EventTarget {
         }
 
         this.dispatchEvent(new CustomEvent("message", {
-            detail: {kind: MESSAGE_KIND.HARD_DROP_TRAIL, entries, duration: HARD_DROP_TRAIL_DURATION_MS},
+            detail: {
+                kind: MESSAGE_KIND.HARD_DROP_TRAIL,
+                entries,
+                duration: HARD_DROP_TRAIL_DURATION_MS,
+                flashEntry: {
+                    x: placement.x,
+                    y: placement.y,
+                    mask: placement.mask,
+                    width: placement.width,
+                    height: placement.height,
+                },
+                flashDuration: HARD_DROP_IMPACT_FLASH_DURATION_MS,
+            },
         }));
     }
 

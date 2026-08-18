@@ -280,6 +280,19 @@ export class MultiplayerController {
         });
     }
 
+    notifyLockImpactFlash() {
+        const flash = this.game.lockImpactFlash;
+        if (!flash || !this.game.multiplayerConnected) return;
+
+        this._sendToPeer({
+            kind: MESSAGE_KIND.HARD_DROP_TRAIL,
+            entries: [],
+            duration: 0,
+            flashEntry: flash.entry,
+            flashDuration: flash.duration,
+        });
+    }
+
     notifyThemeChanged() {
         const theme = this.game.settings.theme ?? "none";
         if (!this.session?.isConnected || theme === this._lastSentTheme) return;
@@ -988,13 +1001,24 @@ export class MultiplayerController {
                         kind: MESSAGE_KIND.PIECE,
                         p: this._packPiecePos(p.x, p.y), mask: p.mask, width: p.width, height: p.height,
                         colorIndex: p.colorIndex, pieceIndex: game.piecesSpawned,
+                        rotationState: p.rotationState,
+                        pivotX: p.pivotX, pivotY: p.pivotY,
+                        rotationAngle: rotationChanged
+                            ? (Math.abs(p.rotationState - this._lastSentPieceRotation) === 2 ? 180
+                                : ((p.rotationState - this._lastSentPieceRotation + 4) % 4 === 1 ? 90 : -90))
+                            : 0,
                     });
                     this._lastSentPieceIndex = game.piecesSpawned;
                     this._lastSentPieceRotation = p.rotationState;
                     this._lastSentPieceX = p.x;
                     this._lastSentPieceY = p.y;
                 } else if (positionChanged) {
-                    this._sendToPeer({kind: MESSAGE_KIND.PIECE, p: this._packPiecePos(p.x, p.y)});
+                    this._sendToPeer({
+                        kind: MESSAGE_KIND.PIECE,
+                        p: this._packPiecePos(p.x, p.y),
+                        pieceIndex: game.piecesSpawned,
+                        rotationState: p.rotationState,
+                    });
                     this._lastSentPieceX = p.x;
                     this._lastSentPieceY = p.y;
                 }
@@ -1163,27 +1187,45 @@ export class MultiplayerController {
         const height = payload.height ?? prevTarget?.height;
         const colorIndex = payload.colorIndex ?? prevTarget?.colorIndex;
         const pieceIndex = payload.pieceIndex ?? prevTarget?.pieceIndex;
+        const pivotX = payload.pivotX ?? prevTarget?.pivotX ?? (width === 4 ? 1.5 : width === 2 ? 0.5 : 1);
+        const pivotY = payload.pivotY ?? prevTarget?.pivotY ?? (height === 4 ? 1.5 : height === 2 ? 0.5 : 1);
+        const rotationAngle = Number(payload.rotationAngle) || 0;
         const samePiece = !!prevTarget && prevTarget.pieceIndex === pieceIndex;
 
         let fromX = x;
         let fromY = y;
-        let sinceLastUpdateMs = 0;
         if (samePiece && prevAnim) {
-            const t = prevAnim.duration > 0 ? Math.min(1, (now - prevAnim.startTime) / prevAnim.duration) : 1;
-            fromX = prevAnim.fromX + (prevAnim.toX - prevAnim.fromX) * t;
-            fromY = prevAnim.fromY + (prevAnim.toY - prevAnim.fromY) * t;
-            sinceLastUpdateMs = now - prevAnim.startTime;
+            const t = prevAnim.duration > 0
+                ? Math.min(1, (now - prevAnim.startTime) / prevAnim.duration)
+                : 1;
+            const eased = t * t * (3 - 2 * t);
+            fromX = prevAnim.fromX + (prevAnim.toX - prevAnim.fromX) * eased;
+            fromY = prevAnim.fromY + (prevAnim.toY - prevAnim.fromY) * eased;
         }
 
-        const duration = samePiece
-            ? Math.min(Math.max(sinceLastUpdateMs, REMOTE_PIECE_LERP_MIN_MS), REMOTE_PIECE_LERP_MAX_MS)
-            : 0;
+        const activeRotation = samePiece && prevAnim?.rotationAngle && prevAnim.duration > 0
+            && now - prevAnim.startTime < prevAnim.duration;
+        const isRotation = samePiece && rotationAngle !== 0 && prevTarget?.mask != null && prevTarget.mask !== mask;
+        const duration = isRotation
+            ? (Math.abs(rotationAngle) >= 180 ? 140 : 90)
+            : activeRotation
+                ? Math.max(0, prevAnim.duration - (now - prevAnim.startTime))
+                : samePiece
+                    ? Math.min(Math.max(prevAnim?.duration ?? 16, REMOTE_PIECE_LERP_MIN_MS), REMOTE_PIECE_LERP_MAX_MS)
+                    : 0;
 
-        this._remoteLivePiece = {x, y, mask, width, height, colorIndex, pieceIndex};
+        this._remoteLivePiece = {x, y, mask, width, height, colorIndex, pieceIndex, pivotX, pivotY};
         this._remoteLivePieceAnim = {
             fromX, fromY,
             toX: x, toY: y,
-            mask, width, height, colorIndex,
+            fromMask: isRotation ? prevTarget.mask : (activeRotation ? prevAnim.fromMask : mask),
+            toMask: mask,
+            mask, width, height, colorIndex, pivotX, pivotY,
+            rotationAngle: isRotation
+                ? rotationAngle
+                : activeRotation
+                    ? prevAnim.rotationAngle
+                    : 0,
             startTime: now,
             duration,
         };
@@ -1193,14 +1235,23 @@ export class MultiplayerController {
         const anim = this._remoteLivePieceAnim;
         if (!anim) return this._remoteLivePiece;
 
-        const t = anim.duration > 0 ? Math.min(1, (performance.now() - anim.startTime) / anim.duration) : 1;
+        const t = anim.duration > 0
+            ? Math.min(1, (performance.now() - anim.startTime) / anim.duration)
+            : 1;
+        const eased = t * t * (3 - 2 * t);
+        const finished = t >= 1;
+
         return {
-            x: anim.fromX + (anim.toX - anim.fromX) * t,
-            y: anim.fromY + (anim.toY - anim.fromY) * t,
-            mask: anim.mask,
+            x: anim.fromX + (anim.toX - anim.fromX) * eased,
+            y: anim.fromY + (anim.toY - anim.fromY) * eased,
+            mask: anim.toMask,
+            renderMask: finished ? null : anim.fromMask,
             width: anim.width,
             height: anim.height,
             colorIndex: anim.colorIndex,
+            pivotX: anim.pivotX,
+            pivotY: anim.pivotY,
+            renderAngle: finished ? 0 : anim.rotationAngle * eased,
         };
     }
 
