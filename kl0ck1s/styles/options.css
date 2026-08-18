@@ -343,7 +343,7 @@ details.options[open] {
     padding: 0.6em;
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    background: rgb(0 0 0 / 0.25);
+    background: oklch(0 0 0 / 0.25);
 }
 
 .options__graphics-preview-label {
@@ -374,7 +374,7 @@ details.options[open] {
     margin: 0.6em auto 0;
     border-radius: var(--radius);
     image-rendering: pixelated;
-    background: rgb(0 0 0 / 0.25);
+    background: oklch(0 0 0 / 0.25);
 }
 
 .options__benchmark-results {
