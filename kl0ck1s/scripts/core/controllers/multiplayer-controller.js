@@ -129,6 +129,7 @@ export class MultiplayerController {
         this._remoteLivePieceAnim = null;
         this._remoteClearing = null;
         this._remoteHardDropTrail = null;
+        this._remoteHardDropFlash = null;
         this._wasLocalClearing = false;
         this._frameLoopRaf = null;
         this._opponentBadgeEl = null;
@@ -254,15 +255,29 @@ export class MultiplayerController {
 
         if (this._remoteClearing) {
             this._renderRemoteClearingFrame();
-        } else if (this._remoteLivePiece || (this._remoteHardDropTrail && this.game.settings.fallTrail)) {
-            this._drawOpponentBoard(this._lastRemoteCells, this._currentRemoteLivePieceForDraw(), this._currentHardDropTrailForDraw());
+        } else if (this._remoteLivePiece
+            || (this._remoteHardDropTrail && this.game.settings.fallTrail)
+            || (this._remoteHardDropFlash && this.game.settings.hardDropFlash)) {
+            this._drawOpponentBoard(
+                this._lastRemoteCells,
+                this._currentRemoteLivePieceForDraw(),
+                this._currentHardDropTrailForDraw(),
+                this._currentHardDropFlashForDraw(),
+            );
         }
     }
 
     notifyHardDropTrail() {
         const trail = this.game.hardDropTrail;
-        if (!trail || !this.session?.isConnected) return;
-        this._sendToPeer({kind: MESSAGE_KIND.HARD_DROP_TRAIL, entries: trail.entries, duration: trail.duration});
+        const flash = this.game.hardDropImpactFlash;
+        if ((!trail && !flash) || !this.session?.isConnected) return;
+        this._sendToPeer({
+            kind: MESSAGE_KIND.HARD_DROP_TRAIL,
+            entries: trail?.entries || [],
+            duration: trail?.duration || 0,
+            flashEntry: flash?.entry || null,
+            flashDuration: flash?.duration || 0,
+        });
     }
 
     notifyThemeChanged() {
@@ -1079,7 +1094,9 @@ export class MultiplayerController {
             this._remoteLivePiece = null;
             this._remoteLivePieceAnim = null;
             if (!this._remoteClearing) {
-                this._drawOpponentBoard(this._lastRemoteCells, null, this._currentHardDropTrailForDraw());
+                this._drawOpponentBoard(
+                    this._lastRemoteCells, null, this._currentHardDropTrailForDraw(), this._currentHardDropFlashForDraw(),
+                );
             }
         } else if (payload.kind === MESSAGE_KIND.PIECE) {
             if (payload.cleared) {
@@ -1089,14 +1106,28 @@ export class MultiplayerController {
                 this._setRemoteLivePiece(payload);
             }
             if (!this._remoteClearing) {
-                this._drawOpponentBoard(this._lastRemoteCells, this._currentRemoteLivePieceForDraw(), this._currentHardDropTrailForDraw());
+                this._drawOpponentBoard(
+                    this._lastRemoteCells,
+                    this._currentRemoteLivePieceForDraw(),
+                    this._currentHardDropTrailForDraw(),
+                    this._currentHardDropFlashForDraw(),
+                );
             }
         } else if (payload.kind === MESSAGE_KIND.HARD_DROP_TRAIL) {
-            this._remoteHardDropTrail = {
-                entries: payload.entries || [],
-                duration: payload.duration || 260,
-                startTime: performance.now(),
-            };
+            if (payload.entries?.length) {
+                this._remoteHardDropTrail = {
+                    entries: payload.entries,
+                    duration: payload.duration || 260,
+                    startTime: performance.now(),
+                };
+            }
+            if (payload.flashEntry) {
+                this._remoteHardDropFlash = {
+                    entry: payload.flashEntry,
+                    duration: payload.flashDuration || 220,
+                    startTime: performance.now(),
+                };
+            }
         } else if (payload.kind === MESSAGE_KIND.CLEARING) {
             if (this._remoteClearing) {
                 this._drawOpponentClearingFrame(this._remoteClearing, 1);
@@ -1636,8 +1667,8 @@ export class MultiplayerController {
         return this.opponentBoard.buildClearFragments(cells, lineIndices);
     }
 
-    _drawOpponentBoard(cells, livePiece = null, hardDropTrail = null) {
-        this.opponentBoard.draw(cells, this._remoteBoardVersion, livePiece, hardDropTrail);
+    _drawOpponentBoard(cells, livePiece = null, hardDropTrail = null, hardDropFlash = null) {
+        this.opponentBoard.draw(cells, this._remoteBoardVersion, livePiece, hardDropTrail, hardDropFlash);
     }
 
     _currentHardDropTrailForDraw() {
@@ -1651,6 +1682,19 @@ export class MultiplayerController {
         }
 
         return {entries: trail.entries, progress};
+    }
+
+    _currentHardDropFlashForDraw() {
+        const flash = this._remoteHardDropFlash;
+        if (!flash || !this.game.settings.hardDropFlash) return null;
+
+        const progress = (performance.now() - flash.startTime) / flash.duration;
+        if (progress >= 1) {
+            this._remoteHardDropFlash = null;
+            return null;
+        }
+
+        return {entry: flash.entry, progress};
     }
 
     _renderRemoteClearingFrame() {
@@ -1821,6 +1865,7 @@ export class MultiplayerController {
         this._remoteLivePieceAnim = null;
         this._remoteClearing = null;
         this._remoteHardDropTrail = null;
+        this._remoteHardDropFlash = null;
         this._wasLocalClearing = false;
         this._lastSentBoardVersion = -1;
         this._lastSentBoardCells = null;

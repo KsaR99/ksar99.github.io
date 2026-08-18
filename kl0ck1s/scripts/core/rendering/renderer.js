@@ -950,6 +950,49 @@ export class Renderer {
             entry.x * size, centerY - bandHeight / 2, entry.width * size, bandHeight,
         );
         ctx.restore();
+
+        this.drawHardDropImpactSparks(entry, progress, surface);
+    }
+
+    drawHardDropImpactSparks(entry, progress, surface = this) {
+        const size = this.boardConfig.CELL_SIZE;
+        const {ctx} = surface;
+        const alpha = 1 - progress;
+        if (alpha <= 0.02) return;
+
+        const originX = (entry.x + entry.width / 2) * size;
+        const originY = (entry.y + entry.height) * size;
+
+        const sparks = [
+            {dx: -0.55, dy: 0.85},
+            {dx: -0.85, dy: 0.55},
+            {dx: 0.55, dy: 0.85},
+            {dx: 0.85, dy: 0.55},
+            {dx: -0.75, dy: -0.7, big: true},
+            {dx: 0.75, dy: -0.7, big: true},
+        ];
+
+        ctx.save();
+        ctx.globalCompositeOperation = "lighter";
+        ctx.lineCap = "round";
+        ctx.strokeStyle = `oklch(1 0 0 / ${alpha})`;
+
+        for (const spark of sparks) {
+            const length = size * (spark.big ? 0.9 : 0.5);
+            const travel = size * (spark.big ? 1.6 : 1.0) * progress;
+            const startX = originX + spark.dx * travel;
+            const startY = originY + spark.dy * travel;
+            const endX = startX + spark.dx * length;
+            const endY = startY + spark.dy * length;
+
+            ctx.lineWidth = spark.big ? Math.max(2, size * 0.09) : Math.max(1.5, size * 0.06);
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+        }
+
+        ctx.restore();
     }
 
     drawGhost(piece, board, surface = this) {

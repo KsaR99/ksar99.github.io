@@ -196,7 +196,7 @@ export class OpponentBoardView {
         return {cols: COLS, rows: ROWS, colors: cells || this._emptyCells, version};
     }
 
-    draw(cells, version, livePiece = null, hardDropTrail = null) {
+    draw(cells, version, livePiece = null, hardDropTrail = null, hardDropFlash = null) {
         const surface = this.surface;
         const renderer = this.game.renderer;
         if (!surface || !renderer) return;
@@ -206,6 +206,10 @@ export class OpponentBoardView {
 
         if (hardDropTrail) {
             renderer.drawHardDropTrail(hardDropTrail.entries, hardDropTrail.progress, surface);
+        }
+
+        if (hardDropFlash) {
+            renderer.drawHardDropImpactFlash(hardDropFlash.entry, hardDropFlash.progress, surface);
         }
 
         if (livePiece) {
