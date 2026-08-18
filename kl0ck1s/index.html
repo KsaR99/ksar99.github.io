@@ -11,13 +11,13 @@
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+Mono:wght@100..900&display=swap"
         rel="stylesheet"
     >
-    <link href="styles/main.css?v=84" rel="stylesheet">
-    <link href="styles/options.css?v=84" rel="stylesheet">
-    <link href="styles/menu.css?v=84" rel="stylesheet">
-    <link href="styles/leaderboard.css?v=84" rel="stylesheet">
-    <link href="styles/multiplayer.css?v=84" rel="stylesheet">
-    <link href="styles/mobile.css?v=84" media="(width < 48rem)" rel="stylesheet">
-    <link href="styles/desktop.css?v=84" media="(width >= 48rem)" rel="stylesheet">
+    <link href="styles/main.css?v=85" rel="stylesheet">
+    <link href="styles/options.css?v=85" rel="stylesheet">
+    <link href="styles/menu.css?v=85" rel="stylesheet">
+    <link href="styles/leaderboard.css?v=85" rel="stylesheet">
+    <link href="styles/multiplayer.css?v=85" rel="stylesheet">
+    <link href="styles/mobile.css?v=85" media="(width < 48rem)" rel="stylesheet">
+    <link href="styles/desktop.css?v=85" media="(width >= 48rem)" rel="stylesheet">
     <meta content="notranslate" name="google">
     <meta content="https://github.com/KsaR99" name="author">
     <meta content="index, follow" name="robots">
@@ -74,7 +74,7 @@
         <header class="card">
             <p class="brand__title" data-role="brand-title">Kl0ck1<span class="brand__title-flip"
                                                                         data-role="brand-title-flip">'s</span></p>
-            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.30-alpha</p>
+            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.30.1-alpha</p>
             <div aria-label="Quick settings" class="settings-shortcut-row" role="toolbar">
                 <button aria-label="Mute sound" aria-pressed="false" class="settings-shortcut-icon"
                         data-role="mute-toggle" type="button">
@@ -172,8 +172,10 @@
     <div aria-label="Touch controls" class="touch-controls" data-role="touch-controls" role="toolbar">
         <div class="touch-controls__group touch-controls__group--move">
             <div class="touch-controls__joystick-wrap">
-                <button aria-label="Rotate left" class="touch-controls__btn touch-controls__rotate touch-controls__rotate--left"
-                        data-key-action="KeyZ" type="button">⟲</button>
+                <button aria-label="Rotate left"
+                        class="touch-controls__btn touch-controls__rotate touch-controls__rotate--left"
+                        data-key-action="KeyZ" type="button">⟲
+                </button>
                 <div aria-label="Move" class="touch-controls__joystick" data-role="touch-joystick" role="group">
                     <div class="touch-controls__joystick-base" data-role="touch-joystick-base">
                         <div class="touch-controls__joystick-stick" data-role="touch-joystick-stick"></div>
@@ -183,13 +185,17 @@
         </div>
         <div class="touch-controls__group touch-controls__group--actions">
             <div class="touch-controls__action-stack">
-                <button aria-label="Rotate" class="touch-controls__btn touch-controls__rotate touch-controls__rotate--right"
-                        data-key-action="ArrowUp" type="button">⟳</button>
+                <button aria-label="Rotate"
+                        class="touch-controls__btn touch-controls__rotate touch-controls__rotate--right"
+                        data-key-action="ArrowUp" type="button">⟳
+                </button>
                 <button aria-label="Hard drop" class="touch-controls__btn" data-key-action="Space" type="button">
                     <span class="touch-controls__btn-label">⏬</span>
                 </button>
             </div>
-            <button aria-label="Pause" class="touch-controls__btn touch-controls__pause" data-key-action="KeyP" type="button">❚❚</button>
+            <button aria-label="Pause" class="touch-controls__btn touch-controls__pause" data-key-action="KeyP"
+                    type="button">❚❚
+            </button>
         </div>
     </div>
 </div>
@@ -327,6 +333,6 @@
         window.addEventListener("orientationchange", notifyResize);
     })();
 </script>
-<script src="scripts/app/main.js?v=84" type="module"></script>
+<script src="scripts/app/main.js?v=85" type="module"></script>
 </body>
 </html>

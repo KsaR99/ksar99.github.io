@@ -12,7 +12,16 @@ const SWIPE_DOWN_THRESHOLD_RATIO = 0.22;
 
 const DRAG_DISTANCE_IN_SCREENS = 0.8;
 
-const JOYSTICK_DEADZONE_RATIO = 0.35;
+const JOYSTICK_DEADZONE_RATIO = 0.08;
+
+const JOYSTICK_STEP_ZONE_RATIO = 0.30;
+const JOYSTICK_ARR_AT_STEP_EDGE_MS = 90;
+const JOYSTICK_ARR_MIN_MS = 28;
+
+function joystickArrForPush(distRatio) {
+    const t = Math.min(1, Math.max(0, (distRatio - JOYSTICK_STEP_ZONE_RATIO) / (1 - JOYSTICK_STEP_ZONE_RATIO)));
+    return JOYSTICK_ARR_AT_STEP_EDGE_MS + t * (JOYSTICK_ARR_MIN_MS - JOYSTICK_ARR_AT_STEP_EDGE_MS);
+}
 
 export class TouchInput extends InputSource {
     /**
@@ -213,24 +222,50 @@ export class TouchInput extends InputSource {
         this._joystickPointerId = null;
     }
 
-    _setJoystickDirection(direction) {
-        if (direction === this._joystickDirection) return;
+    /**
+     * @param {string} direction
+     * @returns {((isRepeat: boolean) => void) | null}
+     */
+    _getJoystickRunner(direction) {
+        const action = this.getAction(direction);
+        if (!action) return null;
+        return (isRepeat) => {
+            if (MOVEMENT_KEYS.has(direction)) this.steeringArbiter.markKeyboardSteer();
+            action(isRepeat);
+        };
+    }
+
+    /**
+     * @param {string|null} direction
+     * @param {number|null} [arrMs] - null means "step zone": move once, no auto-repeat.
+     */
+    _setJoystickDirection(direction, arrMs = null) {
+        if (direction === this._joystickDirection) {
+            if (!direction) return;
+            if (arrMs === null) {
+                this.stopRepeat(direction);
+            } else if (this._repeatTimers.has(direction)) {
+                this.updateRepeatArr(direction, arrMs);
+            } else {
+                const runAction = this._getJoystickRunner(direction);
+                if (runAction) this.startRepeat(direction, () => runAction(true), {dasMs: arrMs, arrMs});
+            }
+            return;
+        }
+
         if (this._joystickDirection) {
             this.stopRepeat(this._joystickDirection);
         }
         this._joystickDirection = direction;
         if (!direction) return;
 
-        const action = this.getAction(direction);
-        if (!action) return;
-
-        const runAction = (isRepeat) => {
-            if (MOVEMENT_KEYS.has(direction)) this.steeringArbiter.markKeyboardSteer();
-            action(isRepeat);
-        };
+        const runAction = this._getJoystickRunner(direction);
+        if (!runAction) return;
 
         runAction(false);
-        this.startRepeat(direction, () => runAction(true));
+        if (arrMs !== null) {
+            this.startRepeat(direction, () => runAction(true), {dasMs: arrMs, arrMs});
+        }
     }
 
     bindJoystick(root) {
@@ -266,14 +301,17 @@ export class TouchInput extends InputSource {
             const visualY = Math.sin(angle) * clampedDist;
             stick.style.transform = `translate(${visualX}px, ${visualY}px)`;
 
-            if (dist < maxRadius * JOYSTICK_DEADZONE_RATIO) {
+            const distRatio = maxRadius > 0 ? clampedDist / maxRadius : 0;
+            if (distRatio < JOYSTICK_DEADZONE_RATIO) {
                 this._setJoystickDirection(null);
                 return;
             }
+
+            const arrMs = distRatio < JOYSTICK_STEP_ZONE_RATIO ? null : joystickArrForPush(distRatio);
             if (Math.abs(dx) >= Math.abs(dy)) {
-                this._setJoystickDirection(dx < 0 ? "ArrowLeft" : "ArrowRight");
+                this._setJoystickDirection(dx < 0 ? "ArrowLeft" : "ArrowRight", arrMs);
             } else if (dy > 0) {
-                this._setJoystickDirection("ArrowDown");
+                this._setJoystickDirection("ArrowDown", arrMs);
             } else {
                 this._setJoystickDirection(null);
             }
