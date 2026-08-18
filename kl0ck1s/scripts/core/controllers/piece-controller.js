@@ -2,7 +2,14 @@
 
 import {Piece} from "../game/piece.js";
 import {pointsForHardDrop, pointsForSoftDrop} from "../game/scoring.js";
-import {getKickTable, PIECE_CONTROLLABLE_STATES, T_FRONT_CORNERS} from "../game/game-constants.js";
+import {
+    getKickTable,
+    PIECE_CONTROLLABLE_STATES,
+    ROTATION_ANIM_ANGLE_180_DEG,
+    ROTATION_ANIM_ANGLE_DEG,
+    ROTATION_ANIM_DURATION_MS,
+    T_FRONT_CORNERS,
+} from "../game/game-constants.js";
 import {forEachShapeCell, getTightBounds} from "../shared/utils.js";
 import {LINE_CLEAR_SOUND_PLAYBACK_RATE, NEXT_PREVIEW_QUEUE_SIZE} from "../shared/config.js";
 
@@ -344,7 +351,9 @@ export class PieceController {
             game.soundManager.play("rotate");
             if (game.board.collides(game.current, 0, 1)) this.resetLockDelay();
 
-            game.rotationAnim = null;
+            const is180 = Math.abs(dir) === 2;
+            const fromAngle = is180 ? ROTATION_ANIM_ANGLE_180_DEG : -dir * ROTATION_ANIM_ANGLE_DEG;
+            game.rotationAnim = {fromAngle, elapsed: 0, duration: ROTATION_ANIM_DURATION_MS};
         }
     }
 
@@ -375,6 +384,7 @@ export class PieceController {
 
         this.stopGameplaySounds();
         game.soundManager.play(isHardDrop ? "drop" : "pieceLock");
+        if (!isHardDrop) game.beginLockImpactFlash(game.current);
         game.board.lockPiece(game.current);
         game.renderer.notifyPieceLocked(game.current, game.board);
 

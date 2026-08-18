@@ -841,12 +841,26 @@ export class Renderer {
 
     drawPiece(piece, board, surface = this) {
         const size = this.boardConfig.CELL_SIZE;
+        const {ctx} = surface;
+        const angle = piece.renderAngle || 0;
+
+        if (angle !== 0) {
+            const cx = (piece.x + piece.width / 2) * size;
+            const cy = (piece.y + piece.height / 2) * size;
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle * Math.PI / 180);
+            ctx.translate(-cx, -cy);
+        }
+
         forEachShapeCell(piece.mask, piece.width, piece.height, (r, c) => {
             const y = piece.y + r;
-            if (y < 0) return;
+            if (y < 0 && angle === 0) return;
             const level = board ? this.saturationLevelForRow(Math.round(y), board.rows) : 0;
-            this.drawCell(surface.ctx, piece.x + c, y, piece.color, size, {glow: true, level});
+            this.drawCell(ctx, piece.x + c, y, piece.color, size, {glow: true, level});
         });
+
+        if (angle !== 0) ctx.restore();
     }
 
     drawFallTrail(trail, headIndex, count, surface = this) {
@@ -923,6 +937,17 @@ export class Renderer {
     drawHardDropImpactFlash(entry, progress, surface = this) {
         if (!entry || !entry.mask || progress >= 1) return;
 
+        this.drawImpactFlash(entry, progress, surface);
+        this.drawHardDropImpactSparks(entry, progress, surface);
+    }
+
+    drawLockImpactFlash(entry, progress, surface = this) {
+        if (!entry || !entry.mask || progress >= 1) return;
+
+        this.drawImpactFlash(entry, progress, surface);
+    }
+
+    drawImpactFlash(entry, progress, surface = this) {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx} = surface;
 
@@ -950,8 +975,6 @@ export class Renderer {
             entry.x * size, centerY - bandHeight / 2, entry.width * size, bandHeight,
         );
         ctx.restore();
-
-        this.drawHardDropImpactSparks(entry, progress, surface);
     }
 
     drawHardDropImpactSparks(entry, progress, surface = this) {

@@ -236,6 +236,25 @@ export class Game {
         };
     }
 
+    beginLockImpactFlash(piece) {
+        if (!this.settings.hardDropFlash || !piece?.mask) {
+            this.lockImpactFlash = null;
+            return;
+        }
+
+        this.lockImpactFlash = {
+            entry: {
+                x: piece.x,
+                y: piece.y,
+                mask: piece.mask,
+                width: piece.width,
+                height: piece.height,
+            },
+            elapsed: 0,
+            duration: HARD_DROP_IMPACT_FLASH_DURATION_MS,
+        };
+    }
+
     noteRowStep() {
         ({lastTime: this.lastRowStepTime, effectiveMs: this.effectiveDropIntervalMs} =
             smoothedInterval(this.lastRowStepTime, this.effectiveDropIntervalMs, nowMs()));
@@ -292,6 +311,13 @@ export class Game {
             this.hardDropImpactFlash.elapsed += delta;
             if (this.hardDropImpactFlash.elapsed >= this.hardDropImpactFlash.duration) {
                 this.hardDropImpactFlash = null;
+            }
+        }
+
+        if (this.lockImpactFlash) {
+            this.lockImpactFlash.elapsed += delta;
+            if (this.lockImpactFlash.elapsed >= this.lockImpactFlash.duration) {
+                this.lockImpactFlash = null;
             }
         }
 
@@ -380,12 +406,12 @@ export class Game {
 
         let x = base.x;
         let y = base.y;
+        let angle = 0;
 
         if (this.rotationAnim) {
             const t = Math.min(1, this.rotationAnim.elapsed / this.rotationAnim.duration);
-            const {fromX, fromY, toX, toY} = this.rotationAnim;
-            x = fromX + (toX - fromX) * t;
-            y = fromY + (toY - fromY) * t;
+            const eased = 1 - Math.pow(1 - t, 3);
+            angle = this.rotationAnim.fromAngle * (1 - eased);
         } else {
             if (this.shiftAnim) {
                 const t = Math.min(1, this.shiftAnim.elapsed / this.shiftAnim.duration);
@@ -397,10 +423,10 @@ export class Game {
             }
         }
 
-        if (x === base.x && y === base.y) return base;
+        if (x === base.x && y === base.y && angle === 0) return base;
 
         const rendered = Object.create(Object.getPrototypeOf(base));
-        Object.assign(rendered, base, {x, y});
+        Object.assign(rendered, base, {x, y, renderAngle: angle});
 
         return rendered;
     }
@@ -486,6 +512,11 @@ export class Game {
         if (this.hardDropImpactFlash) {
             const progress = Math.min(1, this.hardDropImpactFlash.elapsed / this.hardDropImpactFlash.duration);
             this.renderer.drawHardDropImpactFlash(this.hardDropImpactFlash.entry, progress);
+        }
+
+        if (this.lockImpactFlash) {
+            const progress = Math.min(1, this.lockImpactFlash.elapsed / this.lockImpactFlash.duration);
+            this.renderer.drawLockImpactFlash(this.lockImpactFlash.entry, progress);
         }
 
         if (["running", "paused"].includes(this.state)

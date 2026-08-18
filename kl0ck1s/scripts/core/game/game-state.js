@@ -47,6 +47,7 @@ export const GAME_STATE_KEYS = [
     "_trailPieceRef",
     "hardDropTrail",
     "hardDropImpactFlash",
+    "lockImpactFlash",
     "lastRowStepTime",
     "effectiveDropIntervalMs",
     "lastColStepTime",
@@ -126,6 +127,7 @@ export class GameState {
         this._trailPieceRef = null;
         this.hardDropTrail = null;
         this.hardDropImpactFlash = null;
+        this.lockImpactFlash = null;
 
         this.lastRowStepTime = 0;
         this.effectiveDropIntervalMs = Infinity;
