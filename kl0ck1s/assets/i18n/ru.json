@@ -94,6 +94,7 @@
             "mouseTitle": "Мышь",
             "mouseControl": "Управление мышью",
             "graphicsTitle": "Графика",
+            "graphicsPreview": "Предпросмотр",
             "ghost": "Призрак фигуры",
             "gridLines": "Линии сетки",
             "screenShake": "Тряска экрана",

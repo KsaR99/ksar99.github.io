@@ -833,11 +833,15 @@ export class ScreenFlow {
             });
         }
 
+        const heightSaturationRow = root.querySelector('[data-role="height-saturation-row"]');
         const syncHeightSaturationAvailability = () => {
-            if (!heightSaturationCheckbox) return;
-            heightSaturationCheckbox.checked = Boolean(game.settings.heightSaturation) && !game.settings.outlineBlocks;
-            heightSaturationCheckbox.disabled = Boolean(game.settings.outlineBlocks);
+            if (heightSaturationCheckbox) {
+                heightSaturationCheckbox.checked = Boolean(game.settings.heightSaturation) && !game.settings.outlineBlocks;
+                heightSaturationCheckbox.disabled = Boolean(game.settings.outlineBlocks);
+            }
+            if (heightSaturationRow) heightSaturationRow.hidden = Boolean(game.settings.outlineBlocks);
         };
+        syncHeightSaturationAvailability();
 
         if (glowCheckbox) {
             glowCheckbox.addEventListener("change", () => {

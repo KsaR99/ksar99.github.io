@@ -106,10 +106,6 @@
                     <input class="options__input options__input--checkbox" data-role="skip-mode-info-checkbox"
                            type="checkbox">
                 </label>
-                <label class="options__row">
-                    <span data-i18n="screens.options.gridLines">Grid lines</span>
-                    <input class="options__input options__input--checkbox" data-role="grid-checkbox" type="checkbox">
-                </label>
                 <div class="options__row options__row--end">
                     <button class="options__preview-button options__preview-button--wide"
                             data-i18n="screens.options.resetDefaults"
@@ -129,6 +125,30 @@
                            type="checkbox">
                 </label>
                 <label class="options__row">
+                    <span data-i18n="screens.options.gridLines">Grid lines</span>
+                    <input class="options__input options__input--checkbox" data-role="grid-checkbox" type="checkbox">
+                </label>
+                <div class="options__graphics-preview">
+                    <span class="options__graphics-preview-label"
+                          data-i18n="screens.options.graphicsPreview">Preview</span>
+                    <div class="options__graphics-preview-canvases" data-role="graphics-preview-canvases">
+                        <canvas class="options__graphics-preview-canvas" data-role="graphics-preview-canvas"></canvas>
+                    </div>
+                </div>
+                <label class="options__row">
+                    <span data-i18n="screens.options.blockType">Block type</span>
+                    <select class="options__input options__input--select" data-role="block-type-select">
+                        <option data-i18n="screens.options.blockTypeRadioactive" value="radioactive">Radioactive
+                        </option>
+                        <option data-i18n="screens.options.blockTypeColorful" value="colorful">Colorful</option>
+                    </select>
+                </label>
+                <label class="options__row" data-role="height-saturation-row">
+                    <span data-i18n="screens.options.heightSaturation">Height saturation</span>
+                    <input class="options__input options__input--checkbox" data-role="height-saturation-checkbox"
+                           type="checkbox">
+                </label>
+                <label class="options__row">
                     <span data-i18n="screens.options.ghost">Ghost piece</span>
                     <select class="options__input options__input--select" data-role="ghost-type-select">
                         <option data-i18n="screens.options.ghostTypeColorful" value="colorful">Colorful</option>
@@ -142,19 +162,6 @@
                     <span data-i18n="screens.options.ghostOpacity">Ghost opacity</span>
                     <input class="options__input options__input--range" data-role="ghost-opacity-slider" max="100"
                            min="5" type="range">
-                </label>
-                <label class="options__row">
-                    <span data-i18n="screens.options.blockType">Block type</span>
-                    <select class="options__input options__input--select" data-role="block-type-select">
-                        <option data-i18n="screens.options.blockTypeRadioactive" value="radioactive">Radioactive
-                        </option>
-                        <option data-i18n="screens.options.blockTypeColorful" value="colorful">Colorful</option>
-                    </select>
-                </label>
-                <label class="options__row" data-role="height-saturation-row">
-                    <span data-i18n="screens.options.heightSaturation">Height saturation</span>
-                    <input class="options__input options__input--checkbox" data-role="height-saturation-checkbox"
-                           type="checkbox">
                 </label>
 
                 <details class="options__group" data-role="options-group-performance">
@@ -358,37 +365,29 @@
                         <summary class="options__group-summary options__group-summary--advanced"
                                  data-i18n="screens.options.advancedTitle">Advanced
                         </summary>
-                        <label class="options__row options__row--metered">
-                            <span class="options__row-tag" data-i18n="screens.options.keyboardDasTag">DAS</span>
-                            <input class="options__input options__input--number" data-role="keyboard-das-input"
-                                   inputmode="numeric"
-                                   type="number">
-                            <div class="options__meter" data-role="das-preview">
-                                <div class="options__meter__track">
-                                    <div class="options__meter__fill"></div>
-                                </div>
+                        <div class="options__graphics-preview options__graphics-preview--das-arr">
+                            <span class="options__graphics-preview-label"
+                                  data-i18n="screens.options.graphicsPreview">Preview</span>
+                            <div class="options__graphics-preview-canvases">
+                                <canvas
+                                    class="options__graphics-preview-canvas options__graphics-preview-canvas--das-arr"
+                                    data-role="das-arr-preview-canvas"></canvas>
                             </div>
-                        </label>
-                        <label class="options__row options__row--metered">
-                            <span class="options__row-tag" data-i18n="screens.options.keyboardArrTag">ARR</span>
-                            <input class="options__input options__input--number" data-role="keyboard-arr-input"
-                                   inputmode="numeric"
-                                   type="number">
-                            <div class="options__meter" data-role="arr-preview">
-                                <div class="options__meter__ticks">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                </div>
-                            </div>
-                        </label>
+                        </div>
+                        <div class="options__das-arr-line">
+                            <label class="options__row options__row--metered">
+                                <span class="options__row-tag" data-i18n="screens.options.keyboardDasTag">DAS</span>
+                                <input class="options__input options__input--number" data-role="keyboard-das-input"
+                                       inputmode="numeric"
+                                       type="number">
+                            </label>
+                            <label class="options__row options__row--metered">
+                                <span class="options__row-tag" data-i18n="screens.options.keyboardArrTag">ARR</span>
+                                <input class="options__input options__input--number" data-role="keyboard-arr-input"
+                                       inputmode="numeric"
+                                       type="number">
+                            </label>
+                        </div>
                         <div class="options__row options__row--end">
                             <button class="options__preview-button options__preview-button--wide"
                                     data-i18n="screens.options.resetDefaults"

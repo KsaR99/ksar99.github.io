@@ -94,6 +94,7 @@
             "mouseTitle": "마우스",
             "mouseControl": "마우스 조작",
             "graphicsTitle": "그래픽",
+            "graphicsPreview": "미리보기",
             "ghost": "고스트 블록",
             "gridLines": "격자선",
             "screenShake": "화면 흔들림",

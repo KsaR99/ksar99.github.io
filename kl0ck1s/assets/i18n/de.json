@@ -94,6 +94,7 @@
             "mouseTitle": "Maus",
             "mouseControl": "Maussteuerung",
             "graphicsTitle": "Grafik",
+            "graphicsPreview": "Vorschau",
             "ghost": "Geisterstein",
             "gridLines": "Gitterlinien",
             "screenShake": "Bildschirm-Shake",

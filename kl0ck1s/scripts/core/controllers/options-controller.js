@@ -14,6 +14,8 @@ import {
 } from "../game/game-constants.js";
 import {copyTextToClipboard, debounce, isMobileViewport} from "../shared/utils.js";
 import {defaultKeyBindings} from "../shared/key-bindings.js";
+import {OptionsPreviewController} from "../rendering/options-preview.js";
+import {DasArrPreviewController} from "../rendering/das-arr-preview.js";
 
 function clampToStep(value, min, max, step) {
     const clamped = Math.max(min, Math.min(max, value));
@@ -25,6 +27,8 @@ export class OptionsController {
         this.game = game;
         this.gameFlow = gameFlow;
         this._pauseBlockedTimer = null;
+        this.graphicsPreview = new OptionsPreviewController(game);
+        this.dasArrPreview = new DasArrPreviewController(game);
     }
 
     toggleMultiplayerLiveOptions() {
@@ -219,10 +223,11 @@ export class OptionsController {
         const touchSensitivityInput = root.querySelector('[data-role="touch-sensitivity-input"]');
         const keyboardDasInput = root.querySelector('[data-role="keyboard-das-input"]');
         const keyboardArrInput = root.querySelector('[data-role="keyboard-arr-input"]');
-        const dasPreview = root.querySelector('[data-role="das-preview"]');
-        const arrPreview = root.querySelector('[data-role="arr-preview"]');
         const closeButton = root.querySelector('[data-role="options-close-button"]');
         const closeKey = root.querySelector('[data-role="options-close-key"]');
+
+        this.graphicsPreview.render();
+        this.dasArrPreview.render(game.settings.keyboardDAS ?? DAS_MIN, game.settings.keyboardARR ?? ARR_MIN);
 
         if (optionsMuteToggle) {
             optionsMuteToggle.addEventListener("click", () => {
@@ -265,6 +270,7 @@ export class OptionsController {
                     }
                 }
                 this.syncCategoryResetButtons();
+                this.graphicsPreview.render();
             });
         }
 
@@ -276,6 +282,7 @@ export class OptionsController {
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
                 this.syncCategoryResetButtons();
+                this.graphicsPreview.render();
             });
         }
 
@@ -285,6 +292,8 @@ export class OptionsController {
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
                 this.syncCategoryResetButtons();
+                this.graphicsPreview.render();
+                this.dasArrPreview.render();
             });
         }
 
@@ -303,14 +312,19 @@ export class OptionsController {
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
                 this.syncCategoryResetButtons();
+                this.graphicsPreview.render();
             });
         }
 
+        const heightSaturationRow = root.querySelector('[data-role="height-saturation-row"]');
         const syncHeightSaturationAvailability = () => {
-            if (!heightSaturationCheckbox) return;
-            heightSaturationCheckbox.checked = Boolean(game.settings.heightSaturation) && !game.settings.outlineBlocks;
-            heightSaturationCheckbox.disabled = Boolean(game.settings.outlineBlocks);
+            if (heightSaturationCheckbox) {
+                heightSaturationCheckbox.checked = Boolean(game.settings.heightSaturation) && !game.settings.outlineBlocks;
+                heightSaturationCheckbox.disabled = Boolean(game.settings.outlineBlocks);
+            }
+            if (heightSaturationRow) heightSaturationRow.hidden = Boolean(game.settings.outlineBlocks);
         };
+        syncHeightSaturationAvailability();
 
         if (glowCheckbox) {
             glowCheckbox.addEventListener("change", () => {
@@ -318,6 +332,8 @@ export class OptionsController {
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
                 this.syncCategoryResetButtons();
+                this.graphicsPreview.render();
+                this.dasArrPreview.render();
             });
         }
 
@@ -328,6 +344,7 @@ export class OptionsController {
                 settingsController.saveSettings();
                 if (ghostOpacityRow) ghostOpacityRow.hidden = !transparencyCheckbox.checked;
                 this.syncCategoryResetButtons();
+                this.graphicsPreview.render();
             });
         }
 
@@ -337,6 +354,8 @@ export class OptionsController {
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
                 this.syncCategoryResetButtons();
+                this.graphicsPreview.playDropDemo();
+                this.dasArrPreview.render();
             });
         }
 
@@ -345,6 +364,7 @@ export class OptionsController {
                 game.settings.hardDropFlash = hardDropFlashCheckbox.checked;
                 settingsController.saveSettings();
                 this.syncCategoryResetButtons();
+                this.graphicsPreview.playDropDemo();
             });
         }
 
@@ -355,6 +375,8 @@ export class OptionsController {
                 settingsController.applyPerformanceSettings();
                 settingsController.saveSettings();
                 this.syncCategoryResetButtons();
+                this.graphicsPreview.render();
+                this.dasArrPreview.render();
             });
         }
 
@@ -443,15 +465,13 @@ export class OptionsController {
         }
 
         const syncDasArrPreview = () => {
-            if (!dasPreview && !arrPreview) return;
             const das = clampToStep(
                 parseFloat(keyboardDasInput?.value) || DAS_MIN, DAS_MIN, DAS_MAX, DAS_STEP
             );
             const arr = clampToStep(
                 parseFloat(keyboardArrInput?.value) || ARR_MIN, ARR_MIN, ARR_MAX, ARR_STEP
             );
-            dasPreview?.style.setProperty("--das-ms", `${das}ms`);
-            arrPreview?.style.setProperty("--arr-ms", `${Math.max(arr, 1)}ms`);
+            this.dasArrPreview.setTimings(das, arr);
         };
 
         if (keyboardDasInput) {
@@ -566,11 +586,11 @@ export class OptionsController {
     }
 
     categoryResetGroups() {
-        const graphicsKeys = ["screenShake", "ghostType", "ghostOpacity", "outlineBlocks", "heightSaturation", "glow", "transparency", "fallTrail", "hardDropFlash"];
+        const graphicsKeys = ["screenShake", "gridLines", "ghostType", "ghostOpacity", "outlineBlocks", "heightSaturation", "glow", "transparency", "fallTrail", "hardDropFlash"];
         return {
             "reset-general-button": ["volume", "muted", "hudRight", "theme"],
             "reset-controls-button": ["mouseControl", "mouseSensitivity", "touchSensitivity"],
-            "reset-gameplay-button": ["skipCountdown", "skipModeInfo", "gridLines"],
+            "reset-gameplay-button": ["skipCountdown", "skipModeInfo"],
             "reset-graphics-button": isMobileViewport()
                 ? graphicsKeys.filter((key) => key !== "screenShake")
                 : graphicsKeys,

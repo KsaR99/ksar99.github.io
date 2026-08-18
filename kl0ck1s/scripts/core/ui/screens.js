@@ -357,6 +357,8 @@ export const Screens = {
             heightSaturationCheckbox.checked = Boolean(settings.heightSaturation) && !settings.outlineBlocks;
             heightSaturationCheckbox.disabled = Boolean(settings.outlineBlocks);
         }
+        const heightSaturationRow = screen.querySelector('[data-role="height-saturation-row"]');
+        if (heightSaturationRow) heightSaturationRow.hidden = Boolean(settings.outlineBlocks);
         screen.querySelector('[data-role="glow-checkbox"]').checked = settings.glow;
         screen.querySelector('[data-role="transparency-checkbox"]').checked = settings.transparency;
         const fallTrailCheckbox = screen.querySelector('[data-role="fall-trail-checkbox"]');

@@ -94,6 +94,7 @@
             "mouseTitle": "Mouse",
             "mouseControl": "Mouse control",
             "graphicsTitle": "Graphics",
+            "graphicsPreview": "Preview",
             "ghost": "Ghost piece",
             "ghostOpacity": "Ghost opacity",
             "ghostTypeColorful": "Colorful",
