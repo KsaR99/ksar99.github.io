@@ -1311,7 +1311,16 @@ export class Renderer {
         const halfVerticalRotated = this.getRotatedHalfExtentY(boxWidth, boxHeight, tiltAngle);
         const halfHorizontalRotated = (boxWidth / 2) * Math.abs(Math.cos(tiltAngle))
             + (boxHeight / 2) * Math.abs(Math.sin(tiltAngle));
-        return {fontSize, fontBody, text, boxWidth, boxHeight, tiltAngle, halfVertical: halfVerticalRotated, halfHorizontal: halfHorizontalRotated};
+        return {
+            fontSize,
+            fontBody,
+            text,
+            boxWidth,
+            boxHeight,
+            tiltAngle,
+            halfVertical: halfVerticalRotated,
+            halfHorizontal: halfHorizontalRotated
+        };
     }
 
     resolveBannerCenters(board, surface = this, levelInfo = null, comboInfo = null) {

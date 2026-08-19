@@ -105,6 +105,11 @@
     white-space: nowrap;
 }
 
+.leaderboard__table--no-combo .leaderboard__cell--combo,
+.leaderboard__table--no-combo .leaderboard__heading--combo {
+    display: none;
+}
+
 .leaderboard__empty {
     color: var(--muted);
     font-size: 0.8125rem;

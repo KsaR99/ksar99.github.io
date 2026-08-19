@@ -327,6 +327,8 @@ export class Leaderboard {
         const table = this.dom.getElementById("tpl-leaderboard-table").content.cloneNode(true);
         const tbody = table.querySelector('[data-field="rows"]');
         const podiumBadges = ["🥇", "🥈", "🥉"];
+        const isCascade = this.entryMode(list[0]) === "cascade";
+        table.querySelector(".leaderboard__table").classList.toggle("leaderboard__table--no-combo", !isCascade);
 
         list.forEach((entry, i) => {
             const row = this.dom.getElementById("tpl-leaderboard-row").content.cloneNode(true);
