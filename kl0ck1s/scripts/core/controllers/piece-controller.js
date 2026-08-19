@@ -455,7 +455,9 @@ export class PieceController {
         game.state = "clearing";
         game.clearingLines = fullRows;
         game.clearingFragments = this.buildClearFragments(fullRows);
-        game.clearingDropRows = this.buildDropRows(fullRows, game.board.rows);
+        game.clearingDropRows = game.gameModes[game.mode]?.cascadeGravity
+            ? new Uint8Array(game.board.rows)
+            : this.buildDropRows(fullRows, game.board.rows);
         game.clearingDropGrid = null;
         game.cascadeFalling = false;
         game.clearingTimer = 0;
