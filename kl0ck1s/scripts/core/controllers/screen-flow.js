@@ -1077,13 +1077,6 @@ export class ScreenFlow {
             });
         });
 
-        if (closeButton) {
-            closeButton.addEventListener("click", () => this.closeOptionsOrPause());
-        }
-
-        if (closeKey) {
-            closeKey.addEventListener("click", () => this.closeOptionsOrPause());
-        }
 
         this.bindLangSelect();
         this.bindOptionsDataMenu();

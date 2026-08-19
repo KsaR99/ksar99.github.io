@@ -132,11 +132,21 @@ export class OptionsController {
 
             if (previousState === "running") {
                 game.hud.hideOverlay();
+                this.gameFlow.stopIdleMusic();
                 game.musicDirector.resume();
             } else if (previousState === "paused") {
+                this.gameFlow.stopIdleMusic();
                 this.renderPauseMenu();
             } else if (previousState === "idle") {
                 this.gameFlow.renderIdleScreen(game.currentIdleList ?? []);
+                if (game.idleMusicWasPlayingBeforeOptions) {
+                    if (game.idleMusicId == null) {
+                        this.gameFlow.startIdleMusic();
+                    } else {
+                        game.soundManager.resume(game.idleMusicId);
+                    }
+                }
+                game.idleMusicWasPlayingBeforeOptions = false;
             } else if (previousState === "gameOver-entry" && game.currentGameOverEntry) {
                 const {list, entry, todayBestBeforeThisGame, reason} = game.currentGameOverEntry;
                 this.gameFlow.renderGameOverEntry(list, entry, todayBestBeforeThisGame, reason);
@@ -149,12 +159,27 @@ export class OptionsController {
             return;
 
         game.previousStateBeforeOptions = game.state;
+        game.idleMusicWasPlayingBeforeOptions =
+            game.idleMusicId != null && game.soundManager.isPlaying(game.idleMusicId);
         if (game.state === "running") {
             game.pieceController.stopAllGameplaySounds();
             game.musicDirector.pause();
         }
+
+        if (game.state !== "idle") this.gameFlow.startIdleMusic();
         game.state = "options";
         this.renderOptionsMenu();
+    }
+
+    syncIdleMusicPreviewButton() {
+        const game = this.game;
+        const button = game.hud.overlayEl?.querySelector(
+            '[data-role="sound-preview-button"][data-sound-key="idleSong"]'
+        );
+        if (!button) return;
+
+        const isPlaying = game.idleMusicId != null && game.soundManager.isPlaying(game.idleMusicId);
+        this.setPreviewButtonState(button, isPlaying ? "pause" : "play");
     }
 
     renderOptionsMenu() {
@@ -176,13 +201,32 @@ export class OptionsController {
         const game = this.game;
         const key = button.dataset.soundKey;
 
+        if (key === "idleSong") {
+            if (game.idleMusicId == null) {
+                this.gameFlow.startIdleMusic();
+            }
+
+            if (game.idleMusicId == null) return;
+
+            if (game.soundManager.isPlaying(game.idleMusicId)) {
+                game.soundManager.pause(game.idleMusicId);
+            } else {
+                game.soundManager.resume(game.idleMusicId);
+            }
+
+            this.syncIdleMusicPreviewButton();
+            return;
+        }
+
         list.querySelectorAll('[data-role="sound-preview-button"]').forEach((otherButton) => {
             if (otherButton !== button) this.setPreviewButtonState(otherButton, "play");
         });
 
         const rate = game.previewPlaybackRateFor(key);
         const state = game.soundManager.previewToggle(
-            key, () => this.setPreviewButtonState(button, "play"), {playbackRate: rate}
+            key,
+            () => this.setPreviewButtonState(button, "play"),
+            {playbackRate: rate}
         );
         this.setPreviewButtonState(button, state === "playing" ? "pause" : "play");
     }
@@ -583,6 +627,7 @@ export class OptionsController {
         this.syncSoundCategoryResetButtons();
         this.syncCategoryResetButtons();
         this.bindOptionsSearch();
+        this.syncIdleMusicPreviewButton();
     }
 
     categoryResetGroups() {

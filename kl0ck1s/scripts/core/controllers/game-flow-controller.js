@@ -17,9 +17,23 @@ export class GameFlowController {
         return this.game.leaderboard.renderTable(list, highlightEntry);
     }
 
+    startIdleMusic() {
+        const game = this.game;
+        if (game.idleMusicId != null) return;
+        game.idleMusicId = game.soundManager.play("idleSong", {loop: true});
+    }
+
+    stopIdleMusic() {
+        const game = this.game;
+        if (game.idleMusicId == null) return;
+        game.soundManager.stop(game.idleMusicId);
+        game.idleMusicId = null;
+    }
+
     async showIdleScreen() {
         const game = this.game;
         game.state = "idle";
+        this.startIdleMusic();
         game.menuSelector = "mode";
         game.isPlayingSession = false;
         game.multiplayerOptionsOverlayOpen = false;
@@ -202,6 +216,7 @@ export class GameFlowController {
         game.isPlayingSession = true;
         game.hud.setPlaying(true, game.mode);
         game.hud.hideOverlay();
+        this.stopIdleMusic();
         game.musicDirector.start(game.board);
 
         if (!game.settings.skipCountdown) {
@@ -223,6 +238,7 @@ export class GameFlowController {
         game.isPlayingSession = false;
         game.hud.setPlaying(false);
         game.musicDirector.stop();
+        this.startIdleMusic();
         game.pieceController.stopAllGameplaySounds();
         if (reason === "topOut") {
             game.soundManager.play("gameOver");
@@ -359,6 +375,7 @@ export class GameFlowController {
 
         game.pieceController.stopAllGameplaySounds();
         game.musicDirector.stop(0);
+        this.startIdleMusic();
 
         game.modeController.resolveRandomMode();
         this.startCountdown();

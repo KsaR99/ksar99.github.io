@@ -201,8 +201,6 @@ export const CREDITS_TIMING = Object.freeze({
 
 export const NEXT_PREVIEW_QUEUE_SIZE = 3;
 export const NEXT_PREVIEW_CELL_SIZE = 27;
-export const NEXT_PREVIEW_CANVAS_WIDTH = NEXT_PREVIEW_CELL_SIZE * 4; // widest piece
-export const NEXT_PREVIEW_CANVAS_HEIGHT = NEXT_PREVIEW_CELL_SIZE * 2; // tallest piece
 
 export const MUSIC_TENSION = Object.freeze({
     TRACK_KEYS: ["tetrisowyShvt", "tetrisowyShvt2", "tetrisowyShvt3"],
@@ -316,5 +314,10 @@ export const SOUND_FILES = Object.freeze({
         src: "assets/audio/music/tetrisowy-shvt-3.opus",
         category: "music",
         label: "Tetrisowy Shvt III"
+    }),
+    idleSong: Object.freeze({
+        src: "assets/audio/music/idle-song.opus",
+        category: "music",
+        label: "Idle"
     }),
 });

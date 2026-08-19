@@ -345,6 +345,11 @@ export class SoundManager {
         return true;
     }
 
+    isPlaying(id) {
+        const instance = this._instance(id);
+        return Boolean(instance && !instance.paused);
+    }
+
     setInstanceVolume(id, volume) {
         const instance = this._instance(id);
         if (!instance) return;
@@ -408,7 +413,6 @@ export class SoundManager {
     setMuted(muted) {
         this.muted = muted;
         this._applyMasterGain();
-        if (muted) this.stopAll();
     }
 
     setVolume(volume) {

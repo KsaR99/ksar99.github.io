@@ -46,7 +46,8 @@ export class SettingsController {
             soundVolumes: {
                 rotate: 0.75,
                 falling: 0.75,
-                drop: 0.9
+                drop: 0.9,
+                idleSong: 1.0
             },
             soundMuted: {},
             keyBindings: defaultKeyBindings(),
