@@ -1082,7 +1082,7 @@ export class MultiplayerController {
             objectivePercent: game.modeController.objectivePercent(),
             objectiveUrgency: game.modeController.objectiveUrgency(),
             objectiveColorMode: game.modeController.objectiveColorMode(),
-            hasLevelProgress: game.gameModes[game.mode].freezeLevel !== true,
+            hasLevelProgress: game.gameModes[game.mode].noLevelBar !== true,
             difficultyTier: game.levelTier,
             difficultyLevel: game.level,
             difficultyPercent,
@@ -1623,9 +1623,9 @@ export class MultiplayerController {
 
         const hasLevelProgress = payload.hasLevelProgress !== false && payload.difficultyTier !== undefined;
         if (this._opponentDifficultyTrackEl) {
-            this._opponentDifficultyTrackEl.parentElement.classList.toggle("stats__row--hidden", !hasLevelProgress);
+            this._opponentDifficultyTrackEl.classList.toggle("progress-bar--no-fill", !hasLevelProgress);
         }
-        if (hasLevelProgress) {
+        if (payload.difficultyTier !== undefined) {
             if (this._opponentDifficultyLabelEl) {
                 this._opponentDifficultyLabelEl.textContent = `${this._t(`difficulty.${payload.difficultyTier}`)} ${payload.difficultyLevel ?? 1}`;
             }

@@ -18,7 +18,8 @@
         "objective": "Objetivo",
         "statusLive": "Partida actual",
         "statusLast": "Última partida",
-        "height": "Altura"
+        "height": "Altura",
+        "combo": "Combo"
     },
     "controls": {
         "toggle": "Controles",
@@ -195,6 +196,7 @@
             "time": "Tiempo",
             "level": "Niv.",
             "lines": "Líneas",
+            "combo": "Combo",
             "date": "Fecha"
         },
         "defaultName": "Jugador"
@@ -287,6 +289,15 @@
                 "🙈 La puntuación no se guarda en la clasificación"
             ]
         },
+        "cascade": {
+            "name": "Cascada",
+            "description": "Las líneas despejadas hacen caer los bloques y encadenan nuevos despejes",
+            "rules": [
+                "🌊 Despejar una línea hace caer los bloques directamente hacia abajo en lugar de desplazar el tablero",
+                "⛓️ Los bloques que caen pueden completar nuevas líneas por sí solos, encadenando un combo",
+                "💰 Cada paso extra de la cadena otorga una bonificación creciente"
+            ]
+        },
         "random": {
             "name": "Aleatorio",
             "description": "Elige uno de los demás modos por ti al pulsar Iniciar",
@@ -298,7 +309,8 @@
         }
     },
     "game": {
-        "levelUpBanner": "NIVEL {level}"
+        "levelUpBanner": "NIVEL {level}",
+        "comboBanner": "COMBO x{combo}"
     },
     "sounds": {
         "lineClear1": "línea",

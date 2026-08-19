@@ -770,7 +770,7 @@ export class BotOpponent extends EventTarget {
             objectivePercent: this._objectivePercent(),
             objectiveUrgency: this._objectiveUrgency(),
             objectiveColorMode: this._objectiveColorMode(),
-            hasLevelProgress: this.modeDef.freezeLevel !== true,
+            hasLevelProgress: this.modeDef.noLevelBar !== true,
             difficultyTier: tierForLevel(this.level, DIFFICULTIES),
             difficultyLevel: this.level,
             difficultyPercent: SCORING.LINES_PER_LEVEL

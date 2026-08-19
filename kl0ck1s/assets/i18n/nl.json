@@ -18,7 +18,8 @@
         "objective": "Doel",
         "statusLive": "Huidige spel",
         "statusLast": "Laatste spel",
-        "height": "Hoogte"
+        "height": "Hoogte",
+        "combo": "Combo"
     },
     "controls": {
         "toggle": "Bediening",
@@ -195,6 +196,7 @@
             "time": "Tijd",
             "level": "Niv.",
             "lines": "Lijnen",
+            "combo": "Combo",
             "date": "Datum"
         },
         "defaultName": "Speler"
@@ -287,6 +289,15 @@
                 "🙈 De score wordt niet opgeslagen op het scorebord"
             ]
         },
+        "cascade": {
+            "name": "Cascade",
+            "description": "Opgeruimde lijnen laten blokken vallen en schakelen nieuwe clears aan elkaar",
+            "rules": [
+                "🌊 Het opruimen van een lijn laat blokken recht naar beneden vallen in plaats van het veld te verschuiven",
+                "⛓️ Vallende blokken kunnen zelf nieuwe lijnen voltooien en zo een combo aan elkaar rijgen",
+                "💰 Elke extra schakel in de keten levert een groeiende bonus op"
+            ]
+        },
         "random": {
             "name": "Willekeurig",
             "description": "Kiest een van de andere modi voor je zodra je op Start drukt",
@@ -298,7 +309,8 @@
         }
     },
     "game": {
-        "levelUpBanner": "NIVEAU {level}"
+        "levelUpBanner": "NIVEAU {level}",
+        "comboBanner": "COMBO x{combo}"
     },
     "sounds": {
         "lineClear1": "lijn",

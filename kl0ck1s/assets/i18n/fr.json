@@ -18,7 +18,8 @@
         "objective": "Objectif",
         "statusLive": "Partie en cours",
         "statusLast": "Dernière partie",
-        "height": "Hauteur"
+        "height": "Hauteur",
+        "combo": "Combo"
     },
     "controls": {
         "toggle": "Commandes",
@@ -195,6 +196,7 @@
             "time": "Temps",
             "level": "Niv.",
             "lines": "Lignes",
+            "combo": "Combo",
             "date": "Date"
         },
         "defaultName": "Joueur"
@@ -287,6 +289,15 @@
                 "🙈 Le score n'est pas enregistré dans le classement"
             ]
         },
+        "cascade": {
+            "name": "Cascade",
+            "description": "Les lignes effacées font tomber les blocs et enchaînent de nouveaux effacements",
+            "rules": [
+                "🌊 Effacer une ligne fait tomber les blocs tout droit au lieu de décaler le plateau",
+                "⛓️ Les blocs qui tombent peuvent compléter de nouvelles lignes tout seuls, enchaînant un combo",
+                "💰 Chaque maillon supplémentaire de la chaîne rapporte un bonus croissant"
+            ]
+        },
         "random": {
             "name": "Aléatoire",
             "description": "Choisit un des autres modes pour toi quand tu appuies sur Démarrer",
@@ -298,7 +309,8 @@
         }
     },
     "game": {
-        "levelUpBanner": "NIVEAU {level}"
+        "levelUpBanner": "NIVEAU {level}",
+        "comboBanner": "COMBO x{combo}"
     },
     "sounds": {
         "lineClear1": "ligne",

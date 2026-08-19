@@ -1,7 +1,7 @@
 "use strict";
 
 import {Piece} from "../game/piece.js";
-import {pointsForHardDrop, pointsForSoftDrop} from "../game/scoring.js";
+import {pointsForCascadeChain, pointsForHardDrop, pointsForSoftDrop} from "../game/scoring.js";
 import {
     getKickTable,
     PIECE_CONTROLLABLE_STATES,
@@ -32,7 +32,9 @@ export class PieceController {
         game.clearingLines = [];
         game.clearingFragments = [];
         game.clearingDropRows = [];
+        game.clearingDropGrid = null;
         game.clearingTimer = 0;
+        game.cascadeFalling = false;
         this.resetPerPieceState();
 
         game.current = new Piece(game.bag.next(), {cols: game.board.cols});
@@ -441,17 +443,21 @@ export class PieceController {
         if (fullRows.length === 0) {
             if (spin) game.statsTracker.registerSpin(spin, 0);
             game.currentCombo = 0;
+            game.cascadeChain = 0;
             this.spawnNext();
             return;
         }
 
         game.pendingSpin = spin;
+        game.cascadeChain = 0;
         const clearedCount = Math.min(fullRows.length, 4);
         game.soundManager.play(`lineClear${clearedCount}`, {playbackRate: LINE_CLEAR_SOUND_PLAYBACK_RATE});
         game.state = "clearing";
         game.clearingLines = fullRows;
         game.clearingFragments = this.buildClearFragments(fullRows);
         game.clearingDropRows = this.buildDropRows(fullRows, game.board.rows);
+        game.clearingDropGrid = null;
+        game.cascadeFalling = false;
         game.clearingTimer = 0;
     }
 
@@ -475,6 +481,12 @@ export class PieceController {
 
     finishLineClear() {
         const game = this.game;
+
+        if (game.gameModes[game.mode]?.cascadeGravity) {
+            this.finishCascadeStep();
+            return;
+        }
+
         const clearedRowIndices = game.clearingLines;
         const cleared = game.board.clearFullLines();
         game.renderer.notifyLinesCleared(game.board, clearedRowIndices);
@@ -489,6 +501,107 @@ export class PieceController {
         game.clearingFragments = [];
         game.clearingDropRows = [];
         game.dropCounter = 0;
+
+        const toppedOutFromResupply = game.modeController.onLinesCleared(cleared);
+        if (toppedOutFromResupply) return;
+        if (game.modeController.checkObjectiveComplete()) return;
+
+        game.state = "running";
+        this.spawnNext();
+    }
+
+    /**
+     * Cascade mode's clear resolution. Unlike finishLineClear(), the board
+     * is compacted per-column (see Board#collapseFullLines) rather than
+     * shifted as a rigid block, so removing a line can drop floating blocks
+     * into holes elsewhere and form brand new full rows on their own. Each
+     * such automatic re-clear is a cascade step. The sequence per step is:
+     * collapse instantly -> if anything actually moved, play a dedicated
+     * fall animation (finishCascadeFall) -> then check whether the fall
+     * formed a brand new full row and either flash+repeat or finish.
+     */
+    finishCascadeStep() {
+        const game = this.game;
+        const clearedRowIndices = game.clearingLines;
+        const {cleared, dropGrid} = game.board.collapseFullLines();
+        game.renderer.notifyLinesCleared(game.board, clearedRowIndices);
+
+        if (game.pendingSpin) {
+            game.statsTracker.registerSpin(game.pendingSpin, cleared);
+            game.pendingSpin = null;
+        }
+
+        const isFirstCascadeStep = game.cascadeChain === 0;
+        ++game.cascadeChain;
+        game.statsTracker.registerLineClears(cleared, game.cascadeChain > 1);
+        if (game.cascadeChain > 1) {
+            game.statsTracker.addScore(pointsForCascadeChain(game.cascadeChain, game.level, game.scoring));
+        }
+
+        if (isFirstCascadeStep) {
+            ++game.currentCombo;
+            game.maxCombo = Math.max(game.maxCombo, game.currentCombo);
+            if (game.currentCombo >= 2) {
+                game.comboBannerCombo = game.currentCombo;
+                game.comboBannerTimer = game.comboBannerDuration;
+            }
+        }
+
+        game.clearingLines = [];
+        game.clearingFragments = [];
+        game.clearingDropRows = [];
+        game.dropCounter = 0;
+        game.cascadeStepCleared = cleared;
+
+        const hasFall = dropGrid && dropGrid.some((amount) => amount !== 0);
+        if (hasFall) {
+            game.state = "clearing";
+            game.clearingDropGrid = dropGrid;
+            game.cascadeFalling = true;
+            game.clearingTimer = 0;
+            return;
+        }
+
+        game.clearingDropGrid = null;
+        this.continueCascadeChain(cleared);
+    }
+
+    /**
+     * Called once the per-column fall animation from finishCascadeStep
+     * finishes playing. The board itself was already updated instantly
+     * when the step started - this only advances the visual/game-flow
+     * side once the player has actually seen the blocks land.
+     */
+    finishCascadeFall() {
+        const game = this.game;
+        game.cascadeFalling = false;
+        game.clearingDropGrid = null;
+        this.continueCascadeChain(game.cascadeStepCleared);
+    }
+
+    /**
+     * Shared tail end of a cascade step (with or without a preceding fall
+     * animation): check whether the collapse formed a brand new full row -
+     * if so, flash it and let the state machine call finishCascadeStep
+     * again; otherwise the chain is over and play resumes.
+     */
+    continueCascadeChain(cleared) {
+        const game = this.game;
+
+        const chainedRows = game.board.getFullLineIndices();
+        if (chainedRows.length > 0) {
+            const clearedCount = Math.min(chainedRows.length, 4);
+            game.soundManager.play(`lineClear${clearedCount}`, {playbackRate: LINE_CLEAR_SOUND_PLAYBACK_RATE});
+            game.state = "clearing";
+            game.clearingLines = chainedRows;
+            game.clearingFragments = this.buildClearFragments(chainedRows);
+
+            game.clearingDropRows = new Uint8Array(game.board.rows);
+            game.clearingTimer = 0;
+            return;
+        }
+
+        game.cascadeChain = 0;
 
         const toppedOutFromResupply = game.modeController.onLinesCleared(cleared);
         if (toppedOutFromResupply) return;

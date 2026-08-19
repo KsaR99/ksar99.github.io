@@ -18,7 +18,8 @@
         "objective": "Cel",
         "statusLive": "Aktualna gra",
         "statusLast": "Ostatnia gra",
-        "height": "Wysokość"
+        "height": "Wysokość",
+        "combo": "Combo"
     },
     "controls": {
         "toggle": "Sterowanie",
@@ -201,6 +202,7 @@
             "time": "Czas",
             "level": "Poz.",
             "lines": "Linie",
+            "combo": "Combo",
             "date": "Data"
         },
         "defaultName": "Gracz",
@@ -294,6 +296,15 @@
                 "🙈 Wynik nie trafia na tablicę wyników"
             ]
         },
+        "cascade": {
+            "name": "Kaskada",
+            "description": "Wyczyszczone linie pozwalają klockom opadać i łączyć się w combo",
+            "rules": [
+                "🌊 Wyczyszczenie linii sprawia, że klocki spadają w dół zamiast przesuwać całą planszę",
+                "⛓️ Spadające klocki mogą same domknąć kolejne linie, tworząc combo",
+                "💰 Każdy dodatkowy krok kaskady daje rosnący bonus punktowy"
+            ]
+        },
         "random": {
             "name": "Losowy",
             "description": "Losuje jeden z pozostałych trybów po naciśnięciu Start",
@@ -305,7 +316,8 @@
         }
     },
     "game": {
-        "levelUpBanner": "POZIOM {level}"
+        "levelUpBanner": "POZIOM {level}",
+        "comboBanner": "COMBO x{combo}"
     },
     "benchmark": {
         "categories": {

@@ -18,7 +18,8 @@
         "objective": "Tujuan",
         "statusLive": "Permainan saat ini",
         "statusLast": "Permainan terakhir",
-        "height": "Ketinggian"
+        "height": "Ketinggian",
+        "combo": "Combo"
     },
     "controls": {
         "toggle": "Kontrol",
@@ -195,6 +196,7 @@
             "time": "Waktu",
             "level": "Lvl",
             "lines": "Baris",
+            "combo": "Combo",
             "date": "Tanggal"
         },
         "defaultName": "Pemain"
@@ -287,6 +289,15 @@
                 "🙈 Skor tidak disimpan ke papan peringkat"
             ]
         },
+        "cascade": {
+            "name": "Cascade",
+            "description": "Baris yang dibersihkan membuat balok jatuh dan memicu pembersihan baru secara berantai",
+            "rules": [
+                "🌊 Membersihkan satu baris membuat balok jatuh lurus ke bawah, bukan menggeser seluruh papan",
+                "⛓️ Balok yang jatuh bisa melengkapi baris baru dengan sendirinya, merangkai sebuah combo",
+                "💰 Setiap langkah rantai tambahan memberi bonus yang makin besar"
+            ]
+        },
         "random": {
             "name": "Acak",
             "description": "Memilihkan salah satu mode lain untukmu saat kamu menekan Mulai",
@@ -298,7 +309,8 @@
         }
     },
     "game": {
-        "levelUpBanner": "LEVEL {level}"
+        "levelUpBanner": "LEVEL {level}",
+        "comboBanner": "COMBO x{combo}"
     },
     "sounds": {
         "lineClear1": "baris",

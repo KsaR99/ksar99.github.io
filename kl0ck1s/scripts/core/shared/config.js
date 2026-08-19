@@ -21,6 +21,7 @@ export const SCORING = Object.freeze({
     LOCK_DELAY_MAX_RESETS: 15,
     MAX_GROUNDED_TIME: 3000,
     DEFAULT_FALLING_SOUND_RATE: 0.5,
+    CASCADE_CHAIN_BONUS: 50,
 });
 
 export const SPIN_POINTS = Object.freeze({
@@ -29,7 +30,8 @@ export const SPIN_POINTS = Object.freeze({
     OTHER: [100, 200, 400, 600],
 });
 
-export const LEVEL_UP_BANNER_DURATION_MS = 300;
+export const LEVEL_UP_BANNER_DURATION_MS = 350;
+export const COMBO_BANNER_DURATION_MS = 400;
 export const LINE_CLEAR_ANIMATION_DURATION_MS = 260;
 export const LINE_CLEAR_SOUND_PLAYBACK_RATE = 0.6;
 export const LINE_CLEAR_FLASH_PHASE_FRACTION = 0.75;
@@ -50,6 +52,7 @@ export const GAME_MODES = Object.freeze({
         timeLimitMs: null,
         garbage: false,
         freezeLevel: true,
+        noLevelBar: true,
         noLeaderboard: true,
         zenOverflow: true,
         zenOverflowThresholdRow: 4,
@@ -65,7 +68,7 @@ export const GAME_MODES = Object.freeze({
         garbageIntervalMs: 20000, garbageLinesMin: 1, garbageLinesMax: 2,
     }),
     cheeseRace: Object.freeze({
-        sprintTarget: null, timeLimitMs: null, garbage: false, cheeseRows: 10,
+        sprintTarget: null, timeLimitMs: null, garbage: false, cheeseRows: 10, noLevelBar: true,
     }),
     digSurvival: Object.freeze({
         sprintTarget: null, timeLimitMs: null, garbage: false, cheeseRows: 4, digTarget: 100,
@@ -73,6 +76,9 @@ export const GAME_MODES = Object.freeze({
     countdown: Object.freeze({
         sprintTarget: null, timeLimitMs: null, garbage: false,
         countdownStartMs: 60000, countdownBonusMs: [3000, 3000, 5000, 8000],
+    }),
+    cascade: Object.freeze({
+        sprintTarget: null, timeLimitMs: null, garbage: false, cascadeGravity: true,
     }),
     random: Object.freeze({sprintTarget: null, timeLimitMs: null, garbage: false, isRandom: true}),
 });

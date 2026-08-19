@@ -40,6 +40,7 @@ export const GAME_STATE_KEYS = [
     "clearingLines",
     "clearingFragments",
     "clearingDropRows",
+    "clearingDropGrid",
     "clearingTimer",
     "fallTrail",
     "fallTrailHead",
@@ -48,6 +49,7 @@ export const GAME_STATE_KEYS = [
     "hardDropTrail",
     "hardDropImpactFlash",
     "lockImpactFlash",
+    "zenShiftAnim",
     "lastRowStepTime",
     "effectiveDropIntervalMs",
     "lastColStepTime",
@@ -57,6 +59,8 @@ export const GAME_STATE_KEYS = [
     "levelTier",
     "levelUpTimer",
     "levelUpLevel",
+    "comboBannerTimer",
+    "comboBannerCombo",
     "score",
     "lines",
     "elapsedMs",
@@ -71,6 +75,9 @@ export const GAME_STATE_KEYS = [
     "spinCounts",
     "currentCombo",
     "maxCombo",
+    "cascadeChain",
+    "cascadeFalling",
+    "cascadeStepCleared",
     "settings",
     "_hudUpdateAcc",
 ];
@@ -117,6 +124,7 @@ export class GameState {
         this.clearingLines = [];
         this.clearingFragments = [];
         this.clearingDropRows = [];
+        this.clearingDropGrid = null;
         this.clearingTimer = 0;
 
         this.fallTrail = Array.from({length: FALL_TRAIL_MAX_LENGTH}, () => ({
@@ -128,6 +136,7 @@ export class GameState {
         this.hardDropTrail = null;
         this.hardDropImpactFlash = null;
         this.lockImpactFlash = null;
+        this.zenShiftAnim = null;
 
         this.lastRowStepTime = 0;
         this.effectiveDropIntervalMs = Infinity;
@@ -140,6 +149,8 @@ export class GameState {
         this.levelTier = null;
         this.levelUpTimer = 0;
         this.levelUpLevel = null;
+        this.comboBannerTimer = 0;
+        this.comboBannerCombo = null;
         this.score = 0;
         this.lines = 0;
         this.elapsedMs = 0;
@@ -154,6 +165,9 @@ export class GameState {
         this.spinCounts = {t: 0, tMini: 0, other: 0};
         this.currentCombo = 0;
         this.maxCombo = 0;
+        this.cascadeChain = 0;
+        this.cascadeFalling = false;
+        this.cascadeStepCleared = 0;
 
         this.settings = null;
         this._hudUpdateAcc = 0;

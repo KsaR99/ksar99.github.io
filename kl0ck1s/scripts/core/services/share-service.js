@@ -128,6 +128,7 @@ export class ShareService {
             level: stats.level,
             lines: stats.lines,
             time: stats.gameTime,
+            combo: stats.mode === "cascade" ? stats.maxCombo : null,
             date: this._formatCardDate(new Date().toISOString()),
             name,
         });
@@ -145,6 +146,7 @@ export class ShareService {
 
         const modeLabel = game.i18n.t(`modes.${mode}.name`);
         const isRace = game.leaderboard.isTimedRaceMode(mode);
+        const isCascade = mode === "cascade";
         const defaultName = game.i18n.t("leaderboard.defaultName");
 
         const rows = entries.map((entry) => ({
@@ -152,13 +154,14 @@ export class ShareService {
             score: formatNumber(entry.score),
             level: entry.level,
             lines: entry.lines,
+            combo: Number.isFinite(entry.combo) ? String(entry.combo) : "—",
             time: Number.isFinite(entry.timeMs)
                 ? (isRace ? formatDurationPrecise(entry.timeMs) : formatDuration(entry.timeMs))
                 : "—",
             date: this._formatCardDate(entry.date),
         }));
 
-        const canvas = await this._buildTableCard({modeLabel, rows});
+        const canvas = await this._buildTableCard({modeLabel, rows, isCascade});
 
         return this._dispatch(canvas, {
             text: this._tableShareText(modeLabel),
@@ -211,8 +214,9 @@ export class ShareService {
         });
     }
 
-    async _buildCard({modeLabel, score, level, lines, time, date, name}) {
+    async _buildCard({modeLabel, score, level, lines, time, combo = null, date, name}) {
         const dom = this.dom;
+        const i18n = this.game.i18n;
         if (dom.fonts?.ready) {
             try {
                 await dom.fonts.ready;
@@ -276,10 +280,13 @@ export class ShareService {
         ctx.fillText(String(score), CARD_WIDTH / 2, 366);
 
         const chips = [
-            {label: "LVL", value: String(level)},
-            {label: "LINII", value: String(lines)},
-            {label: "CZAS", value: time},
+            {label: i18n.t("leaderboard.headers.level").toUpperCase(), value: String(level)},
+            {label: i18n.t("leaderboard.headers.lines").toUpperCase(), value: String(lines)},
+            {label: i18n.t("leaderboard.headers.time").toUpperCase(), value: time},
         ];
+        if (Number.isFinite(combo)) {
+            chips.push({label: i18n.t("leaderboard.headers.combo").toUpperCase(), value: `x${combo}`});
+        }
         this._drawChips(ctx, chips, CARD_WIDTH / 2, 426, {panel, line, muted, text});
 
         ctx.textAlign = "center";
@@ -350,7 +357,7 @@ export class ShareService {
         });
     }
 
-    async _buildTableCard({modeLabel, rows}) {
+    async _buildTableCard({modeLabel, rows, isCascade = false}) {
         const dom = this.dom;
         if (dom.fonts?.ready) {
             try {
@@ -425,10 +432,12 @@ export class ShareService {
         const colDateW = 170;
         const colTimeW = 110;
         const colStatW = 70;
+        const colComboW = 70;
         const colScoreX = tableX + tableWidth - colScoreW;
         const colDateX = colScoreX - colDateW - colGap;
         const colTimeX = colDateX - colTimeW - colGap;
-        const colLinesX = colTimeX - colStatW - colGap;
+        const colComboX = colTimeX - colComboW - colGap;
+        const colLinesX = (isCascade ? colComboX : colTimeX) - colStatW - colGap;
         const colLevelX = colLinesX - colStatW - colGap;
         const colNameX = tableX + colRankW + colGap;
         const nameWidth = colLevelX - colNameX - colGap;
@@ -440,6 +449,9 @@ export class ShareService {
         ctx.textAlign = "center";
         ctx.fillText(i18n.t("leaderboard.headers.level").toUpperCase(), colLevelX + colStatW / 2, tableTop + 20);
         ctx.fillText(i18n.t("leaderboard.headers.lines").toUpperCase(), colLinesX + colStatW / 2, tableTop + 20);
+        if (isCascade) {
+            ctx.fillText(i18n.t("leaderboard.headers.combo").toUpperCase(), colComboX + colComboW / 2, tableTop + 20);
+        }
         ctx.fillText(i18n.t("leaderboard.headers.time").toUpperCase(), colTimeX + colTimeW / 2, tableTop + 20);
         ctx.fillText(i18n.t("leaderboard.headers.date").toUpperCase(), colDateX + colDateW / 2, tableTop + 20);
         ctx.textAlign = "right";
@@ -481,6 +493,9 @@ export class ShareService {
             ctx.fillStyle = muted;
             ctx.fillText(String(row.level), colLevelX + colStatW / 2, midY);
             ctx.fillText(String(row.lines), colLinesX + colStatW / 2, midY);
+            if (isCascade) {
+                ctx.fillText(row.combo, colComboX + colComboW / 2, midY);
+            }
             ctx.fillText(row.time, colTimeX + colTimeW / 2, midY);
             ctx.font = "500 16px 'Inter', sans-serif";
             ctx.fillText(row.date, colDateX + colDateW / 2, midY);

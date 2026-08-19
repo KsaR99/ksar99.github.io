@@ -10,7 +10,8 @@ import {
     HARD_DROP_IMPACT_FLASH_DURATION_MS,
     HARD_DROP_TRAIL_ALPHAS,
     HARD_DROP_TRAIL_DURATION_MS,
-    HUD_UPDATE_INTERVAL_MS
+    HUD_UPDATE_INTERVAL_MS,
+    ZEN_SHIFT_ANIMATION_DURATION_MS
 } from "./game-constants.js";
 import {GAME_STATE_KEYS, GameState} from "./game-state.js";
 import {InputController} from "../controllers/input-controller.js";
@@ -50,7 +51,9 @@ export class Game {
                     defaultMode,
                     scoring,
                     levelUpBannerDuration,
+                    comboBannerDuration,
                     lineClearAnimationDuration,
+                    cascadeFallDuration = 180,
                     countdownStepDuration = 500,
                     settingsStore = null,
                     themeCanvas = null,
@@ -69,7 +72,9 @@ export class Game {
         this.gameModes = gameModes;
         this.scoring = scoring;
         this.levelUpBannerDuration = levelUpBannerDuration;
+        this.comboBannerDuration = comboBannerDuration ?? levelUpBannerDuration;
         this.lineClearAnimationDuration = lineClearAnimationDuration;
+        this.cascadeFallDuration = cascadeFallDuration;
         this.countdownStepDuration = countdownStepDuration;
         this.settingsStore = settingsStore ?? leaderboard.store;
         this.dom = dom;
@@ -255,6 +260,11 @@ export class Game {
         };
     }
 
+    startZenShiftAnimation(rowDelta) {
+        if (!rowDelta) return;
+        this.zenShiftAnim = {rowDelta, elapsed: 0, duration: ZEN_SHIFT_ANIMATION_DURATION_MS};
+    }
+
     noteRowStep() {
         ({lastTime: this.lastRowStepTime, effectiveMs: this.effectiveDropIntervalMs} =
             smoothedInterval(this.lastRowStepTime, this.effectiveDropIntervalMs, nowMs()));
@@ -314,6 +324,13 @@ export class Game {
             }
         }
 
+        if (this.zenShiftAnim) {
+            this.zenShiftAnim.elapsed += delta;
+            if (this.zenShiftAnim.elapsed >= this.zenShiftAnim.duration) {
+                this.zenShiftAnim = null;
+            }
+        }
+
         if (this.lockImpactFlash) {
             this.lockImpactFlash.elapsed += delta;
             if (this.lockImpactFlash.elapsed >= this.lockImpactFlash.duration) {
@@ -323,6 +340,10 @@ export class Game {
 
         if (this.levelUpTimer > 0) {
             this.levelUpTimer = Math.max(0, this.levelUpTimer - delta);
+        }
+
+        if (this.comboBannerTimer > 0) {
+            this.comboBannerTimer = Math.max(0, this.comboBannerTimer - delta);
         }
 
         if (this.state === "running" || this.state === "clearing") {
@@ -353,8 +374,16 @@ export class Game {
 
         if (this.state === "clearing") {
             this.clearingTimer += delta;
-            if (this.clearingTimer >= this.lineClearAnimationDuration) {
-                this.pieceController.finishLineClear();
+            const duration = this.cascadeFalling ? this.cascadeFallDuration : this.lineClearAnimationDuration;
+            if (this.clearingTimer >= duration) {
+                if (this.cascadeFalling) {
+                    this.pieceController.finishCascadeFall();
+                } else {
+                    this.pieceController.finishLineClear();
+                }
+
+                this._hudUpdateAcc = 0;
+                this.hud.update(this.stats);
             }
             return;
         }
@@ -500,10 +529,18 @@ export class Game {
             && ["running", "paused"].includes(this.previousStateBeforeOptions);
 
         if (this.state === "clearing") {
-            const progress = Math.min(1, this.clearingTimer / this.lineClearAnimationDuration);
-            this.renderer.drawClearingFrame(
-                this.board, this.clearingLines, this.clearingDropRows, this.clearingFragments, progress
-            );
+            if (this.cascadeFalling) {
+                const progress = Math.min(1, this.clearingTimer / this.cascadeFallDuration);
+                this.renderer.drawCascadeFallFrame(this.board, this.clearingDropGrid, progress);
+            } else {
+                const progress = Math.min(1, this.clearingTimer / this.lineClearAnimationDuration);
+                this.renderer.drawClearingFrame(
+                    this.board, this.clearingLines, this.clearingDropRows, this.clearingFragments, progress
+                );
+            }
+        } else if (this.zenShiftAnim) {
+            const progress = Math.min(1, this.zenShiftAnim.elapsed / this.zenShiftAnim.duration);
+            this.renderer.drawZenShiftFrame(this.board, this.zenShiftAnim.rowDelta, progress);
         } else {
             this.renderer.drawBoard(this.board);
         }
@@ -548,7 +585,11 @@ export class Game {
         }
 
         if (this.levelUpTimer > 0) {
-            this.renderer.drawLevelUpBanner(this.levelUpLevel);
+            this.renderer.drawLevelUpBanner(this.levelUpLevel, this.board);
+        }
+
+        if (this.comboBannerTimer > 0) {
+            this.renderer.drawComboBanner(this.comboBannerCombo, this.board);
         }
     }
 

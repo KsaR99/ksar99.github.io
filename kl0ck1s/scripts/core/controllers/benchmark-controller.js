@@ -325,6 +325,7 @@ export class BenchmarkController {
         shadow.currentCombo = 0;
         shadow.maxCombo = 0;
         shadow.levelUpBannerDuration = liveGame.levelUpBannerDuration;
+        shadow.comboBannerDuration = liveGame.comboBannerDuration;
         shadow.transitionScore = null;
 
         shadow.statsTracker = new StatsTracker(shadow);

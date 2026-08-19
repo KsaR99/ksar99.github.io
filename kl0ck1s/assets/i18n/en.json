@@ -18,7 +18,8 @@
         "objective": "Objective",
         "statusLive": "Current game",
         "statusLast": "Last game",
-        "height": "Height"
+        "height": "Height",
+        "combo": "Combo"
     },
     "controls": {
         "toggle": "Controls",
@@ -201,6 +202,7 @@
             "time": "Time",
             "level": "Lvl",
             "lines": "Lines",
+            "combo": "Combo",
             "date": "Date"
         },
         "defaultName": "Player",
@@ -294,6 +296,15 @@
                 "🙈 Score is not saved to the leaderboard"
             ]
         },
+        "cascade": {
+            "name": "Cascade",
+            "description": "Cleared lines let blocks fall and chain into new clears",
+            "rules": [
+                "🌊 Clearing a line drops blocks straight down instead of shifting the board",
+                "⛓️ Falling blocks can complete new lines on their own, chaining a combo",
+                "💰 Each extra chain step scores a growing bonus"
+            ]
+        },
         "random": {
             "name": "Random",
             "description": "Picks one of the other modes for you when you press Start",
@@ -305,7 +316,8 @@
         }
     },
     "game": {
-        "levelUpBanner": "LEVEL {level}"
+        "levelUpBanner": "LEVEL {level}",
+        "comboBanner": "COMBO x{combo}"
     },
     "benchmark": {
         "categories": {

@@ -118,6 +118,20 @@ export class Renderer {
             _clearingGridSize: 0,
             _clearingGridRows: 0,
             _clearingGridCols: 0,
+
+            cascadeDrop: new CachedCanvasLayer(),
+            _cascadeDropVersion: -1,
+            _cascadeDropSize: 0,
+            _cascadeDropSat: null,
+            _cascadeDropOutline: null,
+            _cascadeDropGridRef: null,
+            _cascadeDropSegments: [],
+
+            zenBlocks: new CachedCanvasLayer(),
+            _zenBlocksVersion: -1,
+            _zenBlocksSize: 0,
+            _zenBlocksSat: null,
+            _zenBlocksOutline: null,
         };
     }
 
@@ -371,38 +385,48 @@ export class Renderer {
             `${this._boardOffsetX ?? 0}rem ${this._boardOffsetY ?? 0}rem`;
     }
 
-    zenShiftTransition(shiftRows, durationMs = 220) {
-        const el = this.boardEl;
-        if (!el || shiftRows <= 0) return;
-        clearTimeout(this._shakeTimer);
-        clearTimeout(this._squashTimerA);
-        clearTimeout(this._squashTimerB);
-        this._boardOffsetX = 0;
-        this._boardOffsetY = 0;
-        const offset = shiftRows * this.boardConfig.CELL_SIZE;
-        el.style.transition = "none";
-        el.style.translate = `0 ${-offset}px`;
-        el.getBoundingClientRect();
-        el.style.setProperty("--shake-duration", `${durationMs}ms`);
-        el.style.transition = "";
-        el.style.translate = "0 0";
+    _ensureZenBlocksCache(surface, board, size) {
+        const dirty = surface._zenBlocksVersion !== board.version
+            || surface._zenBlocksSize !== size
+            || surface._zenBlocksSat !== this.heightSaturationEnabled
+            || surface._zenBlocksOutline !== this.outlineBlocksEnabled;
+
+        if (!dirty) return;
+
+        const width = board.cols * size;
+        const height = board.rows * size;
+        surface.zenBlocks.resize(width, height);
+
+        const bCtx = surface.zenBlocks.ctx;
+        bCtx.clearRect(0, 0, width, height);
+
+        for (let y = 0; y < board.rows; y++) {
+            for (let x = 0; x < board.cols; x++) {
+                const colorIndex = board.colors[y * board.cols + x];
+                if (colorIndex) this.drawCell(bCtx, x, y, this.colorPalette[colorIndex], size, {level: this.saturationLevelForRow(y, board.rows)});
+            }
+        }
+
+        surface._zenBlocksVersion = board.version;
+        surface._zenBlocksSize = size;
+        surface._zenBlocksSat = this.heightSaturationEnabled;
+        surface._zenBlocksOutline = this.outlineBlocksEnabled;
     }
 
-    zenGiveBackTransition(shiftRows, durationMs = 220) {
-        const el = this.boardEl;
-        if (!el || shiftRows <= 0) return;
-        clearTimeout(this._shakeTimer);
-        clearTimeout(this._squashTimerA);
-        clearTimeout(this._squashTimerB);
-        this._boardOffsetX = 0;
-        this._boardOffsetY = 0;
-        const offset = shiftRows * this.boardConfig.CELL_SIZE;
-        el.style.transition = "none";
-        el.style.translate = `0 ${offset}px`;
-        el.getBoundingClientRect();
-        el.style.setProperty("--shake-duration", `${durationMs}ms`);
-        el.style.transition = "";
-        el.style.translate = "0 0";
+    drawZenShiftFrame(board, rowDelta, progress, surface = this) {
+        const size = this.boardConfig.CELL_SIZE;
+        const {ctx, boardCanvas} = surface;
+
+        this._ensureZenBlocksCache(surface, board, size);
+        if (this.gridEnabled) this._ensureClearingGridCache(surface, board, size);
+
+        const t = Math.min(1, Math.max(0, progress));
+        const eased = 1 - Math.pow(1 - t, 3);
+        const dy = -rowDelta * size * (1 - eased);
+
+        ctx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
+        if (this.gridEnabled) ctx.drawImage(surface.clearingGrid.canvas, 0, 0);
+        ctx.drawImage(surface.zenBlocks.canvas, 0, dy);
     }
 
     shakeMove(dir) {
@@ -766,6 +790,108 @@ export class Renderer {
         surface._clearingAboveDropRowsRef = dropRows;
         surface._clearingAboveSat = this.heightSaturationEnabled;
         surface._clearingAboveOutline = this.outlineBlocksEnabled;
+    }
+
+    /**
+     * Column-major counterpart to _ensureClearingAboveCache, for Cascade
+     * mode's per-cell drop grid. Since per-column compaction can drop cells
+     * anywhere on the board (not just "above" a fixed clear line), this
+     * caches the whole board height, grouped into vertical runs per column
+     * that share the same drop amount.
+     */
+    _ensureCascadeDropCache(surface, board, size, dropGrid) {
+        const dirty = surface._cascadeDropVersion !== board.version
+            || surface._cascadeDropSize !== size
+            || surface._cascadeDropGridRef !== dropGrid
+            || surface._cascadeDropSat !== this.heightSaturationEnabled
+            || surface._cascadeDropOutline !== this.outlineBlocksEnabled;
+
+        if (!dirty) return;
+
+        const width = board.cols * size;
+        const height = board.rows * size;
+        surface.cascadeDrop.resize(width, height);
+
+        const ctx = surface.cascadeDrop.ctx;
+        ctx.clearRect(0, 0, width, Math.max(1, height));
+
+        const segments = [];
+        for (let x = 0; x < board.cols; x++) {
+            let runStart = -1;
+            let runDrop = 0;
+
+            const flushRun = (endExclusive) => {
+                if (runStart === -1) return;
+                segments.push({x, top: runStart, height: endExclusive - runStart, dropAmount: runDrop});
+                runStart = -1;
+            };
+
+            for (let y = 0; y < board.rows; y++) {
+                const drop = dropGrid[y * board.cols + x] || 0;
+                if (runStart === -1) {
+                    runStart = y;
+                    runDrop = drop;
+                } else if (drop !== runDrop) {
+                    flushRun(y);
+                    runStart = y;
+                    runDrop = drop;
+                }
+            }
+
+            flushRun(board.rows);
+        }
+
+        for (const segment of segments) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(segment.x * size, segment.top * size, size, segment.height * size);
+            ctx.clip();
+            for (let y = segment.top; y < segment.top + segment.height; y++) {
+                const colorIndex = board.colors[y * board.cols + segment.x];
+                if (!colorIndex) continue;
+                this.drawCell(ctx, segment.x, y, this.colorPalette[colorIndex], size, {level: this.saturationLevelForRow(y, board.rows)});
+            }
+            ctx.restore();
+        }
+
+        surface._cascadeDropSegments = segments;
+        surface._cascadeDropVersion = board.version;
+        surface._cascadeDropSize = size;
+        surface._cascadeDropGridRef = dropGrid;
+        surface._cascadeDropSat = this.heightSaturationEnabled;
+        surface._cascadeDropOutline = this.outlineBlocksEnabled;
+    }
+
+    /**
+     * Pure per-column fall animation for Cascade mode: after a collapse,
+     * board.colors is already the final compacted layout, so this replays
+     * the fall from each cell's pre-collapse row using the dropGrid from
+     * Board#collapseFullLines. No flash/wipe - that's drawClearingFrame's
+     * job for the (possibly newly-formed) rows before/after this phase.
+     */
+    drawCascadeFallFrame(board, dropGrid, progress, surface = this) {
+        const size = this.boardConfig.CELL_SIZE;
+        const {ctx, boardCanvas} = surface;
+
+        const t = Math.min(1, Math.max(0, progress));
+        const eased = 1 - Math.pow(1 - t, 3);
+
+        this._ensureCascadeDropCache(surface, board, size, dropGrid);
+        if (this.gridEnabled) this._ensureClearingGridCache(surface, board, size);
+
+        ctx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
+        if (this.gridEnabled) ctx.drawImage(surface.clearingGrid.canvas, 0, 0);
+
+        const colWidth = size;
+        for (const segment of surface._cascadeDropSegments) {
+            const dy = segment.top * size - segment.dropAmount * size * (1 - eased);
+            const segHeight = segment.height * size;
+            ctx.drawImage(
+                surface.cascadeDrop.canvas,
+                segment.x * size, segment.top * size, colWidth, segHeight,
+                segment.x * size, dy, colWidth, segHeight,
+            );
+        }
     }
 
     drawClearingFrame(board, lineIndices, dropRows, fragments, progress, surface = this) {
@@ -1143,7 +1269,20 @@ export class Renderer {
         ctx.restore();
     }
 
-    drawLevelUpBanner(level, surface = this) {
+    getBannerAnchorY(board, surface = this) {
+        const {boardCanvas} = surface;
+        const {boardConfig} = this;
+        const size = boardConfig.CELL_SIZE;
+        const highestRow = board?.getHighestOccupiedRow() ?? 2;
+        const anchorRow = board && highestRow < board.rows ? highestRow : 2;
+        return Math.min(anchorRow * size, boardCanvas.height - size);
+    }
+
+    getRotatedHalfExtentY(boxWidth, boxHeight, angleRad) {
+        return (boxWidth / 2) * Math.abs(Math.sin(angleRad)) + (boxHeight / 2) * Math.abs(Math.cos(angleRad));
+    }
+
+    drawLevelUpBanner(level, board, surface = this) {
         const {ctx, boardCanvas} = surface;
         const {boardConfig} = this;
         const centerX = boardCanvas.width / 2;
@@ -1163,7 +1302,11 @@ export class Renderer {
         const textWidth = ctx.measureText(text).width;
         const boxWidth = textWidth + paddingX * 2;
         const boxHeight = fontSize + paddingY * 2;
-        const centerY = boardCanvas.height / 2;
+        const anchorY = this.getBannerAnchorY(board, surface);
+        const halfVertical = boxHeight / 2;
+        const maxCenterY = boardCanvas.height - halfVertical - 4;
+        const minCenterY = halfVertical + 4;
+        const centerY = Math.min(Math.max(anchorY - halfVertical - 4, minCenterY), maxCenterY);
 
         ctx.shadowBlur = 8;
         ctx.fillStyle = "oklch(0 0 0 / 0.1)";
@@ -1184,6 +1327,60 @@ export class Renderer {
 
         ctx.fillStyle = "oklch(0.94 0.05 90)";
         ctx.fillText(text, centerX, centerY);
+        ctx.restore();
+    }
+
+    drawComboBanner(combo, board, surface = this) {
+        const {ctx, boardCanvas} = surface;
+        const {boardConfig} = this;
+        const fontSize = Math.max(12, Math.round(boardConfig.CELL_SIZE * 0.8));
+        const text = this.i18n ? this.i18n.t("game.comboBanner", {combo}) : `COMBO x${combo}`;
+        const fontBody = getComputedStyle(document.documentElement)
+            .getPropertyValue("--font-body")
+            .trim();
+
+        ctx.save();
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = `bold ${fontSize}px ${fontBody}`;
+
+        const paddingX = fontSize * 0.6;
+        const paddingY = fontSize * 0.35;
+        const textWidth = ctx.measureText(text).width;
+        const boxWidth = textWidth + paddingX * 2;
+        const boxHeight = fontSize + paddingY * 2;
+        const tiltAngle = Math.PI / 4;
+        const halfVerticalRotated = this.getRotatedHalfExtentY(boxWidth, boxHeight, tiltAngle);
+        const halfHorizontalRotated = (boxWidth / 2) * Math.abs(Math.cos(tiltAngle))
+            + (boxHeight / 2) * Math.abs(Math.sin(tiltAngle));
+        const anchorY = this.getBannerAnchorY(board, surface);
+        const maxCenterY = boardCanvas.height - halfVerticalRotated - 4;
+        const minCenterY = halfVerticalRotated + 4;
+        const centerY = Math.min(Math.max(anchorY + halfVerticalRotated + 4, minCenterY), maxCenterY);
+        const centerX = Math.max(boardCanvas.width - halfHorizontalRotated - 4, halfHorizontalRotated + 4);
+
+        ctx.translate(centerX, centerY);
+        ctx.rotate(tiltAngle);
+
+        ctx.shadowBlur = 8;
+        ctx.fillStyle = "oklch(0 0 0 / 0.1)";
+        ctx.beginPath();
+        ctx.roundRect(-boxWidth / 2, -boxHeight / 2, boxWidth, boxHeight, fontSize * 0.2);
+        ctx.fill();
+
+        if (this.glowEnabled) {
+            ctx.shadowBlur = fontSize * 0.25;
+            ctx.shadowColor = "oklch(0.3706 0.1479 24.04 / 0.85)";
+        } else {
+            ctx.shadowBlur = 0;
+        }
+
+        ctx.lineWidth = Math.max(2, fontSize * 0.12);
+        ctx.strokeStyle = "oklch(0 0 0)";
+        ctx.strokeText(text, 0, 0);
+
+        ctx.fillStyle = "oklch(0.729 0.156 71.488)";
+        ctx.fillText(text, 0, 0);
         ctx.restore();
     }
 

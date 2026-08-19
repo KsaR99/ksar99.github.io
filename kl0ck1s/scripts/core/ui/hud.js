@@ -149,7 +149,7 @@ export class HUD {
         if (this.difficultyRowEl && hasLevelProgress !== undefined) {
             if (this._cache.hasLevelProgress !== hasLevelProgress) {
                 this._cache.hasLevelProgress = hasLevelProgress;
-                this.difficultyRowEl.classList.toggle("stats__row--hidden", !hasLevelProgress);
+                this.difficultyRowEl.classList.toggle("progress-bar--no-fill", !hasLevelProgress);
             }
         }
 

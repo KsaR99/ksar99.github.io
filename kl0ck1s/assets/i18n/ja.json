@@ -18,7 +18,8 @@
         "objective": "目標",
         "statusLive": "現在のゲーム",
         "statusLast": "前回のゲーム",
-        "height": "高さ"
+        "height": "高さ",
+        "combo": "コンボ"
     },
     "controls": {
         "toggle": "操作方法",
@@ -195,6 +196,7 @@
             "time": "時間",
             "level": "Lv",
             "lines": "ライン",
+            "combo": "コンボ",
             "date": "日付"
         },
         "defaultName": "プレイヤー"
@@ -287,6 +289,15 @@
                 "🙈 スコアはランキングに保存されない"
             ]
         },
+        "cascade": {
+            "name": "カスケード",
+            "description": "消したラインでブロックが落下し、さらなる連鎖を生む",
+            "rules": [
+                "🌊 ラインを消すと盤面全体をずらす代わりにブロックがまっすぐ落下する",
+                "⛓️ 落下したブロックが自然に新しいラインを完成させ、コンボにつながる",
+                "💰 連鎖が続くごとにボーナスが増えていく"
+            ]
+        },
         "random": {
             "name": "ランダム",
             "description": "スタートを押すと他のモードの中から1つを選んでくれる",
@@ -298,7 +309,8 @@
         }
     },
     "game": {
-        "levelUpBanner": "レベル {level}"
+        "levelUpBanner": "レベル {level}",
+        "comboBanner": "コンボ x{combo}"
     },
     "sounds": {
         "lineClear1": "ライン",

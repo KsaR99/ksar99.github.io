@@ -980,6 +980,10 @@ body.perf-no-glow .board__filter--active.board__filter--vhs {
     transition: width 0.1s ease;
 }
 
+.progress-bar--no-fill .progress-bar__fill {
+    display: none;
+}
+
 .progress-bar--difficulty {
     position: relative;
     height: 1.5rem;

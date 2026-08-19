@@ -247,6 +247,7 @@ export class GameFlowController {
             date: new Date().toISOString(),
             mode: game.mode,
             timeMs: game.elapsedMs,
+            combo: game.mode === "cascade" ? game.maxCombo : null,
         };
 
         const raceUnfinished =

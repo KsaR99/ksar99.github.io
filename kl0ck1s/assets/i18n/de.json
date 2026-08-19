@@ -18,7 +18,8 @@
         "objective": "Ziel",
         "statusLive": "Aktuelles Spiel",
         "statusLast": "Letztes Spiel",
-        "height": "Höhe"
+        "height": "Höhe",
+        "combo": "Combo"
     },
     "controls": {
         "toggle": "Steuerung",
@@ -195,6 +196,7 @@
             "time": "Zeit",
             "level": "Lvl",
             "lines": "Reihen",
+            "combo": "Combo",
             "date": "Datum"
         },
         "defaultName": "Spieler"
@@ -287,6 +289,15 @@
                 "🙈 Der Punktestand wird nicht in der Bestenliste gespeichert"
             ]
         },
+        "cascade": {
+            "name": "Kaskade",
+            "description": "Geräumte Linien lassen Blöcke fallen und weitere Räumungen auslösen",
+            "rules": [
+                "🌊 Eine geräumte Linie lässt Blöcke direkt nach unten fallen, statt das Feld zu verschieben",
+                "⛓️ Fallende Blöcke können von selbst neue Linien vervollständigen und ein Combo auslösen",
+                "💰 Jeder zusätzliche Kettenschritt bringt einen wachsenden Bonus"
+            ]
+        },
         "random": {
             "name": "Zufällig",
             "description": "Wählt beim Drücken von Start einen der anderen Modi für dich aus",
@@ -298,7 +309,8 @@
         }
     },
     "game": {
-        "levelUpBanner": "LEVEL {level}"
+        "levelUpBanner": "LEVEL {level}",
+        "comboBanner": "COMBO x{combo}"
     },
     "sounds": {
         "lineClear1": "Reihe",

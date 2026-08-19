@@ -43,9 +43,9 @@ export class StatsTracker {
             best: bestDisplay,
             mode: game.mode,
             noLeaderboard: game.gameModes[game.mode].noLeaderboard === true || Boolean(game.multiplayerConnected),
-            hasLevelProgress: game.gameModes[game.mode].freezeLevel !== true,
+            hasLevelProgress: game.gameModes[game.mode].noLevelBar !== true,
             objective: game.modeController.objectiveText() !== null
-                ? `${game.i18n.t(game.mode === "zen" ? "sidebar.height" : "sidebar.objective")}: ${game.modeController.objectiveText()}`
+                ? `${game.i18n.t(this._objectiveLabelKey(game.mode))}: ${game.modeController.objectiveText()}`
                 : null,
             objectivePercent: game.modeController.objectivePercent(),
             objectiveUrgency: game.modeController.objectiveUrgency(),
@@ -73,6 +73,12 @@ export class StatsTracker {
         };
     }
 
+    _objectiveLabelKey(mode) {
+        if (mode === "zen") return "sidebar.height";
+        if (mode === "cascade") return "sidebar.combo";
+        return "sidebar.objective";
+    }
+
     reset() {
         const game = this.game;
         game.score = 0;
@@ -89,8 +95,11 @@ export class StatsTracker {
         game.spinCounts = {t: 0, tMini: 0, other: 0};
         game.currentCombo = 0;
         game.maxCombo = 0;
+        game.cascadeChain = 0;
         game.levelUpTimer = 0;
         game.levelUpLevel = null;
+        game.comboBannerTimer = 0;
+        game.comboBannerCombo = null;
     }
 
     registerPieceSpawn(type) {

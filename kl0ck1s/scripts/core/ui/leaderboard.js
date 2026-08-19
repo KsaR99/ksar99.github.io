@@ -341,6 +341,9 @@ export class Leaderboard {
                 : "—";
             row.querySelector('[data-field="level"]').textContent = entry.level;
             row.querySelector('[data-field="lines"]').textContent = entry.lines;
+            row.querySelector('[data-field="combo"]').textContent = Number.isFinite(entry.combo)
+                ? entry.combo
+                : "—";
             row.querySelector('[data-field="date"]').textContent = this.formatDate(entry.date);
             tbody.appendChild(row);
         });

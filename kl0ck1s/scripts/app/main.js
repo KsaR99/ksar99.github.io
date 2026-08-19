@@ -3,6 +3,7 @@
 import {
     BOARD_CONFIG,
     COLOR_PALETTE,
+    COMBO_BANNER_DURATION_MS,
     DEFAULT_DIFFICULTY,
     DEFAULT_MODE,
     DIFFICULTIES,
@@ -198,6 +199,7 @@ const game = new Game({
     defaultMode: DEFAULT_MODE,
     scoring: SCORING,
     levelUpBannerDuration: LEVEL_UP_BANNER_DURATION_MS,
+    comboBannerDuration: COMBO_BANNER_DURATION_MS,
     lineClearAnimationDuration: LINE_CLEAR_ANIMATION_DURATION_MS,
     settingsStore: store,
     themeCanvas,

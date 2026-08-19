@@ -18,7 +18,8 @@
         "objective": "Cíl",
         "statusLive": "Aktuální hra",
         "statusLast": "Poslední hra",
-        "height": "Výška"
+        "height": "Výška",
+        "combo": "Combo"
     },
     "controls": {
         "toggle": "Ovládání",
@@ -195,6 +196,7 @@
             "time": "Čas",
             "level": "Úr.",
             "lines": "Řádky",
+            "combo": "Combo",
             "date": "Datum"
         },
         "defaultName": "Hráč"
@@ -287,6 +289,15 @@
                 "🙈 Skóre se neukládá do žebříčku"
             ]
         },
+        "cascade": {
+            "name": "Kaskáda",
+            "description": "Vyčištěné řádky nechají klocky padat a řetězit další čistění",
+            "rules": [
+                "🌊 Vyčištění řádku srazí klocky přímo dolů místo posunu celé plochy",
+                "⛓️ Padající klocky mohou samy doplnit nové řádky a prodloužit combo",
+                "💰 Každý další článek řetězu dává rostoucí bonus"
+            ]
+        },
         "random": {
             "name": "Náhodný",
             "description": "Při stisknutí Start za tebe vybere jeden z ostatních režimů",
@@ -298,7 +309,8 @@
         }
     },
     "game": {
-        "levelUpBanner": "ÚROVEŇ {level}"
+        "levelUpBanner": "ÚROVEŇ {level}",
+        "comboBanner": "COMBO x{combo}"
     },
     "sounds": {
         "lineClear1": "řádek",

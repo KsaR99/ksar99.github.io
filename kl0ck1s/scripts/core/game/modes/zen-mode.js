@@ -46,7 +46,7 @@ export class ZenMode extends BaseMode {
         if (shifted <= 0) return;
 
         game.modeState.zenOverflowUsed = used + shifted;
-        game.renderer?.zenShiftTransition(shifted);
+        game.startZenShiftAnimation?.(shifted);
     }
 
     maybeGiveBackZenOverflow() {
@@ -72,6 +72,6 @@ export class ZenMode extends BaseMode {
 
         game.modeState.zenOverflowUsed = used - shifted;
         game.modeState.zenGiveBackUsed = giveBackUsed + shifted;
-        game.renderer?.zenGiveBackTransition(shifted);
+        game.startZenShiftAnimation?.(-shifted);
     }
 }

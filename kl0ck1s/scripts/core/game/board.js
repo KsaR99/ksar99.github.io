@@ -98,6 +98,13 @@ export class Board {
         return indices;
     }
 
+    getHighestOccupiedRow() {
+        for (let y = 0; y < this.rows; y++) {
+            if (this.occupancy[y] !== 0) return y;
+        }
+        return this.rows;
+    }
+
     lockPiece(piece) {
         const {width, height, mask, colorIndex} = piece;
 
@@ -141,6 +148,81 @@ export class Board {
         return cleared;
     }
 
+    /**
+     * Compacts every column independently, letting each column's filled
+     * cells fall to fill any gaps beneath them - unlike a normal Tetris
+     * clear, where whole rows shift down as a rigid block. Used by Cascade
+     * mode so that clearing a line can drop overhanging blocks into holes
+     * elsewhere on the board, potentially completing new lines.
+     *
+     * @param {Uint8Array|null} [dropGrid] - optional buffer (length rows*cols)
+     *   to receive, for every surviving cell's *final* position, how many
+     *   rows it fell from its pre-compaction position (0 if it didn't move).
+     *   Lets a caller animate the per-column fall instead of only applying
+     *   the result instantly.
+     * @returns {boolean} true if any cell moved.
+     */
+    compactColumns(dropGrid = null) {
+        let moved = false;
+
+        for (let x = 0; x < this.cols; x++) {
+            const bit = 1 << x;
+            const stackColors = [];
+            const stackFromRows = [];
+            for (let y = 0; y < this.rows; y++) {
+                if (this.occupancy[y] & bit) {
+                    stackColors.push(this.colors[y * this.cols + x]);
+                    stackFromRows.push(y);
+                }
+            }
+
+            const startY = this.rows - stackColors.length;
+            for (let y = 0; y < this.rows; y++) {
+                const idx = y * this.cols + x;
+                if (y >= startY) {
+                    const i = y - startY;
+                    const color = stackColors[i];
+                    if (!(this.occupancy[y] & bit) || this.colors[idx] !== color) moved = true;
+                    this.occupancy[y] |= bit;
+                    this.colors[idx] = color;
+                    if (dropGrid) dropGrid[idx] = y - stackFromRows[i];
+                } else if (this.occupancy[y] & bit) {
+                    moved = true;
+                    this.occupancy[y] &= ~bit;
+                    this.colors[idx] = 0;
+                }
+            }
+        }
+
+        if (moved) this.version++;
+        return moved;
+    }
+
+    /**
+     * Cascade-style clear: removes whichever rows are currently full, then
+     * lets each column collapse independently via compactColumns() instead
+     * of shifting the whole board down as one rigid block. This can drop
+     * floating blocks into holes elsewhere on the board and form brand new
+     * full rows without the player placing another piece - call this again
+     * (checking getFullLineIndices()) to resolve a full cascade chain.
+     *
+     * @returns {{cleared: number, rows: number[], dropGrid: Uint8Array|null}}
+     */
+    collapseFullLines() {
+        const rows = this.getFullLineIndices();
+        if (rows.length === 0) return {cleared: 0, rows, dropGrid: null};
+
+        for (const y of rows) {
+            this.occupancy[y] = 0;
+            this.colors.fill(0, y * this.cols, (y + 1) * this.cols);
+        }
+
+        const dropGrid = new Uint8Array(this.rows * this.cols);
+        this.compactColumns(dropGrid);
+        this.version++;
+        return {cleared: rows.length, rows, dropGrid};
+    }
+
     addGarbageLines(count) {
         if (count <= 0) return {toppedOut: false};
 
@@ -156,9 +238,9 @@ export class Board {
             this.#copyRowColors(newColors, y, y - count);
         }
 
+        const gapCol = Math.floor(Math.random() * this.cols);
         for (let i = 0; i < Math.min(count, this.rows); i++) {
             const y = this.rows - count + i;
-            const gapCol = Math.floor(Math.random() * this.cols);
             let rowMask = 0;
             for (let x = 0; x < this.cols; x++) {
                 if (x === gapCol) continue;

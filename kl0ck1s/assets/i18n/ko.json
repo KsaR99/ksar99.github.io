@@ -18,7 +18,8 @@
         "objective": "목표",
         "statusLive": "현재 게임",
         "statusLast": "마지막 게임",
-        "height": "높이"
+        "height": "높이",
+        "combo": "콤보"
     },
     "controls": {
         "toggle": "조작법",
@@ -195,6 +196,7 @@
             "time": "시간",
             "level": "레벨",
             "lines": "라인",
+            "combo": "콤보",
             "date": "날짜"
         },
         "defaultName": "플레이어"
@@ -287,6 +289,15 @@
                 "🙈 점수는 리더보드에 저장되지 않음"
             ]
         },
+        "cascade": {
+            "name": "캐스케이드",
+            "description": "지운 라인 때문에 블록이 떨어지며 새로운 클리어로 이어집니다",
+            "rules": [
+                "🌊 라인을 지우면 보드를 밀어내는 대신 블록이 바로 아래로 떨어집니다",
+                "⛓️ 떨어지는 블록이 스스로 새로운 라인을 완성해 콤보로 이어질 수 있습니다",
+                "💰 연쇄가 이어질 때마다 보너스가 점점 커집니다"
+            ]
+        },
         "random": {
             "name": "랜덤",
             "description": "시작을 누르면 다른 모드 중 하나를 무작위로 선택해 줍니다",
@@ -298,7 +309,8 @@
         }
     },
     "game": {
-        "levelUpBanner": "레벨 {level}"
+        "levelUpBanner": "레벨 {level}",
+        "comboBanner": "콤보 x{combo}"
     },
     "sounds": {
         "lineClear1": "라인",

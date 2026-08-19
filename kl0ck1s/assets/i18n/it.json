@@ -18,7 +18,8 @@
         "objective": "Obiettivo",
         "statusLive": "Partita in corso",
         "statusLast": "Ultima partita",
-        "height": "Altezza"
+        "height": "Altezza",
+        "combo": "Combo"
     },
     "controls": {
         "toggle": "Comandi",
@@ -195,6 +196,7 @@
             "time": "Tempo",
             "level": "Lvl",
             "lines": "Linee",
+            "combo": "Combo",
             "date": "Data"
         },
         "defaultName": "Giocatore"
@@ -287,6 +289,15 @@
                 "🙈 Il punteggio non viene salvato in classifica"
             ]
         },
+        "cascade": {
+            "name": "Cascata",
+            "description": "Le linee eliminate fanno cadere i blocchi e incatenano nuove eliminazioni",
+            "rules": [
+                "🌊 Eliminare una linea fa cadere i blocchi dritti verso il basso invece di spostare la griglia",
+                "⛓️ I blocchi che cadono possono completare da soli nuove linee, incatenando un combo",
+                "💰 Ogni passo extra della catena dà un bonus crescente"
+            ]
+        },
         "random": {
             "name": "Casuale",
             "description": "Sceglie una delle altre modalità per te quando premi Avvia",
@@ -298,7 +309,8 @@
         }
     },
     "game": {
-        "levelUpBanner": "LIVELLO {level}"
+        "levelUpBanner": "LIVELLO {level}",
+        "comboBanner": "COMBO x{combo}"
     },
     "sounds": {
         "lineClear1": "linea",

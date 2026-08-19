@@ -8,6 +8,7 @@ import {SurvivalMode} from "./survival-mode.js";
 import {CheeseRaceMode} from "./cheese-race-mode.js";
 import {DigSurvivalMode} from "./dig-survival-mode.js";
 import {CountdownMode} from "./countdown-mode.js";
+import {CascadeMode} from "./cascade-mode.js";
 
 export const MODE_CLASSES = {
     zen: ZenMode,
@@ -18,6 +19,7 @@ export const MODE_CLASSES = {
     cheeseRace: CheeseRaceMode,
     digSurvival: DigSurvivalMode,
     countdown: CountdownMode,
+    cascade: CascadeMode,
     random: BaseMode,
 };
 
