@@ -584,12 +584,13 @@ export class Game {
             this.renderer.drawPiece(renderedPiece, this.board);
         }
 
-        if (this.levelUpTimer > 0) {
-            this.renderer.drawLevelUpBanner(this.levelUpLevel, this.board);
-        }
-
-        if (this.comboBannerTimer > 0) {
-            this.renderer.drawComboBanner(this.comboBannerCombo, this.board);
+        if (this.levelUpTimer > 0 || this.comboBannerTimer > 0) {
+            this.renderer.drawBanners(
+                this.board,
+                this.renderer,
+                this.levelUpTimer > 0 ? this.levelUpLevel : null,
+                this.comboBannerTimer > 0 ? this.comboBannerCombo : null,
+            );
         }
     }
 

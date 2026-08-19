@@ -792,13 +792,6 @@ export class Renderer {
         surface._clearingAboveOutline = this.outlineBlocksEnabled;
     }
 
-    /**
-     * Column-major counterpart to _ensureClearingAboveCache, for Cascade
-     * mode's per-cell drop grid. Since per-column compaction can drop cells
-     * anywhere on the board (not just "above" a fixed clear line), this
-     * caches the whole board height, grouped into vertical runs per column
-     * that share the same drop amount.
-     */
     _ensureCascadeDropCache(surface, board, size, dropGrid) {
         const dirty = surface._cascadeDropVersion !== board.version
             || surface._cascadeDropSize !== size
@@ -862,13 +855,6 @@ export class Renderer {
         surface._cascadeDropOutline = this.outlineBlocksEnabled;
     }
 
-    /**
-     * Pure per-column fall animation for Cascade mode: after a collapse,
-     * board.colors is already the final compacted layout, so this replays
-     * the fall from each cell's pre-collapse row using the dropGrid from
-     * Board#collapseFullLines. No flash/wipe - that's drawClearingFrame's
-     * job for the (possibly newly-formed) rows before/after this phase.
-     */
     drawCascadeFallFrame(board, dropGrid, progress, surface = this) {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx, boardCanvas} = surface;
@@ -1282,7 +1268,105 @@ export class Renderer {
         return (boxWidth / 2) * Math.abs(Math.sin(angleRad)) + (boxHeight / 2) * Math.abs(Math.cos(angleRad));
     }
 
-    drawLevelUpBanner(level, board, surface = this) {
+    getLevelUpBannerMetrics(level, surface = this) {
+        const {ctx} = surface;
+        const {boardConfig} = this;
+        const fontSize = Math.max(12, Math.round(boardConfig.CELL_SIZE * 1.2));
+        const text = this.i18n ? this.i18n.t("game.levelUpBanner", {level}) : `LEVEL ${level}`;
+        const fontBody = getComputedStyle(document.documentElement)
+            .getPropertyValue("--font-body")
+            .trim();
+
+        ctx.save();
+        ctx.font = `bold ${fontSize}px ${fontBody}`;
+        const paddingX = fontSize * 0.6;
+        const paddingY = fontSize * 0.35;
+        const textWidth = ctx.measureText(text).width;
+        ctx.restore();
+
+        const boxWidth = textWidth + paddingX * 2;
+        const boxHeight = fontSize + paddingY * 2;
+        return {fontSize, fontBody, text, boxWidth, boxHeight, halfVertical: boxHeight / 2};
+    }
+
+    getComboBannerMetrics(combo, surface = this) {
+        const {ctx} = surface;
+        const {boardConfig} = this;
+        const fontSize = Math.max(12, Math.round(boardConfig.CELL_SIZE * 0.8));
+        const text = this.i18n ? this.i18n.t("game.comboBanner", {combo}) : `COMBO x${combo}`;
+        const fontBody = getComputedStyle(document.documentElement)
+            .getPropertyValue("--font-body")
+            .trim();
+
+        ctx.save();
+        ctx.font = `bold ${fontSize}px ${fontBody}`;
+        const paddingX = fontSize * 0.6;
+        const paddingY = fontSize * 0.35;
+        const textWidth = ctx.measureText(text).width;
+        ctx.restore();
+
+        const boxWidth = textWidth + paddingX * 2;
+        const boxHeight = fontSize + paddingY * 2;
+        const tiltAngle = Math.PI / 4;
+        const halfVerticalRotated = this.getRotatedHalfExtentY(boxWidth, boxHeight, tiltAngle);
+        const halfHorizontalRotated = (boxWidth / 2) * Math.abs(Math.cos(tiltAngle))
+            + (boxHeight / 2) * Math.abs(Math.sin(tiltAngle));
+        return {fontSize, fontBody, text, boxWidth, boxHeight, tiltAngle, halfVertical: halfVerticalRotated, halfHorizontal: halfHorizontalRotated};
+    }
+
+    resolveBannerCenters(board, surface = this, levelInfo = null, comboInfo = null) {
+        const {boardCanvas} = surface;
+        const anchorY = this.getBannerAnchorY(board, surface);
+        const gap = 8;
+        let levelCenterY = null;
+        let comboCenterY = null;
+
+        if (levelInfo) {
+            const {halfVertical} = levelInfo.metrics;
+            const minCenterY = halfVertical + 4;
+            const maxCenterY = boardCanvas.height - halfVertical - 4;
+            levelCenterY = Math.min(Math.max(anchorY - halfVertical - 4, minCenterY), maxCenterY);
+        }
+
+        if (comboInfo) {
+            const {halfVertical} = comboInfo.metrics;
+            const minCenterY = halfVertical + 4;
+            const maxCenterY = boardCanvas.height - halfVertical - 4;
+            comboCenterY = Math.min(Math.max(anchorY + halfVertical + 4, minCenterY), maxCenterY);
+        }
+
+        if (levelCenterY !== null && comboCenterY !== null) {
+            const requiredGap = levelInfo.metrics.halfVertical + comboInfo.metrics.halfVertical + gap;
+            const currentGap = comboCenterY - levelCenterY;
+            if (currentGap < requiredGap) {
+                const deficit = requiredGap - currentGap;
+                const comboMaxCenterY = boardCanvas.height - comboInfo.metrics.halfVertical - 4;
+                comboCenterY = Math.min(comboCenterY + deficit, comboMaxCenterY);
+                const remaining = requiredGap - (comboCenterY - levelCenterY);
+                if (remaining > 0) {
+                    const levelMinCenterY = levelInfo.metrics.halfVertical + 4;
+                    levelCenterY = Math.max(levelCenterY - remaining, levelMinCenterY);
+                }
+            }
+        }
+
+        return {levelCenterY, comboCenterY};
+    }
+
+    drawBanners(board, surface = this, level = null, combo = null) {
+        const levelInfo = level !== null ? {metrics: this.getLevelUpBannerMetrics(level, surface)} : null;
+        const comboInfo = combo !== null ? {metrics: this.getComboBannerMetrics(combo, surface)} : null;
+        const {levelCenterY, comboCenterY} = this.resolveBannerCenters(board, surface, levelInfo, comboInfo);
+
+        if (levelInfo) {
+            this.drawLevelUpBanner(level, board, surface, levelCenterY);
+        }
+        if (comboInfo) {
+            this.drawComboBanner(combo, board, surface, comboCenterY);
+        }
+    }
+
+    drawLevelUpBanner(level, board, surface = this, centerYOverride = null) {
         const {ctx, boardCanvas} = surface;
         const {boardConfig} = this;
         const centerX = boardCanvas.width / 2;
@@ -1302,14 +1386,17 @@ export class Renderer {
         const textWidth = ctx.measureText(text).width;
         const boxWidth = textWidth + paddingX * 2;
         const boxHeight = fontSize + paddingY * 2;
-        const anchorY = this.getBannerAnchorY(board, surface);
         const halfVertical = boxHeight / 2;
-        const maxCenterY = boardCanvas.height - halfVertical - 4;
-        const minCenterY = halfVertical + 4;
-        const centerY = Math.min(Math.max(anchorY - halfVertical - 4, minCenterY), maxCenterY);
+        let centerY = centerYOverride;
+        if (centerY === null) {
+            const anchorY = this.getBannerAnchorY(board, surface);
+            const maxCenterY = boardCanvas.height - halfVertical - 4;
+            const minCenterY = halfVertical + 4;
+            centerY = Math.min(Math.max(anchorY - halfVertical - 4, minCenterY), maxCenterY);
+        }
 
         ctx.shadowBlur = 8;
-        ctx.fillStyle = "oklch(0 0 0 / 0.1)";
+        ctx.fillStyle = "oklch(0.15 0.01 90 / 0.72)";
         ctx.beginPath();
         ctx.roundRect(centerX - boxWidth / 2, centerY - boxHeight / 2, boxWidth, boxHeight, fontSize * 0.2);
         ctx.fill();
@@ -1322,15 +1409,15 @@ export class Renderer {
         }
 
         ctx.lineWidth = Math.max(2, fontSize * 0.12);
-        ctx.strokeStyle = "oklch(0 0 0 / 0.2)";
+        ctx.strokeStyle = "oklch(0.1 0 0 / 0.85)";
         ctx.strokeText(text, centerX, centerY);
 
-        ctx.fillStyle = "oklch(0.94 0.05 90)";
+        ctx.fillStyle = "oklch(0.97 0.04 95)";
         ctx.fillText(text, centerX, centerY);
         ctx.restore();
     }
 
-    drawComboBanner(combo, board, surface = this) {
+    drawComboBanner(combo, board, surface = this, centerYOverride = null) {
         const {ctx, boardCanvas} = surface;
         const {boardConfig} = this;
         const fontSize = Math.max(12, Math.round(boardConfig.CELL_SIZE * 0.8));
@@ -1353,17 +1440,20 @@ export class Renderer {
         const halfVerticalRotated = this.getRotatedHalfExtentY(boxWidth, boxHeight, tiltAngle);
         const halfHorizontalRotated = (boxWidth / 2) * Math.abs(Math.cos(tiltAngle))
             + (boxHeight / 2) * Math.abs(Math.sin(tiltAngle));
-        const anchorY = this.getBannerAnchorY(board, surface);
-        const maxCenterY = boardCanvas.height - halfVerticalRotated - 4;
-        const minCenterY = halfVerticalRotated + 4;
-        const centerY = Math.min(Math.max(anchorY + halfVerticalRotated + 4, minCenterY), maxCenterY);
+        let centerY = centerYOverride;
+        if (centerY === null) {
+            const anchorY = this.getBannerAnchorY(board, surface);
+            const maxCenterY = boardCanvas.height - halfVerticalRotated - 4;
+            const minCenterY = halfVerticalRotated + 4;
+            centerY = Math.min(Math.max(anchorY + halfVerticalRotated + 4, minCenterY), maxCenterY);
+        }
         const centerX = Math.max(boardCanvas.width - halfHorizontalRotated - 4, halfHorizontalRotated + 4);
 
         ctx.translate(centerX, centerY);
         ctx.rotate(tiltAngle);
 
         ctx.shadowBlur = 8;
-        ctx.fillStyle = "oklch(0 0 0 / 0.1)";
+        ctx.fillStyle = "oklch(0.15 0.01 90 / 0.72)";
         ctx.beginPath();
         ctx.roundRect(-boxWidth / 2, -boxHeight / 2, boxWidth, boxHeight, fontSize * 0.2);
         ctx.fill();
@@ -1376,10 +1466,10 @@ export class Renderer {
         }
 
         ctx.lineWidth = Math.max(2, fontSize * 0.12);
-        ctx.strokeStyle = "oklch(0 0 0)";
+        ctx.strokeStyle = "oklch(0.1 0 0 / 0.85)";
         ctx.strokeText(text, 0, 0);
 
-        ctx.fillStyle = "oklch(0.729 0.156 71.488)";
+        ctx.fillStyle = "oklch(0.82 0.16 71.488)";
         ctx.fillText(text, 0, 0);
         ctx.restore();
     }

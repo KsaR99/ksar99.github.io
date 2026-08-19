@@ -26,11 +26,6 @@ export function pointsForHardDrop(cellsDropped, scoring = SCORING) {
     return cellsDropped * scoring.HARD_DROP_POINT;
 }
 
-/**
- * Bonus points for each cascade step beyond the first triggered by a single
- * piece lock in Cascade mode (chainIndex 1 = the initial clear, no bonus;
- * chainIndex 2 = the first automatic cascade, etc).
- */
 export function pointsForCascadeChain(chainIndex, level, scoring = SCORING) {
     if (chainIndex <= 1) return 0;
     return scoring.CASCADE_CHAIN_BONUS * (chainIndex - 1) * level;

@@ -510,16 +510,6 @@ export class PieceController {
         this.spawnNext();
     }
 
-    /**
-     * Cascade mode's clear resolution. Unlike finishLineClear(), the board
-     * is compacted per-column (see Board#collapseFullLines) rather than
-     * shifted as a rigid block, so removing a line can drop floating blocks
-     * into holes elsewhere and form brand new full rows on their own. Each
-     * such automatic re-clear is a cascade step. The sequence per step is:
-     * collapse instantly -> if anything actually moved, play a dedicated
-     * fall animation (finishCascadeFall) -> then check whether the fall
-     * formed a brand new full row and either flash+repeat or finish.
-     */
     finishCascadeStep() {
         const game = this.game;
         const clearedRowIndices = game.clearingLines;
@@ -566,12 +556,6 @@ export class PieceController {
         this.continueCascadeChain(cleared);
     }
 
-    /**
-     * Called once the per-column fall animation from finishCascadeStep
-     * finishes playing. The board itself was already updated instantly
-     * when the step started - this only advances the visual/game-flow
-     * side once the player has actually seen the blocks land.
-     */
     finishCascadeFall() {
         const game = this.game;
         game.cascadeFalling = false;
@@ -579,12 +563,6 @@ export class PieceController {
         this.continueCascadeChain(game.cascadeStepCleared);
     }
 
-    /**
-     * Shared tail end of a cascade step (with or without a preceding fall
-     * animation): check whether the collapse formed a brand new full row -
-     * if so, flash it and let the state machine call finishCascadeStep
-     * again; otherwise the chain is over and play resumes.
-     */
     continueCascadeChain(cleared) {
         const game = this.game;
 

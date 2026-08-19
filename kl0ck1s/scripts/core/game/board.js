@@ -148,20 +148,6 @@ export class Board {
         return cleared;
     }
 
-    /**
-     * Compacts every column independently, letting each column's filled
-     * cells fall to fill any gaps beneath them - unlike a normal Tetris
-     * clear, where whole rows shift down as a rigid block. Used by Cascade
-     * mode so that clearing a line can drop overhanging blocks into holes
-     * elsewhere on the board, potentially completing new lines.
-     *
-     * @param {Uint8Array|null} [dropGrid] - optional buffer (length rows*cols)
-     *   to receive, for every surviving cell's *final* position, how many
-     *   rows it fell from its pre-compaction position (0 if it didn't move).
-     *   Lets a caller animate the per-column fall instead of only applying
-     *   the result instantly.
-     * @returns {boolean} true if any cell moved.
-     */
     compactColumns(dropGrid = null) {
         let moved = false;
 
@@ -198,16 +184,6 @@ export class Board {
         return moved;
     }
 
-    /**
-     * Cascade-style clear: removes whichever rows are currently full, then
-     * lets each column collapse independently via compactColumns() instead
-     * of shifting the whole board down as one rigid block. This can drop
-     * floating blocks into holes elsewhere on the board and form brand new
-     * full rows without the player placing another piece - call this again
-     * (checking getFullLineIndices()) to resolve a full cascade chain.
-     *
-     * @returns {{cleared: number, rows: number[], dropGrid: Uint8Array|null}}
-     */
     collapseFullLines() {
         const rows = this.getFullLineIndices();
         if (rows.length === 0) return {cleared: 0, rows, dropGrid: null};
