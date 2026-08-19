@@ -225,6 +225,16 @@
                 "🏆 Cuentan tanto la puntuación como el nivel más alto alcanzado"
             ]
         },
+        "marathonHardcore": {
+            "name": "Maratón Hardcore",
+            "description": "Como Maratón, pero la profundidad de la pila está oculta",
+            "rules": [
+                "♾️ El mismo juego infinito que Maratón — despeja líneas y sube de nivel",
+                "🙈 Las filas que la pieza actual no puede alcanzar quedan cubiertas",
+                "🧠 Recuerda lo que hay bajo la niebla o colocarás a ciegas",
+                "📈 La velocidad de caída aumenta con cada nivel"
+            ]
+        },
         "sprint": {
             "name": "Sprint",
             "description": "Completa 40 líneas lo más rápido posible",
@@ -294,6 +304,17 @@
             "description": "Las líneas despejadas hacen caer los bloques y encadenan nuevos despejes",
             "rules": [
                 "🌊 Despejar una línea hace caer los bloques directamente hacia abajo en lugar de desplazar el tablero",
+                "⛓️ Los bloques que caen pueden completar nuevas líneas por sí solos, encadenando un combo",
+                "💰 Cada paso extra de la cadena otorga una bonificación creciente"
+            ]
+        },
+        "cascadeHardcore": {
+            "name": "Cascada Hardcore",
+            "description": "Gravedad de cascada, pero solo por encima de la línea que acabas de despejar",
+            "rules": [
+                "🌊 Despejar una línea hace caer los bloques directamente hacia abajo en lugar de desplazar el tablero",
+                "🧱 Solo caen los bloques por encima de la línea despejada - todo lo demás se queda congelado",
+                "🕳️ Los huecos por debajo de la línea despejada son permanentes hasta que los excaves tú mismo",
                 "⛓️ Los bloques que caen pueden completar nuevas líneas por sí solos, encadenando un combo",
                 "💰 Cada paso extra de la cadena otorga una bonificación creciente"
             ]

@@ -1,7 +1,7 @@
 "use strict";
 
 import {APP_NAME} from "../game/game-constants.js";
-import {formatDuration, formatDurationPrecise, formatNumber} from "../shared/utils.js";
+import {formatDuration, formatDurationPrecise, formatNumber, isCascadeMode} from "../shared/utils.js";
 
 const CARD_WIDTH = 1200;
 const CARD_HEIGHT = 630;
@@ -128,7 +128,7 @@ export class ShareService {
             level: stats.level,
             lines: stats.lines,
             time: stats.gameTime,
-            combo: stats.mode === "cascade" ? stats.maxCombo : null,
+            combo: isCascadeMode(stats.mode) ? stats.maxCombo : null,
             date: this._formatCardDate(new Date().toISOString()),
             name,
         });
@@ -146,7 +146,7 @@ export class ShareService {
 
         const modeLabel = game.i18n.t(`modes.${mode}.name`);
         const isRace = game.leaderboard.isTimedRaceMode(mode);
-        const isCascade = mode === "cascade";
+        const isCascade = isCascadeMode(mode);
         const defaultName = game.i18n.t("leaderboard.defaultName");
 
         const rows = entries.map((entry) => ({

@@ -225,6 +225,16 @@
                 "🏆 Zowel score als hoogst bereikte level tellen mee"
             ]
         },
+        "marathonHardcore": {
+            "name": "Marathon Hardcore",
+            "description": "Zoals Marathon, maar de diepte van de stapel is verborgen",
+            "rules": [
+                "♾️ Hetzelfde eindeloze spel als Marathon — ruim lijnen op en stijg in level",
+                "🙈 Rijen die het huidige blok niet kan bereiken worden bedekt",
+                "🧠 Onthoud wat er onder de mist zit, anders plaats je blind",
+                "📈 De valsnelheid neemt toe met elk level"
+            ]
+        },
         "sprint": {
             "name": "Sprint",
             "description": "Ruim 40 lijnen zo snel mogelijk",
@@ -294,6 +304,17 @@
             "description": "Opgeruimde lijnen laten blokken vallen en schakelen nieuwe clears aan elkaar",
             "rules": [
                 "🌊 Het opruimen van een lijn laat blokken recht naar beneden vallen in plaats van het veld te verschuiven",
+                "⛓️ Vallende blokken kunnen zelf nieuwe lijnen voltooien en zo een combo aan elkaar rijgen",
+                "💰 Elke extra schakel in de keten levert een groeiende bonus op"
+            ]
+        },
+        "cascadeHardcore": {
+            "name": "Cascade Hardcore",
+            "description": "Cascade-zwaartekracht, maar alleen boven de lijn die je net hebt opgeruimd",
+            "rules": [
+                "🌊 Het opruimen van een lijn laat blokken recht naar beneden vallen in plaats van het veld te verschuiven",
+                "🧱 Alleen blokken boven de opgeruimde lijn vallen - alles daaronder blijft precies liggen",
+                "🕳️ Gaten onder de opgeruimde lijn blijven permanent tot je ze zelf uitgraaft",
                 "⛓️ Vallende blokken kunnen zelf nieuwe lijnen voltooien en zo een combo aan elkaar rijgen",
                 "💰 Elke extra schakel in de keten levert een groeiende bonus op"
             ]

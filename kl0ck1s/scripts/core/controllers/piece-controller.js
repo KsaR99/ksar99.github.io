@@ -515,7 +515,9 @@ export class PieceController {
     finishCascadeStep() {
         const game = this.game;
         const clearedRowIndices = game.clearingLines;
-        const {cleared, dropGrid} = game.board.collapseFullLines();
+        const {cleared, dropGrid} = game.board.collapseFullLines(
+            Boolean(game.gameModes[game.mode]?.cascadeHardcore)
+        );
         game.renderer.notifyLinesCleared(game.board, clearedRowIndices);
 
         if (game.pendingSpin) {

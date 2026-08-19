@@ -232,6 +232,16 @@
                 "🏆 Liczy się wynik i najwyższy osiągnięty poziom"
             ]
         },
+        "marathonHardcore": {
+            "name": "Maraton Hardcore",
+            "description": "Maraton, ale głębia stosu jest zasłonięta",
+            "rules": [
+                "♾️ Ta sama nieskończona gra co w Maratonie — układaj linie i rośnij w poziomach",
+                "🙈 Rzędy, których aktualny klocek nie jest w stanie dosięgnąć, zostają zasłonięte",
+                "🧠 Pamiętaj, co jest pod zasłoną, bo inaczej ustawisz klocek na ślepo",
+                "📈 Tempo opadania rośnie z każdym poziomem"
+            ]
+        },
         "sprint": {
             "name": "Sprint",
             "description": "Ułóż 40 linii najszybciej jak potrafisz",
@@ -301,6 +311,17 @@
             "description": "Wyczyszczone linie pozwalają klockom opadać i łączyć się w combo",
             "rules": [
                 "🌊 Wyczyszczenie linii sprawia, że klocki spadają w dół zamiast przesuwać całą planszę",
+                "⛓️ Spadające klocki mogą same domknąć kolejne linie, tworząc combo",
+                "💰 Każdy dodatkowy krok kaskady daje rosnący bonus punktowy"
+            ]
+        },
+        "cascadeHardcore": {
+            "name": "Kaskada Hardcore",
+            "description": "Grawitacja kaskady, ale tylko nad wyczyszczoną właśnie linią",
+            "rules": [
+                "🌊 Wyczyszczenie linii sprawia, że klocki spadają w dół zamiast przesuwać całą planszę",
+                "🧱 Opadają tylko klocki znad wyczyszczonej linii - wszystko poniżej zostaje na swoim miejscu",
+                "🕳️ Dziury poniżej wyczyszczonej linii zostają na stałe, dopóki sam ich nie wykopiesz",
                 "⛓️ Spadające klocki mogą same domknąć kolejne linie, tworząc combo",
                 "💰 Każdy dodatkowy krok kaskady daje rosnący bonus punktowy"
             ]

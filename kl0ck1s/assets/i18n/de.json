@@ -225,6 +225,16 @@
                 "🏆 Punktzahl und höchstes erreichtes Level zählen beide"
             ]
         },
+        "marathonHardcore": {
+            "name": "Marathon Hardcore",
+            "description": "Wie Marathon, aber die Tiefe des Stapels ist verborgen",
+            "rules": [
+                "♾️ Dasselbe endlose Spiel wie Marathon — räume Linien und steige im Level auf",
+                "🙈 Reihen, die der aktuelle Stein nicht erreichen kann, werden verdeckt",
+                "🧠 Merke dir, was unter dem Nebel liegt, sonst setzt du blind",
+                "📈 Die Fallgeschwindigkeit steigt mit jedem Level"
+            ]
+        },
         "sprint": {
             "name": "Sprint",
             "description": "Räume 40 Reihen so schnell wie möglich",
@@ -294,6 +304,17 @@
             "description": "Geräumte Linien lassen Blöcke fallen und weitere Räumungen auslösen",
             "rules": [
                 "🌊 Eine geräumte Linie lässt Blöcke direkt nach unten fallen, statt das Feld zu verschieben",
+                "⛓️ Fallende Blöcke können von selbst neue Linien vervollständigen und ein Combo auslösen",
+                "💰 Jeder zusätzliche Kettenschritt bringt einen wachsenden Bonus"
+            ]
+        },
+        "cascadeHardcore": {
+            "name": "Kaskade Hardcore",
+            "description": "Kaskaden-Schwerkraft, aber nur oberhalb der gerade geräumten Linie",
+            "rules": [
+                "🌊 Eine geräumte Linie lässt Blöcke direkt nach unten fallen, statt das Feld zu verschieben",
+                "🧱 Nur Blöcke oberhalb der geräumten Linie fallen - alles darunter bleibt an Ort und Stelle",
+                "🕳️ Lücken unterhalb der geräumten Linie bleiben dauerhaft, bis du sie selbst ausgräbst",
                 "⛓️ Fallende Blöcke können von selbst neue Linien vervollständigen und ein Combo auslösen",
                 "💰 Jeder zusätzliche Kettenschritt bringt einen wachsenden Bonus"
             ]

@@ -225,6 +225,16 @@
                 "🏆 Le score et le niveau le plus haut atteint comptent tous les deux"
             ]
         },
+        "marathonHardcore": {
+            "name": "Marathon Hardcore",
+            "description": "Comme le Marathon, mais la profondeur de la pile est cachée",
+            "rules": [
+                "♾️ Le même jeu sans fin que le Marathon — efface des lignes et monte de niveau",
+                "🙈 Les lignes hors de portée de la pièce actuelle sont recouvertes",
+                "🧠 Souviens-toi de ce qui se cache sous le brouillard, ou tu placeras à l'aveugle",
+                "📈 La vitesse de chute augmente à chaque niveau"
+            ]
+        },
         "sprint": {
             "name": "Sprint",
             "description": "Efface 40 lignes le plus vite possible",
@@ -294,6 +304,17 @@
             "description": "Les lignes effacées font tomber les blocs et enchaînent de nouveaux effacements",
             "rules": [
                 "🌊 Effacer une ligne fait tomber les blocs tout droit au lieu de décaler le plateau",
+                "⛓️ Les blocs qui tombent peuvent compléter de nouvelles lignes tout seuls, enchaînant un combo",
+                "💰 Chaque maillon supplémentaire de la chaîne rapporte un bonus croissant"
+            ]
+        },
+        "cascadeHardcore": {
+            "name": "Cascade Hardcore",
+            "description": "Gravité en cascade, mais seulement au-dessus de la ligne que tu viens d'effacer",
+            "rules": [
+                "🌊 Effacer une ligne fait tomber les blocs tout droit au lieu de décaler le plateau",
+                "🧱 Seuls les blocs au-dessus de la ligne effacée tombent - tout le reste reste figé",
+                "🕳️ Les trous sous la ligne effacée restent définitifs tant que tu ne les creuses pas toi-même",
                 "⛓️ Les blocs qui tombent peuvent compléter de nouvelles lignes tout seuls, enchaînant un combo",
                 "💰 Chaque maillon supplémentaire de la chaîne rapporte un bonus croissant"
             ]

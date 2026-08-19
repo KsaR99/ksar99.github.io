@@ -545,6 +545,11 @@ export class Game {
             this.renderer.drawBoard(this.board);
         }
 
+        const hardcoreMaskFromRow = this.modeController.hardcoreMaskFromRow();
+        if (hardcoreMaskFromRow !== null) {
+            this.renderer.drawHardcoreMask(this.board, hardcoreMaskFromRow, this.activeTheme);
+        }
+
         if (this.hardDropTrail) {
             const progress = Math.min(1, this.hardDropTrail.elapsed / this.hardDropTrail.duration);
             this.renderer.drawHardDropTrail(this.hardDropTrail.entries, progress);

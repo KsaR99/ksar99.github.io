@@ -5,6 +5,7 @@ import {
     formatDuration,
     formatDurationPrecise,
     formatNumber,
+    isCascadeMode,
     numberToVoiceKeys,
     tierForLevel
 } from "../shared/utils.js";
@@ -75,7 +76,7 @@ export class StatsTracker {
 
     _objectiveLabelKey(mode) {
         if (mode === "zen") return "sidebar.height";
-        if (mode === "cascade") return "sidebar.combo";
+        if (isCascadeMode(mode)) return "sidebar.combo";
         return "sidebar.objective";
     }
 

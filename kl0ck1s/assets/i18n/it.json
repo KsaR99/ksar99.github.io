@@ -225,6 +225,16 @@
                 "🏆 Contano sia il punteggio che il livello più alto raggiunto"
             ]
         },
+        "marathonHardcore": {
+            "name": "Maratona Hardcore",
+            "description": "Come Maratona, ma la profondità della pila è nascosta",
+            "rules": [
+                "♾️ Stessa modalità infinita della Maratona — elimina linee e sali di livello",
+                "🙈 Le righe che il pezzo attuale non può raggiungere vengono coperte",
+                "🧠 Ricorda cosa c'è sotto la nebbia, o piazzerai alla cieca",
+                "📈 La velocità di caduta aumenta a ogni livello"
+            ]
+        },
         "sprint": {
             "name": "Sprint",
             "description": "Elimina 40 linee il più velocemente possibile",
@@ -294,6 +304,17 @@
             "description": "Le linee eliminate fanno cadere i blocchi e incatenano nuove eliminazioni",
             "rules": [
                 "🌊 Eliminare una linea fa cadere i blocchi dritti verso il basso invece di spostare la griglia",
+                "⛓️ I blocchi che cadono possono completare da soli nuove linee, incatenando un combo",
+                "💰 Ogni passo extra della catena dà un bonus crescente"
+            ]
+        },
+        "cascadeHardcore": {
+            "name": "Cascata Hardcore",
+            "description": "Gravità a cascata, ma solo sopra la linea appena eliminata",
+            "rules": [
+                "🌊 Eliminare una linea fa cadere i blocchi dritti verso il basso invece di spostare la griglia",
+                "🧱 Cadono solo i blocchi sopra la linea eliminata - tutto il resto resta fermo",
+                "🕳️ I buchi sotto la linea eliminata restano permanenti finché non li scavi tu stesso",
                 "⛓️ I blocchi che cadono possono completare da soli nuove linee, incatenando un combo",
                 "💰 Ogni passo extra della catena dà un bonus crescente"
             ]

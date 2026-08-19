@@ -103,6 +103,10 @@ export class ModeController {
         return this.currentMode.objectiveColorMode();
     }
 
+    hardcoreMaskFromRow() {
+        return this.currentMode.hardcoreMaskFromRow();
+    }
+
     update(delta) {
         this.currentMode.update(delta);
     }

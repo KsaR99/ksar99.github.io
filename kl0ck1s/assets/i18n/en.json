@@ -232,6 +232,16 @@
                 "🏆 Score and highest level reached both count"
             ]
         },
+        "marathonHardcore": {
+            "name": "Marathon Hardcore",
+            "description": "Marathon, but the depths of the stack are hidden from view",
+            "rules": [
+                "♾️ Same endless play as Marathon — clear lines and climb levels",
+                "🙈 Rows your current piece can't possibly reach are covered up",
+                "🧠 Remember what's buried under the fog, or you'll place blind",
+                "📈 Drop speed increases with every level"
+            ]
+        },
         "sprint": {
             "name": "Sprint",
             "description": "Clear 40 lines as fast as you can",
@@ -301,6 +311,17 @@
             "description": "Cleared lines let blocks fall and chain into new clears",
             "rules": [
                 "🌊 Clearing a line drops blocks straight down instead of shifting the board",
+                "⛓️ Falling blocks can complete new lines on their own, chaining a combo",
+                "💰 Each extra chain step scores a growing bonus"
+            ]
+        },
+        "cascadeHardcore": {
+            "name": "Cascade Hardcore",
+            "description": "Cascade gravity, but only above the line you just cleared",
+            "rules": [
+                "🌊 Clearing a line drops blocks straight down instead of shifting the board",
+                "🧱 Only blocks above the cleared line fall - anything below stays frozen in place",
+                "🕳️ Gaps below the cleared line are permanent unless you dig them out yourself",
                 "⛓️ Falling blocks can complete new lines on their own, chaining a combo",
                 "💰 Each extra chain step scores a growing bonus"
             ]

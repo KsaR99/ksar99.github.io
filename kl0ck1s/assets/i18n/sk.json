@@ -225,6 +225,16 @@
                 "🏆 Počíta sa skóre aj najvyššia dosiahnutá úroveň"
             ]
         },
+        "marathonHardcore": {
+            "name": "Maratón Hardcore",
+            "description": "Maratón, ale hĺbka hromady je skrytá",
+            "rules": [
+                "♾️ Rovnaká nekonečná hra ako Maratón — maž riadky a stúpaj v úrovniach",
+                "🙈 Riadky, ktoré aktuálny kváder nedokáže dosiahnuť, sú zakryté",
+                "🧠 Pamätaj si, čo je pod hmlou, inak umiestníš kváder naslepo",
+                "📈 Rýchlosť pádu sa zvyšuje s každou úrovňou"
+            ]
+        },
         "sprint": {
             "name": "Šprint",
             "description": "Vyčisti 40 riadkov čo najrýchlejšie",
@@ -294,6 +304,17 @@
             "description": "Vyčistené riadky nechajú klocky padať a reťaziť ďalšie čistenia",
             "rules": [
                 "🌊 Vyčistenie riadku zhodí klocky priamo nadol namiesto posunu celej plochy",
+                "⛓️ Padajúce klocky môžu samy doplniť nové riadky a predĺžiť combo",
+                "💰 Každý ďalší článok reťaze dáva rastúci bonus"
+            ]
+        },
+        "cascadeHardcore": {
+            "name": "Kaskáda Hardcore",
+            "description": "Gravitácia kaskády, ale len nad práve vyčisteným riadkom",
+            "rules": [
+                "🌊 Vyčistenie riadku zhodí klocky priamo nadol namiesto posunu celej plochy",
+                "🧱 Padajú len klocky nad vyčisteným riadkom - všetko pod ním ostáva na mieste",
+                "🕳️ Diery pod vyčisteným riadkom ostávajú natrvalo, kým si ich sám nevykopeš",
                 "⛓️ Padajúce klocky môžu samy doplniť nové riadky a predĺžiť combo",
                 "💰 Každý ďalší článok reťaze dáva rastúci bonus"
             ]

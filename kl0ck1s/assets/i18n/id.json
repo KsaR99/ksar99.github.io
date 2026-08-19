@@ -225,6 +225,16 @@
                 "🏆 Skor dan level tertinggi yang dicapai sama-sama dihitung"
             ]
         },
+        "marathonHardcore": {
+            "name": "Maraton Hardcore",
+            "description": "Seperti Maraton, tapi kedalaman tumpukan disembunyikan",
+            "rules": [
+                "♾️ Permainan tanpa akhir yang sama seperti Maraton — bersihkan baris dan naik level",
+                "🙈 Baris yang tidak bisa dijangkau balok saat ini akan tertutup",
+                "🧠 Ingat apa yang ada di balik kabut, atau kamu akan menempatkan balok secara membabi buta",
+                "📈 Kecepatan jatuh meningkat setiap level"
+            ]
+        },
         "sprint": {
             "name": "Sprint",
             "description": "Bersihkan 40 baris secepat mungkin",
@@ -294,6 +304,17 @@
             "description": "Baris yang dibersihkan membuat balok jatuh dan memicu pembersihan baru secara berantai",
             "rules": [
                 "🌊 Membersihkan satu baris membuat balok jatuh lurus ke bawah, bukan menggeser seluruh papan",
+                "⛓️ Balok yang jatuh bisa melengkapi baris baru dengan sendirinya, merangkai sebuah combo",
+                "💰 Setiap langkah rantai tambahan memberi bonus yang makin besar"
+            ]
+        },
+        "cascadeHardcore": {
+            "name": "Cascade Hardcore",
+            "description": "Gravitasi cascade, tapi hanya di atas baris yang baru saja dibersihkan",
+            "rules": [
+                "🌊 Membersihkan satu baris membuat balok jatuh lurus ke bawah, bukan menggeser seluruh papan",
+                "🧱 Hanya balok di atas baris yang dibersihkan yang jatuh - semua di bawahnya tetap diam",
+                "🕳️ Lubang di bawah baris yang dibersihkan bersifat permanen sampai kamu menggalinya sendiri",
                 "⛓️ Balok yang jatuh bisa melengkapi baris baru dengan sendirinya, merangkai sebuah combo",
                 "💰 Setiap langkah rantai tambahan memberi bonus yang makin besar"
             ]

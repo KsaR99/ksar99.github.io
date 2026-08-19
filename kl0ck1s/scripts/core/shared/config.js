@@ -61,6 +61,7 @@ export const GAME_MODES = Object.freeze({
         zenGiveBackMaxRows: 10000,
     }),
     marathon: Object.freeze({sprintTarget: null, timeLimitMs: null, garbage: false}),
+    marathonHardcore: Object.freeze({sprintTarget: null, timeLimitMs: null, garbage: false, hardcoreMask: true}),
     sprint: Object.freeze({sprintTarget: 40, timeLimitMs: null, garbage: false}),
     ultra: Object.freeze({sprintTarget: null, timeLimitMs: 180000, garbage: false}),
     survival: Object.freeze({
@@ -79,6 +80,9 @@ export const GAME_MODES = Object.freeze({
     }),
     cascade: Object.freeze({
         sprintTarget: null, timeLimitMs: null, garbage: false, cascadeGravity: true,
+    }),
+    cascadeHardcore: Object.freeze({
+        sprintTarget: null, timeLimitMs: null, garbage: false, cascadeGravity: true, cascadeHardcore: true,
     }),
     random: Object.freeze({sprintTarget: null, timeLimitMs: null, garbage: false, isRandom: true}),
 });

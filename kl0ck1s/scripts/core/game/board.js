@@ -184,7 +184,43 @@ export class Board {
         return moved;
     }
 
-    collapseFullLines() {
+    compactColumnsAbove(boundaryRow, dropGrid = null) {
+        let moved = false;
+
+        for (let x = 0; x < this.cols; x++) {
+            const bit = 1 << x;
+            const stackColors = [];
+            const stackFromRows = [];
+            for (let y = 0; y <= boundaryRow; y++) {
+                if (this.occupancy[y] & bit) {
+                    stackColors.push(this.colors[y * this.cols + x]);
+                    stackFromRows.push(y);
+                }
+            }
+
+            const startY = boundaryRow + 1 - stackColors.length;
+            for (let y = 0; y <= boundaryRow; y++) {
+                const idx = y * this.cols + x;
+                if (y >= startY) {
+                    const i = y - startY;
+                    const color = stackColors[i];
+                    if (!(this.occupancy[y] & bit) || this.colors[idx] !== color) moved = true;
+                    this.occupancy[y] |= bit;
+                    this.colors[idx] = color;
+                    if (dropGrid) dropGrid[idx] = y - stackFromRows[i];
+                } else if (this.occupancy[y] & bit) {
+                    moved = true;
+                    this.occupancy[y] &= ~bit;
+                    this.colors[idx] = 0;
+                }
+            }
+        }
+
+        if (moved) this.version++;
+        return moved;
+    }
+
+    collapseFullLines(hardcore = false) {
         const rows = this.getFullLineIndices();
         if (rows.length === 0) return {cleared: 0, rows, dropGrid: null};
 
@@ -194,7 +230,12 @@ export class Board {
         }
 
         const dropGrid = new Uint8Array(this.rows * this.cols);
-        this.compactColumns(dropGrid);
+        if (hardcore) {
+            const boundaryRow = Math.min(...rows);
+            this.compactColumnsAbove(boundaryRow, dropGrid);
+        } else {
+            this.compactColumns(dropGrid);
+        }
         this.version++;
         return {cleared: rows.length, rows, dropGrid};
     }

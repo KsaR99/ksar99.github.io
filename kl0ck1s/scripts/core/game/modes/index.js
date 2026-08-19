@@ -1,6 +1,7 @@
 "use strict";
 
 import {BaseMode} from "./base-mode.js";
+import {MarathonHardcoreMode} from "./marathon-hardcore-mode.js";
 import {ZenMode} from "./zen-mode.js";
 import {SprintMode} from "./sprint-mode.js";
 import {UltraMode} from "./ultra-mode.js";
@@ -8,11 +9,12 @@ import {SurvivalMode} from "./survival-mode.js";
 import {CheeseRaceMode} from "./cheese-race-mode.js";
 import {DigSurvivalMode} from "./dig-survival-mode.js";
 import {CountdownMode} from "./countdown-mode.js";
-import {CascadeMode} from "./cascade-mode.js";
+import {CascadeHardcoreMode, CascadeMode} from "./cascade-mode.js";
 
 export const MODE_CLASSES = {
     zen: ZenMode,
     marathon: BaseMode,
+    marathonHardcore: MarathonHardcoreMode,
     sprint: SprintMode,
     ultra: UltraMode,
     survival: SurvivalMode,
@@ -20,6 +22,7 @@ export const MODE_CLASSES = {
     digSurvival: DigSurvivalMode,
     countdown: CountdownMode,
     cascade: CascadeMode,
+    cascadeHardcore: CascadeHardcoreMode,
     random: BaseMode,
 };
 

@@ -37,6 +37,10 @@ export class BaseMode {
         return null;
     }
 
+    hardcoreMaskFromRow() {
+        return null;
+    }
+
     update(_delta) {
     }
 

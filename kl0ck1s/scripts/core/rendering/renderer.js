@@ -17,6 +17,43 @@ import {
 const GHOST_MIN_DROP_ROWS = 3;
 const GHOST_WHITE_COLOR = "oklch(0.96 0 0)";
 
+const HARDCORE_MASK_STYLES = Object.freeze({
+    none: Object.freeze({
+        base: "oklch(0.08 0 0 / 95%)",
+        hatch: "oklch(1 0 0 / 5%)",
+        edge: "oklch(1 0 0 / 32%)",
+    }),
+    volcano: Object.freeze({
+        base: "oklch(0.58 0.21 45 / 92%)",
+        hatch: "oklch(0.16 0.04 30 / 45%)",
+        edge: "oklch(0.9 0.18 75 / 70%)",
+        pattern: "wave",
+    }),
+    matrix: Object.freeze({
+        base: "oklch(0.1 0.02 150 / 92%)",
+        hatch: "oklch(0.543 0.123 151.327 / 24%)",
+        edge: "oklch(0.751 0.133 144.116 / 50%)",
+    }),
+    rain: Object.freeze({
+        base: "oklch(0.28 0.09 235 / 92%)",
+        hatch: "oklch(0.85 0.06 220 / 26%)",
+        edge: "oklch(0.9 0.05 220 / 60%)",
+        pattern: "wave",
+    }),
+    snow: Object.freeze({
+        base: "oklch(0.93 0.01 240 / 92%)",
+        hatch: "oklch(0.8 0.02 240 / 30%)",
+        edge: "oklch(0.78 0.04 235 / 60%)",
+        pattern: "puff",
+    }),
+    vhs: Object.freeze({
+        base: "oklch(0.12 0.04 320 / 92%)",
+        hatch: "oklch(0.6 0.25 340 / 22%)",
+        edge: "oklch(0.75 0.18 200 / 48%)",
+        pattern: "scanline",
+    }),
+});
+
 export class Renderer {
     /**
      * @param {object} deps
@@ -720,6 +757,93 @@ export class Renderer {
 
         ctx.clearRect(0, 0, surface.boardCanvas.width, surface.boardCanvas.height); // required for fall-trail.
         ctx.drawImage(surface.background.canvas, 0, 0);
+    }
+
+    drawHardcoreMask(board, fromRow, theme = "none", surface = this) {
+        if (fromRow == null) return;
+
+        const size = this.boardConfig.CELL_SIZE;
+        const maskFromRow = Math.max(0, Math.min(board.rows, fromRow + 1));
+        if (maskFromRow >= board.rows) return;
+
+        const {ctx} = surface;
+        const width = board.cols * size;
+        const top = maskFromRow * size;
+        const height = (board.rows - maskFromRow) * size;
+        if (height <= 0) return;
+
+        const style = HARDCORE_MASK_STYLES[theme] ?? HARDCORE_MASK_STYLES.none;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, top, width, height);
+        ctx.clip();
+
+        ctx.fillStyle = style.base;
+        ctx.fillRect(0, top, width, height);
+
+        ctx.strokeStyle = style.hatch;
+        ctx.fillStyle = style.hatch;
+        if (style.pattern === "scanline") {
+            ctx.lineWidth = Math.max(1, size * 0.12);
+            const lineStep = Math.max(3, size * 0.22);
+            for (let y = top; y < top + height; y += lineStep) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+        } else if (style.pattern === "wave") {
+            ctx.lineWidth = Math.max(1, size * 0.1);
+            const waveStep = Math.max(8, size * 0.9);
+            const amplitude = Math.max(2, size * 0.18);
+            const segments = Math.max(6, Math.ceil(width / (size * 0.5)));
+            for (let y = top + waveStep / 2; y < top + height; y += waveStep) {
+                ctx.beginPath();
+                for (let i = 0; i <= segments; i++) {
+                    const x = (i / segments) * width;
+                    const phase = (x / width) * Math.PI * 4 + y * 0.05;
+                    const wy = y + Math.sin(phase) * amplitude;
+                    if (i === 0) ctx.moveTo(x, wy);
+                    else ctx.lineTo(x, wy);
+                }
+                ctx.stroke();
+            }
+        } else if (style.pattern === "puff") {
+            const puffRadius = Math.max(2, size * 0.16);
+            const spacingX = puffRadius * 2.6;
+            const spacingY = puffRadius * 2.4;
+            let rowIndex = 0;
+            for (let y = top + spacingY / 2; y < top + height; y += spacingY) {
+                const offsetX = (rowIndex % 2 === 0) ? 0 : spacingX / 2;
+                for (let x = offsetX + spacingX / 2; x < width; x += spacingX) {
+                    ctx.beginPath();
+                    ctx.arc(x, y, puffRadius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ++rowIndex;
+            }
+        } else {
+            ctx.lineWidth = Math.max(1, size * 0.08);
+            const step = Math.max(6, size * 0.6);
+            for (let d = -height; d < width; d += step) {
+                ctx.beginPath();
+                ctx.moveTo(d, top + height);
+                ctx.lineTo(d + height, top);
+                ctx.stroke();
+            }
+        }
+
+        ctx.restore();
+
+        ctx.save();
+        ctx.strokeStyle = style.edge;
+        ctx.lineWidth = Math.max(1, size * 0.06);
+        ctx.beginPath();
+        ctx.moveTo(0, top);
+        ctx.lineTo(width, top);
+        ctx.stroke();
+        ctx.restore();
     }
 
     _ensureClearingAboveCache(surface, board, size, affectedMaxRow, lineIndices, dropRows) {

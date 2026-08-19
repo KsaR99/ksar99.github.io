@@ -29,6 +29,10 @@ export function numberToVoiceKeys(number, lang = "en") {
     });
 }
 
+export function isCascadeMode(mode) {
+    return mode === "cascade" || mode === "cascadeHardcore";
+}
+
 export function forEachShapeCell(mask, width, height, cb) {
     for (let r = 0; r < height; r++) {
         for (let c = 0; c < width; c++) {

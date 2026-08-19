@@ -1,7 +1,7 @@
 "use strict";
 
 import {APP_NAME, COUNTDOWN_STEPS} from "../game/game-constants.js";
-import {numberToVoiceKeys} from "../shared/utils.js";
+import {isCascadeMode, numberToVoiceKeys} from "../shared/utils.js";
 import {voiceCountingKey} from "../shared/config.js";
 import {ProfileController} from "./profile-controller.js";
 import {OptionsController} from "./options-controller.js";
@@ -263,7 +263,7 @@ export class GameFlowController {
             date: new Date().toISOString(),
             mode: game.mode,
             timeMs: game.elapsedMs,
-            combo: game.mode === "cascade" ? game.maxCombo : null,
+            combo: isCascadeMode(game.mode) ? game.maxCombo : null,
         };
 
         const raceUnfinished =

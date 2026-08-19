@@ -1,6 +1,6 @@
 "use strict";
 
-import {formatDuration, formatDurationPrecise, formatNumber} from "../shared/utils.js";
+import {formatDuration, formatDurationPrecise, formatNumber, isCascadeMode} from "../shared/utils.js";
 
 export class Leaderboard {
     static SCORES_KEY = "klockis-scores";
@@ -327,7 +327,7 @@ export class Leaderboard {
         const table = this.dom.getElementById("tpl-leaderboard-table").content.cloneNode(true);
         const tbody = table.querySelector('[data-field="rows"]');
         const podiumBadges = ["🥇", "🥈", "🥉"];
-        const isCascade = this.entryMode(list[0]) === "cascade";
+        const isCascade = isCascadeMode(this.entryMode(list[0]));
         table.querySelector(".leaderboard__table").classList.toggle("leaderboard__table--no-combo", !isCascade);
 
         list.forEach((entry, i) => {

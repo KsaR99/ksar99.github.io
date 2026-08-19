@@ -8,3 +8,6 @@ export class CascadeMode extends BaseMode {
         return combo >= 2 ? `x${combo}` : null;
     }
 }
+
+export class CascadeHardcoreMode extends CascadeMode {
+}
