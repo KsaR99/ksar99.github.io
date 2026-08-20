@@ -1503,7 +1503,7 @@ export class Renderer {
         const {ctx, boardCanvas} = surface;
         const {boardConfig} = this;
         const centerX = boardCanvas.width / 2;
-        const fontSize = Math.max(12, Math.round(boardConfig.CELL_SIZE * 1.2));
+        const fontSize = Math.max(12, Math.round(boardConfig.CELL_SIZE * 0.9));
         const text = this.i18n ? this.i18n.t("game.levelUpBanner", {level}) : `LEVEL ${level}`;
         const fontBody = getComputedStyle(document.documentElement)
             .getPropertyValue("--font-body")
