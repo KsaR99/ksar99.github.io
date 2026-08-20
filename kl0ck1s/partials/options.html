@@ -27,13 +27,13 @@
                                min="0" type="range">
                     </div>
                 </div>
-                <label class="options__row">
+                <label class="options__row options__row--mobile-hidden">
                     <span data-i18n="screens.options.hudRight">HUD on the right</span>
                     <input class="options__input options__input--checkbox" data-role="hud-right-checkbox"
                            type="checkbox">
                 </label>
                 <details class="options__theme-picker" data-role="theme-details">
-                    <summary class="options__row">
+                    <summary class="options__row options__theme-toggle">
                         <span data-i18n="screens.options.theme">Screen filter</span>
                         <span class="options__theme-current" data-role="theme-current"></span>
                     </summary>
@@ -118,9 +118,9 @@
                 <summary class="options__title options__title--graphics" data-i18n="screens.options.graphicsTitle">
                     Graphics
                 </summary>
-                <label class="options__row">
+                <label class="options__row options__row--desktop-only">
                     <span data-i18n="screens.options.screenShake">Screen shake</span>
-                    <input class="options__input options__input--checkbox options__input--desktop-only"
+                    <input class="options__input options__input--checkbox"
                            data-role="screen-shake-checkbox"
                            type="checkbox">
                 </label>
@@ -309,15 +309,15 @@
                     <summary class="options__group-summary options__group-summary--mouse"
                              data-i18n="screens.options.mouseTitle">Mouse
                     </summary>
-                    <label class="options__row">
+                    <label class="options__row options__row--desktop-only">
                         <span data-i18n="screens.options.mouseControl">Mouse control</span>
-                        <input class="options__input options__input--checkbox options__input--desktop-only"
+                        <input class="options__input options__input--checkbox"
                                data-role="mouse-control-checkbox"
                                type="checkbox">
                     </label>
-                    <label class="options__row">
+                    <label class="options__row options__row--desktop-only">
                         <span data-i18n="screens.options.mouseSensitivity">Mouse sensitivity</span>
-                        <input class="options__input options__input--number options__input--desktop-only"
+                        <input class="options__input options__input--number"
                                data-role="mouse-sensitivity-input"
                                inputmode="decimal"
                                type="number">
@@ -352,7 +352,7 @@
                             <span data-i18n="controls.touchPauseGesture">❚❚ button</span>
                         </li>
                     </ul>
-                    <div class="options__row">
+                    <div class="options__row options__row--mobile-hidden">
                         <span data-i18n="screens.options.keyboardReset" data-role="keybind-reset-label" hidden>Reset keys</span>
                         <button
                             class="options__preview-button options__preview-button--wide options__preview-button--keybind-reset"
@@ -446,18 +446,18 @@
             </section>
         </div>
 
-        <section aria-labelledby="options-import-title" class="options options__import-review"
+        <section aria-labelledby="options-import-title" class="options options--import-review"
                  data-role="options-import-review" hidden>
             <h3 class="options__title options__title--static" data-i18n="screens.options.importDiffTitle"
                 id="options-import-title">Import
                 options</h3>
-            <p class="options__import-review__subtitle" data-role="options-import-subtitle"></p>
+            <p class="options__import-review-subtitle" data-role="options-import-subtitle"></p>
 
-            <p class="options__import-review__empty" data-i18n="screens.options.importNoChanges"
+            <p class="options__import-review-empty" data-i18n="screens.options.importNoChanges"
                data-role="options-import-empty" hidden>
                 The imported file matches your current options — nothing to change.
             </p>
-            <p class="options__import-review__empty" data-i18n="screens.options.importInvalid"
+            <p class="options__import-review-empty" data-i18n="screens.options.importInvalid"
                data-role="options-import-invalid" hidden>
                 This file doesn't look like a valid options export.
             </p>
@@ -468,9 +468,9 @@
                        type="checkbox">
             </label>
 
-            <div class="options__import-review__list" data-role="options-import-list"></div>
+            <div class="options__import-review-list" data-role="options-import-list"></div>
 
-            <div class="options__import-review__actions" data-role="options-import-actions">
+            <div class="options__import-review-actions" data-role="options-import-actions">
                 <button class="button" data-i18n="screens.options.importCancel" data-role="options-import-cancel"
                         type="button">Cancel
                 </button>
@@ -495,10 +495,10 @@
 
 <template id="tpl-options-diff-row">
     <label class="options__row options__row--diff" data-role="options-diff-row">
-        <span class="options__diff-label" data-field="label"></span>
+        <span class="options__diff-label options__label" data-field="label"></span>
         <span class="options__diff-value">
             <span class="options__diff-value--old" data-field="oldValue"></span>
-            <span aria-hidden="true" class="options__diff-value__arrow">→</span>
+            <span aria-hidden="true" class="options__diff-value-arrow">→</span>
             <span class="options__diff-value--new" data-field="newValue"></span>
         </span>
         <input class="options__input options__input--checkbox" data-role="options-diff-checkbox" type="checkbox">
@@ -507,7 +507,7 @@
 
 <template id="tpl-benchmark-row">
     <li class="options__benchmark-row" data-role="benchmark-row">
-        <span class="options__benchmark-label" data-field="label"></span>
+        <span class="options__benchmark-label options__label" data-field="label"></span>
         <span class="options__benchmark-value" data-field="value"></span>
     </li>
 </template>

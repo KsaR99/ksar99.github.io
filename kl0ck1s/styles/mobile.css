@@ -1,5 +1,5 @@
 .app:has(.board__overlay--visible) :where(
-    .card--next-piece,
+    .next-piece,
     .difficulty-indicator,
     .touch-controls
 ) {
@@ -17,7 +17,7 @@
     display: none;
 }
 
-.options__row:has(.options__preview-button--keybind-reset, [data-role="hud-right-checkbox"]) {
+.options__row--mobile-hidden {
     display: none;
 }
 
@@ -25,7 +25,7 @@
     border: 0;
     padding: 0;
 
-    & > summary {
+    & > .options__group-summary {
         display: none;
     }
 

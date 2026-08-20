@@ -60,7 +60,7 @@
     border-collapse: collapse;
     font-size: 0.75rem;
 
-    & tbody tr:nth-child(even) .leaderboard__cell {
+    & .leaderboard__row:nth-child(even) .leaderboard__cell {
         background: color-mix(in oklch, var(--line) 30%, transparent);
     }
 }
@@ -70,7 +70,8 @@
     user-select: none;
 }
 
-.leaderboard__heading, .leaderboard__cell {
+.leaderboard__heading,
+.leaderboard__cell {
     font-size: 0.85rem;
     text-align: left;
     padding: 0.2rem;
@@ -94,13 +95,15 @@
     font-weight: 700;
 }
 
-.leaderboard__cell--date, .leaderboard__heading--date {
+.leaderboard__cell--date,
+.leaderboard__heading--date {
     color: var(--muted);
     white-space: nowrap;
     text-align: right;
 }
 
-.leaderboard__cell--combo, .leaderboard__heading--combo {
+.leaderboard__cell--combo,
+.leaderboard__heading--combo {
     color: var(--muted);
     white-space: nowrap;
 }
@@ -121,8 +124,10 @@
 }
 
 @media (width <= 30rem) {
-    .leaderboard__cell--date, .leaderboard__heading--date,
-    .leaderboard__cell--combo, .leaderboard__heading--combo {
+    .leaderboard__cell--date,
+    .leaderboard__heading--date,
+    .leaderboard__cell--combo,
+    .leaderboard__heading--combo {
         display: none;
     }
 }

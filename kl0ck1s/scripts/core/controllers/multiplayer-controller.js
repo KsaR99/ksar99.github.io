@@ -1318,12 +1318,12 @@ export class MultiplayerController {
         };
 
         const colorPair = (localEl, remoteEl, localRaw, remoteRaw, lowerBetter) => {
-            localEl?.classList.remove("mp-result-value--better", "mp-result-value--worse");
-            remoteEl?.classList.remove("mp-result-value--better", "mp-result-value--worse");
+            localEl?.classList.remove("mp-result-stat__value--better", "mp-result-stat__value--worse");
+            remoteEl?.classList.remove("mp-result-stat__value--better", "mp-result-stat__value--worse");
             if (localRaw === remoteRaw) return;
             const localIsBetter = lowerBetter ? localRaw < remoteRaw : localRaw > remoteRaw;
-            localEl?.classList.add(localIsBetter ? "mp-result-value--better" : "mp-result-value--worse");
-            remoteEl?.classList.add(localIsBetter ? "mp-result-value--worse" : "mp-result-value--better");
+            localEl?.classList.add(localIsBetter ? "mp-result-stat__value--better" : "mp-result-stat__value--worse");
+            remoteEl?.classList.add(localIsBetter ? "mp-result-stat__value--worse" : "mp-result-stat__value--better");
         };
 
         const localName = this.game.playerName || this._t("leaderboard.defaultName");

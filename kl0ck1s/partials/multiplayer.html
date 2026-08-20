@@ -48,7 +48,7 @@
                         type="button">►
                 </button>
             </div>
-            <div class="mode-description" data-field="mp-bot-mode-description"></div>
+            <div class="mode-info__description" data-field="mp-bot-mode-description"></div>
             <p class="screen__hint" data-i18n="screens.idle.hint">Choose difficulty</p>
             <div class="difficulty difficulty--carousel" data-role="mp-bot-level-select">
                 <button aria-label="Previous difficulty" class="difficulty__nav" data-role="mp-bot-level-prev"
@@ -173,41 +173,71 @@
             </div>
             <div class="mp-result-stats">
                 <div class="mp-result-stat mp-result-stat--header">
-                    <strong data-result-side="local" data-role="mp-result-local-name-mini">You</strong>
+                    <strong class="mp-result-stat__value mp-result-stat__value--local" data-result-side="local"
+                            data-role="mp-result-local-name-mini">You</strong>
                     <span class="mp-result-stat__vs">vs.</span>
-                    <strong data-result-side="remote" data-role="mp-result-remote-name-mini">Opponent</strong>
+                    <strong class="mp-result-stat__value mp-result-stat__value--remote" data-result-side="remote"
+                            data-role="mp-result-remote-name-mini">Opponent</strong>
                 </div>
-                <div class="mp-result-stat"><span data-i18n="sidebar.lines">Lines</span><strong
-                    data-result-side="local" data-role="mp-result-local-lines">0</strong><strong
-                    data-result-side="remote" data-role="mp-result-remote-lines">0</strong></div>
-                <div class="mp-result-stat"><span
-                    data-i18n="screens.gameOverEntry.tetrisRateLabel">Tetris rate</span><strong
-                    data-result-side="local" data-role="mp-result-local-trt">0.0%</strong><strong
-                    data-result-side="remote" data-role="mp-result-remote-trt">0.0%</strong></div>
-                <div class="mp-result-stat"><span data-i18n="screens.gameOverEntry.ppsLabel">PPS</span><strong
-                    data-result-side="local" data-role="mp-result-local-pps">0.00</strong><strong
-                    data-result-side="remote" data-role="mp-result-remote-pps">0.00</strong></div>
-                <div class="mp-result-stat"><span
-                    data-i18n="screens.gameOverEntry.efficiencyLabel">Efficiency</span><strong
-                    data-result-side="local" data-role="mp-result-local-efficiency">0</strong><strong
-                    data-result-side="remote" data-role="mp-result-remote-efficiency">0</strong></div>
-                <div class="mp-result-stat"><span
-                    data-i18n="screens.gameOverEntry.maxComboLabel">Longest combo</span><strong
-                    data-result-side="local" data-role="mp-result-local-combo">0</strong><strong
-                    data-result-side="remote" data-role="mp-result-remote-combo">0</strong></div>
-                <div class="mp-result-stat"><span data-i18n="screens.gameOverEntry.burnLabel">BRN</span><strong
-                    data-result-side="local" data-role="mp-result-local-burn">0</strong><strong
-                    data-result-side="remote" data-role="mp-result-remote-burn">0</strong></div>
-                <div class="mp-result-stat"><span data-i18n="screens.gameOverEntry.droughtLabel">D.MAX</span><strong
-                    data-result-side="local" data-role="mp-result-local-drought-max">0</strong><strong
-                    data-result-side="remote" data-role="mp-result-remote-drought-max">0</strong></div>
-                <div class="mp-result-stat"><span
-                    data-i18n="screens.gameOverEntry.droughtTotalLabel">D.TOTAL</span><strong
-                    data-result-side="local" data-role="mp-result-local-drought-total">0</strong><strong
-                    data-result-side="remote" data-role="mp-result-remote-drought-total">0</strong></div>
-                <div class="mp-result-stat"><span data-i18n="screens.gameOverEntry.droughtAvgLabel">D.AVG</span><strong
-                    data-result-side="local" data-role="mp-result-local-drought-avg">0.0</strong><strong
-                    data-result-side="remote" data-role="mp-result-remote-drought-avg">0.0</strong></div>
+                <div class="mp-result-stat"><span class="mp-result-stat__label"
+                                                  data-i18n="sidebar.lines">Lines</span><strong
+                    class="mp-result-stat__value" data-result-side="local"
+                    data-role="mp-result-local-lines">0</strong><strong class="mp-result-stat__value"
+                                                                        data-result-side="remote"
+                                                                        data-role="mp-result-remote-lines">0</strong>
+                </div>
+                <div class="mp-result-stat"><span class="mp-result-stat__label"
+                                                  data-i18n="screens.gameOverEntry.tetrisRateLabel">Tetris rate</span><strong
+                    class="mp-result-stat__value" data-result-side="local" data-role="mp-result-local-trt">0.0%</strong><strong
+                    class="mp-result-stat__value" data-result-side="remote"
+                    data-role="mp-result-remote-trt">0.0%</strong></div>
+                <div class="mp-result-stat"><span class="mp-result-stat__label"
+                                                  data-i18n="screens.gameOverEntry.ppsLabel">PPS</span><strong
+                    class="mp-result-stat__value" data-result-side="local" data-role="mp-result-local-pps">0.00</strong><strong
+                    class="mp-result-stat__value" data-result-side="remote"
+                    data-role="mp-result-remote-pps">0.00</strong></div>
+                <div class="mp-result-stat"><span class="mp-result-stat__label"
+                                                  data-i18n="screens.gameOverEntry.efficiencyLabel">Efficiency</span><strong
+                    class="mp-result-stat__value" data-result-side="local"
+                    data-role="mp-result-local-efficiency">0</strong><strong class="mp-result-stat__value"
+                                                                             data-result-side="remote"
+                                                                             data-role="mp-result-remote-efficiency">0</strong>
+                </div>
+                <div class="mp-result-stat"><span class="mp-result-stat__label"
+                                                  data-i18n="screens.gameOverEntry.maxComboLabel">Longest combo</span><strong
+                    class="mp-result-stat__value" data-result-side="local"
+                    data-role="mp-result-local-combo">0</strong><strong class="mp-result-stat__value"
+                                                                        data-result-side="remote"
+                                                                        data-role="mp-result-remote-combo">0</strong>
+                </div>
+                <div class="mp-result-stat"><span class="mp-result-stat__label"
+                                                  data-i18n="screens.gameOverEntry.burnLabel">BRN</span><strong
+                    class="mp-result-stat__value" data-result-side="local"
+                    data-role="mp-result-local-burn">0</strong><strong class="mp-result-stat__value"
+                                                                       data-result-side="remote"
+                                                                       data-role="mp-result-remote-burn">0</strong>
+                </div>
+                <div class="mp-result-stat"><span class="mp-result-stat__label"
+                                                  data-i18n="screens.gameOverEntry.droughtLabel">D.MAX</span><strong
+                    class="mp-result-stat__value" data-result-side="local"
+                    data-role="mp-result-local-drought-max">0</strong><strong class="mp-result-stat__value"
+                                                                              data-result-side="remote"
+                                                                              data-role="mp-result-remote-drought-max">0</strong>
+                </div>
+                <div class="mp-result-stat"><span class="mp-result-stat__label"
+                                                  data-i18n="screens.gameOverEntry.droughtTotalLabel">D.TOTAL</span><strong
+                    class="mp-result-stat__value" data-result-side="local"
+                    data-role="mp-result-local-drought-total">0</strong><strong class="mp-result-stat__value"
+                                                                                data-result-side="remote"
+                                                                                data-role="mp-result-remote-drought-total">0</strong>
+                </div>
+                <div class="mp-result-stat"><span class="mp-result-stat__label"
+                                                  data-i18n="screens.gameOverEntry.droughtAvgLabel">D.AVG</span><strong
+                    class="mp-result-stat__value" data-result-side="local"
+                    data-role="mp-result-local-drought-avg">0.0</strong><strong class="mp-result-stat__value"
+                                                                                data-result-side="remote"
+                                                                                data-role="mp-result-remote-drought-avg">0.0</strong>
+                </div>
             </div>
             <div class="screen__button-row">
                 <button class="button button--accent" data-role="mp-result-rematch-button" type="button">Rematch

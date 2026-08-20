@@ -10,13 +10,16 @@
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+Mono:wght@100..900&display=swap"
         rel="stylesheet"
     >
-    <link href="styles/main.css?v=99" rel="stylesheet">
-    <link href="styles/options.css?v=99" rel="stylesheet">
-    <link href="styles/menu.css?v=99" rel="stylesheet">
-    <link href="styles/leaderboard.css?v=99" rel="stylesheet">
-    <link href="styles/multiplayer.css?v=99" rel="stylesheet">
-    <link href="styles/mobile.css?v=99" media="(width < 48rem)" rel="stylesheet">
-    <link href="styles/desktop.css?v=99" media="(width >= 48rem)" rel="stylesheet">
+    <link href="styles/main.css?v=100" rel="stylesheet">
+    <link href="styles/board.css?v=100" rel="stylesheet">
+    <link href="styles/components.css?v=100" rel="stylesheet">
+    <link href="styles/options.css?v=100" rel="stylesheet">
+    <link href="styles/menu.css?v=100" rel="stylesheet">
+    <link href="styles/leaderboard.css?v=100" rel="stylesheet">
+    <link href="styles/multiplayer.css?v=100" rel="stylesheet">
+    <link href="styles/touch.css?v=100" rel="stylesheet">
+    <link href="styles/mobile.css?v=100" media="(width < 48rem)" rel="stylesheet">
+    <link href="styles/desktop.css?v=100" media="(width >= 48rem)" rel="stylesheet">
     <link href="./favicon.ico" rel="icon">
     <link href="./assets/img/icons/favicon.svg" rel="icon" type="image/svg+xml">
     <link href="./assets/img/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
@@ -66,14 +69,14 @@
 <div class="app" id="app-root">
     <div aria-label="Quick actions" class="mobile-fabs" role="toolbar">
         <div class="mobile-fabs__group">
-            <button aria-label="Stats" class="mobile-fab" data-role="fab-stats" type="button">📊</button>
-            <button aria-label="Controls" class="mobile-fab" data-role="fab-controls" type="button">⚙️</button>
+            <button aria-label="Stats" class="mobile-fabs__button" data-role="fab-stats" type="button">📊</button>
+            <button aria-label="Controls" class="mobile-fabs__button" data-role="fab-controls" type="button">⚙️</button>
         </div>
         <div class="mobile-fabs__group">
-            <button aria-label="Fullscreen" aria-pressed="false" class="mobile-fab" data-role="fab-fullscreen"
+            <button aria-label="Fullscreen" aria-pressed="false" class="mobile-fabs__button" data-role="fab-fullscreen"
                     type="button">⛶
             </button>
-            <button aria-label="Exit" class="mobile-fab exit-match-button" data-role="exit-match-button"
+            <button aria-label="Exit" class="mobile-fabs__button exit-match" data-role="exit-match-button"
                     type="button">❌
             </button>
         </div>
@@ -81,25 +84,25 @@
     <div class="drawer-scrim" data-role="drawer-scrim"></div>
 
     <aside aria-label="Stats sidebar" class="app__sidebar sidebar sidebar--stats">
-        <button aria-label="Close" class="drawer-close" data-role="drawer-close" type="button">❌</button>
+        <button aria-label="Close" class="sidebar__close" data-role="drawer-close" type="button">❌</button>
         <header class="card">
             <p class="brand__title" data-role="brand-title">Kl0ck1<span class="brand__title-flip"
                                                                         data-role="brand-title-flip">'s</span></p>
-            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.37-alpha</p>
-            <div aria-label="Quick settings" class="settings-shortcut-row" role="toolbar">
-                <button aria-label="Mute sound" aria-pressed="false" class="settings-shortcut-icon"
+            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.37.1-alpha</p>
+            <div aria-label="Quick settings" class="settings-shortcut__row" role="toolbar">
+                <button aria-label="Mute sound" aria-pressed="false" class="settings-shortcut__button"
                         data-role="mute-toggle" type="button">
                     <span aria-hidden="true" data-role="mute-toggle-icon">🔊</span>
                 </button>
-                <button aria-label="Fullscreen" aria-pressed="false" class="settings-shortcut-icon"
+                <button aria-label="Fullscreen" aria-pressed="false" class="settings-shortcut__button"
                         data-role="fullscreen-toggle" type="button">
                     <span aria-hidden="true">⛶</span>
                 </button>
-                <button aria-label="Options" class="settings-shortcut-icon" data-role="settings-shortcut"
+                <button aria-label="Options" class="settings-shortcut__button" data-role="settings-shortcut"
                         type="button">
                     <span aria-hidden="true">⚙️</span>
                 </button>
-                <button aria-label="Exit" class="settings-shortcut-icon exit-match-button"
+                <button aria-label="Exit" class="settings-shortcut__button exit-match"
                         data-role="exit-match-button" type="button">
                     <span aria-hidden="true">❌</span>
                 </button>
@@ -153,8 +156,8 @@
             </div>
         </section>
 
-        <section aria-labelledby="next-piece-title" class="card card--next-piece" data-role="next-piece-card">
-            <h3 class="card__title card__title--next-piece" data-i18n="sidebar.nextPiece" id="next-piece-title">Next
+        <section aria-labelledby="next-piece-title" class="card next-piece" data-role="next-piece-card">
+            <h3 class="card__title next-piece__title" data-i18n="sidebar.nextPiece" id="next-piece-title">Next
                 piece</h3>
             <div class="next-piece__queue" data-role="next-piece-queue">
                 <canvas class="next-piece__canvas" height="66" width="132"></canvas>
@@ -174,7 +177,7 @@
                 </div>
                 <div class="board__overlay" id="overlay"></div>
                 <div aria-hidden="true" class="board__credits" data-role="credits">
-                    <div class="board__credits__scroll" data-role="credits-scroll"></div>
+                    <div class="board__credits-scroll" data-role="credits-scroll"></div>
                 </div>
             </div>
         </div>
@@ -245,9 +248,9 @@
 </template>
 
 <template id="tpl-credits-entry">
-    <div class="board__credits__entry">
-        <a class="board__credits__link" data-field="link" data-role="credits-link" rel="noopener" target="_blank"></a>
-        <span class="board__credits__roles" data-field="roles"></span>
+    <div class="board__credits-entry">
+        <a class="board__credits-link" data-field="link" data-role="credits-link" rel="noopener" target="_blank"></a>
+        <span class="board__credits-roles" data-field="roles"></span>
     </div>
 </template>
 
@@ -261,7 +264,7 @@
         const fabStats = document.querySelector('[data-role="fab-stats"]');
 
         function notifyResize() {
-            requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
+            requestAnimationFrame(() => (window.visualViewport || window).dispatchEvent(new Event("resize")));
         }
 
         function closeDrawers() {
@@ -336,8 +339,14 @@
                 notifyResize();
             }));
 
-            document.addEventListener("fullscreenchange", () => setFullscreenPressed(isFullscreen()));
-            document.addEventListener("webkitfullscreenchange", () => setFullscreenPressed(isFullscreen()));
+            const onFullscreenChange = () => {
+                setFullscreenPressed(isFullscreen());
+                notifyResize();
+                requestAnimationFrame(notifyResize);
+            };
+
+            document.addEventListener("fullscreenchange", onFullscreenChange);
+            document.addEventListener("webkitfullscreenchange", onFullscreenChange);
             window.addEventListener("resize", () => setFullscreenPressed(isFullscreen()));
         }
 

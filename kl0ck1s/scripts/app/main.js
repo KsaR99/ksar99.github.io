@@ -90,13 +90,15 @@ function getSidebarInlineFootprint() {
 
 function getChrome() {
     const bodyStyle = getComputedStyle(bodyEl);
+    const appStyle = getComputedStyle(appEl);
     const boardWrapStyle = getComputedStyle(boardDiv.parentElement);
     const boardStyle = getComputedStyle(boardDiv);
-    const appStyle = getComputedStyle(appEl);
 
     const verticalChrome =
         parseFloat(bodyStyle.paddingTop) + parseFloat(bodyStyle.paddingBottom) +
+        parseFloat(appStyle.paddingTop) + parseFloat(appStyle.paddingBottom) +
         parseFloat(boardWrapStyle.paddingTop) + parseFloat(boardWrapStyle.paddingBottom) +
+        parseFloat(boardWrapStyle.borderTopWidth) + parseFloat(boardWrapStyle.borderBottomWidth) +
         parseFloat(boardStyle.borderTopWidth) + parseFloat(boardStyle.borderBottomWidth);
 
     const {width: sidebarsWidth, count: inFlowSidebars} = getSidebarInlineFootprint();
@@ -104,7 +106,9 @@ function getChrome() {
 
     const horizontalChrome =
         parseFloat(bodyStyle.paddingLeft) + parseFloat(bodyStyle.paddingRight) +
+        parseFloat(appStyle.paddingLeft) + parseFloat(appStyle.paddingRight) +
         parseFloat(boardWrapStyle.paddingLeft) + parseFloat(boardWrapStyle.paddingRight) +
+        parseFloat(boardWrapStyle.borderLeftWidth) + parseFloat(boardWrapStyle.borderRightWidth) +
         parseFloat(boardStyle.borderLeftWidth) + parseFloat(boardStyle.borderRightWidth) +
         sidebarsWidth + rowGap * inFlowSidebars;
 
@@ -267,6 +271,18 @@ function handleViewportResize() {
 }
 
 (window?.visualViewport || window).addEventListener("resize", handleViewportResize);
+
+if (typeof ResizeObserver !== "undefined") {
+    let skipFirstObservation = true;
+    const bodyResizeObserver = new ResizeObserver(() => {
+        if (skipFirstObservation) {
+            skipFirstObservation = false;
+            return;
+        }
+        handleViewportResize();
+    });
+    bodyResizeObserver.observe(bodyEl);
+}
 
 document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
