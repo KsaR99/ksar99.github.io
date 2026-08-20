@@ -121,6 +121,10 @@ export class Game {
         this.benchmarkController = new BenchmarkController(this);
 
         this.settings = this.settingsController.defaultSettings();
+
+        this.hardcoreMaskTargetRow = null;
+        this.hardcoreMaskDisplayRow = null;
+        this.hardcoreMaskAnim = null;
     }
 
     get stats() {
@@ -174,6 +178,11 @@ export class Game {
 
         this.board.reset();
         this.modeController.setupBoard();
+
+        this.hardcoreMaskTargetRow = null;
+        this.hardcoreMaskDisplayRow = null;
+        this.hardcoreMaskAnim = null;
+
         this.startLevel = startLevel;
         this.level = startLevel;
         this.levelTier = tierForLevel(this.level, this.difficulties);
@@ -296,7 +305,45 @@ export class Game {
         return fromX + (toX - fromX) * t;
     }
 
+    _updateHardcoreMask(delta) {
+        const target = this.modeController.hardcoreMaskFromRow();
+
+        if (target === null) {
+            this.hardcoreMaskTargetRow = null;
+            this.hardcoreMaskDisplayRow = null;
+            this.hardcoreMaskAnim = null;
+            return;
+        }
+
+        if (this.hardcoreMaskTargetRow === null) {
+            this.hardcoreMaskTargetRow = target;
+            this.hardcoreMaskDisplayRow = target;
+            this.hardcoreMaskAnim = null;
+            return;
+        }
+
+        if (target !== this.hardcoreMaskTargetRow) {
+            this.hardcoreMaskAnim = {
+                fromRow: this.hardcoreMaskDisplayRow,
+                toRow: target,
+                elapsed: 0,
+                duration: this.lineClearAnimationDuration,
+            };
+            this.hardcoreMaskTargetRow = target;
+        }
+
+        if (this.hardcoreMaskAnim) {
+            this.hardcoreMaskAnim.elapsed += delta;
+            const t = Math.min(1, this.hardcoreMaskAnim.elapsed / this.hardcoreMaskAnim.duration);
+            const {fromRow, toRow} = this.hardcoreMaskAnim;
+            this.hardcoreMaskDisplayRow = fromRow + (toRow - fromRow) * t;
+            if (t >= 1) this.hardcoreMaskAnim = null;
+        }
+    }
+
     update(delta) {
+        this._updateHardcoreMask(delta);
+
         if (this.rotationAnim) {
             this.rotationAnim.elapsed += delta;
             if (this.rotationAnim.elapsed >= this.rotationAnim.duration) {
@@ -579,9 +626,8 @@ export class Game {
             this.renderer.drawBoard(this.board);
         }
 
-        const hardcoreMaskFromRow = this.modeController.hardcoreMaskFromRow();
-        if (hardcoreMaskFromRow !== null) {
-            this.renderer.drawHardcoreMask(this.board, hardcoreMaskFromRow, this.activeTheme);
+        if (this.hardcoreMaskDisplayRow !== null) {
+            this.renderer.drawHardcoreMask(this.board, this.hardcoreMaskDisplayRow, this.activeTheme);
         }
 
         if (this.hardDropTrail) {
