@@ -393,12 +393,15 @@ export class PieceController {
         if (game.board.collides(piece, 0, 1)) this.resetLockDelay();
 
         const is180 = Math.abs(normalizedDir) === 2;
+        const isSquare = piece.type === "O";
         game.rotationAnim = {
             fromX,
             fromY,
             toX: piece.x,
             toY: piece.y,
             fromAngle: is180 ? 180 : -normalizedDir * 90,
+            squareSpin: isSquare,
+            spinAngle: is180 ? 180 : normalizedDir * 90,
             elapsed: 0,
             duration: is180 ? ROTATION_ANIM_180_DURATION_MS : ROTATION_ANIM_DURATION_MS,
         };

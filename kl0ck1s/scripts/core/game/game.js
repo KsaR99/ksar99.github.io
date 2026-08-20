@@ -11,6 +11,7 @@ import {
     HARD_DROP_TRAIL_ALPHAS,
     HARD_DROP_TRAIL_DURATION_MS,
     HUD_UPDATE_INTERVAL_MS,
+    SQUARE_SPIN_SCALE_DIP,
     ZEN_SHIFT_ANIMATION_DURATION_MS
 } from "./game-constants.js";
 import {GAME_STATE_KEYS, GameState} from "./game-state.js";
@@ -436,6 +437,8 @@ export class Game {
         let x = base.x;
         let y = base.y;
         let angle = 0;
+        let scale = 1;
+        let squareSpinActive = false;
 
         if (this.rotationAnim) {
             const anim = this.rotationAnim;
@@ -444,7 +447,33 @@ export class Game {
 
             x = anim.fromX + (base.x - anim.fromX) * eased;
             y = anim.fromY + (base.y - anim.fromY) * eased;
-            angle = anim.fromAngle * (1 - eased);
+
+            if (anim.squareSpin) {
+                squareSpinActive = true;
+                const SHRINK_PHASE = 0.25;
+                const GROW_PHASE = 0.25;
+                const SPIN_START = SHRINK_PHASE;
+                const SPIN_END = 1 - GROW_PHASE;
+
+                if (t < SHRINK_PHASE) {
+                    const localT = t / SHRINK_PHASE;
+                    const localEased = localT * localT * (3 - 2 * localT);
+                    angle = 0;
+                    scale = 1 - SQUARE_SPIN_SCALE_DIP * localEased;
+                } else if (t < SPIN_END) {
+                    const localT = (t - SPIN_START) / (SPIN_END - SPIN_START);
+                    const localEased = localT * localT * (3 - 2 * localT);
+                    angle = anim.spinAngle * localEased;
+                    scale = 1 - SQUARE_SPIN_SCALE_DIP;
+                } else {
+                    const localT = (t - SPIN_END) / GROW_PHASE;
+                    const localEased = localT * localT * (3 - 2 * localT);
+                    angle = anim.spinAngle;
+                    scale = (1 - SQUARE_SPIN_SCALE_DIP) + SQUARE_SPIN_SCALE_DIP * localEased;
+                }
+            } else {
+                angle = anim.fromAngle * (1 - eased);
+            }
         } else {
             if (this.shiftAnim && this.rawGrounded) {
                 const t = Math.min(1, this.shiftAnim.elapsed / this.shiftAnim.duration);
@@ -456,10 +485,15 @@ export class Game {
             }
         }
 
-        if (x === base.x && y === base.y && angle === 0) return base;
+        if (x === base.x && y === base.y && angle === 0 && scale === 1) return base;
 
         const rendered = Object.create(Object.getPrototypeOf(base));
-        Object.assign(rendered, base, {x, y, renderAngle: angle});
+        Object.assign(rendered, base, {x, y, renderAngle: angle, renderScale: scale});
+
+        if (squareSpinActive) {
+            rendered.pivotX = base.width / 2;
+            rendered.pivotY = base.height / 2;
+        }
 
         return rendered;
     }

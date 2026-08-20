@@ -1114,8 +1114,10 @@ export class Renderer {
         const size = this.boardConfig.CELL_SIZE;
         const {ctx} = surface;
         const angle = piece.renderAngle || 0;
+        const scale = piece.renderScale || 1;
+        const transformed = angle !== 0 || scale !== 1;
 
-        if (angle !== 0) {
+        if (transformed) {
             const pivotX = piece.pivotX ?? (piece.width / 2);
             const pivotY = piece.pivotY ?? (piece.height / 2);
             const cx = (piece.x + pivotX) * size;
@@ -1124,18 +1126,19 @@ export class Renderer {
             ctx.save();
             ctx.translate(cx, cy);
             ctx.rotate(angle * Math.PI / 180);
+            if (scale !== 1) ctx.scale(scale, scale);
             ctx.translate(-cx, -cy);
         }
 
         const renderMask = piece.renderMask ?? piece.mask;
         forEachShapeCell(renderMask, piece.width, piece.height, (r, c) => {
             const y = piece.y + r;
-            if (y < 0 && angle === 0) return;
+            if (y < 0 && !transformed) return;
             const level = board ? this.saturationLevelForRow(Math.round(y), board.rows) : 0;
             this.drawCell(ctx, piece.x + c, y, piece.color, size, {glow: true, level});
         });
 
-        if (angle !== 0) ctx.restore();
+        if (transformed) ctx.restore();
     }
 
     drawFallTrail(trail, headIndex, count, surface = this) {
