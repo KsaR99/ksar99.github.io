@@ -196,13 +196,17 @@ export class OpponentBoardView {
         return {cols: COLS, rows: ROWS, colors: cells || this._emptyCells, version};
     }
 
-    draw(cells, version, livePiece = null, hardDropTrail = null, hardDropFlash = null) {
+    draw(cells, version, livePiece = null, hardDropTrail = null, hardDropFlash = null, hardcoreMaskRow = null, theme = "none") {
         const surface = this.surface;
         const renderer = this.game.renderer;
         if (!surface || !renderer) return;
 
         const board = this._boardView(cells, version);
         renderer.drawBoard(board, surface);
+
+        if (hardcoreMaskRow !== null) {
+            renderer.drawHardcoreMask(board, hardcoreMaskRow, theme, surface);
+        }
 
         if (hardDropTrail) {
             renderer.drawHardDropTrail(hardDropTrail.entries, hardDropTrail.progress, surface);

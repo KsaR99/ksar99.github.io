@@ -1086,6 +1086,7 @@ export class MultiplayerController {
             difficultyTier: game.levelTier,
             difficultyLevel: game.level,
             difficultyPercent,
+            hardcoreMaskRow: game.hardcoreMaskDisplayRow,
         };
     }
 
@@ -1094,6 +1095,14 @@ export class MultiplayerController {
 
         if (payload.kind === MESSAGE_KIND.STATS) {
             this._updateOpponentStats(payload);
+            if (!this._remoteClearing) {
+                this._drawOpponentBoard(
+                    this._lastRemoteCells,
+                    this._currentRemoteLivePieceForDraw(),
+                    this._currentHardDropTrailForDraw(),
+                    this._currentHardDropFlashForDraw(),
+                );
+            }
         } else if (payload.kind === MESSAGE_KIND.FINAL) {
             this._remoteFinalScore = payload.score;
             this._remoteFinalStats = payload;
@@ -1719,7 +1728,10 @@ export class MultiplayerController {
     }
 
     _drawOpponentBoard(cells, livePiece = null, hardDropTrail = null, hardDropFlash = null) {
-        this.opponentBoard.draw(cells, this._remoteBoardVersion, livePiece, hardDropTrail, hardDropFlash);
+        this.opponentBoard.draw(
+            cells, this._remoteBoardVersion, livePiece, hardDropTrail, hardDropFlash,
+            this._lastRemoteStats?.hardcoreMaskRow ?? null, this.game.activeTheme,
+        );
     }
 
     _currentHardDropTrailForDraw() {

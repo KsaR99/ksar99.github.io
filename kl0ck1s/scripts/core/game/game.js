@@ -306,6 +306,17 @@ export class Game {
     }
 
     _updateHardcoreMask(delta) {
+        if (this.state === "clearing") {
+            if (this.hardcoreMaskAnim) {
+                this.hardcoreMaskAnim.elapsed += delta;
+                const t = Math.min(1, this.hardcoreMaskAnim.elapsed / this.hardcoreMaskAnim.duration);
+                const {fromRow, toRow} = this.hardcoreMaskAnim;
+                this.hardcoreMaskDisplayRow = fromRow + (toRow - fromRow) * t;
+                if (t >= 1) this.hardcoreMaskAnim = null;
+            }
+            return;
+        }
+
         const target = this.modeController.hardcoreMaskFromRow();
 
         if (target === null) {

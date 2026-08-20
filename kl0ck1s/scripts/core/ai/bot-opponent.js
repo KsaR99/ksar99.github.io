@@ -3,6 +3,7 @@
 import {DIFFICULTIES, KLOCKOMINOS, LINE_CLEAR_ANIMATION_DURATION_MS, SCORING} from "../shared/config.js";
 import {MESSAGE_KIND} from "../net/net-constants.js";
 import {Board} from "../game/board.js";
+import {deepestReachableRow} from "../game/modes/marathon-hardcore-mode.js";
 import {
     HARD_DROP_IMPACT_FLASH_DURATION_MS,
     HARD_DROP_TRAIL_ALPHAS,
@@ -776,6 +777,7 @@ export class BotOpponent extends EventTarget {
             difficultyPercent: SCORING.LINES_PER_LEVEL
                 ? Math.floor(((this.lines % SCORING.LINES_PER_LEVEL) / SCORING.LINES_PER_LEVEL) * 100)
                 : 0,
+            hardcoreMaskRow: this.modeDef.hardcoreMask ? deepestReachableRow(this.board, this.current) : null,
             display: {
                 best: "—",
                 score: formatNumber(this.score),

@@ -14,7 +14,7 @@ import {KLOCKOMINOS} from "../../shared/config.js";
  * @returns {number|null} deepest reachable row index, or null if the piece
  *   can't be placed anywhere (shouldn't normally happen).
  */
-function deepestReachableRow(board, type) {
+export function deepestReachableRow(board, type) {
     const def = KLOCKOMINOS[type];
     if (!def) return null;
 
