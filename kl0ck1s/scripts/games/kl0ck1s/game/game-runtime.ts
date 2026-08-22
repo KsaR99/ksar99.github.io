@@ -238,12 +238,12 @@ export class GameRuntime {
                 x = fromX + (toX - fromX) * t;
             }
             if (state.state === "running" && state.dropInterval > 0 && !state.rawGrounded) {
-                // Only show fractional fall when the next whole-cell position is
-                // actually free. Otherwise the interpolation would visually sink
-                // the piece into the block it is about to land on.
-                const nextCellBlocked = game.board.collides(base, 0, 1);
-                if (!nextCellBlocked) {
-                    y = base.y + Math.min(0.999, state.dropCounter / state.dropInterval);
+                const canAdvanceOneCell = !game.board.collides(base, 0, 1);
+                if (canAdvanceOneCell) {
+                    const progress = Math.max(0, Math.min(0.999, state.dropCounter / state.dropInterval));
+                    y = base.y + progress;
+                } else {
+                    y = base.y;
                 }
             }
         }

@@ -172,8 +172,6 @@ export class GameEngine<T extends string = string> {
 
     rotate(direction: -1 | 1 | 2): boolean {
         if (direction === 2) {
-            // 180° rotation must be atomic. A failed second quarter-turn
-            // must not leave the piece half-rotated.
             const piece = this.state.current;
             if (!piece) return false;
 
@@ -285,9 +283,6 @@ export class GameEngine<T extends string = string> {
 
         this.state.isGrounded = false;
 
-        // Keep the lock/ground timer across a one-frame rotation kick.
-        // This mirrors step(), so callers using the standalone API cannot
-        // accidentally reintroduce the infinite-rotation lock-delay bug.
         const piece = this.state.current;
         const temporarilyUngroundedByRotation =
             this.groundedPiece === piece && this.state.lastAction === "rotate";
@@ -419,9 +414,6 @@ export class GameEngine<T extends string = string> {
             this.groundedPieceY = piece.y;
             this.state.rawGrounded = true;
             this.state.isGrounded = true;
-            // No fractional gravity is rendered while the next cell is blocked.
-            // Keeping leftover drop time here makes the renderer interpolate the
-            // piece downward into the occupied cell for a frame.
             this.state.dropCounter = 0;
             this.state.lockDelayTimer += deltaMs;
             this.state.groundedTime += deltaMs;
@@ -432,10 +424,6 @@ export class GameEngine<T extends string = string> {
         this.state.rawGrounded = false;
         this.state.isGrounded = false;
 
-        // A rotation kick can lift a grounded piece for a frame. Do not erase
-        // the grounded timer in that case: otherwise alternating rotations
-        // can keep a piece alive forever by repeatedly leaving/re-entering
-        // the floor state.
         const temporarilyUngroundedByRotation =
             this.groundedPiece === piece && this.state.lastAction === "rotate";
 
@@ -448,9 +436,6 @@ export class GameEngine<T extends string = string> {
         this.state.dropCounter += deltaMs;
         let dropped = false;
 
-        // Advance one cell at a time and re-check collision after every step.
-        // This prevents large frame deltas / very fast gravity from ever
-        // moving a piece through an occupied cell.
         while (
             this.state.dropInterval > 0 &&
             this.state.dropCounter >= this.state.dropInterval
