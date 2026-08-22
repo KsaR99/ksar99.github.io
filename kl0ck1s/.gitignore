@@ -1,1 +1,6 @@
+migrations
 node_modules/
+
+.idea
+.vscode
+*.log
