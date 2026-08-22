@@ -1,6 +1,6 @@
-migrations
-node_modules/
-
 .idea
 .vscode
 *.log
+
+migrations
+node_modules/

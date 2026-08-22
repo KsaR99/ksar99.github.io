@@ -5,10 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="df1c1c4c-a6df-4996-a224-4c213e3fe93e" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/desktop.ini" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/engine/simulation/game-engine.ts" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/engine/simulation/game-engine.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/styles/kl0ck1s.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles/kl0ck1s.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/games/kl0ck1s/game/game-runtime.ts" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/games/kl0ck1s/game/game-runtime.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -147,7 +150,7 @@
       <workItem from="1787295093121" duration="145000" />
       <workItem from="1787323411096" duration="10967000" />
       <workItem from="1787354756010" duration="17683000" />
-      <workItem from="1787409973034" duration="2523000" />
+      <workItem from="1787409973034" duration="2861000" />
     </task>
     <servers />
   </component>
