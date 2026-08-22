@@ -131,3 +131,30 @@
         display: none;
     }
 }
+
+body.body--theme-volcano .board__bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, oklch(0.23 0 0), oklch(0.18 0 0));
+    clip-path: polygon(
+        19% 63%,
+        0% 100%,
+        100% 100%,
+        81% 63%,
+        72% 35%,
+        67% 18%,
+        62% 0%,
+        57% 3%,
+        55% 4%,
+        45% 4%,
+        43% 3%,
+        38% 0%,
+        33% 18%,
+        28% 35%
+    );
+    border-radius: var(--radius);
+    pointer-events: none;
+}
+
+

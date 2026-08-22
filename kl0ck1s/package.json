@@ -1,8 +1,16 @@
 {
-    "name": "Kl0ck1s",
+    "name": "kl0ck1s",
+    "version": "1.0.0",
     "private": true,
+    "description": "Build tooling for kl0ck1's - bundles scripts/app/main.(js|ts) and everything it imports into a single scripts/kl0ck1s.js",
     "type": "module",
     "scripts": {
-        "test": "node --test tests/"
+        "build": "node build.mjs",
+        "watch": "node build.mjs --watch",
+        "typecheck": "tsc --noEmit -p scripts/tsconfig.json"
+    },
+    "devDependencies": {
+        "esbuild": "^0.28.2",
+        "typescript": "^7.0.2"
     }
 }

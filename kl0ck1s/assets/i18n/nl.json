@@ -13,7 +13,7 @@
         "lines": "Lijnen",
         "best": "Beste",
         "drought": "Droogte",
-        "tetrisRate": "4LP",
+        "tetrisRate": "TRT",
         "pps": "PPS",
         "objective": "Doel",
         "statusLive": "Huidige spel",
@@ -155,10 +155,19 @@
             "benchmarkDone": "Simulated {pieces} pieces in {ms} ms. Slowest: {label} ({percent}%).",
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
-            "benchmarkCopyFailed": "Copy failed"
+            "benchmarkCopyFailed": "Copy failed",
+            "showFirstGameTutorial": "Toon tutorial bij eerste game",
+            "asciiFallingPieces": "Vallende stukken als ASCII",
+            "blockTypeAscii": "ASCII",
+            "ghostTypeAscii": "ASCII"
         },
         "loading": {
-            "leaderboardHint": "Scorebord laden..."
+            "leaderboardHint": "Scorebord laden...",
+            "audio": {
+                "sfx": "Geluidseffecten laden...",
+                "voices": "Stemmen laden...",
+                "music": "Muziek laden..."
+            }
         },
         "gameOverEntry": {
             "title": "GAME OVER",
@@ -179,12 +188,31 @@
             "droughtAvgLabel": "D.AVG",
             "burnLabel": "BRN",
             "transitionLabel": "TRNS",
-            "tetrisRateLabel": "4-lijnenpercentage (4LP)",
+            "tetrisRateLabel": "4-lijnenpercentage (TRT)",
             "clearsLabel": "Lijnen (1/2/3/4 tegelijk)",
             "ppsLabel": "PPS",
             "spinsLabel": "Spins (T / T-mini / overig)",
             "maxComboLabel": "Langste combo",
             "efficiencyLabel": "Efficiëntie (pt/lijn)"
+        },
+        "firstGameTutorial": {
+            "badge": "EERSTE GAME",
+            "title": "Snelle besturing",
+            "move": "Bewegen",
+            "rotate": "Draaien",
+            "softDrop": "Zacht laten vallen",
+            "hardDrop": "Hard laten vallen",
+            "keyboardHint": "Toetsenbordbesturing kan altijd worden gewijzigd in Opties.",
+            "touchHint": "Gebruik de bediening op het scherm om het stuk te bewegen, draaien en laten vallen.",
+            "dismiss": "Sluiten",
+            "dontShowAgain": "Niet meer tonen",
+            "closeHint": "Druk op Enter of Esc om te sluiten."
+        },
+        "modeChoice": {
+            "title": "Spelmodus kiezen",
+            "hint": "Kies hoe je wilt spelen",
+            "single": "Singleplayer",
+            "multiplayer": "Multiplayer"
         }
     },
     "leaderboard": {
@@ -357,7 +385,7 @@
             "lineClearApply": "Clearing full lines",
             "scoring": "Scoring",
             "renderRefreshRect": "Render: canvas rect refresh",
-            "renderBackgroundRebuild": "Render: board background rebuild",
+            "renderWebGL": "Render: WebGL-bord",
             "renderBlit": "Render: board blit",
             "renderDrawPiece": "Render: falling piece",
             "renderDrawGhost": "Render: ghost piece",
@@ -413,6 +441,30 @@
         "hostFallback": "Host",
         "waitingForHost": "Waiting for {name} to respond…",
         "hostDeclined": "The host declined your request to join.",
-        "hostNoResponse": "The host didn't respond in time. Try another room."
+        "hostNoResponse": "The host didn't respond in time. Try another room.",
+        "blockTypeLabel": "Bloktype",
+        "ghostTypeLabel": "Geesttype"
+    },
+    "statsInfo": {
+        "best": "Je hoogste geregistreerde score voor het huidige profiel en klassement.",
+        "burn": "Burn: stukken/regels gebruikt zonder het hoofddoel voor lijnruimen te bevorderen.",
+        "clears": "Overzicht van enkele, dubbele, drievoudige en vierregelige clears.",
+        "difficulty": "Huidig moeilijkheidsniveau en voortgang naar de volgende stap.",
+        "drought": "Huidige droogte: opeenvolgende stukken sinds de laatste lijnclear.",
+        "droughtAvg": "Gemiddelde lengte van voltooide droogteperiodes.",
+        "droughtTotal": "Totaal aantal stukken in voltooide droogteperiodes.",
+        "efficiency": "Gemiddelde score per vrijgemaakte lijn.",
+        "gameTime": "Totale speeltijd die voor deze run is geregistreerd.",
+        "infoLabel": "Deze statistiek uitleggen",
+        "lines": "Totaal aantal vrijgemaakte lijnen tijdens deze game.",
+        "maxCombo": "Grootste combo-keten tijdens de run.",
+        "objective": "Huidige doelstelling van de modus en de voortgang. De balk toont hoe dicht je bij voltooiing bent.",
+        "pps": "Stukken per seconde: gemiddelde plaatsingssnelheid tijdens de run.",
+        "result": "Het resultaat dat voor deze run is geregistreerd.",
+        "score": "Huidige punten uit lijnclears, spins, drops, combo’s en andere acties.",
+        "spins": "Overzicht van T-spins, T-spin-minis en andere gedetecteerde spins.",
+        "tetrisRate": "TRT: het percentage vrijgemaakte lijnen dat uit vier lijnen tegelijk bestaat (Tetrises).",
+        "time": "Verstreken speeltijd. Pauzes en schermen buiten het spel worden uitgesloten.",
+        "transition": "Transitionscore verdiend door de overgangsmechanismen van de spelmodus."
     }
 }

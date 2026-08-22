@@ -1,0 +1,10 @@
+@import "./main.css";
+@import "./board.css";
+@import "./components.css";
+@import "./options.css";
+@import "./menu.css";
+@import "./leaderboard.css";
+@import "./multiplayer.css";
+@import "./touch.css";
+@import "./mobile.css" (width < 48rem);
+@import "./desktop.css" (width >= 48rem);

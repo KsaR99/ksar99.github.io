@@ -1,5 +1,31 @@
+<template id="tpl-screen-mode-choice">
+    <section class="screen screen--mode-choice">
+        <header aria-label="Kl0ck1's" class="mode-choice__brand">
+            <p class="brand__title mode-choice__title">Kl0ck1's</p>
+        </header>
+        <div class="mode-choice__panels">
+            <section aria-labelledby="mode-choice-single-label" class="mode-choice__panel">
+                <button class="button button--accent mode-choice__button" data-role="single-player-button"
+                        type="button">
+                    <span aria-hidden="true" class="mode-choice__button-icon">🎮</span>
+                    <span data-i18n="screens.modeChoice.single" id="mode-choice-single-label">Singleplayer</span>
+                </button>
+            </section>
+            <section aria-labelledby="mode-choice-multi-label" class="mode-choice__panel">
+                <button class="button button--primary mode-choice__button" data-role="multiplayer-button" type="button">
+                    <span aria-hidden="true" class="mode-choice__button-icon">🌐</span>
+                    <span data-i18n="screens.modeChoice.multiplayer" id="mode-choice-multi-label">Multiplayer</span>
+                </button>
+            </section>
+        </div>
+    </section>
+</template>
+
 <template id="tpl-screen-idle">
     <section class="screen screen--menu">
+        <button aria-label="Return to game mode selection" class="mp-screen__return" data-role="single-return-button"
+                type="button">↩
+        </button>
         <h2 class="screen__title">Kl0ck1's</h2>
         <p class="screen__hint" data-i18n="screens.idle.modeHint">Choose mode</p>
         <div class="difficulty difficulty--modes difficulty--carousel" data-role="mode-select">
@@ -27,7 +53,7 @@
                     data-role="profile-select"></select>
             <input class="nickname-form__input" data-i18n-placeholder="screens.idle.namePlaceholder"
                    data-role="name-input" maxlength="16"
-                   name="nickname" pattern="[a-zA-Z\d_\-]{3,16}"
+                   name="nickname" pattern="[\p{L}\p{N}_\-]{3,16}"
                    placeholder="Your nickname"
                    required type="text">
             <button aria-label="Delete profile" class="nickname-form__delete-button"
@@ -39,9 +65,6 @@
         <div class="screen__button-row">
             <button class="button button--accent" data-i18n="screens.idle.startButton"
                     data-role="start-button" type="button">Start
-            </button>
-            <button class="button button--primary" data-role="multiplayer-button" type="button">🌐 <span
-                data-i18n="multiplayer.button">Multiplayer</span>
             </button>
         </div>
         <section aria-label="Leaderboard" class="leaderboard" data-role="leaderboard-section">

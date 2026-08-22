@@ -13,7 +13,7 @@
         "lines": "Linee",
         "best": "Record",
         "drought": "Siccità",
-        "tetrisRate": "4LR",
+        "tetrisRate": "TRT",
         "pps": "PPS",
         "objective": "Obiettivo",
         "statusLive": "Partita in corso",
@@ -155,10 +155,19 @@
             "benchmarkDone": "Simulated {pieces} pieces in {ms} ms. Slowest: {label} ({percent}%).",
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
-            "benchmarkCopyFailed": "Copy failed"
+            "benchmarkCopyFailed": "Copy failed",
+            "showFirstGameTutorial": "Mostra tutorial della prima partita",
+            "asciiFallingPieces": "Pezzi cadenti ASCII",
+            "blockTypeAscii": "ASCII",
+            "ghostTypeAscii": "ASCII"
         },
         "loading": {
-            "leaderboardHint": "Caricamento classifica..."
+            "leaderboardHint": "Caricamento classifica...",
+            "audio": {
+                "sfx": "Caricamento effetti sonori...",
+                "voices": "Caricamento delle voci...",
+                "music": "Caricamento musica..."
+            }
         },
         "gameOverEntry": {
             "title": "FINE PARTITA",
@@ -179,12 +188,31 @@
             "droughtAvgLabel": "D.MEDIA",
             "burnLabel": "BRN",
             "transitionLabel": "TRNS",
-            "tetrisRateLabel": "Tasso 4 linee (4LR)",
+            "tetrisRateLabel": "Tasso 4 linee (TRT)",
             "clearsLabel": "Linee eliminate (1/2/3/4)",
             "ppsLabel": "PPS",
             "spinsLabel": "Spin (T / T-mini / altro)",
             "maxComboLabel": "Combo più lunga",
             "efficiencyLabel": "Efficienza (punti/linea)"
+        },
+        "firstGameTutorial": {
+            "badge": "PRIMA PARTITA",
+            "title": "Comandi rapidi",
+            "move": "Muovi",
+            "rotate": "Ruota",
+            "softDrop": "Caduta rapida",
+            "hardDrop": "Caduta istantanea",
+            "keyboardHint": "I comandi da tastiera possono essere modificati in qualsiasi momento nelle Opzioni.",
+            "touchHint": "Usa i comandi sullo schermo per muovere, ruotare e far cadere il pezzo.",
+            "dismiss": "Chiudi",
+            "dontShowAgain": "Non mostrare più",
+            "closeHint": "Premi Invio o Esc per chiudere."
+        },
+        "modeChoice": {
+            "title": "Scegli la modalità di gioco",
+            "hint": "Scegli come vuoi giocare",
+            "single": "Giocatore singolo",
+            "multiplayer": "Multigiocatore"
         }
     },
     "leaderboard": {
@@ -357,7 +385,7 @@
             "lineClearApply": "Clearing full lines",
             "scoring": "Scoring",
             "renderRefreshRect": "Render: canvas rect refresh",
-            "renderBackgroundRebuild": "Render: board background rebuild",
+            "renderWebGL": "Rendering: tabellone WebGL",
             "renderBlit": "Render: board blit",
             "renderDrawPiece": "Render: falling piece",
             "renderDrawGhost": "Render: ghost piece",
@@ -413,6 +441,30 @@
         "hostFallback": "Host",
         "waitingForHost": "Waiting for {name} to respond…",
         "hostDeclined": "The host declined your request to join.",
-        "hostNoResponse": "The host didn't respond in time. Try another room."
+        "hostNoResponse": "The host didn't respond in time. Try another room.",
+        "blockTypeLabel": "Tipo di blocco",
+        "ghostTypeLabel": "Tipo di fantasma"
+    },
+    "statsInfo": {
+        "best": "Il tuo punteggio più alto registrato per il profilo e l’ambito della classifica correnti.",
+        "burn": "Burn: pezzi/linee usati senza far avanzare l’obiettivo principale di completamento delle linee.",
+        "clears": "Dettaglio di clear singoli, doppi, tripli e da quattro linee.",
+        "difficulty": "Livello di difficoltà attuale e progresso verso il livello successivo.",
+        "drought": "Siccità attuale: pezzi consecutivi dall’ultimo clear di linea.",
+        "droughtAvg": "Lunghezza media delle serie di siccità completate.",
+        "droughtTotal": "Numero totale di pezzi nelle serie di siccità completate.",
+        "efficiency": "Punteggio medio ottenuto per ogni linea completata.",
+        "gameTime": "Tempo di gioco totale registrato per questa partita.",
+        "infoLabel": "Spiega questa statistica",
+        "lines": "Totale delle linee completate nella partita corrente.",
+        "maxCombo": "La più lunga catena di combo raggiunta durante la partita.",
+        "objective": "Obiettivo della modalità e relativo progresso. La barra mostra quanto manca al completamento.",
+        "pps": "Pezzi al secondo: velocità media di posizionamento durante la partita.",
+        "result": "Il risultato registrato per questa partita.",
+        "score": "Punti ottenuti da linee, spin, drop, combo e altre azioni di punteggio.",
+        "spins": "Dettaglio di T-spin, mini T-spin e altri spin rilevati.",
+        "tetrisRate": "TRT: percentuale delle linee completate che erano clear da quattro linee (Tetris).",
+        "time": "Tempo di gioco trascorso. Pause e schermate fuori dalla partita sono escluse.",
+        "transition": "Punteggio di transizione ottenuto dalle meccaniche di transizione della modalità."
     }
 }

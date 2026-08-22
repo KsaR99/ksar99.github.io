@@ -13,7 +13,7 @@
         "lines": "Riadky",
         "best": "Najlepšie",
         "drought": "Sucho",
-        "tetrisRate": "T4R",
+        "tetrisRate": "TRT",
         "pps": "PPS",
         "objective": "Cieľ",
         "statusLive": "Aktuálna hra",
@@ -155,10 +155,19 @@
             "benchmarkDone": "Simulated {pieces} pieces in {ms} ms. Slowest: {label} ({percent}%).",
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
-            "benchmarkCopyFailed": "Copy failed"
+            "benchmarkCopyFailed": "Copy failed",
+            "showFirstGameTutorial": "Zobraziť tutoriál prvej hry",
+            "asciiFallingPieces": "Padajúce kocky ASCII",
+            "blockTypeAscii": "ASCII",
+            "ghostTypeAscii": "ASCII"
         },
         "loading": {
-            "leaderboardHint": "Načítavanie rebríčka..."
+            "leaderboardHint": "Načítavanie rebríčka...",
+            "audio": {
+                "sfx": "Načítavanie zvukových efektov...",
+                "voices": "Načítavanie hlasov...",
+                "music": "Načítavanie hudby..."
+            }
         },
         "gameOverEntry": {
             "title": "KONIEC HRY",
@@ -179,12 +188,31 @@
             "droughtAvgLabel": "D.PRIEM",
             "burnLabel": "BRN",
             "transitionLabel": "TRNS",
-            "tetrisRateLabel": "Miera 4 riadkov (T4R)",
+            "tetrisRateLabel": "Miera 4 riadkov (TRT)",
             "clearsLabel": "Vyčistenia (1/2/3/4 riadky)",
             "ppsLabel": "PPS",
             "spinsLabel": "Spiny (T / T-mini / iné)",
             "maxComboLabel": "Najdlhšie kombo",
             "efficiencyLabel": "Efektivita (body/riadok)"
+        },
+        "firstGameTutorial": {
+            "badge": "PRVÁ HRA",
+            "title": "Rýchle ovládanie",
+            "move": "Pohyb",
+            "rotate": "Otočenie",
+            "softDrop": "Mäkký pád",
+            "hardDrop": "Okamžitý pád",
+            "keyboardHint": "Ovládanie klávesnicou môžeš kedykoľvek zmeniť v Možnostiach.",
+            "touchHint": "Použi ovládacie prvky na obrazovke na pohyb, otáčanie a spúšťanie dielika.",
+            "dismiss": "Zavrieť",
+            "dontShowAgain": "Už nezobrazovať",
+            "closeHint": "Stlač Enter alebo Esc pre zatvorenie."
+        },
+        "modeChoice": {
+            "title": "Vyberte herný režim",
+            "hint": "Vyberte, ako chcete hrať",
+            "single": "Hra pre jedného",
+            "multiplayer": "Hra viacerých hráčov"
         }
     },
     "leaderboard": {
@@ -357,7 +385,7 @@
             "lineClearApply": "Clearing full lines",
             "scoring": "Scoring",
             "renderRefreshRect": "Render: canvas rect refresh",
-            "renderBackgroundRebuild": "Render: board background rebuild",
+            "renderWebGL": "Renderovanie: hracia plocha WebGL",
             "renderBlit": "Render: board blit",
             "renderDrawPiece": "Render: falling piece",
             "renderDrawGhost": "Render: ghost piece",
@@ -413,6 +441,30 @@
         "hostFallback": "Host",
         "waitingForHost": "Waiting for {name} to respond…",
         "hostDeclined": "The host declined your request to join.",
-        "hostNoResponse": "The host didn't respond in time. Try another room."
+        "hostNoResponse": "The host didn't respond in time. Try another room.",
+        "blockTypeLabel": "Typ kocky",
+        "ghostTypeLabel": "Typ ducha"
+    },
+    "statsInfo": {
+        "best": "Tvoje najvyššie zaznamenané skóre pre aktuálny profil a rozsah rebríčka.",
+        "burn": "Burn: dieliky/riadky použité bez postupu hlavného cieľa čistenia riadkov.",
+        "clears": "Rozpis vyčistenia jedného, dvoch, troch a štyroch riadkov.",
+        "difficulty": "Aktuálna úroveň obtiažnosti a postup k ďalšej úrovni.",
+        "drought": "Aktuálne sucho: počet po sebe idúcich dielikov od posledného vyčistenia riadku.",
+        "droughtAvg": "Priemerná dĺžka dokončených období sucha.",
+        "droughtTotal": "Celkový počet dielikov použitých v dokončených obdobiach sucha.",
+        "efficiency": "Priemerné skóre získané za každý vyčistený riadok.",
+        "gameTime": "Celkový čas hrania zaznamenaný v tejto hre.",
+        "infoLabel": "Vysvetliť túto štatistiku",
+        "lines": "Celkový počet vyčistených riadkov v aktuálnej hre.",
+        "maxCombo": "Najväčšia dosiahnutá séria komb počas hry.",
+        "objective": "Cieľ aktuálneho režimu a jeho postup. Panel ukazuje, ako blízko si k dokončeniu.",
+        "pps": "Dieliky za sekundu: priemerné tempo umiestňovania počas hry.",
+        "result": "Výsledok zaznamenaný pre túto hru.",
+        "score": "Aktuálne body za vyčistené riadky, spiny, pády, kombá a ďalšie bodované akcie.",
+        "spins": "Rozpis T-spinov, mini T-spinov a ďalších zistených spinov.",
+        "tetrisRate": "TRT: percento vyčistených riadkov, ktoré boli štvorriadkové vyčistenia (Tetris).",
+        "time": "Uplynutý čas hrania. Pauzy a obrazovky mimo hry sa nezapočítavajú.",
+        "transition": "Body za prechod získané mechanikami prechodu daného režimu."
     }
 }

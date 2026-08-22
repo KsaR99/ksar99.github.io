@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="df1c1c4c-a6df-4996-a224-4c213e3fe93e" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/i18n/ary.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/i18n/ary.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/i18n/cs.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/i18n/cs.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/i18n/de.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/i18n/de.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/i18n/en.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/i18n/en.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/i18n/es.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/i18n/es.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/i18n/fr.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/i18n/fr.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/i18n/id.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/i18n/id.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/i18n/it.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/i18n/it.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/i18n/ja.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/i18n/ja.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/i18n/ko.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/i18n/ko.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/i18n/nl.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/i18n/nl.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/i18n/pl.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/i18n/pl.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/i18n/ru.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/i18n/ru.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/i18n/sk.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/i18n/sk.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/partials/gameover.html" beforeDir="false" afterPath="$PROJECT_DIR$/partials/gameover.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/partials/menu.html" beforeDir="false" afterPath="$PROJECT_DIR$/partials/menu.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/partials/multiplayer.html" beforeDir="false" afterPath="$PROJECT_DIR$/partials/multiplayer.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/partials/options.html" beforeDir="false" afterPath="$PROJECT_DIR$/partials/options.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/app/boot-loader.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/app/main.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/ai/bot-opponent.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/ai/desktop.ini" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/benchmark-controller.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/credits-controller.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/difficulty-controller.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/game-flow-controller.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/input-controller.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/input/input-source.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/input/keyboard-input.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/input/mouse-input.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/input/steering-arbiter.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/input/touch-input.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/mode-controller.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/multiplayer-controller.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/multiplayer/opponent-board-view.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/options-controller.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/piece-controller.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/profile-controller.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/screen-flow.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/settings-controller.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/stats-tracker.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/controllers/theme-overlay.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/game/board.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/game/game-constants.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/game/game-state.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/game/game.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/game/modes/base-mode.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/game/modes/cascade-mode.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/game/modes/cheese-race-mode.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/game/modes/countdown-mode.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/game/modes/dig-survival-mode.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/game/modes/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/game/modes/marathon-hardcore-mode.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/game/modes/sprint-mode.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/game/modes/survival-mode.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/game/modes/ultra-mode.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/game/modes/zen-mode.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/game/piece-bag.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/game/piece.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/game/scoring.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/net/binary-codec.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/net/ice-servers.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/net/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/net/multiplayer-session.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/net/net-constants.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/net/rtc-peer-connection.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/net/sdp-codec.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/net/signaling-codec.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/net/supabase-signaling.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/net/wire-codec.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/rendering/board-sizing.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/rendering/cached-canvas-layer.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/rendering/das-arr-preview.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/rendering/options-preview.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/rendering/renderer.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/rendering/sprite-cache.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/services/confirm-dialog.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/services/i18n.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/services/music-director.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/services/persistent-store.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/services/share-service.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/services/sound-manager.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/shared/config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/shared/desktop.ini" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/shared/key-bindings.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/shared/seeded-random.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/shared/utils.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/ui/desktop.ini" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/ui/hud.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/ui/leaderboard.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/ui/screens.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/ui/themes/desktop.ini" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/ui/themes/matrix.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/ui/themes/particle-field.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/ui/themes/rain.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/ui/themes/snow.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/ui/themes/theme-effect.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/ui/themes/vhs.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/core/ui/themes/volcano.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/styles/board.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles/board.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/styles/components.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles/components.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/styles/leaderboard.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles/leaderboard.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/styles/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles/main.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/styles/menu.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles/menu.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/styles/multiplayer.css" beforeDir="false" afterPath="$PROJECT_DIR$/styles/multiplayer.css" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;KsaR99&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/KsaR99/ksar99.github.io.git&quot;,
+    &quot;accountId&quot;: &quot;d9ffa0bd-5e6e-4240-bd10-6bfaef1e2b30&quot;
+  }
+}</component>
+  <component name="NamedScopeManager">
+    <scope name="html" pattern="file:index.html||file[kl0ck1s]:partials/*" />
+    <scope name="css" pattern="file[kl0ck1s]:styles/*" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="3HRC7htxfXy1Q4pmbBlhpCVcGvG" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "JavaScript Debug.index.html.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Node.js.renderer.js.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "javascript.preferred.runtime.type.id": "node",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.jshint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.jshint": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\WebStorm 2026.1.4\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\saymo\Desktop\Programowanie\projekty\kl0ck1s\ksar99.github.io\kl0ck1s\scripts\core\ui" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-WS-262.9437.145" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="df1c1c4c-a6df-4996-a224-4c213e3fe93e" name="Changes" comment="" />
+      <created>1785821336123</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1785821336123</updated>
+      <workItem from="1785821345941" duration="14899000" />
+      <workItem from="1785845111249" duration="7437000" />
+      <workItem from="1785900041422" duration="7717000" />
+      <workItem from="1785925767999" duration="10483000" />
+      <workItem from="1785949973699" duration="1591000" />
+      <workItem from="1785995753681" duration="12935000" />
+      <workItem from="1786039426972" duration="7773000" />
+      <workItem from="1786080517185" duration="20211000" />
+      <workItem from="1786109880577" duration="2053000" />
+      <workItem from="1786112340849" duration="33000" />
+      <workItem from="1786112475492" duration="31000" />
+      <workItem from="1786112866159" duration="6456000" />
+      <workItem from="1786128362627" duration="7449000" />
+      <workItem from="1786142466028" duration="33000" />
+      <workItem from="1786167458438" duration="11758000" />
+      <workItem from="1786188200302" duration="10753000" />
+      <workItem from="1786216283002" duration="5281000" />
+      <workItem from="1786257616515" duration="18740000" />
+      <workItem from="1786300565388" duration="5880000" />
+      <workItem from="1786343566819" duration="8230000" />
+      <workItem from="1786363430873" duration="3529000" />
+      <workItem from="1786373499667" duration="2790000" />
+      <workItem from="1786384682457" duration="1870000" />
+      <workItem from="1786387988747" duration="12904000" />
+      <workItem from="1786403244021" duration="1745000" />
+      <workItem from="1786470517352" duration="3491000" />
+      <workItem from="1786479784046" duration="7842000" />
+      <workItem from="1786525997261" duration="9546000" />
+      <workItem from="1786545598541" duration="1809000" />
+      <workItem from="1786555214281" duration="3412000" />
+      <workItem from="1786576151496" duration="7157000" />
+      <workItem from="1786615659673" duration="5841000" />
+      <workItem from="1786629214786" duration="3387000" />
+      <workItem from="1786645908372" duration="1911000" />
+      <workItem from="1786650237915" duration="855000" />
+      <workItem from="1786651974212" duration="531000" />
+      <workItem from="1786652866414" duration="8638000" />
+      <workItem from="1786703515552" duration="11452000" />
+      <workItem from="1786727361416" duration="13725000" />
+      <workItem from="1786786291335" duration="6184000" />
+      <workItem from="1786801202631" duration="1023000" />
+      <workItem from="1786807106495" duration="15297000" />
+      <workItem from="1786846921857" duration="823000" />
+      <workItem from="1786881461070" duration="7977000" />
+      <workItem from="1786936383043" duration="3941000" />
+      <workItem from="1786946686599" duration="6470000" />
+      <workItem from="1786960034023" duration="11263000" />
+      <workItem from="1786997673012" duration="14207000" />
+      <workItem from="1787028992422" duration="2754000" />
+      <workItem from="1787054284295" duration="5414000" />
+      <workItem from="1787067076764" duration="10504000" />
+      <workItem from="1787092568985" duration="8533000" />
+      <workItem from="1787153911556" duration="5625000" />
+      <workItem from="1787171665451" duration="9465000" />
+      <workItem from="1787229488939" duration="13183000" />
+      <workItem from="1787260393475" duration="11880000" />
+      <workItem from="1787295093121" duration="145000" />
+      <workItem from="1787323411096" duration="10967000" />
+      <workItem from="1787354756010" duration="17683000" />
+      <workItem from="1787409973034" duration="1573000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

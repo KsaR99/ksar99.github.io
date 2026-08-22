@@ -10,16 +10,7 @@
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+Mono:wght@100..900&display=swap"
         rel="stylesheet"
     >
-    <link href="styles/main.css?v=100" rel="stylesheet">
-    <link href="styles/board.css?v=100" rel="stylesheet">
-    <link href="styles/components.css?v=100" rel="stylesheet">
-    <link href="styles/options.css?v=100" rel="stylesheet">
-    <link href="styles/menu.css?v=100" rel="stylesheet">
-    <link href="styles/leaderboard.css?v=100" rel="stylesheet">
-    <link href="styles/multiplayer.css?v=100" rel="stylesheet">
-    <link href="styles/touch.css?v=100" rel="stylesheet">
-    <link href="styles/mobile.css?v=100" media="(width < 48rem)" rel="stylesheet">
-    <link href="styles/desktop.css?v=100" media="(width >= 48rem)" rel="stylesheet">
+    <link href="styles/kl0ck1s.css?v=1" rel="stylesheet">
     <link href="./favicon.ico" rel="icon">
     <link href="./assets/img/icons/favicon.svg" rel="icon" type="image/svg+xml">
     <link href="./assets/img/icons/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
@@ -88,7 +79,7 @@
         <header class="card">
             <p class="brand__title" data-role="brand-title">Kl0ck1<span class="brand__title-flip"
                                                                         data-role="brand-title-flip">'s</span></p>
-            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.37.1-alpha</p>
+            <p class="brand__subtitle brand__subtitle--clickable" data-role="brand-version">v0.1-beta</p>
             <div aria-label="Quick settings" class="settings-shortcut__row" role="toolbar">
                 <button aria-label="Mute sound" aria-pressed="false" class="settings-shortcut__button"
                         data-role="mute-toggle" type="button">
@@ -113,6 +104,9 @@
             <p class="stats__status" data-i18n="sidebar.statusLast" data-role="stats-status">Last game</p>
             <div class="stats__row" data-role="time-stat">
                 <h3 class="card__title" data-i18n="sidebar.time">Time</h3>
+                <button aria-label="Info" class="stat-info" data-i18n-title="statsInfo.time" data-stat-info
+                        type="button">i
+                </button>
                 <div class="stats__value" id="time-value">00:00</div>
             </div>
         </section>
@@ -120,38 +114,63 @@
         <section aria-label="Stats" class="card stats" data-role="stats-card">
             <div class="stats__row" data-role="best-stat">
                 <h3 class="card__title" data-i18n="sidebar.best">Best</h3>
+                <button aria-label="Info" class="stat-info" data-i18n-title="statsInfo.best" data-stat-info
+                        type="button">i
+                </button>
                 <div class="stats__value" id="best-value">0</div>
             </div>
             <div class="stats__row">
                 <h3 class="card__title" data-i18n="sidebar.score">Score</h3>
+                <button aria-label="Info" class="stat-info" data-i18n-title="statsInfo.score" data-stat-info
+                        type="button">i
+                </button>
                 <div class="stats__value" id="score-value">0</div>
             </div>
             <div class="stats__row" data-role="lines-stat">
                 <h3 class="card__title" data-i18n="sidebar.lines">Lines</h3>
+                <button aria-label="Info" class="stat-info" data-i18n-title="statsInfo.lines" data-stat-info
+                        type="button">i
+                </button>
                 <div class="stats__value" id="lines-value">0</div>
             </div>
             <div class="stats__row" data-role="trt-stat">
                 <h3 class="card__title" data-i18n="sidebar.tetrisRate">TRT</h3>
+                <button aria-label="Info" class="stat-info" data-i18n-title="statsInfo.tetrisRate" data-stat-info
+                        type="button">i
+                </button>
                 <div class="stats__value" id="trt-value">0.0%</div>
             </div>
             <div class="stats__row" data-role="pps-stat">
                 <h3 class="card__title" data-i18n="sidebar.pps">PPS</h3>
+                <button aria-label="Info" class="stat-info" data-i18n-title="statsInfo.pps" data-stat-info
+                        type="button">i
+                </button>
                 <div class="stats__value" id="pps-value">0.00</div>
             </div>
             <div class="stats__row" data-role="drought-stat">
                 <h3 class="card__title" data-i18n="sidebar.drought">Drought</h3>
+                <button aria-label="Info" class="stat-info" data-i18n-title="statsInfo.drought" data-stat-info
+                        type="button">i
+                </button>
                 <div class="stats__value" id="drought-value">0</div>
             </div>
             <div data-role="objective-stat">
                 <div class="progress-bar progress-bar--objective" id="objective-bar-track">
                     <div class="progress-bar__fill" id="objective-bar"></div>
                     <div class="progress-bar__label" id="objective-value">-</div>
+                    <button aria-label="Info" class="stat-info stat-info--overlay" data-i18n-title="statsInfo.objective"
+                            data-stat-info type="button">i
+                    </button>
                 </div>
             </div>
             <div class="difficulty-indicator" data-role="difficulty-stat">
                 <div class="progress-bar progress-bar--difficulty">
                     <div class="progress-bar__fill" id="difficulty-bar"></div>
                     <div class="progress-bar__label" id="difficulty-value">-</div>
+                    <button aria-label="Info" class="stat-info stat-info--overlay"
+                            data-i18n-title="statsInfo.difficulty"
+                            data-stat-info type="button">i
+                    </button>
                 </div>
             </div>
         </section>
@@ -176,6 +195,7 @@
                     <canvas class="board__filter-canvas" id="filter-canvas"></canvas>
                 </div>
                 <div class="board__overlay" id="overlay"></div>
+                <div class="first-game-tutorial" data-role="first-game-tutorial" hidden></div>
                 <div aria-hidden="true" class="board__credits" data-role="credits">
                     <div class="board__credits-scroll" data-role="credits-scroll"></div>
                 </div>
@@ -213,6 +233,27 @@
         </div>
     </div>
 </div>
+
+<template id="tpl-first-game-tutorial">
+    <section aria-live="polite" class="first-game-tutorial__panel" data-role="first-game-tutorial-panel">
+        <div class="first-game-tutorial__header">
+            <span class="first-game-tutorial__badge" data-i18n="screens.firstGameTutorial.badge">FIRST GAME</span>
+            <h2 class="first-game-tutorial__title" data-i18n="screens.firstGameTutorial.title">Quick controls</h2>
+        </div>
+        <div class="first-game-tutorial__controls" data-role="first-game-tutorial-controls"></div>
+        <p class="first-game-tutorial__hint" data-field="hint"></p>
+        <label class="first-game-tutorial__dont-show">
+            <input class="options__input--checkbox" data-role="first-game-tutorial-dont-show" type="checkbox">
+            <span data-field="dont-show-label">Don't show this again</span>
+        </label>
+        <p class="first-game-tutorial__close-hint" data-field="close-hint"></p>
+        <button class="button button--accent first-game-tutorial__dismiss"
+                data-i18n="screens.firstGameTutorial.dismiss"
+                data-role="first-game-tutorial-dismiss"
+                type="button">Close
+        </button>
+    </section>
+</template>
 
 <template id="tpl-screen-loading">
     <section class="screen">
@@ -353,6 +394,6 @@
         window.addEventListener("orientationchange", notifyResize);
     })();
 </script>
-<script src="scripts/app/main.js?v=99" type="module"></script>
+<script src="scripts/kl0ck1s.js?v=1" type="module"></script>
 </body>
 </html>

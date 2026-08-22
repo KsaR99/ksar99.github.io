@@ -13,7 +13,7 @@
         "lines": "라인",
         "best": "최고 기록",
         "drought": "가뭄",
-        "tetrisRate": "4LR",
+        "tetrisRate": "TRT",
         "pps": "PPS",
         "objective": "목표",
         "statusLive": "현재 게임",
@@ -155,10 +155,19 @@
             "benchmarkDone": "Simulated {pieces} pieces in {ms} ms. Slowest: {label} ({percent}%).",
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
-            "benchmarkCopyFailed": "Copy failed"
+            "benchmarkCopyFailed": "Copy failed",
+            "showFirstGameTutorial": "첫 게임 튜토리얼 표시",
+            "asciiFallingPieces": "ASCII 낙하 블록",
+            "blockTypeAscii": "ASCII",
+            "ghostTypeAscii": "ASCII"
         },
         "loading": {
-            "leaderboardHint": "리더보드 불러오는 중..."
+            "leaderboardHint": "리더보드 불러오는 중...",
+            "audio": {
+                "sfx": "효과음 불러오는 중...",
+                "voices": "음성 불러오는 중...",
+                "music": "음악 불러오는 중..."
+            }
         },
         "gameOverEntry": {
             "title": "게임 오버",
@@ -179,12 +188,31 @@
             "droughtAvgLabel": "D.AVG",
             "burnLabel": "BRN",
             "transitionLabel": "TRNS",
-            "tetrisRateLabel": "4라인 비율 (4LR)",
+            "tetrisRateLabel": "4라인 비율 (TRT)",
             "clearsLabel": "라인 클리어 (1/2/3/4줄)",
             "ppsLabel": "PPS",
             "spinsLabel": "스핀 (T / T-미니 / 기타)",
             "maxComboLabel": "최장 콤보",
             "efficiencyLabel": "효율 (점수/라인)"
+        },
+        "firstGameTutorial": {
+            "badge": "첫 게임",
+            "title": "빠른 조작",
+            "move": "이동",
+            "rotate": "회전",
+            "softDrop": "소프트 드롭",
+            "hardDrop": "하드 드롭",
+            "keyboardHint": "키보드 조작은 언제든지 옵션에서 변경할 수 있습니다.",
+            "touchHint": "화면 조작을 사용해 블록을 이동하고 회전하고 떨어뜨리세요.",
+            "dismiss": "닫기",
+            "dontShowAgain": "다시 표시하지 않기",
+            "closeHint": "Enter 또는 Esc를 눌러 닫으세요."
+        },
+        "modeChoice": {
+            "title": "게임 모드 선택",
+            "hint": "플레이 방법을 선택하세요",
+            "single": "싱글플레이어",
+            "multiplayer": "멀티플레이어"
         }
     },
     "leaderboard": {
@@ -357,7 +385,7 @@
             "lineClearApply": "Clearing full lines",
             "scoring": "Scoring",
             "renderRefreshRect": "Render: canvas rect refresh",
-            "renderBackgroundRebuild": "Render: board background rebuild",
+            "renderWebGL": "렌더링: WebGL 보드",
             "renderBlit": "Render: board blit",
             "renderDrawPiece": "Render: falling piece",
             "renderDrawGhost": "Render: ghost piece",
@@ -413,6 +441,30 @@
         "hostFallback": "Host",
         "waitingForHost": "Waiting for {name} to respond…",
         "hostDeclined": "The host declined your request to join.",
-        "hostNoResponse": "The host didn't respond in time. Try another room."
+        "hostNoResponse": "The host didn't respond in time. Try another room.",
+        "blockTypeLabel": "블록 유형",
+        "ghostTypeLabel": "고스트 유형"
+    },
+    "statsInfo": {
+        "best": "현재 프로필과 순위 범위에서 기록된 최고 점수입니다.",
+        "burn": "Burn: 주요 줄 제거 목표의 진행 없이 사용된 블록/줄입니다.",
+        "clears": "1줄, 2줄, 3줄, 4줄 제거의 내역입니다.",
+        "difficulty": "현재 난이도와 다음 난이도 단계까지의 진행도입니다.",
+        "drought": "현재 가뭄: 마지막 줄 제거 이후 연속으로 놓은 블록 수입니다.",
+        "droughtAvg": "완료된 가뭄 구간의 평균 길이입니다.",
+        "droughtTotal": "완료된 가뭄 구간에서 사용한 블록의 총 개수입니다.",
+        "efficiency": "제거한 한 줄당 평균 획득 점수입니다.",
+        "gameTime": "이번 플레이에서 기록된 총 플레이 시간입니다.",
+        "infoLabel": "이 통계 설명",
+        "lines": "현재 게임에서 제거한 줄의 총합입니다.",
+        "maxCombo": "이번 플레이에서 달성한 가장 긴 콤보입니다.",
+        "objective": "현재 모드의 목표와 진행도입니다. 막대는 목표까지 얼마나 남았는지 보여줍니다.",
+        "pps": "초당 블록 수: 이번 플레이의 평균 배치 속도입니다.",
+        "result": "이번 플레이에 기록된 결과입니다.",
+        "score": "줄 제거, 스핀, 드롭, 콤보 및 기타 점수 행동으로 얻은 현재 점수입니다.",
+        "spins": "T-spin, 미니 T-spin 및 기타 감지된 스핀의 내역입니다.",
+        "tetrisRate": "TRT: 제거한 줄 중 4줄 동시 제거(Tetris)의 비율입니다.",
+        "time": "경과한 플레이 시간입니다. 일시정지와 게임 외 화면은 제외됩니다.",
+        "transition": "게임 모드의 전환 메커니즘으로 얻은 전환 점수입니다."
     }
 }

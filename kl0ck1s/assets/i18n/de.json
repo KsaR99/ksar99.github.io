@@ -13,7 +13,7 @@
         "lines": "Reihen",
         "best": "Bestwert",
         "drought": "Dürre",
-        "tetrisRate": "4LR",
+        "tetrisRate": "TRT",
         "pps": "PPS",
         "objective": "Ziel",
         "statusLive": "Aktuelles Spiel",
@@ -155,10 +155,19 @@
             "benchmarkDone": "Simulated {pieces} pieces in {ms} ms. Slowest: {label} ({percent}%).",
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
-            "benchmarkCopyFailed": "Copy failed"
+            "benchmarkCopyFailed": "Copy failed",
+            "showFirstGameTutorial": "Tutorial für das erste Spiel anzeigen",
+            "asciiFallingPieces": "Fallende Steine als ASCII",
+            "blockTypeAscii": "ASCII",
+            "ghostTypeAscii": "ASCII"
         },
         "loading": {
-            "leaderboardHint": "Bestenliste wird geladen..."
+            "leaderboardHint": "Bestenliste wird geladen...",
+            "audio": {
+                "sfx": "Soundeffekte werden geladen...",
+                "voices": "Stimmen werden geladen...",
+                "music": "Musik wird geladen..."
+            }
         },
         "gameOverEntry": {
             "title": "GAME OVER",
@@ -179,12 +188,31 @@
             "droughtAvgLabel": "D.AVG",
             "burnLabel": "BRN",
             "transitionLabel": "TRNS",
-            "tetrisRateLabel": "4-Linien-Rate (4LR)",
+            "tetrisRateLabel": "4-Linien-Rate (TRT)",
             "clearsLabel": "Reihen (1/2/3/4 gleichzeitig)",
             "ppsLabel": "PPS",
             "spinsLabel": "Spins (T / T-Mini / sonstige)",
             "maxComboLabel": "Längste Combo",
             "efficiencyLabel": "Effizienz (Pkt./Reihe)"
+        },
+        "firstGameTutorial": {
+            "badge": "ERSTES SPIEL",
+            "title": "Schnellsteuerung",
+            "move": "Bewegen",
+            "rotate": "Drehen",
+            "softDrop": "Soft Drop",
+            "hardDrop": "Hard Drop",
+            "keyboardHint": "Die Tastatursteuerung kann jederzeit in den Optionen geändert werden.",
+            "touchHint": "Verwende die Bildschirmsteuerung, um den Stein zu bewegen, zu drehen und fallen zu lassen.",
+            "dismiss": "Schließen",
+            "dontShowAgain": "Nicht mehr anzeigen",
+            "closeHint": "Drücke Enter oder Esc zum Schließen."
+        },
+        "modeChoice": {
+            "title": "Spielmodus wählen",
+            "hint": "Wähle, wie du spielen möchtest",
+            "single": "Einzelspieler",
+            "multiplayer": "Mehrspieler"
         }
     },
     "leaderboard": {
@@ -357,7 +385,7 @@
             "lineClearApply": "Clearing full lines",
             "scoring": "Scoring",
             "renderRefreshRect": "Render: canvas rect refresh",
-            "renderBackgroundRebuild": "Render: board background rebuild",
+            "renderWebGL": "Rendering: WebGL-Spielfeld",
             "renderBlit": "Render: board blit",
             "renderDrawPiece": "Render: falling piece",
             "renderDrawGhost": "Render: ghost piece",
@@ -413,6 +441,30 @@
         "hostFallback": "Host",
         "waitingForHost": "Waiting for {name} to respond…",
         "hostDeclined": "The host declined your request to join.",
-        "hostNoResponse": "The host didn't respond in time. Try another room."
+        "hostNoResponse": "The host didn't respond in time. Try another room.",
+        "blockTypeLabel": "Blocktyp",
+        "ghostTypeLabel": "Geist-Typ"
+    },
+    "statsInfo": {
+        "best": "Deine höchste gespeicherte Punktzahl für das aktuelle Profil und den aktuellen Ranglistenbereich.",
+        "burn": "Burn: Steine/Zeilen, die verwendet wurden, ohne das Hauptziel zum Löschen von Zeilen voranzubringen.",
+        "clears": "Aufschlüsselung von Einzel-, Doppel-, Dreifach- und Vierfach-Clears.",
+        "difficulty": "Aktuelle Schwierigkeitsstufe und Fortschritt zur nächsten Stufe.",
+        "drought": "Aktuelle Durststrecke: aufeinanderfolgende Steine seit dem letzten Zeilen-Clear.",
+        "droughtAvg": "Durchschnittliche Länge abgeschlossener Durststrecken.",
+        "droughtTotal": "Gesamtzahl der Steine in abgeschlossenen Durststrecken.",
+        "efficiency": "Durchschnittliche Punktzahl pro gelöschter Zeile.",
+        "gameTime": "Gesamte für diesen Lauf aufgezeichnete Spielzeit.",
+        "infoLabel": "Diese Statistik erklären",
+        "lines": "Gesamtzahl der in diesem Spiel gelöschten Zeilen.",
+        "maxCombo": "Größte während des Laufs erreichte Combo-Kette.",
+        "objective": "Aktuelles Modusziel und Fortschritt. Der Balken zeigt, wie nah du am Abschluss bist.",
+        "pps": "Steine pro Sekunde: durchschnittliches Platzierungstempo während des Laufs.",
+        "result": "Das für diesen Lauf aufgezeichnete Ergebnis.",
+        "score": "Aktuelle Punkte aus Zeilen-Clears, Spins, Drops, Combos und anderen Aktionen.",
+        "spins": "Aufschlüsselung von T-Spins, Mini-T-Spins und anderen erkannten Spins.",
+        "tetrisRate": "TRT: Anteil der gelöschten Zeilen, die Vierzeiler (Tetris) waren.",
+        "time": "Vergangene Spielzeit. Pausen und Bildschirme außerhalb des Spiels werden nicht gezählt.",
+        "transition": "Übergangspunkte aus den Übergangsmechaniken des Spielmodus."
     }
 }

@@ -13,7 +13,7 @@
         "lines": "خطوط",
         "best": "أحسن نتيجة",
         "drought": "الجفاف",
-        "tetrisRate": "4LR",
+        "tetrisRate": "TRT",
         "pps": "PPS",
         "objective": "الهدف",
         "statusLive": "اللعبة الحالية",
@@ -155,10 +155,19 @@
             "benchmarkDone": "Simulated {pieces} pieces in {ms} ms. Slowest: {label} ({percent}%).",
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
-            "benchmarkCopyFailed": "Copy failed"
+            "benchmarkCopyFailed": "Copy failed",
+            "showFirstGameTutorial": "إظهار برنامج تعليمي للعبة الأولى",
+            "asciiFallingPieces": "قطع ASCII الهابطة",
+            "blockTypeAscii": "ASCII",
+            "ghostTypeAscii": "ASCII"
         },
         "loading": {
-            "leaderboardHint": "كيتحمّل الترتيب..."
+            "leaderboardHint": "كيتحمّل الترتيب...",
+            "audio": {
+                "sfx": "كيتحمّلو المؤثرات الصوتية...",
+                "voices": "كيتحمّلو الأصوات...",
+                "music": "كيتحمّل الموسيقى..."
+            }
         },
         "gameOverEntry": {
             "title": "خلصات اللعبة",
@@ -179,12 +188,31 @@
             "droughtAvgLabel": "D.AVG",
             "burnLabel": "BRN",
             "transitionLabel": "TRNS",
-            "tetrisRateLabel": "نسبة 4 خطوط (4LR)",
+            "tetrisRateLabel": "نسبة 4 خطوط (TRT)",
             "clearsLabel": "التنظيفات (1/2/3/4 خطوط)",
             "ppsLabel": "PPS",
             "spinsLabel": "دورات (T / T-mini / أخرى)",
             "maxComboLabel": "أطول كومبو",
             "efficiencyLabel": "الفعالية (نقط/خط)"
+        },
+        "firstGameTutorial": {
+            "badge": "أول لعبة",
+            "title": "التحكم السريع",
+            "move": "تحريك",
+            "rotate": "تدوير",
+            "softDrop": "إسقاط سريع",
+            "hardDrop": "إسقاط فوري",
+            "keyboardHint": "يمكن تغيير تحكم لوحة المفاتيح في أي وقت من الخيارات.",
+            "touchHint": "استعمل عناصر التحكم على الشاشة لتحريك القطعة وتدويرها وإسقاطها.",
+            "dismiss": "إغلاق",
+            "dontShowAgain": "لا تظهر هذا مرة أخرى",
+            "closeHint": "اضغط Enter أو Esc للإغلاق."
+        },
+        "modeChoice": {
+            "title": "خْتار نمط اللعب",
+            "hint": "خْتار كيفاش بغيتي تلعب",
+            "single": "لعب بوحدك",
+            "multiplayer": "لعب جماعي"
         }
     },
     "leaderboard": {
@@ -357,7 +385,7 @@
             "lineClearApply": "Clearing full lines",
             "scoring": "Scoring",
             "renderRefreshRect": "Render: canvas rect refresh",
-            "renderBackgroundRebuild": "Render: board background rebuild",
+            "renderWebGL": "التصيير: لوحة WebGL",
             "renderBlit": "Render: board blit",
             "renderDrawPiece": "Render: falling piece",
             "renderDrawGhost": "Render: ghost piece",
@@ -413,6 +441,30 @@
         "hostFallback": "Host",
         "waitingForHost": "Waiting for {name} to respond…",
         "hostDeclined": "The host declined your request to join.",
-        "hostNoResponse": "The host didn't respond in time. Try another room."
+        "hostNoResponse": "The host didn't respond in time. Try another room.",
+        "blockTypeLabel": "نوع القطعة",
+        "ghostTypeLabel": "نوع الشبح"
+    },
+    "statsInfo": {
+        "best": "أعلى نتيجة مسجلة لك في الملف الشخصي ونطاق الترتيب الحالي.",
+        "burn": "Burn: قطع/أسطر استُخدمت بدون التقدم في هدف المسح الرئيسي.",
+        "clears": "تفصيل لمسح سطر واحد أو سطرين أو ثلاثة أو أربعة أسطر.",
+        "difficulty": "مستوى الصعوبة الحالي والتقدم نحو مستوى الصعوبة التالي.",
+        "drought": "الجفاف الحالي: عدد القطع المتتالية منذ آخر مسح لسطر.",
+        "droughtAvg": "متوسط طول فترات الجفاف المكتملة.",
+        "droughtTotal": "إجمالي عدد القطع المستخدمة في فترات الجفاف المكتملة.",
+        "efficiency": "متوسط النقاط المكتسبة لكل سطر تم مسحه.",
+        "gameTime": "إجمالي وقت اللعب المسجل لهذه الجولة.",
+        "infoLabel": "شرح هذه الإحصائية",
+        "lines": "إجمالي الأسطر التي تم مسحها في اللعبة الحالية.",
+        "maxCombo": "أكبر سلسلة كومبو وصلت إليها خلال الجولة.",
+        "objective": "هدف الوضع الحالي ومدى التقدم فيه. يوضح الشريط مدى قربك من إكماله.",
+        "pps": "القطع في الثانية: متوسط سرعة وضع القطع خلال الجولة.",
+        "result": "النتيجة المسجلة لهذه الجولة.",
+        "score": "النقاط الحالية المكتسبة من مسح الأسطر والدوران والإسقاطات والكومبو وغيرها من أفعال التسجيل.",
+        "spins": "تفصيل T-spin وMini T-spin والدورات الأخرى المكتشفة.",
+        "tetrisRate": "TRT: نسبة الأسطر الممسوحة التي كانت مسحًا لأربعة أسطر (Tetris).",
+        "time": "وقت اللعب المنقضي. لا تُحتسب فترات التوقف والشاشات خارج اللعب.",
+        "transition": "نقاط الانتقال المكتسبة من آليات الانتقال الخاصة بوضع اللعب."
     }
 }

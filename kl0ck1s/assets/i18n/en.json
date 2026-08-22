@@ -13,7 +13,7 @@
         "lines": "Lines",
         "best": "Best",
         "drought": "Drought",
-        "tetrisRate": "4LR",
+        "tetrisRate": "TRT",
         "pps": "PPS",
         "objective": "Objective",
         "statusLive": "Current game",
@@ -160,10 +160,19 @@
             "benchmarkDone": "Simulated {pieces} pieces in {ms} ms. Slowest: {label} ({percent}%).",
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
-            "benchmarkCopyFailed": "Copy failed"
+            "benchmarkCopyFailed": "Copy failed",
+            "showFirstGameTutorial": "Show first-game tutorial",
+            "asciiFallingPieces": "ASCII falling pieces",
+            "blockTypeAscii": "ASCII",
+            "ghostTypeAscii": "ASCII"
         },
         "loading": {
-            "leaderboardHint": "Loading leaderboard..."
+            "leaderboardHint": "Loading leaderboard...",
+            "audio": {
+                "sfx": "Loading sound effects...",
+                "voices": "Loading voices...",
+                "music": "Loading music..."
+            }
         },
         "gameOverEntry": {
             "title": "GAME OVER",
@@ -185,12 +194,31 @@
             "droughtAvgLabel": "D.AVG",
             "burnLabel": "BRN",
             "transitionLabel": "TRNS",
-            "tetrisRateLabel": "4-line rate (4LR)",
+            "tetrisRateLabel": "4-line rate (TRT)",
             "clearsLabel": "Clears (1/2/3/4 lines)",
             "ppsLabel": "PPS",
             "spinsLabel": "Spins (T / T-mini / other)",
             "maxComboLabel": "Longest combo",
             "efficiencyLabel": "Efficiency (pts/line)"
+        },
+        "firstGameTutorial": {
+            "badge": "FIRST GAME",
+            "title": "Quick controls",
+            "move": "Move",
+            "rotate": "Rotate",
+            "softDrop": "Soft drop",
+            "hardDrop": "Hard drop",
+            "keyboardHint": "Keyboard controls can be changed any time in Options.",
+            "touchHint": "Use the on-screen controls to move, rotate and drop the piece.",
+            "dismiss": "Close",
+            "dontShowAgain": "Don't show this again",
+            "closeHint": "Press Enter or Escape to close."
+        },
+        "modeChoice": {
+            "title": "Choose game mode",
+            "hint": "Choose how you want to play",
+            "single": "Singleplayer",
+            "multiplayer": "Multiplayer"
         }
     },
     "leaderboard": {
@@ -351,7 +379,7 @@
             "lineClearApply": "Clearing full lines",
             "scoring": "Scoring",
             "renderRefreshRect": "Render: canvas rect refresh",
-            "renderBackgroundRebuild": "Render: board background rebuild",
+            "renderWebGL": "Render: WebGL board",
             "renderBlit": "Render: board blit",
             "renderDrawPiece": "Render: falling piece",
             "renderDrawGhost": "Render: ghost piece",
@@ -439,6 +467,30 @@
         "hostFallback": "Host",
         "waitingForHost": "Waiting for {name} to respond…",
         "hostDeclined": "The host declined your request to join.",
-        "hostNoResponse": "The host didn't respond in time. Try another room."
+        "hostNoResponse": "The host didn't respond in time. Try another room.",
+        "blockTypeLabel": "Block type",
+        "ghostTypeLabel": "Ghost type"
+    },
+    "statsInfo": {
+        "best": "Your highest recorded score for the current profile and leaderboard scope.",
+        "score": "Current points earned from line clears, spins, drops, combos and other scoring actions.",
+        "lines": "Total lines cleared during the current game.",
+        "tetrisRate": "TRT: the percentage of cleared lines that were four-line clears (Tetrises).",
+        "pps": "Pieces per second: average placement rate over the run.",
+        "drought": "Current drought: consecutive pieces since the last line clear.",
+        "time": "Elapsed gameplay time. Pauses and non-playing screens are excluded.",
+        "objective": "Current mode objective and its progress. The bar shows how close you are to completing it.",
+        "difficulty": "Current difficulty level and progress toward the next difficulty step.",
+        "gameTime": "Total gameplay time recorded for this run.",
+        "efficiency": "Average score earned per cleared line.",
+        "result": "The result recorded for this run.",
+        "transition": "Transition score earned from the game mode's transition mechanics.",
+        "clears": "Breakdown of single, double, triple and four-line clears.",
+        "burn": "Burn: pieces/lines used without progressing the main clear objective.",
+        "maxCombo": "Largest combo chain reached during the run.",
+        "spins": "Breakdown of T spins, T-spin minis and other detected spins.",
+        "droughtTotal": "Total number of pieces spent in completed drought streaks.",
+        "droughtAvg": "Average length of completed drought streaks.",
+        "infoLabel": "Explain this statistic"
     }
 }

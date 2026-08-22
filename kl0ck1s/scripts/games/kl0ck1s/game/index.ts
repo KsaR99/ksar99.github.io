@@ -1,0 +1,21 @@
+export {Board} from "./board.js";
+export {Piece} from "./piece.js";
+export {PieceBag} from "./piece-bag.js";
+export {GameState} from "./game-state.js";
+export {GameEventBus} from "./game-events.js";
+export {GameProgressionService} from "./game-progression-service.js";
+export {GameScoringService} from "./game-scoring-service.js";
+export {initializeGameDomainServices} from "./game-factory.js";
+export {createGameSnapshot, restoreGameSnapshot} from "./game-snapshot.js";
+export type {GameSnapshot, GameSnapshotCounters} from "./game-snapshot.js";
+export {createBoardSnapshot, restoreBoardSnapshot} from "./board-snapshot.js";
+export type {BoardSnapshot} from "./board-snapshot.js";
+export {createPieceSnapshot, restorePieceSnapshot} from "./piece-snapshot.js";
+export type {PieceSnapshot} from "./piece-snapshot.js";
+export {getPieceCells, getRotationMask, getRotatedTransform, getSpawnX} from "./piece-operations.js";
+export type {PieceCell, PieceTransform} from "./piece-operations.js";
+export {analyzeOccupancy, getColumnHeights} from "./board-analysis.js";
+export type {BoardMetrics} from "./board-analysis.js";
+
+export {GameEngine, SimulationState} from "../../../engine/simulation/index.js";
+export type {GameAction, SimulationPhase} from "../../../engine/simulation/index.js";

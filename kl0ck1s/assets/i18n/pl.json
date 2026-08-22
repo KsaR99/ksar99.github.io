@@ -160,10 +160,19 @@
             "benchmarkDone": "Zasymulowano {pieces} klocków w {ms} ms. Najwolniejsze: {label} ({percent}%).",
             "benchmarkCopyButton": "Kopiuj wyniki",
             "benchmarkCopied": "Skopiowano do schowka",
-            "benchmarkCopyFailed": "Nie udało się skopiować"
+            "benchmarkCopyFailed": "Nie udało się skopiować",
+            "showFirstGameTutorial": "Pokaż tutorial pierwszej gry",
+            "asciiFallingPieces": "Spadające klocki ASCII",
+            "blockTypeAscii": "ASCII",
+            "ghostTypeAscii": "ASCII"
         },
         "loading": {
-            "leaderboardHint": "Wczytywanie tabeli wyników..."
+            "leaderboardHint": "Wczytywanie tabeli wyników...",
+            "audio": {
+                "sfx": "Wczytywanie efektów dźwiękowych...",
+                "voices": "Wczytywanie głosów...",
+                "music": "Wczytywanie muzyki..."
+            }
         },
         "gameOverEntry": {
             "title": "KONIEC GRY",
@@ -185,12 +194,31 @@
             "droughtAvgLabel": "D.AVG",
             "burnLabel": "BRN",
             "transitionLabel": "TRNS",
-            "tetrisRateLabel": "Wskaźnik 4 linii (W4L)",
+            "tetrisRateLabel": "Wskaźnik 4 linii (TRT)",
             "clearsLabel": "Czyszczenia (1/2/3/4 linie)",
             "ppsLabel": "PPS",
             "spinsLabel": "Spiny (T / T-mini / inne)",
             "maxComboLabel": "Najdłuższe combo",
             "efficiencyLabel": "Efektywność (pkt/linię)"
+        },
+        "firstGameTutorial": {
+            "badge": "PIERWSZA GRA",
+            "title": "Szybkie sterowanie",
+            "move": "Ruch",
+            "rotate": "Obrót",
+            "softDrop": "Miękki zrzut",
+            "hardDrop": "Twardy zrzut",
+            "keyboardHint": "Sterowanie klawiaturą możesz zmienić w dowolnym momencie w Opcjach.",
+            "touchHint": "Użyj przycisków na ekranie, aby przesuwać, obracać i zrzucać klocek.",
+            "dismiss": "Zamknij",
+            "dontShowAgain": "Nie pokazuj ponownie",
+            "closeHint": "Naciśnij Enter lub Esc, aby zamknąć."
+        },
+        "modeChoice": {
+            "title": "Wybierz tryb gry",
+            "hint": "Wybierz sposób gry",
+            "single": "Tryb jednoosobowy",
+            "multiplayer": "Multiplayer"
         }
     },
     "leaderboard": {
@@ -351,7 +379,7 @@
             "lineClearApply": "Usuwanie pełnych linii",
             "scoring": "Punktacja",
             "renderRefreshRect": "Render: odświeżenie prostokąta canvasu",
-            "renderBackgroundRebuild": "Render: przebudowa tła planszy",
+            "renderWebGL": "Renderowanie: plansza WebGL",
             "renderBlit": "Render: kopiowanie tła na canvas",
             "renderDrawPiece": "Render: spadający klocek",
             "renderDrawGhost": "Render: cień klocka",
@@ -439,6 +467,30 @@
         "hostFallback": "Host",
         "waitingForHost": "Czekam na odpowiedź gracza {name}…",
         "hostDeclined": "Host odrzucił Twoją prośbę o dołączenie.",
-        "hostNoResponse": "Host nie odpowiedział na czas. Spróbuj innego pokoju."
+        "hostNoResponse": "Host nie odpowiedział na czas. Spróbuj innego pokoju.",
+        "blockTypeLabel": "Typ klocka",
+        "ghostTypeLabel": "Typ duszka"
+    },
+    "statsInfo": {
+        "best": "Twój najwyższy zapisany wynik dla bieżącego profilu i zakresu rankingu.",
+        "burn": "Burn: klocki/linie zużyte bez posuwania głównego celu czyszczenia linii.",
+        "clears": "Podział na czyszczenie jednej, dwóch, trzech i czterech linii.",
+        "difficulty": "Bieżący poziom trudności i postęp do następnego poziomu.",
+        "drought": "Bieżąca susza: liczba kolejnych klocków od ostatniego wyczyszczenia linii.",
+        "droughtAvg": "Średnia długość zakończonych serii suszy.",
+        "droughtTotal": "Łączna liczba klocków wykorzystanych w zakończonych seriach suszy.",
+        "efficiency": "Średni wynik zdobyty za każdą wyczyszczoną linię.",
+        "gameTime": "Łączny czas gry zarejestrowany w tej rozgrywce.",
+        "infoLabel": "Wyjaśnij tę statystykę",
+        "lines": "Łączna liczba wyczyszczonych linii w bieżącej grze.",
+        "maxCombo": "Najdłuższy osiągnięty łańcuch combo w tej rozgrywce.",
+        "objective": "Cel bieżącego trybu i jego postęp. Pasek pokazuje, jak blisko jesteś ukończenia celu.",
+        "pps": "Klocki na sekundę: średnie tempo układania w tej rozgrywce.",
+        "result": "Wynik zarejestrowany dla tej rozgrywki.",
+        "score": "Bieżące punkty z czyszczenia linii, spinów, zrzutów, combo i innych akcji punktowanych.",
+        "spins": "Podział na T-spiny, mini T-spiny i inne wykryte spiny.",
+        "tetrisRate": "TRT: procent wyczyszczonych linii, które były czteroliniowymi czyszczeniami (Tetrisami).",
+        "time": "Czas trwania rozgrywki. Pauzy i ekrany poza grą nie są wliczane.",
+        "transition": "Punkty przejścia zdobyte dzięki mechanikom przejścia danego trybu."
     }
 }

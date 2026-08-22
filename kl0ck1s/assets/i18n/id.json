@@ -13,7 +13,7 @@
         "lines": "Baris",
         "best": "Terbaik",
         "drought": "Kekeringan",
-        "tetrisRate": "4LR",
+        "tetrisRate": "TRT",
         "pps": "PPS",
         "objective": "Tujuan",
         "statusLive": "Permainan saat ini",
@@ -155,10 +155,19 @@
             "benchmarkDone": "Simulated {pieces} pieces in {ms} ms. Slowest: {label} ({percent}%).",
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
-            "benchmarkCopyFailed": "Copy failed"
+            "benchmarkCopyFailed": "Copy failed",
+            "showFirstGameTutorial": "Tampilkan tutorial permainan pertama",
+            "asciiFallingPieces": "Keping jatuh ASCII",
+            "blockTypeAscii": "ASCII",
+            "ghostTypeAscii": "ASCII"
         },
         "loading": {
-            "leaderboardHint": "Memuat papan peringkat..."
+            "leaderboardHint": "Memuat papan peringkat...",
+            "audio": {
+                "sfx": "Memuat efek suara...",
+                "voices": "Memuat suara...",
+                "music": "Memuat musik..."
+            }
         },
         "gameOverEntry": {
             "title": "PERMAINAN BERAKHIR",
@@ -179,12 +188,31 @@
             "droughtAvgLabel": "D.AVG",
             "burnLabel": "BRN",
             "transitionLabel": "TRNS",
-            "tetrisRateLabel": "Tingkat 4 baris (4LR)",
+            "tetrisRateLabel": "Tingkat 4 baris (TRT)",
             "clearsLabel": "Pembersihan (1/2/3/4 baris)",
             "ppsLabel": "PPS",
             "spinsLabel": "Spin (T / T-mini / lainnya)",
             "maxComboLabel": "Kombo terpanjang",
             "efficiencyLabel": "Efisiensi (poin/baris)"
+        },
+        "firstGameTutorial": {
+            "badge": "PERMAINAN PERTAMA",
+            "title": "Kontrol cepat",
+            "move": "Gerak",
+            "rotate": "Putar",
+            "softDrop": "Jatuhkan perlahan",
+            "hardDrop": "Jatuhkan langsung",
+            "keyboardHint": "Kontrol keyboard dapat diubah kapan saja di Opsi.",
+            "touchHint": "Gunakan kontrol di layar untuk menggerakkan, memutar, dan menjatuhkan keping.",
+            "dismiss": "Tutup",
+            "dontShowAgain": "Jangan tampilkan lagi",
+            "closeHint": "Tekan Enter atau Esc untuk menutup."
+        },
+        "modeChoice": {
+            "title": "Pilih mode permainan",
+            "hint": "Pilih cara bermain",
+            "single": "Pemain tunggal",
+            "multiplayer": "Multipemain"
         }
     },
     "leaderboard": {
@@ -357,7 +385,7 @@
             "lineClearApply": "Clearing full lines",
             "scoring": "Scoring",
             "renderRefreshRect": "Render: canvas rect refresh",
-            "renderBackgroundRebuild": "Render: board background rebuild",
+            "renderWebGL": "Render: papan WebGL",
             "renderBlit": "Render: board blit",
             "renderDrawPiece": "Render: falling piece",
             "renderDrawGhost": "Render: ghost piece",
@@ -413,6 +441,30 @@
         "hostFallback": "Host",
         "waitingForHost": "Waiting for {name} to respond…",
         "hostDeclined": "The host declined your request to join.",
-        "hostNoResponse": "The host didn't respond in time. Try another room."
+        "hostNoResponse": "The host didn't respond in time. Try another room.",
+        "blockTypeLabel": "Tipe blok",
+        "ghostTypeLabel": "Tipe hantu"
+    },
+    "statsInfo": {
+        "best": "Skor tertinggi yang tercatat untuk profil dan cakupan papan peringkat saat ini.",
+        "burn": "Burn: keping/baris yang digunakan tanpa memajukan tujuan utama pembersihan baris.",
+        "clears": "Rincian pembersihan satu, dua, tiga, dan empat baris.",
+        "difficulty": "Tingkat kesulitan saat ini dan progres menuju tingkat berikutnya.",
+        "drought": "Kekeringan saat ini: jumlah keping berturut-turut sejak pembersihan baris terakhir.",
+        "droughtAvg": "Rata-rata panjang rangkaian kekeringan yang selesai.",
+        "droughtTotal": "Jumlah total keping dalam rangkaian kekeringan yang selesai.",
+        "efficiency": "Rata-rata skor yang diperoleh untuk setiap baris yang dibersihkan.",
+        "gameTime": "Total waktu bermain yang tercatat untuk permainan ini.",
+        "infoLabel": "Jelaskan statistik ini",
+        "lines": "Total baris yang dibersihkan selama permainan saat ini.",
+        "maxCombo": "Rangkaian combo terbesar yang dicapai selama permainan.",
+        "objective": "Tujuan mode saat ini dan progresnya. Bilah menunjukkan seberapa dekat kamu menyelesaikannya.",
+        "pps": "Keping per detik: rata-rata kecepatan penempatan selama permainan.",
+        "result": "Hasil yang tercatat untuk permainan ini.",
+        "score": "Poin saat ini dari pembersihan baris, spin, drop, combo, dan aksi penilaian lainnya.",
+        "spins": "Rincian T-spin, mini T-spin, dan spin lain yang terdeteksi.",
+        "tetrisRate": "TRT: persentase baris yang dibersihkan dengan clear empat baris (Tetris).",
+        "time": "Waktu bermain yang telah berlalu. Jeda dan layar di luar permainan tidak dihitung.",
+        "transition": "Skor transisi yang diperoleh dari mekanik transisi mode permainan."
     }
 }

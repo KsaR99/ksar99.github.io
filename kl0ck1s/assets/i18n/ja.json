@@ -13,7 +13,7 @@
         "lines": "ライン",
         "best": "ベスト",
         "drought": "ドロート",
-        "tetrisRate": "4LR",
+        "tetrisRate": "TRT",
         "pps": "PPS",
         "objective": "目標",
         "statusLive": "現在のゲーム",
@@ -155,10 +155,19 @@
             "benchmarkDone": "Simulated {pieces} pieces in {ms} ms. Slowest: {label} ({percent}%).",
             "benchmarkCopyButton": "Copy results",
             "benchmarkCopied": "Copied to clipboard",
-            "benchmarkCopyFailed": "Copy failed"
+            "benchmarkCopyFailed": "Copy failed",
+            "showFirstGameTutorial": "初回プレイのチュートリアルを表示",
+            "asciiFallingPieces": "ASCII落下ブロック",
+            "blockTypeAscii": "ASCII",
+            "ghostTypeAscii": "ASCII"
         },
         "loading": {
-            "leaderboardHint": "ランキングを読み込み中..."
+            "leaderboardHint": "ランキングを読み込み中...",
+            "audio": {
+                "sfx": "効果音を読み込み中...",
+                "voices": "ボイスを読み込み中...",
+                "music": "音楽を読み込み中..."
+            }
         },
         "gameOverEntry": {
             "title": "ゲームオーバー",
@@ -179,12 +188,31 @@
             "droughtAvgLabel": "D.AVG",
             "burnLabel": "BRN",
             "transitionLabel": "TRNS",
-            "tetrisRateLabel": "4ライン率（4LR）",
+            "tetrisRateLabel": "4ライン率（TRT）",
             "clearsLabel": "消去数（1/2/3/4ライン）",
             "ppsLabel": "PPS",
             "spinsLabel": "スピン（T / T-mini / その他）",
             "maxComboLabel": "最長コンボ",
             "efficiencyLabel": "効率（点/ライン）"
+        },
+        "firstGameTutorial": {
+            "badge": "初回プレイ",
+            "title": "クイック操作",
+            "move": "移動",
+            "rotate": "回転",
+            "softDrop": "ソフトドロップ",
+            "hardDrop": "ハードドロップ",
+            "keyboardHint": "キーボード操作はいつでも「オプション」で変更できます。",
+            "touchHint": "画面上の操作を使って、ピースを移動・回転・落下させます。",
+            "dismiss": "閉じる",
+            "dontShowAgain": "今後表示しない",
+            "closeHint": "Enter または Esc で閉じます。"
+        },
+        "modeChoice": {
+            "title": "ゲームモードを選択",
+            "hint": "プレイ方法を選択してください",
+            "single": "シングルプレイヤー",
+            "multiplayer": "マルチプレイヤー"
         }
     },
     "leaderboard": {
@@ -357,7 +385,7 @@
             "lineClearApply": "Clearing full lines",
             "scoring": "Scoring",
             "renderRefreshRect": "Render: canvas rect refresh",
-            "renderBackgroundRebuild": "Render: board background rebuild",
+            "renderWebGL": "レンダリング: WebGL盤面",
             "renderBlit": "Render: board blit",
             "renderDrawPiece": "Render: falling piece",
             "renderDrawGhost": "Render: ghost piece",
@@ -413,6 +441,30 @@
         "hostFallback": "Host",
         "waitingForHost": "Waiting for {name} to respond…",
         "hostDeclined": "The host declined your request to join.",
-        "hostNoResponse": "The host didn't respond in time. Try another room."
+        "hostNoResponse": "The host didn't respond in time. Try another room.",
+        "blockTypeLabel": "ブロックタイプ",
+        "ghostTypeLabel": "ゴーストタイプ"
+    },
+    "statsInfo": {
+        "best": "現在のプロフィールとランキング範囲で記録された最高スコアです。",
+        "burn": "Burn：メインのライン消去目標を進めずに消費したピース／ラインです。",
+        "clears": "1列、2列、3列、4列消去の内訳です。",
+        "difficulty": "現在の難易度と、次の難易度までの進行状況です。",
+        "drought": "現在のドライ期間：最後にラインを消してから連続して置いたピース数です。",
+        "droughtAvg": "完了したドライ期間の平均長です。",
+        "droughtTotal": "完了したドライ期間で使ったピースの合計数です。",
+        "efficiency": "消した1ラインあたりの平均スコアです。",
+        "gameTime": "このプレイで記録された総プレイ時間です。",
+        "infoLabel": "この統計を説明",
+        "lines": "現在のゲームで消したラインの合計です。",
+        "maxCombo": "このプレイで達成した最大コンボ数です。",
+        "objective": "現在のモードの目標と進行状況です。バーは達成までの距離を示します。",
+        "pps": "Pieces per second：このプレイでの平均配置速度です。",
+        "result": "このプレイで記録された結果です。",
+        "score": "ライン消去、スピン、ドロップ、コンボなどで獲得した現在の得点です。",
+        "spins": "Tスピン、Tスピンミニ、その他検出されたスピンの内訳です。",
+        "tetrisRate": "TRT：消去したラインのうち、4ライン同時消去（テトリス）の割合です。",
+        "time": "経過したプレイ時間です。ポーズ中やゲーム外の画面は含みません。",
+        "transition": "モードのトランジション処理で獲得したスコアです。"
     }
 }

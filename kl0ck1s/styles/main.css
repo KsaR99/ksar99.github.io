@@ -349,9 +349,6 @@ body {
     }
 }
 
-body.cursor-hidden {
-    cursor: none;
-}
 
 body.hud-right .sidebar--stats {
     inset: 0 -105% 0 auto;

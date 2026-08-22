@@ -1,7 +1,9 @@
 <div class="mp-overlay" data-role="mp-overlay" hidden>
-    <div aria-modal="true" class="mp-dialog" data-role="mp-dialog" role="dialog">
-        <button aria-label="Close" class="mp-dialog__close" data-role="mp-close-button" type="button">❌</button>
-        <h2 class="screen__title mp-dialog__title" data-i18n="multiplayer.title">Multiplayer</h2>
+    <section aria-labelledby="mp-title" class="screen screen--menu mp-dialog mp-screen" data-role="mp-dialog">
+        <button aria-label="Return to game mode selection" class="mp-screen__return" data-role="mp-return-button"
+                type="button">↩
+        </button>
+        <h2 class="screen__title mp-dialog__title" data-i18n="multiplayer.title" id="mp-title">Multiplayer</h2>
         <div class="mp-steps" data-role="mp-steps">
             <span aria-label="Connection type" class="mp-step" data-i18n-title="multiplayer.step1Label"
                   data-role="mp-step"
@@ -156,7 +158,8 @@
             </div>
         </section>
 
-        <section aria-labelledby="mp-result-title" class="mp-panel mp-result-panel" data-role="mp-panel-result"
+        <section aria-labelledby="mp-result-title" class="screen screen--menu mp-result-screen"
+                 data-role="mp-panel-result"
                  hidden>
             <h2 class="screen__title mp-result-panel__title" data-role="mp-result-title" id="mp-result-title">YOU
                 WIN</h2>
@@ -180,63 +183,101 @@
                             data-role="mp-result-remote-name-mini">Opponent</strong>
                 </div>
                 <div class="mp-result-stat"><span class="mp-result-stat__label"
-                                                  data-i18n="sidebar.lines">Lines</span><strong
-                    class="mp-result-stat__value" data-result-side="local"
-                    data-role="mp-result-local-lines">0</strong><strong class="mp-result-stat__value"
-                                                                        data-result-side="remote"
-                                                                        data-role="mp-result-remote-lines">0</strong>
+                                                  data-i18n="sidebar.lines">Lines</span>
+                    <button aria-label="Info" class="stat-info" data-i18n-title="statsInfo.lines" data-stat-info
+                            type="button">i
+                    </button>
+                    <strong
+                        class="mp-result-stat__value" data-result-side="local"
+                        data-role="mp-result-local-lines">0</strong><strong class="mp-result-stat__value"
+                                                                            data-result-side="remote"
+                                                                            data-role="mp-result-remote-lines">0</strong>
                 </div>
                 <div class="mp-result-stat"><span class="mp-result-stat__label"
-                                                  data-i18n="screens.gameOverEntry.tetrisRateLabel">Tetris rate</span><strong
-                    class="mp-result-stat__value" data-result-side="local" data-role="mp-result-local-trt">0.0%</strong><strong
-                    class="mp-result-stat__value" data-result-side="remote"
-                    data-role="mp-result-remote-trt">0.0%</strong></div>
+                                                  data-i18n="screens.gameOverEntry.tetrisRateLabel">Tetris rate</span>
+                    <button aria-label="Info" class="stat-info" data-i18n-title="statsInfo.tetrisRate" data-stat-info
+                            type="button">i
+                    </button>
+                    <strong
+                        class="mp-result-stat__value" data-result-side="local"
+                        data-role="mp-result-local-trt">0.0%</strong><strong
+                        class="mp-result-stat__value" data-result-side="remote"
+                        data-role="mp-result-remote-trt">0.0%</strong></div>
                 <div class="mp-result-stat"><span class="mp-result-stat__label"
-                                                  data-i18n="screens.gameOverEntry.ppsLabel">PPS</span><strong
-                    class="mp-result-stat__value" data-result-side="local" data-role="mp-result-local-pps">0.00</strong><strong
-                    class="mp-result-stat__value" data-result-side="remote"
-                    data-role="mp-result-remote-pps">0.00</strong></div>
+                                                  data-i18n="screens.gameOverEntry.ppsLabel">PPS</span>
+                    <button aria-label="Info" class="stat-info" data-i18n-title="statsInfo.pps" data-stat-info
+                            type="button">i
+                    </button>
+                    <strong
+                        class="mp-result-stat__value" data-result-side="local"
+                        data-role="mp-result-local-pps">0.00</strong><strong
+                        class="mp-result-stat__value" data-result-side="remote"
+                        data-role="mp-result-remote-pps">0.00</strong></div>
                 <div class="mp-result-stat"><span class="mp-result-stat__label"
-                                                  data-i18n="screens.gameOverEntry.efficiencyLabel">Efficiency</span><strong
-                    class="mp-result-stat__value" data-result-side="local"
-                    data-role="mp-result-local-efficiency">0</strong><strong class="mp-result-stat__value"
-                                                                             data-result-side="remote"
-                                                                             data-role="mp-result-remote-efficiency">0</strong>
+                                                  data-i18n="screens.gameOverEntry.efficiencyLabel">Efficiency</span>
+                    <button aria-label="Info" class="stat-info" data-i18n-title="statsInfo.efficiency" data-stat-info
+                            type="button">i
+                    </button>
+                    <strong
+                        class="mp-result-stat__value" data-result-side="local"
+                        data-role="mp-result-local-efficiency">0</strong><strong class="mp-result-stat__value"
+                                                                                 data-result-side="remote"
+                                                                                 data-role="mp-result-remote-efficiency">0</strong>
                 </div>
                 <div class="mp-result-stat"><span class="mp-result-stat__label"
-                                                  data-i18n="screens.gameOverEntry.maxComboLabel">Longest combo</span><strong
-                    class="mp-result-stat__value" data-result-side="local"
-                    data-role="mp-result-local-combo">0</strong><strong class="mp-result-stat__value"
-                                                                        data-result-side="remote"
-                                                                        data-role="mp-result-remote-combo">0</strong>
+                                                  data-i18n="screens.gameOverEntry.maxComboLabel">Longest combo</span>
+                    <button aria-label="Info" class="stat-info" data-i18n-title="statsInfo.maxCombo" data-stat-info
+                            type="button">i
+                    </button>
+                    <strong
+                        class="mp-result-stat__value" data-result-side="local"
+                        data-role="mp-result-local-combo">0</strong><strong class="mp-result-stat__value"
+                                                                            data-result-side="remote"
+                                                                            data-role="mp-result-remote-combo">0</strong>
                 </div>
                 <div class="mp-result-stat"><span class="mp-result-stat__label"
-                                                  data-i18n="screens.gameOverEntry.burnLabel">BRN</span><strong
-                    class="mp-result-stat__value" data-result-side="local"
-                    data-role="mp-result-local-burn">0</strong><strong class="mp-result-stat__value"
-                                                                       data-result-side="remote"
-                                                                       data-role="mp-result-remote-burn">0</strong>
+                                                  data-i18n="screens.gameOverEntry.burnLabel">BRN</span>
+                    <button aria-label="Info" class="stat-info" data-i18n-title="statsInfo.burn" data-stat-info
+                            type="button">i
+                    </button>
+                    <strong
+                        class="mp-result-stat__value" data-result-side="local"
+                        data-role="mp-result-local-burn">0</strong><strong class="mp-result-stat__value"
+                                                                           data-result-side="remote"
+                                                                           data-role="mp-result-remote-burn">0</strong>
                 </div>
                 <div class="mp-result-stat"><span class="mp-result-stat__label"
-                                                  data-i18n="screens.gameOverEntry.droughtLabel">D.MAX</span><strong
-                    class="mp-result-stat__value" data-result-side="local"
-                    data-role="mp-result-local-drought-max">0</strong><strong class="mp-result-stat__value"
-                                                                              data-result-side="remote"
-                                                                              data-role="mp-result-remote-drought-max">0</strong>
+                                                  data-i18n="screens.gameOverEntry.droughtLabel">D.MAX</span>
+                    <button aria-label="Info" class="stat-info" data-i18n-title="statsInfo.drought" data-stat-info
+                            type="button">i
+                    </button>
+                    <strong
+                        class="mp-result-stat__value" data-result-side="local"
+                        data-role="mp-result-local-drought-max">0</strong><strong class="mp-result-stat__value"
+                                                                                  data-result-side="remote"
+                                                                                  data-role="mp-result-remote-drought-max">0</strong>
                 </div>
                 <div class="mp-result-stat"><span class="mp-result-stat__label"
-                                                  data-i18n="screens.gameOverEntry.droughtTotalLabel">D.TOTAL</span><strong
-                    class="mp-result-stat__value" data-result-side="local"
-                    data-role="mp-result-local-drought-total">0</strong><strong class="mp-result-stat__value"
-                                                                                data-result-side="remote"
-                                                                                data-role="mp-result-remote-drought-total">0</strong>
+                                                  data-i18n="screens.gameOverEntry.droughtTotalLabel">D.TOTAL</span>
+                    <button aria-label="Info" class="stat-info" data-i18n-title="statsInfo.droughtTotal" data-stat-info
+                            type="button">i
+                    </button>
+                    <strong
+                        class="mp-result-stat__value" data-result-side="local"
+                        data-role="mp-result-local-drought-total">0</strong><strong class="mp-result-stat__value"
+                                                                                    data-result-side="remote"
+                                                                                    data-role="mp-result-remote-drought-total">0</strong>
                 </div>
                 <div class="mp-result-stat"><span class="mp-result-stat__label"
-                                                  data-i18n="screens.gameOverEntry.droughtAvgLabel">D.AVG</span><strong
-                    class="mp-result-stat__value" data-result-side="local"
-                    data-role="mp-result-local-drought-avg">0.0</strong><strong class="mp-result-stat__value"
-                                                                                data-result-side="remote"
-                                                                                data-role="mp-result-remote-drought-avg">0.0</strong>
+                                                  data-i18n="screens.gameOverEntry.droughtAvgLabel">D.AVG</span>
+                    <button aria-label="Info" class="stat-info" data-i18n-title="statsInfo.droughtAvg" data-stat-info
+                            type="button">i
+                    </button>
+                    <strong
+                        class="mp-result-stat__value" data-result-side="local"
+                        data-role="mp-result-local-drought-avg">0.0</strong><strong class="mp-result-stat__value"
+                                                                                    data-result-side="remote"
+                                                                                    data-role="mp-result-remote-drought-avg">0.0</strong>
                 </div>
             </div>
             <div class="screen__button-row">
@@ -247,5 +288,5 @@
         </section>
 
         <p class="mp-error" data-field="mp-error-text" hidden></p>
-    </div>
+    </section>
 </div>
