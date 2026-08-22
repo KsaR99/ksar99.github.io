@@ -172,9 +172,25 @@ export class GameEngine<T extends string = string> {
 
     rotate(direction: -1 | 1 | 2): boolean {
         if (direction === 2) {
-            const first = this.rotate(1);
-            const second = first && this.rotate(1);
-            return Boolean(first && second);
+            const piece = this.state.current;
+            if (!piece) return false;
+
+            const snapshot = {
+                mask: piece.mask,
+                rotationState: piece.rotationState,
+                x: piece.x,
+                y: piece.y,
+                lastAction: this.state.lastAction,
+            };
+
+            if (this.rotate(1) && this.rotate(1)) return true;
+
+            piece.mask = snapshot.mask;
+            piece.rotationState = snapshot.rotationState;
+            piece.x = snapshot.x;
+            piece.y = snapshot.y;
+            this.state.lastAction = snapshot.lastAction;
+            return false;
         }
         const piece = this.state.current;
         if (!piece) return false;
@@ -264,8 +280,15 @@ export class GameEngine<T extends string = string> {
             this.state.isGrounded = true;
             return;
         }
+
         this.state.isGrounded = false;
-        this.state.groundedTime = 0;
+
+        const piece = this.state.current;
+        const temporarilyUngroundedByRotation =
+            this.groundedPiece === piece && this.state.lastAction === "rotate";
+        if (!temporarilyUngroundedByRotation) {
+            this.state.groundedTime = 0;
+        }
     }
 
     lock({clearLines = true}: { clearLines?: boolean } = {}): number[] {
@@ -399,18 +422,32 @@ export class GameEngine<T extends string = string> {
 
         this.state.rawGrounded = false;
         this.state.isGrounded = false;
-        this.groundedPiece = null;
-        this.state.lockDelayTimer = 0;
-        this.state.groundedTime = 0;
+
+        const temporarilyUngroundedByRotation =
+            this.groundedPiece === piece && this.state.lastAction === "rotate";
+
+        if (!temporarilyUngroundedByRotation) {
+            this.groundedPiece = null;
+            this.state.lockDelayTimer = 0;
+            this.state.groundedTime = 0;
+        }
+
         this.state.dropCounter += deltaMs;
-        if (this.state.dropInterval > 0 && this.state.dropCounter >= this.state.dropInterval) {
+        let dropped = false;
+
+        while (
+            this.state.dropInterval > 0 &&
+            this.state.dropCounter >= this.state.dropInterval
+            ) {
+            if (this.board.collides(piece, 0, 1)) break;
             this.state.dropCounter -= this.state.dropInterval;
             piece.y++;
             this.state.lastAction = "move";
+            dropped = true;
             this.events.emit({type: "pieceMoved", pieceType: String(piece.type), x: piece.x, y: piece.y});
-            return {locked: false, lockReady: false, cleared: 0, dropped: true};
         }
-        return {locked: false, lockReady: false, cleared: 0, dropped: false};
+
+        return {locked: false, lockReady: false, cleared: 0, dropped};
     }
 }
 
